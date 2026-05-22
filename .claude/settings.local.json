@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(ls ~/.claude/agents 2>/dev/null && echo \"exists\" || echo \"not found\")",
+      "Read(//c/Users/Authma/.claude/**)",
+      "Bash(mkdir -p ~/.claude/agents && echo \"created\")",
+      "Bash(ls /tmp/agency-agents/)",
+      "Read(//tmp/**)",
+      "Bash(rm -f ~/.claude/agents/PULL_REQUEST_TEMPLATE.md && echo \"cleaned\")",
+      "Bash(rm -f /tmp/agency-agents -rf && echo \"cleaned tmp\")",
+      "Bash(xargs -I{} basename {} .md)",
+      "WebFetch(domain:authmas.com.tw)",
+      "WebFetch(domain:www.facebook.com)",
+      "WebFetch(domain:www.notion.so)",
+      "WebSearch",
+      "WebFetch(domain:newhouse.591.com.tw)",
+      "WebFetch(domain:build.myhousing.com.tw)",
+      "WebFetch(domain:taichung.housetube.tw)",
+      "WebFetch(domain:community.houseprice.tw)",
+      "WebFetch(domain:www.jiac.com.tw)",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\受眾包\" -Recurse)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Authma\\.claude",
+      "C:\\Users\\Authma\\.claude\\agents",
+      "\\tmp"
+    ]
+  }
+}
