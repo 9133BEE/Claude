@@ -155,10 +155,16 @@
       "PowerShell(& py -3 --version 2>&1)",
       "Bash(Get-ChildItem \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\專案資料\\\\台中石岡-自然紅屋\\(工商\\)\" -Recurse)",
       "Bash(Start-Process powershell *)",
-      "PowerShell(Start-Process powershell)"
+      "PowerShell(Start-Process powershell)",
+      "PowerShell(Start-Process powershell -Verb RunAs)",
+      "PowerShell(Start-Process powershell -ArgumentList \"-ExecutionPolicy Bypass -File `\"C:\\\\Users\\\\Authma\\\\Desktop\\\\同步工具.ps1`\"\")",
+      "PowerShell(Start-Process powershell -ArgumentList \"-ExecutionPolicy Bypass -NoExit -File `\"C:\\\\Users\\\\Authma\\\\Desktop\\\\同步工具.ps1`\"\")",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\Authma\\\\Desktop\\\\�P�B�u��.ps1\" \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\�P�B�u��.ps1\" -Force)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\Authma\\\\Desktop\\\\�P�B�u��.bat\" \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\�P�B�u��.bat\" -Force)"
     ],
     "additionalDirectories": [
-      "\\tmp"
+      "\\tmp",
+      "C:\\Users\\Authma\\Desktop"
     ]
   }
 }
