@@ -180,7 +180,10 @@
       "Bash(grep -oP '\"c\":\"[^\"]{2,}\"')",
       "Bash(grep -oP '\"c\":\"[^\"]{1,}\"')",
       "Bash(curl -s -X POST https://www.notion.so/api/v3/loadCachedPageChunk -H 'Content-Type: application/json' -d '{\"page\":{\"id\":\"321b1307-b65f-8150-b40b-c1f9aac1e50b\"},\"limit\":100,\"cursor\":{\"stack\":[]},\"chunkNumber\":0,\"verticalColumns\":false}' -o /tmp/notion_children.json)",
-      "Bash(curl -s -X POST https://www.notion.so/api/v3/queryCollection -H 'Content-Type: application/json' -d '{ *)"
+      "Bash(curl -s -X POST https://www.notion.so/api/v3/queryCollection -H 'Content-Type: application/json' -d '{ *)",
+      "WebFetch(domain:reurl.cc)",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
     ],
     "additionalDirectories": [
       "\\tmp",
