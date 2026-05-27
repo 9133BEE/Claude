@@ -183,7 +183,13 @@
       "Bash(curl -s -X POST https://www.notion.so/api/v3/queryCollection -H 'Content-Type: application/json' -d '{ *)",
       "WebFetch(domain:reurl.cc)",
       "Skill(update-config)",
-      "Skill(update-config:*)"
+      "Skill(update-config:*)",
+      "PowerShell(python -c \"import openpyxl; print\\('ok'\\)\")",
+      "PowerShell(Get-Command python, python3, py -ErrorAction SilentlyContinue)",
+      "Bash(python \"C:\\\\Users\\\\Authma\\\\Downloads\\\\read_excel.py\")",
+      "Bash(python -c \"import openpyxl; print\\('openpyxl ok'\\)\")",
+      "PowerShell(python --version 2>&1)",
+      "PowerShell(python -c \"import openpyxl; print\\('openpyxl ok'\\)\" 2>&1)"
     ],
     "additionalDirectories": [
       "\\tmp",
