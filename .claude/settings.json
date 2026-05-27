@@ -194,7 +194,8 @@
       "WebFetch(domain:lihi2.me)",
       "PowerShell(\\(Get-Content \"C:\\\\Users\\\\Authma\\\\Downloads\\\\太原YES20250918-1217名單.txt\"\\) -replace 'p:\\\\+', '' | Set-Content \"C:\\\\Users\\\\Authma\\\\Downloads\\\\太原YES20250918-1217名單.txt\" -Encoding UTF8)",
       "PowerShell(\\(Get-Content \"C:\\\\Users\\\\Authma\\\\Downloads\\\\太原YES20250918-1217名單.txt\"\\) -replace 'p:', '' | Set-Content \"C:\\\\Users\\\\Authma\\\\Downloads\\\\太原YES20250918-1217名單.txt\" -Encoding UTF8)",
-      "PowerShell(Get-Content \"C:\\\\Users\\\\Authma\\\\Downloads\\\\C_--10-1_-_-_2023_4_27_-2026_5_27_.csv\" -Encoding UTF8 | Select-Object -Skip 1 | ConvertFrom-Csv -Header @\\(\"開始\",\"結束\",\"受眾組\",\"留言\",\"訊息\",\"潛客\",\"CPL\",\"指標\",\"花費\",\"點擊\",\"CTR\",\"頻率\",\"廣告開始\",\"廣告結束\"\\) | Select-Object 受眾組,留言,訊息,潛客,CPL,花費,廣告開始,廣告結束 | Format-Table -AutoSize | Out-String -Width 300)"
+      "PowerShell(Get-Content \"C:\\\\Users\\\\Authma\\\\Downloads\\\\C_--10-1_-_-_2023_4_27_-2026_5_27_.csv\" -Encoding UTF8 | Select-Object -Skip 1 | ConvertFrom-Csv -Header @\\(\"開始\",\"結束\",\"受眾組\",\"留言\",\"訊息\",\"潛客\",\"CPL\",\"指標\",\"花費\",\"點擊\",\"CTR\",\"頻率\",\"廣告開始\",\"廣告結束\"\\) | Select-Object 受眾組,留言,訊息,潛客,CPL,花費,廣告開始,廣告結束 | Format-Table -AutoSize | Out-String -Width 300)",
+      "PowerShell(Get-Content \"C:\\\\Users\\\\Authma\\\\Downloads\\\\C_--10_-_-_2023_4_27_-2026_5_27_.csv\" -Encoding UTF8 | ForEach-Object { $_ })"
     ],
     "additionalDirectories": [
       "\\tmp",
