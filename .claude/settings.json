@@ -202,7 +202,8 @@
       "Bash(cat .gitmodules)",
       "Bash(git submodule *)",
       "PowerShell($lines = Get-Content \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\C_--8_-_-_-_-_2023_4_28_-2026_5_28_.csv\" -Encoding UTF8; $lines | Select-Object -First 2; Write-Host \"Total: $\\($lines.Count\\)\")",
-      "PowerShell(cd \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\受眾資料庫網頁\"; git add hub.html \"富宇玥和_受眾分析.html\"; git commit -m \"update: 富宇玥和數據更新 179潛客/均CPL NT\\\\$373/39組\"; git push)"
+      "PowerShell(cd \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\受眾資料庫網頁\"; git add hub.html \"富宇玥和_受眾分析.html\"; git commit -m \"update: 富宇玥和數據更新 179潛客/均CPL NT\\\\$373/39組\"; git push)",
+      "Read(//c/Users/Authma/Downloads/**)"
     ],
     "additionalDirectories": [
       "\\tmp",
