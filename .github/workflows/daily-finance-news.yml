@@ -1,0 +1,91 @@
+name: 每日台股財經簡報
+
+on:
+  schedule:
+    - cron: '0 1 * * 1-5'  # 台灣時間週一至週五 早上 9:00
+  workflow_dispatch:        # 允許手動觸發測試
+
+jobs:
+  send-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 抓取財經新聞並推播 Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          pip install requests feedparser --quiet
+
+          python3 << 'EOF'
+          import requests
+          import feedparser
+          from datetime import datetime, timezone, timedelta
+
+          # 台灣時間
+          tz = timezone(timedelta(hours=8))
+          now = datetime.now(tz)
+          date_str = now.strftime("%Y/%m/%d")
+          weekday = ["週一","週二","週三","週四","週五","週六","週日"][now.weekday()]
+
+          def fetch_rss(url, limit=3):
+              try:
+                  feed = feedparser.parse(url)
+                  items = []
+                  for entry in feed.entries[:limit]:
+                      title = entry.get('title', '').strip()
+                      if title:
+                          items.append(f"• {title}")
+                  return items
+              except:
+                  return []
+
+          # 抓取各財經 RSS 來源
+          cnyes_tw = fetch_rss("https://feeds.feedburner.com/cnyes-tw-stock", 4)
+          cnyes_us = fetch_rss("https://feeds.feedburner.com/cnyes-us-stock", 3)
+          cnyes_macro = fetch_rss("https://feeds.feedburner.com/cnyes-macro", 3)
+
+          # 備援來源
+          if not cnyes_tw:
+              cnyes_tw = fetch_rss("https://www.cnyes.com/rss/cat/tw_stock.xml", 4)
+          if not cnyes_us:
+              cnyes_us = fetch_rss("https://www.cnyes.com/rss/cat/us_stock.xml", 3)
+
+          # 組合訊息
+          tw_section = "\n".join(cnyes_tw) if cnyes_tw else "• 請至鉅亨網查看今日台股動態"
+          us_section = "\n".join(cnyes_us) if cnyes_us else "• 請至鉅亨網查看今日美股動態"
+          macro_section = "\n".join(cnyes_macro) if cnyes_macro else "• 請至鉅亨網查看總體經濟資訊"
+
+          message = f"""📈 每日財經簡報 {date_str}（{weekday}）
+
+🇹🇼 台股重點新聞
+{tw_section}
+
+🌏 美股 / 國際市場
+{us_section}
+
+📊 總體經濟
+{macro_section}
+
+⚡ 今日提醒
+• 台股交易時間：09:00–13:30
+• 留意三大法人買賣超動向
+• 重大消息請至公開資訊觀測站確認
+
+📚 資料來源：鉅亨網 RSS
+🔗 更多資訊：cnyes.com"""
+
+          import os
+          token = os.environ['TELEGRAM_TOKEN']
+          chat_id = os.environ['TELEGRAM_CHAT_ID']
+
+          resp = requests.post(
+              f"https://api.telegram.org/bot{token}/sendMessage",
+              data={"chat_id": chat_id, "text": message}
+          )
+
+          if resp.json().get('ok'):
+              print("✅ 財經簡報推播成功！")
+          else:
+              print(f"❌ 推播失敗：{resp.text}")
+              exit(1)
+          EOF
