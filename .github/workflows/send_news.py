@@ -22,34 +22,47 @@ today_date = now.strftime("%Y%m%d")
 
 TOKEN    = os.environ["TELEGRAM_TOKEN"]
 CHAT_ID  = os.environ["TELEGRAM_CHAT_ID"]
-GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+GROQ_KEY = os.environ["GROQ_API_KEY"]
 HEADERS  = {'User-Agent': 'Mozilla/5.0 (compatible; finbot/1.0)'}
 
-GEMINI_SYSTEM = (
+LLM_SYSTEM = (
     "你是台灣頂尖的金融市場分析師，專精於台股、美股、總體經濟分析。"
     "你的分析風格：每個論點必須引用具體數字（指數點位、漲跌幅、成交量、金額）；"
-    "說明「為什麼」而不只是「是什麼」；每個分析段落至少 4 句話，150 字以上；"
+    "說明「為什麼」而不只是「是什麼」；每個分析段落至少 4 句話；"
     "整篇分析要有連貫的市場邏輯，而不是各點獨立的片段。"
 )
 
-def call_gemini(prompt, retries=4):
-    url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
-           f"gemini-2.0-flash:generateContent?key={GEMINI_KEY}")
-    payload = {
-        "system_instruction": {"parts": [{"text": GEMINI_SYSTEM}]},
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {"maxOutputTokens": 2048, "temperature": 0.7}
-    }
+def call_llm(prompt, retries=3):
     for attempt in range(retries):
-        r = requests.post(url, json=payload, timeout=60)
-        if r.status_code == 429:
-            wait = 65 * (attempt + 1)
-            print(f"Rate limit (429)，等待 {wait} 秒後重試（第 {attempt+1} 次）...")
-            time.sleep(wait)
-            continue
-        r.raise_for_status()
-        return r.json()['candidates'][0]['content']['parts'][0]['text']
-    raise Exception("Gemini API 重試次數已達上限")
+        try:
+            r = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {GROQ_KEY}",
+                         "Content-Type": "application/json"},
+                json={
+                    "model": "llama-3.3-70b-versatile",
+                    "messages": [
+                        {"role": "system", "content": LLM_SYSTEM},
+                        {"role": "user",   "content": prompt}
+                    ],
+                    "max_tokens": 2000,
+                    "temperature": 0.7
+                },
+                timeout=60
+            )
+            if r.status_code == 429:
+                wait = 30 * (attempt + 1)
+                print(f"Rate limit，等待 {wait} 秒後重試...")
+                time.sleep(wait)
+                continue
+            r.raise_for_status()
+            return r.json()['choices'][0]['message']['content']
+        except Exception as e:
+            if attempt == retries - 1:
+                raise
+            print(f"呼叫失敗（{e}），重試中...")
+            time.sleep(10)
+    raise Exception("LLM API 重試次數已達上限")
 
 def send_telegram(text):
     r = requests.post(
@@ -256,7 +269,7 @@ def generate_msg1(data_ctx):
 • [具體事件]"""
 
     print("呼叫 Gemini API 生成 MSG1...")
-    return call_gemini(prompt)
+    return call_llm(prompt)
 
 # ── 生成 MSG2（重點新聞連結）────────────────────────────────────────────────
 def generate_msg2(data_ctx):
@@ -308,7 +321,7 @@ def generate_msg2(data_ctx):
 - 總長度控制在 1200 字元以內"""
 
     print("呼叫 Gemini API 生成 MSG2...")
-    return call_gemini(prompt)
+    return call_llm(prompt)
 
 # ── 主流程 ────────────────────────────────────────────────────────────────────
 data_context = build_data_context()
