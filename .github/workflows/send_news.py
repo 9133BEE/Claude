@@ -6,7 +6,7 @@
 推播：Telegram
 """
 
-import os, re, html
+import os, re, html, time
 from datetime import datetime, timezone, timedelta
 import requests, feedparser
 import google.generativeai as genai
@@ -28,7 +28,7 @@ HEADERS  = {'User-Agent': 'Mozilla/5.0 (compatible; finbot/1.0)'}
 
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash",
+    model_name="gemini-1.5-flash",
     system_instruction=(
         "你是台灣頂尖的金融市場分析師，專精於台股、美股、總體經濟分析。"
         "你的分析風格：每個論點必須引用具體數字（指數點位、漲跌幅、成交量、金額）；"
@@ -328,6 +328,8 @@ def generate_msg2(data_ctx):
 data_context = build_data_context()
 
 msg1 = generate_msg1(data_context)
+print("等待 15 秒避免 API 頻率限制...")
+time.sleep(15)
 msg2 = generate_msg2(data_context)
 
 print("── 第一則：市場分析 ──")
