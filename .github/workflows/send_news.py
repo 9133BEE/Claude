@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-每日財經簡報 — Claude AI 撰寫版
+每日財經簡報 — Gemini AI 撰寫版（免費）
 資料收集：Yahoo Finance + TWSE + RSS
-分析撰寫：Claude claude-sonnet-4-6（Financial Analyst）
+分析撰寫：Google Gemini 1.5 Flash
 推播：Telegram
 """
 
-import os, re, html, json
+import os, re, html
 from datetime import datetime, timezone, timedelta
 import requests, feedparser
-import anthropic
+import google.generativeai as genai
 
 # ── 時區 ──────────────────────────────────────────────────────────────────────
 tz         = timezone(timedelta(hours=8))
@@ -21,12 +21,16 @@ is_morning = hour < 14
 session    = "早盤簡報" if is_morning else "收盤復盤"
 today_date = now.strftime("%Y%m%d")
 
-TOKEN     = os.environ["TELEGRAM_TOKEN"]
-CHAT_ID   = os.environ["TELEGRAM_CHAT_ID"]
-API_KEY   = os.environ["ANTHROPIC_API_KEY"]
-HEADERS   = {'User-Agent': 'Mozilla/5.0 (compatible; finbot/1.0)'}
+TOKEN    = os.environ["TELEGRAM_TOKEN"]
+CHAT_ID  = os.environ["TELEGRAM_CHAT_ID"]
+GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+HEADERS  = {'User-Agent': 'Mozilla/5.0 (compatible; finbot/1.0)'}
 
-client = anthropic.Anthropic(api_key=API_KEY)
+genai.configure(api_key=GEMINI_KEY)
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    system_instruction="你是台灣頂尖的金融市場分析師，專精於台股、美股、總體經濟分析。你的分析以數據驅動、邏輯清晰、洞察深刻著稱。每個論點都必須引用具體數字。"
+)
 
 def send_telegram(text):
     r = requests.post(
@@ -138,7 +142,6 @@ tw2  = rss("https://money.udn.com/rssfeed/news/1/5607?ch=money", 8)
 us1  = rss("https://www.cnyes.com/rss/cat/us_stock.xml", 10)
 mac1 = rss("https://www.cnyes.com/rss/cat/economy.xml", 8)
 
-# 台股去重合併
 seen = set()
 tw_all = []
 for n in tw1 + tw2:
@@ -146,10 +149,9 @@ for n in tw1 + tw2:
         seen.add(n['title'])
         tw_all.append(n)
 
-# ── 組合給 Claude 的原始資料 ──────────────────────────────────────────────────
+# ── 組合給 Gemini 的原始資料 ──────────────────────────────────────────────────
 def build_data_context():
     lines = []
-
     lines.append(f"=== 即時市場數據（{date_str} {weekday} {session}）===")
     lines.append("")
     lines.append("【台股指數】")
@@ -159,79 +161,63 @@ def build_data_context():
         f = inst.get('foreign'); t = inst.get('trust'); d = inst.get('dealer')
         total = (f or 0) + (t or 0) + (d or 0)
         lines.append(f"外資：{amt(f)}  投信：{amt(t)}  自營商：{amt(d)}  合計：{amt(total)}")
-
     lines.append("")
     lines.append("【台股重點個股】")
     if tsmc: lines.append(f"台積電(2330)：{fmt(tsmc)}")
     if hon:  lines.append(f"鴻海(2317)：{fmt(hon)}")
-
     lines.append("")
     lines.append("【美股指數】")
     if dji:    lines.append(f"道瓊：{fmt(dji)}")
     if spx:    lines.append(f"標普500：{fmt(spx)}")
     if ixic:   lines.append(f"那斯達克：{fmt(ixic)}")
     if nvidia: lines.append(f"NVIDIA(NVDA)：{fmt(nvidia)}")
-
     lines.append("")
     lines.append("【總體經濟】")
     if dxy:  lines.append(f"美元指數(DXY)：{fmt(dxy)}")
     if t10y: lines.append(f"美國10年期公債殖利率：{t10y['p']:.3f}%（{'+' if t10y['chg']>=0 else ''}{t10y['chg']:.3f}%）")
-
     lines.append("")
     lines.append("=== 最新新聞 ===")
-
     lines.append("")
     lines.append("【台股新聞】")
     for i, n in enumerate(tw_all[:10]):
         lines.append(f"{i+1}. {n['title']}")
-        if n['summary']:
-            lines.append(f"   摘要：{n['summary']}")
-        if n['url']:
-            lines.append(f"   連結：{n['url']}")
-
+        if n['summary']: lines.append(f"   摘要：{n['summary']}")
+        if n['url']:     lines.append(f"   連結：{n['url']}")
     lines.append("")
     lines.append("【美股新聞】")
     for i, n in enumerate(us1[:8]):
         lines.append(f"{i+1}. {n['title']}")
-        if n['summary']:
-            lines.append(f"   摘要：{n['summary']}")
-        if n['url']:
-            lines.append(f"   連結：{n['url']}")
-
+        if n['summary']: lines.append(f"   摘要：{n['summary']}")
+        if n['url']:     lines.append(f"   連結：{n['url']}")
     lines.append("")
     lines.append("【總體經濟新聞】")
     for i, n in enumerate(mac1[:6]):
         lines.append(f"{i+1}. {n['title']}")
-        if n['summary']:
-            lines.append(f"   摘要：{n['summary']}")
-        if n['url']:
-            lines.append(f"   連結：{n['url']}")
-
+        if n['summary']: lines.append(f"   摘要：{n['summary']}")
+        if n['url']:     lines.append(f"   連結：{n['url']}")
     return "\n".join(lines)
 
-# ── 呼叫 Claude API 生成 MSG1 ──────────────────────────────────────────────────
+# ── 生成 MSG1（市場深度分析）────────────────────────────────────────────────
 def generate_msg1(data_ctx):
-    prompt = f"""你是一位專業的台灣金融市場分析師，每日為投資人撰寫財經簡報。
-
-以下是今日（{date_str} {weekday}）最新市場數據與新聞：
+    prompt = f"""以下是今日（{date_str} {weekday}）最新市場數據與新聞：
 
 {data_ctx}
 
-請根據以上數據與新聞，撰寫第一則「市場資金動向詳細分析」。
+請根據以上數據與新聞，撰寫「市場資金動向詳細分析」。
 
-格式要求：
+格式：
 📈 每日財經簡報｜{date_str}（{weekday}）{session}
 
 🇹🇼 台股市場
 
-① [標題：反映今日最重要的台股動態]
-[3-4句深入分析：引用具體指數數字、漲跌幅、成交量；說明背後資金驅動力；指出技術面意義]
+① [標題：今日最重要台股動態]
+[3-4句深入分析：必須引用具體指數數字、漲跌幅；說明背後資金驅動力；指出技術面意義]
 
 ② [標題：三大法人籌碼分析]
 [3-4句分析：引用具體外資/投信/自營商買賣超金額；分析法人操作邏輯；說明對後市影響]
 
-③ [標題：台積電/鴻海等重點個股]
-[3-4句分析：引用具體股價、漲跌幅；分析產業趨勢；說明供應鏈連動效應]
+③ [標題：台積電/鴻海重點個股]
+[3-4句分析：引用具體股價漲跌幅；分析產業趨勢；說明供應鏈連動效應]
 
 ④ [標題：重點財報或題材]
 [3-4句分析：具體數字+深度解讀]
@@ -239,12 +225,12 @@ def generate_msg1(data_ctx):
 🌏 美股市場
 
 ① [標題：美股三大指數動態]
-[3-4句分析：引用具體指數數字；分析推動因素；說明對台股的傳導效應]
+[3-4句分析：引用具體指數數字；分析推動因素；說明對台股傳導效應]
 
 ② [標題：NVIDIA/AI科技股動態]
 [3-4句分析：具體股價+供應鏈影響]
 
-③ [標題：其他重點美股動態]
+③ [標題：其他重點美股]
 [2-3句分析]
 
 📊 總體經濟
@@ -252,40 +238,28 @@ def generate_msg1(data_ctx):
 ① [標題：Fed/利率/通膨動態]
 [3-4句分析：引用具體數字；說明政策方向；評估對市場影響]
 
-② [標題：美債/美元/總經指標]
+② [標題：美債/美元指標]
 [2-3句分析：具體數字+市場意義]
 
 ⚡ 今日注意事項
-• [具體事件提醒，不要空泛]
 • [具體事件提醒]
 • [具體事件提醒]
+• [具體事件提醒]
 
-規則：
-- 每個分析點必須包含具體數字（指數點數、漲跌幅、金額）
-- 不能用模糊詞彙如「持續走高」「表現良好」替代真實數據
-- 分析要有深度：說明「為什麼」而不只是「是什麼」
-- 總長度控制在 1500-2000 字元"""
+規則：每個分析點必須包含具體數字。總長度 1500-2000 字元。"""
 
-    print("呼叫 Claude API 生成 MSG1...")
-    msg = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=2000,
-        system="你是台灣頂尖的金融市場分析師，專精於台股、美股、總體經濟分析。你的分析以數據驅動、邏輯清晰、洞察深刻著稱。",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return msg.content[0].text
+    print("呼叫 Gemini API 生成 MSG1...")
+    response = model.generate_content(prompt)
+    return response.text
 
-# ── 呼叫 Claude API 生成 MSG2 ──────────────────────────────────────────────────
+# ── 生成 MSG2（重點新聞連結）────────────────────────────────────────────────
 def generate_msg2(data_ctx):
-    prompt = f"""你是一位專業的台灣金融市場分析師。
-
-以下是今日（{date_str} {weekday}）最新市場數據與新聞（含連結）：
+    prompt = f"""以下是今日（{date_str} {weekday}）最新新聞（含連結）：
 
 {data_ctx}
 
-請根據以上新聞，整理第二則「重點新聞連結」。
+請整理「重點新聞連結」，格式如下：
 
-格式要求：
 📰 重點新聞連結｜{date_str}（{weekday}）
 
 🇹🇼 資金流向
@@ -323,19 +297,13 @@ def generate_msg2(data_ctx):
    [完整文章URL]
 
 規則：
-- 每條新聞必須使用上方原始資料中提供的真實 URL，不可捏造
-- 如果某分類沒有足夠新聞，可以少幾條，但不要放假連結
-- 標題保持原始新聞標題（可適當縮短）
+- 只使用上方原始資料中提供的真實 URL，不可捏造連結
+- 如某分類無相關新聞可少幾條，但不放假連結
 - 總長度控制在 1200 字元以內"""
 
-    print("呼叫 Claude API 生成 MSG2...")
-    msg = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1500,
-        system="你是台灣頂尖的金融市場分析師，擅長從大量新聞中精選最重要的資訊。",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return msg.content[0].text
+    print("呼叫 Gemini API 生成 MSG2...")
+    response = model.generate_content(prompt)
+    return response.text
 
 # ── 主流程 ────────────────────────────────────────────────────────────────────
 data_context = build_data_context()
