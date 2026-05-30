@@ -34,7 +34,7 @@ GEMINI_SYSTEM = (
 
 def call_gemini(prompt):
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
-           f"gemini-1.5-flash:generateContent?key={GEMINI_KEY}")
+           f"gemini-2.0-flash:generateContent?key={GEMINI_KEY}")
     payload = {
         "system_instruction": {"parts": [{"text": GEMINI_SYSTEM}]},
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
@@ -149,10 +149,10 @@ t10y   = yf("%5ETNX")
 inst   = get_inst()
 
 print("抓取新聞 RSS...")
-tw1  = rss("https://www.cnyes.com/rss/cat/tw_stock.xml", 12)
-tw2  = rss("https://money.udn.com/rssfeed/news/1/5607?ch=money", 8)
-us1  = rss("https://www.cnyes.com/rss/cat/us_stock.xml", 10)
-mac1 = rss("https://www.cnyes.com/rss/cat/economy.xml", 8)
+tw1  = rss("https://www.cnyes.com/rss/cat/tw_stock.xml", 8)
+tw2  = rss("https://money.udn.com/rssfeed/news/1/5607?ch=money", 5)
+us1  = rss("https://www.cnyes.com/rss/cat/us_stock.xml", 6)
+mac1 = rss("https://www.cnyes.com/rss/cat/economy.xml", 5)
 
 seen = set()
 tw_all = []
@@ -191,19 +191,19 @@ def build_data_context():
     lines.append("=== 最新新聞 ===")
     lines.append("")
     lines.append("【台股新聞】")
-    for i, n in enumerate(tw_all[:10]):
+    for i, n in enumerate(tw_all[:7]):
         lines.append(f"{i+1}. {n['title']}")
         if n['summary']: lines.append(f"   摘要：{n['summary']}")
         if n['url']:     lines.append(f"   連結：{n['url']}")
     lines.append("")
     lines.append("【美股新聞】")
-    for i, n in enumerate(us1[:8]):
+    for i, n in enumerate(us1[:5]):
         lines.append(f"{i+1}. {n['title']}")
         if n['summary']: lines.append(f"   摘要：{n['summary']}")
         if n['url']:     lines.append(f"   連結：{n['url']}")
     lines.append("")
     lines.append("【總體經濟新聞】")
-    for i, n in enumerate(mac1[:6]):
+    for i, n in enumerate(mac1[:4]):
         lines.append(f"{i+1}. {n['title']}")
         if n['summary']: lines.append(f"   摘要：{n['summary']}")
         if n['url']:     lines.append(f"   連結：{n['url']}")
@@ -211,68 +211,42 @@ def build_data_context():
 
 # ── 生成 MSG1（市場深度分析）────────────────────────────────────────────────
 def generate_msg1(data_ctx):
-    prompt = f"""以下是今日（{date_str} {weekday}）最新市場數據與新聞：
+    prompt = f"""今日（{date_str} {weekday}）市場數據：
 
 {data_ctx}
 
-請根據以上數據與新聞，撰寫「市場資金動向詳細分析」。
-
-【重要】參考以下範例的寫作深度與風格（這是你應達到的標準）：
-
-範例格式（每個分析點至少這樣的深度）：
-① 本月指數強漲 4,700 點，挑戰史上最強 5 月
-加權指數今日收 44,256 點（+1.23%），成交量爆出 4,521 億天量，外資單日買超 803 億創今年第二高。月初台股 39,556 點，至今累漲 4,700 點（+11.88%），已超越 2021 年 7 月單月漲幅 4,200 點，挑戰史上最強五月紀錄。資金面由 AI 伺服器訂單爆發驅動，輝達 GB200 供應鏈全面拉貨，法人預估 Q3 訂單能見度高達 18 個月。技術面站上所有均線，月線乖離率達 12%，短線雖有過熱疑慮，但籌碼集中度持續提升。
-
-② 外資連 8 日買超，累計鎖碼逾 2,200 億
-外資今日買超 803 億，連續第 8 個交易日買超，累計金額突破 2,200 億元，為今年最長連買紀錄。投信加碼 42 億，自營商買超 38 億，三大法人合計買超 883 億，籌碼集中效應明顯。外資鎖定台積電（買超逾 350 億）與鴻海（買超逾 120 億），顯示資金主要追蹤 AI 算力供應鏈核心標的。法人籌碼持續擴增，意味市場對 Q3 台股業績能見度信心充足。
-
-現在用上方提供的【真實數據】，依照此深度與風格撰寫今日分析：
+用上方真實數據撰寫財經簡報，每個分析點必須含具體數字，每段至少4句，禁止空泛詞彙：
 
 📈 每日財經簡報｜{date_str}（{weekday}）{session}
 
 🇹🇼 台股市場
-
-① [標題：反映最重要台股動態，要有具體數字]
-[4-5句分析：引用指數點位、漲跌幅、成交量；說明月度背景；分析資金驅動邏輯；技術面解讀]
-
-② [標題：三大法人籌碼分析，包含具體金額]
-[4-5句分析：外資/投信/自營商各別金額；分析法人偏好標的與操作邏輯；說明籌碼面對後市意義]
-
-③ [標題：台積電/鴻海等權值股動態]
-[4-5句分析：具體股價漲跌幅；外資目標價或法說重點；產業趨勢；供應鏈連動效應]
-
-④ [標題：今日最重要財報或題材]
-[4句分析：具體數字+深度解讀+受惠族群]
+① [標題含具體指數點位]
+[4句：指數漲跌幅+成交量+月度漲幅+資金驅動邏輯]
+② [標題含法人買賣超金額]
+[4句：外資/投信/自營商各別金額+操作邏輯+後市影響]
+③ [標題含台積電/鴻海股價]
+[4句：具體股價漲跌+產業趨勢+供應鏈連動]
+④ [標題：重點財報或題材]
+[3句：具體數字+受惠族群]
 
 🌏 美股市場
-
-① [標題：美股三大指數昨夜動態]
-[4句分析：具體指數點位漲跌；推動因素；對今日台股的傳導效應]
-
-② [標題：NVIDIA/AI科技股動態]
-[4句分析：具體股價；財報或題材驅動；台灣供應鏈受惠情況]
-
-③ [標題：其他重點美股事件]
-[3句分析：具體數字+市場影響]
+① [標題含道瓊/標普/那指點位]
+[4句：具體指數+推動因素+對台股傳導]
+② [標題含NVIDIA股價]
+[3句：股價+AI需求+台廠受惠]
+③ [標題：其他重點]
+[2句：具體數字+影響]
 
 📊 總體經濟
-
-① [標題：Fed/利率/通膨最新動態]
-[4句分析：具體數字；政策方向；對股市債市影響]
-
-② [標題：美債殖利率/美元指數]
-[3句分析：具體數字+對科技股估值或新興市場的影響]
+① [標題：Fed/CPI/PCE具體數字]
+[3句：數字+政策方向+市場影響]
+② [標題：美債殖利率/美元]
+[2句：具體數字+科技股影響]
 
 ⚡ 今日注意事項
-• [具體財經事件，不要寫廢話]
-• [具體財經事件]
-• [具體財經事件]
-
-【強制規則】
-- 每個分析點必須引用具體數字（從上方數據中取用）
-- 每個分析段落至少 4 句話
-- 禁止使用「持續走高」「表現良好」「值得關注」等空泛詞彙
-- 整篇總長度 2000-2500 字元"""
+• [具體事件]
+• [具體事件]
+• [具體事件]"""
 
     print("呼叫 Gemini API 生成 MSG1...")
     return call_gemini(prompt)
@@ -333,8 +307,8 @@ def generate_msg2(data_ctx):
 data_context = build_data_context()
 
 msg1 = generate_msg1(data_context)
-print("等待 15 秒避免 API 頻率限制...")
-time.sleep(15)
+print("等待 30 秒避免 API 頻率限制...")
+time.sleep(30)
 msg2 = generate_msg2(data_context)
 
 print("── 第一則：市場分析 ──")
