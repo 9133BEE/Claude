@@ -2,8 +2,9 @@ name: 每日台股財經簡報
 
 on:
   schedule:
-    - cron: '0 1 * * 1-5'  # 台灣時間週一至週五 早上 9:00
-  workflow_dispatch:        # 允許手動觸發測試
+    - cron: '0 1 * * *'   # 每天 09:00 台灣時間（早盤簡報）
+    - cron: '0 10 * * *'  # 每天 18:00 台灣時間（收盤復盤）
+  workflow_dispatch:       # 允許手動觸發測試
 
 jobs:
   send-news:
