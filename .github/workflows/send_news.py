@@ -32,7 +32,7 @@ GEMINI_SYSTEM = (
     "整篇分析要有連貫的市場邏輯，而不是各點獨立的片段。"
 )
 
-def call_gemini(prompt):
+def call_gemini(prompt, retries=4):
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"gemini-2.0-flash:generateContent?key={GEMINI_KEY}")
     payload = {
@@ -40,9 +40,16 @@ def call_gemini(prompt):
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "generationConfig": {"maxOutputTokens": 2048, "temperature": 0.7}
     }
-    r = requests.post(url, json=payload, timeout=60)
-    r.raise_for_status()
-    return r.json()['candidates'][0]['content']['parts'][0]['text']
+    for attempt in range(retries):
+        r = requests.post(url, json=payload, timeout=60)
+        if r.status_code == 429:
+            wait = 65 * (attempt + 1)
+            print(f"Rate limit (429)，等待 {wait} 秒後重試（第 {attempt+1} 次）...")
+            time.sleep(wait)
+            continue
+        r.raise_for_status()
+        return r.json()['candidates'][0]['content']['parts'][0]['text']
+    raise Exception("Gemini API 重試次數已達上限")
 
 def send_telegram(text):
     r = requests.post(
