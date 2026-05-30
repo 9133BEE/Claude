@@ -271,65 +271,72 @@ def generate_msg1(data_ctx):
     print("呼叫 Gemini API 生成 MSG1...")
     return call_llm(prompt)
 
-# ── 生成 MSG2（重點新聞連結）────────────────────────────────────────────────
-def generate_msg2(data_ctx):
-    prompt = f"""以下是今日（{date_str} {weekday}）最新新聞（含連結）：
+# ── 生成 MSG2（直接格式化，確保連結真實）────────────────────────────────────
+NUMS = "①②③④⑤"
 
-{data_ctx}
+def news_block(title, items, n=4):
+    lines = [title]
+    count = 0
+    for item in items:
+        if count >= n: break
+        if not item.get('url'): continue
+        lines.append(f"{NUMS[count]} {item['title']}")
+        lines.append(f"   {item['url']}")
+        count += 1
+    return "\n".join(lines) if count > 0 else ""
 
-請整理「重點新聞連結」，格式如下：
+def generate_msg2():
+    # 關鍵字分類篩選
+    capital_kw  = ['外資','法人','買超','賣超','籌碼','三大法人','資金','成交','天量']
+    earnings_kw = ['財報','業績','EPS','獲利','營收','法說','配息','股利']
+    benefit_kw  = ['受惠','AI','伺服器','供應鏈','台積電','鴻海','半導體','漲停','目標價']
+    us_kw       = ['美股','道瓊','標普','那斯達克','NVIDIA','輝達','Fed','聯準','科技']
+    macro_kw    = ['GDP','PMI','CPI','PCE','通膨','殖利率','美元','油價','黃金','降息','升息']
 
-📰 重點新聞連結｜{date_str}（{weekday}）
+    def pick(pool, kws, n=3):
+        found = [x for x in pool if any(k in x['title'] for k in kws) and x.get('url')]
+        return found[:n]
 
-🇹🇼 資金流向
-① [新聞標題]
-   [完整文章URL]
-② [新聞標題]
-   [完整文章URL]
-③ [新聞標題]
-   [完整文章URL]
+    all_news = tw_all + us1 + mac1
 
-📋 重點財報
-① [新聞標題]
-   [完整文章URL]
-② [新聞標題]
-   [完整文章URL]
+    capital  = pick(tw_all, capital_kw, 3)
+    earnings = pick(all_news, earnings_kw, 3)
+    benefit  = pick(tw_all, benefit_kw, 3)
+    us_news  = pick(us1, us_kw, 4)
+    macro    = pick(mac1, macro_kw, 3)
 
-🎯 預期受惠股
-① [新聞標題]
-   [完整文章URL]
-② [新聞標題]
-   [完整文章URL]
+    # 不夠的用剩餘新聞補
+    used = set(x['url'] for x in capital+earnings+benefit+us_news+macro)
+    spare_tw = [x for x in tw_all if x.get('url') and x['url'] not in used]
+    spare_us = [x for x in us1 if x.get('url') and x['url'] not in used]
+    spare_mac = [x for x in mac1 if x.get('url') and x['url'] not in used]
 
-🌏 美股動態
-① [新聞標題]
-   [完整文章URL]
-② [新聞標題]
-   [完整文章URL]
-③ [新聞標題]
-   [完整文章URL]
+    while len(capital)  < 2 and spare_tw:  capital.append(spare_tw.pop(0))
+    while len(earnings) < 2 and spare_tw:  earnings.append(spare_tw.pop(0))
+    while len(benefit)  < 2 and spare_tw:  benefit.append(spare_tw.pop(0))
+    while len(us_news)  < 3 and spare_us:  us_news.append(spare_us.pop(0))
+    while len(macro)    < 2 and spare_mac: macro.append(spare_mac.pop(0))
 
-📊 總體經濟
-① [新聞標題]
-   [完整文章URL]
-② [新聞標題]
-   [完整文章URL]
+    parts = [f"📰 重點新聞連結｜{date_str}（{weekday}）\n"]
 
-規則：
-- 只使用上方原始資料中提供的真實 URL，不可捏造連結
-- 如某分類無相關新聞可少幾條，但不放假連結
-- 總長度控制在 1200 字元以內"""
+    b = news_block("🇹🇼 資金流向", capital)
+    if b: parts.append(b)
+    b = news_block("📋 重點財報", earnings)
+    if b: parts.append(b)
+    b = news_block("🎯 受惠個股", benefit)
+    if b: parts.append(b)
+    b = news_block("🌏 美股動態", us_news)
+    if b: parts.append(b)
+    b = news_block("📊 總體經濟", macro)
+    if b: parts.append(b)
 
-    print("呼叫 Gemini API 生成 MSG2...")
-    return call_llm(prompt)
+    return "\n\n".join(parts)
 
 # ── 主流程 ────────────────────────────────────────────────────────────────────
 data_context = build_data_context()
 
 msg1 = generate_msg1(data_context)
-print("等待 30 秒避免 API 頻率限制...")
-time.sleep(30)
-msg2 = generate_msg2(data_context)
+msg2 = generate_msg2()   # 直接格式化，不需 AI
 
 print("── 第一則：市場分析 ──")
 print(msg1[:300], "...")
