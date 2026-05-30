@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
-每日財經簡報 — 生成 A4 圖片並推送 Telegram
+每日財經簡報 — 三段推送：
+  1. sendMessage  — 重點摘要
+  2. sendMessage  — 新聞連結清單
+  3. sendDocument — A4 PDF 簡報檔
 """
 
-import os
-import io
-import textwrap
+import os, io, textwrap
 from datetime import datetime, timezone, timedelta
-from PIL import Image, ImageDraw, ImageFont
-import requests
-import feedparser
+import requests, feedparser
 
 # ── 時間 ──────────────────────────────────────────────────────────────────────
 tz       = timezone(timedelta(hours=8))
@@ -17,9 +16,9 @@ now      = datetime.now(tz)
 date_str = now.strftime("%Y/%m/%d")
 weekday  = ["週一","週二","週三","週四","週五","週六","週日"][now.weekday()]
 hour     = now.hour
-is_morning  = hour < 14
-is_weekday  = now.weekday() < 5
-session     = "早盤簡報" if is_morning else "收盤復盤"
+is_morning = hour < 14
+is_weekday = now.weekday() < 5
+session    = "早盤簡報" if is_morning else "收盤復盤"
 
 # ── RSS ───────────────────────────────────────────────────────────────────────
 def fetch_rss(url, limit=4):
@@ -46,199 +45,278 @@ if not us_news:
 if not mac_news:
     mac_news = [{'title':'請至鉅亨網查看總體經濟', 'link':'https://www.cnyes.com/economy/'}]
 
-# ── 字型 ──────────────────────────────────────────────────────────────────────
-FONT_CANDIDATES = [
-    '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
-    '/usr/share/fonts/opentype/noto/NotoSansCJKtc-Regular.otf',
-    '/usr/share/fonts/noto-cjk/NotoSansCJKtc-Regular.otf',
-    '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',
-    'C:/Windows/Fonts/msjh.ttc',
-    'C:/Windows/Fonts/mingliu.ttc',
-]
+# ── Telegram helper ───────────────────────────────────────────────────────────
+TOKEN   = os.environ["TELEGRAM_TOKEN"]
+CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
+BASE    = f"https://api.telegram.org/bot{TOKEN}"
 
-def load_font(size):
-    for p in FONT_CANDIDATES:
-        try:
-            return ImageFont.truetype(p, size)
-        except Exception:
-            continue
-    return ImageFont.load_default()
+def send_message(text):
+    r = requests.post(f"{BASE}/sendMessage",
+                      data={"chat_id": CHAT_ID, "text": text})
+    ok = r.json().get("ok")
+    print("sendMessage:", "OK" if ok else r.text)
+    return ok
 
-# ── 文字換行（支援中文）────────────────────────────────────────────────────────
-def wrap_text(text, font, max_px):
-    lines, cur = [], ''
-    for ch in text:
-        test = cur + ch
-        if font.getlength(test) <= max_px:
-            cur = test
-        else:
-            if cur:
-                lines.append(cur)
-            cur = ch
-    if cur:
-        lines.append(cur)
-    return lines
+def send_document(file_bytes, filename, caption=""):
+    r = requests.post(
+        f"{BASE}/sendDocument",
+        data={"chat_id": CHAT_ID, "caption": caption},
+        files={"document": (filename, file_bytes, "application/pdf")}
+    )
+    ok = r.json().get("ok")
+    print("sendDocument:", "OK" if ok else r.text)
+    return ok
 
-# ── 色票 ──────────────────────────────────────────────────────────────────────
-C_BG      = (248, 249, 252)
-C_HDR     = (15,  23,  42)
-C_WHITE   = (255, 255, 255)
-C_TW      = (220, 38,  38)
-C_US      = (37,  99,  235)
-C_MAC     = (5,   150, 105)
-C_TXT     = (15,  23,  42)
-C_LINK    = (59,  130, 246)
-C_SUB     = (100, 116, 139)
-C_DIV     = (226, 232, 240)
-C_BADGE   = C_WHITE
+# ════════════════════════════════════════════════════════════════════════════
+# 第一則：重點摘要
+# ════════════════════════════════════════════════════════════════════════════
+def build_summary():
+    lines = [f"📈 每日財經簡報｜{date_str}（{weekday}）{session}\n"]
 
-# ── 版面 ──────────────────────────────────────────────────────────────────────
-W      = 1240
-MARGIN = 64
-CW     = W - MARGIN * 2   # 可用寬度
+    if not is_weekday:
+        lines.append("🇹🇼 台股今日休市（週末）")
+    else:
+        lines.append("🇹🇼 台股重點摘要")
+        for i, n in enumerate(tw_news, 1):
+            lines.append(f"  {i}. {n['title']}")
 
-# ── 計算總高度（dry-run）────────────────────────────────────────────────────
-def measure_height(news_sections):
-    f_news = load_font(24)
-    f_link = load_font(18)
-    y = 140  # header
-    for color, title, news_list, is_closed in news_sections:
-        y += 56   # section header
-        if is_closed:
-            y += 44
-        else:
-            for item in news_list:
-                lines = wrap_text(item['title'], f_news, CW - 48)
-                y += max(1, len(lines)) * 32 + 4
-                if item.get('link'):
-                    y += 26
-                y += 20  # gap
-        y += 24   # section bottom gap
-    y += 160   # tips
-    y += 70    # footer
-    return y + 40
+    lines.append("")
+    lines.append("🌏 美股 / 國際市場")
+    for i, n in enumerate(us_news, 1):
+        lines.append(f"  {i}. {n['title']}")
 
-# ── 繪製 ─────────────────────────────────────────────────────────────────────
-def generate_image(news_sections):
-    H = measure_height(news_sections)
-    img  = Image.new('RGB', (W, H), C_BG)
-    draw = ImageDraw.Draw(img)
+    lines.append("")
+    lines.append("📊 總體經濟")
+    for i, n in enumerate(mac_news, 1):
+        lines.append(f"  {i}. {n['title']}")
 
-    f_h1   = load_font(40)
-    f_date = load_font(22)
-    f_sec  = load_font(28)
-    f_news = load_font(24)
-    f_link = load_font(18)
-    f_tip  = load_font(20)
-    f_foot = load_font(18)
-    f_num  = load_font(17)
+    lines.append("")
+    if is_morning:
+        lines.append("⚡ 開盤前注意")
+        lines.append("  • 台股交易時間：09:00–13:30")
+        lines.append("  • 留意三大法人開盤動向")
+    else:
+        lines.append("⚡ 盤後注意")
+        lines.append("  • 留意三大法人今日買賣超")
+        lines.append("  • 關注美股期貨與亞股走勢")
 
-    # Header
-    draw.rectangle([(0, 0), (W, 128)], fill=C_HDR)
-    draw.text((MARGIN, 22),  "📈 每日財經簡報", font=f_h1,   fill=C_WHITE)
-    draw.text((MARGIN, 78),  f"{date_str}（{weekday}）{session}",
-              font=f_date, fill=(148, 163, 184))
+    return "\n".join(lines)
 
-    y = 148
+# ════════════════════════════════════════════════════════════════════════════
+# 第二則：新聞連結清單
+# ════════════════════════════════════════════════════════════════════════════
+def build_links():
+    lines = [f"🔗 今日重點新聞連結｜{date_str}\n"]
 
-    for color, sec_title, news_list, is_closed in news_sections:
-        # Section bar
-        draw.rectangle([(MARGIN, y), (MARGIN + 6, y + 34)], fill=color)
-        draw.text((MARGIN + 18, y + 3), sec_title, font=f_sec, fill=color)
-        y += 50
+    if not is_weekday:
+        lines.append("🇹🇼 台股今日休市")
+    else:
+        lines.append("🇹🇼 台股")
+        for i, n in enumerate(tw_news, 1):
+            lines.append(f"  {i}. {n['title']}")
+            if n.get('link'):
+                lines.append(f"     {n['link']}")
+    lines.append("")
 
-        if is_closed:
-            draw.text((MARGIN + 10, y),
-                      "• 今日休市，下週一開盤前請留意美股及外資動向",
-                      font=f_news, fill=C_SUB)
-            y += 44
-        else:
-            for idx, item in enumerate(news_list):
-                # Badge
-                bx, by = MARGIN, y + 3
-                draw.ellipse([(bx, by), (bx + 26, by + 26)], fill=color)
-                num_str = str(idx + 1)
-                draw.text((bx + (13 - int(font_offset(num_str, f_num)/2)), by + 5),
-                          num_str, font=f_num, fill=C_BADGE)
+    lines.append("🌏 美股 / 國際市場")
+    for i, n in enumerate(us_news, 1):
+        lines.append(f"  {i}. {n['title']}")
+        if n.get('link'):
+            lines.append(f"     {n['link']}")
+    lines.append("")
 
-                tx = MARGIN + 38
-                # Title
-                lines = wrap_text(item['title'], f_news, CW - 48)
-                for ln in lines:
-                    draw.text((tx, y), ln, font=f_news, fill=C_TXT)
-                    y += 32
-                # Link
-                if item.get('link'):
-                    link_str = item['link']
-                    if len(link_str) > 72:
-                        link_str = link_str[:69] + '...'
-                    draw.text((tx, y - 4), link_str, font=f_link, fill=C_LINK)
-                    y += 26
-                y += 16  # item gap
+    lines.append("📊 總體經濟")
+    for i, n in enumerate(mac_news, 1):
+        lines.append(f"  {i}. {n['title']}")
+        if n.get('link'):
+            lines.append(f"     {n['link']}")
 
-            # Thin divider after each news (not after last)
-        y += 18  # section bottom gap
+    return "\n".join(lines)
 
-    # Divider before tips
-    draw.rectangle([(MARGIN, y), (W - MARGIN, y + 1)], fill=C_DIV)
-    y += 14
+# ════════════════════════════════════════════════════════════════════════════
+# 第三則：PDF 簡報
+# ════════════════════════════════════════════════════════════════════════════
+def build_pdf():
+    from reportlab.pdfgen import canvas as rl_canvas
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
 
-    # Tips
-    draw.text((MARGIN, y), "⚡ 注意事項", font=f_sec, fill=C_TXT)
-    y += 44
+    # 字型路徑（Ubuntu GitHub Actions）
+    FONT_PATHS = [
+        '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+        '/usr/share/fonts/opentype/noto/NotoSansCJKtc-Regular.otf',
+        '/usr/share/fonts/noto-cjk/NotoSansCJKtc-Regular.otf',
+        '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',
+        'C:/Windows/Fonts/msjh.ttc',
+    ]
+    font_path = None
+    for p in FONT_PATHS:
+        if os.path.exists(p):
+            font_path = p
+            break
+
+    buf = io.BytesIO()
+    W, H = A4  # 595 x 841 pt
+    c = rl_canvas.Canvas(buf, pagesize=A4)
+
+    if font_path:
+        pdfmetrics.registerFont(TTFont('CJK', font_path))
+        FONT = 'CJK'
+    else:
+        FONT = 'Helvetica'
+
+    MARGIN  = 36
+    CW      = W - MARGIN * 2
+
+    # ── 色塊定義
+    HDR_COLOR  = colors.HexColor('#0F1726')
+    TW_COLOR   = colors.HexColor('#DC2626')
+    US_COLOR   = colors.HexColor('#2563EB')
+    MAC_COLOR  = colors.HexColor('#059669')
+    LINK_COLOR = colors.HexColor('#3B82F6')
+    BG_COLOR   = colors.HexColor('#F8F9FC')
+    SUB_COLOR  = colors.HexColor('#64748B')
+
+    def wrap(text, font, size, max_w):
+        """按像素寬度換行（中文適用）"""
+        lines, cur = [], ''
+        for ch in text:
+            test = cur + ch
+            c.setFont(font, size)
+            if c.stringWidth(test, font, size) <= max_w:
+                cur = test
+            else:
+                if cur:
+                    lines.append(cur)
+                cur = ch
+        if cur:
+            lines.append(cur)
+        return lines if lines else ['']
+
+    # ── 頁面背景
+    c.setFillColor(BG_COLOR)
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+
+    # ── Header
+    c.setFillColor(HDR_COLOR)
+    c.rect(0, H - 72, W, 72, fill=1, stroke=0)
+    c.setFillColor(colors.white)
+    c.setFont(FONT, 22)
+    c.drawString(MARGIN, H - 34, f"每日財經簡報  {date_str}（{weekday}）{session}")
+    c.setFont(FONT, 11)
+    c.setFillColor(colors.HexColor('#94A3B8'))
+    c.drawString(MARGIN, H - 56, "資料來源：鉅亨網 RSS  ·  cnyes.com")
+
+    y = H - 92  # 起始 y（從 Header 下方）
+
+    # ── 繪製一個 section
+    def draw_section(color, title, news_list, closed=False):
+        nonlocal y
+        # Section header bar
+        c.setFillColor(color)
+        c.rect(MARGIN, y - 4, 5, 22, fill=1, stroke=0)
+        c.setFont(FONT, 14)
+        c.drawString(MARGIN + 12, y, title)
+        y -= 26
+
+        if closed:
+            c.setFont(FONT, 11)
+            c.setFillColor(SUB_COLOR)
+            c.drawString(MARGIN + 8, y, "今日休市，下週一開盤前請留意美股及外資動向")
+            y -= 20
+            return
+
+        for idx, item in enumerate(news_list):
+            # Badge
+            c.setFillColor(color)
+            c.circle(MARGIN + 8, y + 5, 8, fill=1, stroke=0)
+            c.setFillColor(colors.white)
+            c.setFont(FONT, 9)
+            c.drawCentredString(MARGIN + 8, y + 2, str(idx + 1))
+
+            tx = MARGIN + 22
+            # Title
+            title_lines = wrap(item['title'], FONT, 11, CW - 28)
+            c.setFillColor(colors.HexColor('#0F1726'))
+            c.setFont(FONT, 11)
+            for ln in title_lines:
+                c.drawString(tx, y, ln)
+                y -= 16
+                if y < 60:
+                    c.showPage()
+                    c.setFillColor(BG_COLOR)
+                    c.rect(0, 0, W, H, fill=1, stroke=0)
+                    y = H - 40
+
+            # Link
+            if item.get('link'):
+                link_str = item['link']
+                if len(link_str) > 80:
+                    link_str = link_str[:77] + '...'
+                c.setFillColor(LINK_COLOR)
+                c.setFont(FONT, 9)
+                c.drawString(tx, y, link_str)
+                y -= 14
+
+            y -= 8  # item gap
+
+        y -= 10  # section gap
+
+    sections = [
+        (TW_COLOR,  "台股重點新聞",   tw_news,  not is_weekday),
+        (US_COLOR,  "美股 / 國際市場", us_news,  False),
+        (MAC_COLOR, "總體經濟",        mac_news, False),
+    ]
+    for col, ttl, news, closed in sections:
+        draw_section(col, ttl, news, closed)
+
+    # ── 注意事項
+    y -= 4
+    c.setStrokeColor(colors.HexColor('#E2E8F0'))
+    c.line(MARGIN, y, W - MARGIN, y)
+    y -= 14
+    c.setFillColor(colors.HexColor('#0F1726'))
+    c.setFont(FONT, 13)
+    c.drawString(MARGIN, y, "注意事項")
+    y -= 18
     tips = [
         "台股交易時間：09:00–13:30",
         "留意三大法人買賣超動向",
-        "重大消息 → 公開資訊觀測站 mops.twse.com.tw",
+        "重大消息請至公開資訊觀測站確認  mops.twse.com.tw",
     ]
     for t in tips:
-        draw.text((MARGIN + 10, y), f"• {t}", font=f_tip, fill=C_SUB)
-        y += 32
-    y += 16
+        c.setFont(FONT, 10)
+        c.setFillColor(SUB_COLOR)
+        c.drawString(MARGIN + 8, y, f"•  {t}")
+        y -= 16
 
-    # Footer
-    draw.rectangle([(0, H - 58), (W, H)], fill=C_HDR)
-    draw.text((MARGIN, H - 40),
-              "📚 資料來源：鉅亨網 RSS  ·  cnyes.com",
-              font=f_foot, fill=(100, 116, 139))
+    # ── Footer
+    c.setFillColor(HDR_COLOR)
+    c.rect(0, 0, W, 28, fill=1, stroke=0)
+    c.setFillColor(colors.HexColor('#64748B'))
+    c.setFont(FONT, 9)
+    c.drawString(MARGIN, 10, f"每日財經簡報  {date_str}  |  Generated by FinBot")
 
-    return img
+    c.save()
+    buf.seek(0)
+    return buf.read()
 
-def font_offset(text, font):
-    try:
-        return font.getlength(text)
-    except Exception:
-        return len(text) * 10
+# ════════════════════════════════════════════════════════════════════════════
+# 執行三段推送
+# ════════════════════════════════════════════════════════════════════════════
+print("── 第一則：重點摘要 ──")
+send_message(build_summary())
 
-# ── 組裝資料 ──────────────────────────────────────────────────────────────────
-closed_tw = (not is_weekday)
-sections = [
-    (C_TW,  "🇹🇼 台股重點新聞",   tw_news,  closed_tw),
-    (C_US,  "🌏 美股 / 國際市場",  us_news,  False),
-    (C_MAC, "📊 總體經濟",          mac_news, False),
-]
+print("── 第二則：新聞連結 ──")
+send_message(build_links())
 
-img = generate_image(sections)
-
-# ── 存成 BytesIO ──────────────────────────────────────────────────────────────
-buf = io.BytesIO()
-img.save(buf, format='PNG', optimize=True)
-buf.seek(0)
-
-# ── 推送 Telegram ─────────────────────────────────────────────────────────────
-token   = os.environ["TELEGRAM_TOKEN"]
-chat_id = os.environ["TELEGRAM_CHAT_ID"]
-
-caption = f"📈 {date_str}（{weekday}）{session}\n資料來源：鉅亨網 RSS"
-
-resp = requests.post(
-    f"https://api.telegram.org/bot{token}/sendPhoto",
-    data={"chat_id": chat_id, "caption": caption},
-    files={"photo": ("briefing.png", buf, "image/png")}
+print("── 第三則：PDF 簡報 ──")
+pdf_bytes = build_pdf()
+send_document(
+    pdf_bytes,
+    filename=f"財經簡報_{date_str.replace('/', '')}.pdf",
+    caption=f"📎 {date_str}（{weekday}）{session} 完整簡報"
 )
-
-if resp.json().get("ok"):
-    print(f"✅ 圖片推播成功（{session}）")
-else:
-    print(f"❌ 推播失敗：{resp.text}")
-    exit(1)

@@ -17,9 +17,9 @@ jobs:
         run: sudo apt-get install -y fonts-noto-cjk --quiet
 
       - name: 安裝 Python 套件
-        run: pip install requests feedparser Pillow --quiet
+        run: pip install requests feedparser reportlab --quiet
 
-      - name: 生成 A4 簡報並推播 Telegram
+      - name: 生成簡報並推播 Telegram（三則）
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
