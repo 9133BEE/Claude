@@ -271,64 +271,73 @@ def generate_msg1(data_ctx):
     print("呼叫 Gemini API 生成 MSG1...")
     return call_llm(prompt)
 
-# ── 生成 MSG2（直接格式化，確保連結真實）────────────────────────────────────
+# ── 生成 MSG2（直接格式化，保證永遠有內容）──────────────────────────────────
 NUMS = "①②③④⑤"
 
-def news_block(title, items, n=4):
-    lines = [title]
-    count = 0
-    for item in items:
-        if count >= n: break
-        if not item.get('url'): continue
-        lines.append(f"{NUMS[count]} {item['title']}")
+def with_url(pool):
+    return [x for x in pool if x.get('url') and x.get('title')]
+
+def fill_to(lst, backup_pool, min_count):
+    used = {x['url'] for x in lst}
+    for x in backup_pool:
+        if len(lst) >= min_count: break
+        if x['url'] not in used:
+            lst.append(x)
+            used.add(x['url'])
+    return lst
+
+def news_block(header, items):
+    if not items: return ""
+    lines = [header]
+    for i, item in enumerate(items[:5]):
+        lines.append(f"{NUMS[i]} {item['title']}")
         lines.append(f"   {item['url']}")
-        count += 1
-    return "\n".join(lines) if count > 0 else ""
+    return "\n".join(lines)
 
 def generate_msg2():
-    # 關鍵字分類篩選
-    capital_kw  = ['外資','法人','買超','賣超','籌碼','三大法人','資金','成交','天量']
-    earnings_kw = ['財報','業績','EPS','獲利','營收','法說','配息','股利']
-    benefit_kw  = ['受惠','AI','伺服器','供應鏈','台積電','鴻海','半導體','漲停','目標價']
-    us_kw       = ['美股','道瓊','標普','那斯達克','NVIDIA','輝達','Fed','聯準','科技']
-    macro_kw    = ['GDP','PMI','CPI','PCE','通膨','殖利率','美元','油價','黃金','降息','升息']
+    tw_u   = with_url(tw_all)
+    us_u   = with_url(us1)
+    mac_u  = with_url(mac1)
+    all_u  = tw_u + us_u + mac_u
 
-    def pick(pool, kws, n=3):
-        found = [x for x in pool if any(k in x['title'] for k in kws) and x.get('url')]
-        return found[:n]
+    kw = {
+        'capital':  ['外資','法人','買超','賣超','籌碼','資金','成交','天量','三大法人'],
+        'earnings': ['財報','業績','EPS','獲利','營收','法說','配息','股利'],
+        'benefit':  ['受惠','AI','伺服器','供應鏈','台積電','鴻海','半導體','漲停','目標價','COMPUTEX'],
+        'us':       ['美股','道瓊','標普','那斯達克','NVIDIA','輝達','Fed','聯準','科技','盤後','收盤'],
+        'macro':    ['GDP','PMI','CPI','PCE','通膨','殖利率','美元','油價','黃金','降息','升息','Fed'],
+    }
 
-    all_news = tw_all + us1 + mac1
+    def pick_kw(pool, keys):
+        return [x for x in pool if any(k in x['title'] for k in keys)]
 
-    capital  = pick(tw_all, capital_kw, 3)
-    earnings = pick(all_news, earnings_kw, 3)
-    benefit  = pick(tw_all, benefit_kw, 3)
-    us_news  = pick(us1, us_kw, 4)
-    macro    = pick(mac1, macro_kw, 3)
+    capital  = pick_kw(tw_u, kw['capital'])
+    earnings = pick_kw(all_u, kw['earnings'])
+    benefit  = pick_kw(tw_u, kw['benefit'])
+    us_news  = pick_kw(us_u, kw['us'])
+    macro    = pick_kw(mac_u, kw['macro'])
 
-    # 不夠的用剩餘新聞補
-    used = set(x['url'] for x in capital+earnings+benefit+us_news+macro)
-    spare_tw = [x for x in tw_all if x.get('url') and x['url'] not in used]
-    spare_us = [x for x in us1 if x.get('url') and x['url'] not in used]
-    spare_mac = [x for x in mac1 if x.get('url') and x['url'] not in used]
+    # 每區不足時補頭條（保證至少 2 條）
+    capital  = fill_to(capital,  tw_u,  2)
+    earnings = fill_to(earnings, all_u, 2)
+    benefit  = fill_to(benefit,  tw_u,  2)
+    us_news  = fill_to(us_news,  us_u,  2)
+    macro    = fill_to(macro,    mac_u, 2)
 
-    while len(capital)  < 2 and spare_tw:  capital.append(spare_tw.pop(0))
-    while len(earnings) < 2 and spare_tw:  earnings.append(spare_tw.pop(0))
-    while len(benefit)  < 2 and spare_tw:  benefit.append(spare_tw.pop(0))
-    while len(us_news)  < 3 and spare_us:  us_news.append(spare_us.pop(0))
-    while len(macro)    < 2 and spare_mac: macro.append(spare_mac.pop(0))
+    # 若整個 feed 都空，從其他 feed 借
+    if not tw_u and not us_u and not mac_u:
+        return f"📰 重點新聞連結｜{date_str}（{weekday}）\n\n（今日新聞 RSS 暫無資料，請至 https://www.cnyes.com 查看）"
 
     parts = [f"📰 重點新聞連結｜{date_str}（{weekday}）\n"]
-
-    b = news_block("🇹🇼 資金流向", capital)
-    if b: parts.append(b)
-    b = news_block("📋 重點財報", earnings)
-    if b: parts.append(b)
-    b = news_block("🎯 受惠個股", benefit)
-    if b: parts.append(b)
-    b = news_block("🌏 美股動態", us_news)
-    if b: parts.append(b)
-    b = news_block("📊 總體經濟", macro)
-    if b: parts.append(b)
+    for header, items in [
+        ("🇹🇼 台股新聞", fill_to(capital[:3],  tw_u, 3)),
+        ("📋 財報 / 個股", fill_to(earnings[:3], all_u, 2)),
+        ("🎯 AI / 供應鏈", fill_to(benefit[:3],  tw_u, 2)),
+        ("🌏 美股動態",    fill_to(us_news[:4],  us_u,  3)),
+        ("📊 總體經濟",    fill_to(macro[:3],    mac_u, 2)),
+    ]:
+        b = news_block(header, items)
+        if b: parts.append(b)
 
     return "\n\n".join(parts)
 
