@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-每日財經簡報
-第1則：市場資金動向分析（即時數據 + 文章摘要組合）
-第2則：重點新聞連結
+每日財經簡報 — Claude AI 撰寫版
+資料收集：Yahoo Finance + TWSE + RSS
+分析撰寫：Claude claude-sonnet-4-6（Financial Analyst）
+推播：Telegram
 """
 
-import os, re, html
+import os, re, html, json
 from datetime import datetime, timezone, timedelta
 import requests, feedparser
+import anthropic
 
 # ── 時區 ──────────────────────────────────────────────────────────────────────
 tz         = timezone(timedelta(hours=8))
@@ -16,29 +18,32 @@ date_str   = now.strftime("%Y/%m/%d")
 weekday    = ["週一","週二","週三","週四","週五","週六","週日"][now.weekday()]
 hour       = now.hour
 is_morning = hour < 14
-is_weekday = now.weekday() < 5
 session    = "早盤簡報" if is_morning else "收盤復盤"
 today_date = now.strftime("%Y%m%d")
-month_day  = now.strftime("%-m/%-d") if hasattr(now, 'strftime') else now.strftime("%m/%d").lstrip('0')
 
-TOKEN   = os.environ["TELEGRAM_TOKEN"]
-CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; finbot/1.0)'}
+TOKEN     = os.environ["TELEGRAM_TOKEN"]
+CHAT_ID   = os.environ["TELEGRAM_CHAT_ID"]
+API_KEY   = os.environ["ANTHROPIC_API_KEY"]
+HEADERS   = {'User-Agent': 'Mozilla/5.0 (compatible; finbot/1.0)'}
 
-def send(text):
+client = anthropic.Anthropic(api_key=API_KEY)
+
+def send_telegram(text):
     r = requests.post(
         f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-        data={"chat_id": CHAT_ID, "text": text}, timeout=30
+        json={"chat_id": CHAT_ID, "text": text, "disable_web_page_preview": False},
+        timeout=30
     )
-    print("send:", "OK" if r.json().get("ok") else r.text[:120])
+    ok = r.json().get("ok")
+    print("Telegram:", "OK" if ok else r.text[:200])
+    return ok
 
 # ── HTML 清理 ─────────────────────────────────────────────────────────────────
-def clean(text, maxlen=300):
+def clean(text, maxlen=400):
     if not text: return ''
     text = html.unescape(text)
     text = re.sub(r'<[^>]+>', ' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
-    # 移除常見廢話前綴
     for prefix in ['（本文出自', '延伸閱讀', '更多相關新聞', '資料來源：', '※', '▲']:
         idx = text.find(prefix)
         if idx > 30:
@@ -62,15 +67,14 @@ def yf(symbol):
         m_chg  = round(price - m_open, 2)
         m_pct  = round(m_chg / m_open * 100, 2) if m_open else 0
         return {'p': price, 'chg': chg, 'pct': pct, 'mchg': m_chg, 'mpct': m_pct}
-    except Exception:
+    except Exception as e:
+        print(f"yf({symbol}) error: {e}")
         return None
 
-def s(v):    return f"+{v}" if v >= 0 else str(v)
-def ar(d):   return "▲" if d and d['chg'] >= 0 else "▼"
-def mar(d):  return "▲" if d and d['mchg'] >= 0 else "▼"
-def amt(n):
-    if n is None: return '－'
-    return f"{'+' if n>0 else ''}{n/1e8:.0f}億"
+def fmt(d):
+    if not d: return 'N/A'
+    sign = '+' if d['chg'] >= 0 else ''
+    return f"{d['p']:,.2f}（{sign}{d['pct']:.2f}%，本月{sign}{d['mpct']:.2f}%）"
 
 # ── 台交所三大法人 ────────────────────────────────────────────────────────────
 def get_inst():
@@ -89,11 +93,16 @@ def get_inst():
             elif '投信' in name:   r['trust']   = net
             elif '自營商' in name: r['dealer']  = net
         return r if r else None
-    except Exception:
+    except Exception as e:
+        print(f"inst error: {e}")
         return None
 
-# ── RSS（抓完整摘要）────────────────────────────────────────────────────────
-def rss(url, n=10):
+def amt(n):
+    if n is None: return 'N/A'
+    return f"{'+'if n>0 else ''}{n/1e8:.1f}億"
+
+# ── RSS 抓取 ──────────────────────────────────────────────────────────────────
+def rss(url, n=12):
     try:
         feed = feedparser.parse(url)
         out  = []
@@ -102,43 +111,16 @@ def rss(url, n=10):
             lnk = e.get('link', '').strip()
             raw = (e.get('summary') or e.get('description') or
                    (e.get('content', [{}])[0].get('value', '') if e.get('content') else ''))
-            sm  = clean(raw, 280)
+            sm  = clean(raw, 350)
             if t:
-                out.append({'t': t, 'l': lnk, 'sm': sm})
+                out.append({'title': t, 'url': lnk, 'summary': sm})
         return out
-    except Exception:
+    except Exception as e:
+        print(f"rss({url}) error: {e}")
         return []
 
-# 多來源抓取
-tw1  = rss("https://www.cnyes.com/rss/cat/tw_stock.xml", 10)
-tw2  = rss("https://money.udn.com/rssfeed/news/1/5607?ch=money", 8)
-us1  = rss("https://www.cnyes.com/rss/cat/us_stock.xml", 10)
-mac1 = rss("https://www.cnyes.com/rss/cat/economy.xml", 8)
-
-# 台股去重合併
-seen = set()
-tw_all = []
-for n in tw1 + tw2:
-    if n['t'] not in seen:
-        seen.add(n['t'])
-        tw_all.append(n)
-
-# 精選分類
-def pick1(pool, kws):
-    """取第一筆符合關鍵字且有摘要的新聞"""
-    for n in pool:
-        if any(k in n['t'] for k in kws) and n['sm']:
-            return n
-    for n in pool:
-        if any(k in n['t'] for k in kws):
-            return n
-    return None
-
-def pick_all(pool, kws, max_n=5):
-    found = [n for n in pool if any(k in n['t'] for k in kws)]
-    return found[:max_n]
-
-# ── 即時數據 ──────────────────────────────────────────────────────────────────
+# ── 收集所有數據 ──────────────────────────────────────────────────────────────
+print("收集市場數據...")
 taiex  = yf("%5ETWII")
 tsmc   = yf("2330.TW")
 hon    = yf("2317.TW")
@@ -148,208 +130,225 @@ spx    = yf("%5EGSPC")
 ixic   = yf("%5EIXIC")
 dxy    = yf("DX-Y.NYB")
 t10y   = yf("%5ETNX")
-t30y   = yf("%5ETYX")
 inst   = get_inst()
 
-# ══════════════════════════════════════════════════════════════════════════════
-# 組合第一則：市場資金動向分析
-# ══════════════════════════════════════════════════════════════════════════════
-L = [f"📈 市場資金動向週報｜{date_str}（{weekday}）\n"]
+print("抓取新聞 RSS...")
+tw1  = rss("https://www.cnyes.com/rss/cat/tw_stock.xml", 12)
+tw2  = rss("https://money.udn.com/rssfeed/news/1/5607?ch=money", 8)
+us1  = rss("https://www.cnyes.com/rss/cat/us_stock.xml", 10)
+mac1 = rss("https://www.cnyes.com/rss/cat/economy.xml", 8)
 
-def add_point(num, headline, body):
-    L.append(f"{num} {headline}")
-    L.append(f"{body}\n")
+# 台股去重合併
+seen = set()
+tw_all = []
+for n in tw1 + tw2:
+    if n['title'] not in seen:
+        seen.add(n['title'])
+        tw_all.append(n)
 
-# ─ 台股 ─────────────────────────────────────────────────────────────────────
-L.append("🇹🇼 台股市場\n")
+# ── 組合給 Claude 的原始資料 ──────────────────────────────────────────────────
+def build_data_context():
+    lines = []
 
-# ① 大盤指數
-if taiex:
-    p, chg, pct = taiex['p'], taiex['chg'], taiex['pct']
-    mchg, mpct  = taiex['mchg'], taiex['mpct']
-    trend = ("強勢上攻" if pct>1.5 else "穩步走高" if pct>0.3
-             else "小幅震盪" if abs(pct)<=0.3 else "拉回修正" if pct>-1.5 else "明顯走弱")
-    headline = f"加權指數{trend}，收 {p:,.0f} 點（{ar(taiex)}{abs(pct):.2f}%）"
-    # 從新聞補充月度背景
-    idx_news = pick1(tw_all, ['加權','大盤','指數','創高','新高','點關卡'])
-    if idx_news and idx_news['sm']:
-        body = (f"加權指數今日收 {p:,.0f} 點，{ar(taiex)} {abs(chg):.0f} 點（{s(pct)}%），"
-                f"本月累計{mar(taiex)}{abs(mpct):.1f}%（{mar(taiex)}{abs(mchg):.0f} 點）。"
-                f"{idx_news['sm']}")
-    else:
-        body = (f"加權指數今日收 {p:,.0f} 點，{ar(taiex)} {abs(chg):.0f} 點（{s(pct)}%），"
-                f"本月累計{mar(taiex)}{abs(mpct):.1f}%。"
-                f"{'AI 供應鏈題材持續發酵，外資買盤支撐指數走高。' if chg>0 else '短線賣壓出籠，留意支撐能否守穩。'}")
-    add_point("①", headline, body)
-else:
-    n = pick1(tw_all, ['加權','大盤','指數'])
-    if n:
-        add_point("①", n['t'], n['sm'] or "請至 Yahoo 股市查看今日加權指數表現。")
+    lines.append(f"=== 即時市場數據（{date_str} {weekday} {session}）===")
+    lines.append("")
+    lines.append("【台股指數】")
+    if taiex:
+        lines.append(f"加權指數：{fmt(taiex)}")
+    if inst:
+        f = inst.get('foreign'); t = inst.get('trust'); d = inst.get('dealer')
+        total = (f or 0) + (t or 0) + (d or 0)
+        lines.append(f"外資：{amt(f)}  投信：{amt(t)}  自營商：{amt(d)}  合計：{amt(total)}")
 
-# ② 三大法人
-if inst and any(v is not None for v in inst.values()):
-    f = inst.get('foreign'); t = inst.get('trust'); d = inst.get('dealer')
-    total = (f or 0) + (t or 0) + (d or 0)
-    f_dir = "買超" if (f or 0) > 0 else "賣超"
-    t_dir = "合計買超" if total > 0 else "合計賣超"
-    headline = f"外資{f_dir} {amt(f)}，三大法人{t_dir} {amt(total)}"
-    parts = []
-    if f is not None: parts.append(f"外資 {amt(f)}")
-    if t is not None: parts.append(f"投信 {amt(t)}")
-    if d is not None: parts.append(f"自營商 {amt(d)}")
-    data_line = f"三大法人今日：{' / '.join(parts)}。"
-    inst_news = pick1(tw_all, ['外資','法人','買超','賣超','籌碼','三大法人','投信'])
-    body = data_line + (inst_news['sm'] if inst_news and inst_news['sm'] else
-           ('外資持續買超，籌碼面支撐多頭格局，法人動向有利後市。' if (f or 0)>0
-            else '外資單日轉賣超，短線籌碼鬆動，留意指數支撐位是否守穩。'))
-    add_point("②", headline, body)
-else:
-    n = pick1(tw_all, ['外資','法人','買超','賣超','籌碼','三大法人'])
-    if n:
-        add_point("②", n['t'], n['sm'] or "三大法人動向為今日盤面重要觀察指標。")
+    lines.append("")
+    lines.append("【台股重點個股】")
+    if tsmc: lines.append(f"台積電(2330)：{fmt(tsmc)}")
+    if hon:  lines.append(f"鴻海(2317)：{fmt(hon)}")
 
-# ③ 重點個股
-if tsmc or hon:
-    parts = []
-    if tsmc: parts.append(f"台積電(2330) {tsmc['p']:,.0f} 元（{s(tsmc['pct'])}%），本月{s(tsmc['mpct'])}%")
-    if hon:  parts.append(f"鴻海(2317) {hon['p']:,.0f} 元（{s(hon['pct'])}%）")
-    headline = "台積電、鴻海 AI 供應鏈個股動向"
-    stock_news = pick1(tw_all, ['台積電','鴻海','AI','半導體','供應鏈','輝達','黃仁勳'])
-    body = ("；".join(parts) + "。\n" +
-            (stock_news['sm'] if stock_news and stock_news['sm'] else
-             ('外資持續鎖碼 AI 伺服器供應鏈，半導體族群籌碼集中效應明顯。'
-              if (tsmc and tsmc['chg']>=0) else '權值股短線拉回，留意是否為整理或趨勢反轉。')))
-    add_point("③", headline, body)
-else:
-    n = pick1(tw_all, ['台積電','鴻海','AI','半導體','供應鏈'])
-    if n:
-        add_point("③", n['t'], n['sm'] or "AI 供應鏈族群持續獲資金青睞。")
+    lines.append("")
+    lines.append("【美股指數】")
+    if dji:    lines.append(f"道瓊：{fmt(dji)}")
+    if spx:    lines.append(f"標普500：{fmt(spx)}")
+    if ixic:   lines.append(f"那斯達克：{fmt(ixic)}")
+    if nvidia: lines.append(f"NVIDIA(NVDA)：{fmt(nvidia)}")
 
-# ④ 財報或題材（用新聞摘要）
-n = pick1(tw_all, ['財報','業績','EPS','獲利','營收','法說']) or \
-    pick1(tw_all, ['受惠','利多','漲停','目標價','上調','題材'])
-if n:
-    add_point("④", n['t'], n['sm'] or "詳細內容請見連結。")
+    lines.append("")
+    lines.append("【總體經濟】")
+    if dxy:  lines.append(f"美元指數(DXY)：{fmt(dxy)}")
+    if t10y: lines.append(f"美國10年期公債殖利率：{t10y['p']:.3f}%（{'+' if t10y['chg']>=0 else ''}{t10y['chg']:.3f}%）")
 
-# ─ 美股 ─────────────────────────────────────────────────────────────────────
-L.append("\n🌏 美股市場\n")
+    lines.append("")
+    lines.append("=== 最新新聞 ===")
 
-# ① 三大指數
-parts = []
-if dji:  parts.append(f"道瓊 {dji['p']:,.0f}（{s(dji['pct'])}%）")
-if spx:  parts.append(f"標普500 {spx['p']:,.0f}（{s(spx['pct'])}%）")
-if ixic: parts.append(f"那斯達克 {ixic['p']:,.0f}（{s(ixic['pct'])}%）")
-if parts:
-    base = dji or spx
-    up   = base and base['chg'] >= 0
-    headline = f"美股三大指數{'走高，多頭延續' if up else '收低，獲利了結'}"
-    idx_news  = pick1(us1, ['盤後','收盤','道瓊','標普','那斯達克','三大指數'])
-    body = " / ".join(parts) + "。\n" + (
-        idx_news['sm'] if idx_news and idx_news['sm'] else
-        ('AI 題材延燒、地緣政治風險降溫，資金持續流入美股。' if up
-         else 'Fed 利率疑慮與獲利了結賣壓，盤面承壓。'))
-    add_point("①", headline, body)
+    lines.append("")
+    lines.append("【台股新聞】")
+    for i, n in enumerate(tw_all[:10]):
+        lines.append(f"{i+1}. {n['title']}")
+        if n['summary']:
+            lines.append(f"   摘要：{n['summary']}")
+        if n['url']:
+            lines.append(f"   連結：{n['url']}")
 
-# ② 機構/資金動向
-n = pick1(us1, ['機構','基金','資金','外資','ETF','法人','買進','賣出'])
-if n:
-    add_point("②", n['t'], n['sm'] or "機構資金動向為美股後市重要觀察指標。")
-elif nvidia:
-    nvda_up = nvidia['chg'] >= 0
-    headline = f"NVIDIA(NVDA) {nvidia['p']:,.2f} 美元（{s(nvidia['pct'])}%），本月{s(nvidia['mpct'])}%"
-    n2 = pick1(us1, ['AI','輝達','NVIDIA','科技','半導體'])
-    body = (n2['sm'] if n2 and n2['sm'] else
-            ('輝達強勁上漲，AI 伺服器需求爆發，帶動台灣供應鏈族群同步受惠。' if nvda_up
-             else '輝達拉回，留意台灣 AI 供應鏈族群連帶修正壓力。'))
-    add_point("②", headline, body)
+    lines.append("")
+    lines.append("【美股新聞】")
+    for i, n in enumerate(us1[:8]):
+        lines.append(f"{i+1}. {n['title']}")
+        if n['summary']:
+            lines.append(f"   摘要：{n['summary']}")
+        if n['url']:
+            lines.append(f"   連結：{n['url']}")
 
-# ③ 財報或題材
-n = pick1(us1, ['財報','業績','EPS','獲利','IPO','法說']) or \
-    pick1(us1, ['AI','半導體','科技','漲','創高','受惠'])
-if n:
-    add_point("③", n['t'], n['sm'] or "重點財報及題材股動向牽動市場情緒。")
+    lines.append("")
+    lines.append("【總體經濟新聞】")
+    for i, n in enumerate(mac1[:6]):
+        lines.append(f"{i+1}. {n['title']}")
+        if n['summary']:
+            lines.append(f"   摘要：{n['summary']}")
+        if n['url']:
+            lines.append(f"   連結：{n['url']}")
 
-# ─ 總體經濟 ──────────────────────────────────────────────────────────────────
-L.append("\n📊 總體經濟 / 全球資金\n")
-
-# ① Fed/利率
-n = pick1(mac1, ['Fed','聯準','降息','升息','利率','FOMC','鮑爾','通膨','CPI'])
-if n:
-    add_point("①", n['t'], n['sm'] or "Fed 政策方向持續左右全球資金配置。")
-elif dxy:
-    add_point("①", f"美元指數 {dxy['p']:.1f}（{ar(dxy)}{abs(dxy['pct']):.2f}%）",
-              f"{'避險買盤升溫，新興市場資金面臨壓力。' if dxy['chg']>=0 else '美元走弱，風險偏好回升，有利新興市場資產。'}")
-
-# ② 美債
-if t10y and t30y:
-    spread = round(t30y['p'] - t10y['p'], 3)
-    n = pick1(mac1, ['美債','殖利率','公債','債市','利差'])
-    headline = f"美債殖利率：10Y {t10y['p']:.3f}% / 30Y {t30y['p']:.3f}%，利差 {spread:.2f}%"
-    body = (n['sm'] if n and n['sm'] else
-            ('殖利率走升，對科技成長股估值施壓。' if t10y['chg']>0
-             else '殖利率回落，有利科技股估值修復。'))
-    add_point("②", headline, body)
-else:
-    n = pick1(mac1, ['美債','殖利率','公債','債市'])
-    if n:
-        add_point("②", n['t'], n['sm'] or "美債殖利率為全球資金配置重要指標。")
-
-# ③ 其他總經
-used = set()
-for n in mac1:
-    if n['t'] not in used and any(k in n['t'] for k in ['GDP','PMI','就業','油價','黃金','匯率','美元','地緣']):
-        add_point("③", n['t'], n['sm'] or "全球總體經濟動向持續影響市場風險偏好。")
-        used.add(n['t'])
-        break
-
-# 注意事項
-L.append("⚡ 今日注意事項")
-if is_morning and is_weekday:
-    L.append("• 台股交易時間：09:00–13:30")
-    L.append("• 留意外資開盤方向及三大法人動態")
-elif is_weekday:
-    L.append("• 今日收盤，關注三大法人最終買賣超")
-    L.append("• 留意美股開盤走向及亞股盤後動態")
-else:
-    L.append("• 週末休市，留意美股收盤及下週觀察重點")
-L.append("• 美債殖利率走勢牽動科技股估值")
-L.append("• 重大消息請至公開資訊觀測站確認")
-L.append("\n📚 資料來源：鉅亨網 / Yahoo股市 / 臺灣證券交易所")
-
-# ══════════════════════════════════════════════════════════════════════════════
-# 第二則：重點新聞連結
-# ══════════════════════════════════════════════════════════════════════════════
-NUMS = "①②③④⑤"
-
-def block(title, items, n=5):
-    lines = [title]
-    for i, x in enumerate(items[:n]):
-        lines.append(f"{NUMS[i]} {x['t']}")
-        if x.get('l'): lines.append(f"   {x['l']}")
     return "\n".join(lines)
 
-R = [f"📈 每日財經簡報｜{date_str}（{weekday}）{session}\n"]
+# ── 呼叫 Claude API 生成 MSG1 ──────────────────────────────────────────────────
+def generate_msg1(data_ctx):
+    prompt = f"""你是一位專業的台灣金融市場分析師，每日為投資人撰寫財經簡報。
 
-if not is_weekday:
-    R.append("🇹🇼 台股重點新聞（今日休市）")
-    R.append("   https://www.cnyes.com/twstock/\n")
-else:
-    R.append(block("🇹🇼 台股重點新聞", tw_all[:5]))
-    R.append("")
+以下是今日（{date_str} {weekday}）最新市場數據與新聞：
 
-R.append(block("🌏 美股重點新聞", us1[:4]))
-R.append("")
-R.append(block("📊 總體經濟", mac1[:3]))
-R.append("")
-R.append("⚡ 盤後注意事項")
-R.append("• 留意三大法人今日買賣超方向")
-R.append("• 下週重點：美國就業報告、重量級企業財報")
-R.append("• 公告查詢：https://mops.twse.com.tw")
-R.append("\n📚 資料來源：鉅亨網 / 聯合新聞網 / 臺灣證券交易所")
+{data_ctx}
 
-# ── 發送 ──────────────────────────────────────────────────────────────────────
+請根據以上數據與新聞，撰寫第一則「市場資金動向詳細分析」。
+
+格式要求：
+📈 每日財經簡報｜{date_str}（{weekday}）{session}
+
+🇹🇼 台股市場
+
+① [標題：反映今日最重要的台股動態]
+[3-4句深入分析：引用具體指數數字、漲跌幅、成交量；說明背後資金驅動力；指出技術面意義]
+
+② [標題：三大法人籌碼分析]
+[3-4句分析：引用具體外資/投信/自營商買賣超金額；分析法人操作邏輯；說明對後市影響]
+
+③ [標題：台積電/鴻海等重點個股]
+[3-4句分析：引用具體股價、漲跌幅；分析產業趨勢；說明供應鏈連動效應]
+
+④ [標題：重點財報或題材]
+[3-4句分析：具體數字+深度解讀]
+
+🌏 美股市場
+
+① [標題：美股三大指數動態]
+[3-4句分析：引用具體指數數字；分析推動因素；說明對台股的傳導效應]
+
+② [標題：NVIDIA/AI科技股動態]
+[3-4句分析：具體股價+供應鏈影響]
+
+③ [標題：其他重點美股動態]
+[2-3句分析]
+
+📊 總體經濟
+
+① [標題：Fed/利率/通膨動態]
+[3-4句分析：引用具體數字；說明政策方向；評估對市場影響]
+
+② [標題：美債/美元/總經指標]
+[2-3句分析：具體數字+市場意義]
+
+⚡ 今日注意事項
+• [具體事件提醒，不要空泛]
+• [具體事件提醒]
+• [具體事件提醒]
+
+規則：
+- 每個分析點必須包含具體數字（指數點數、漲跌幅、金額）
+- 不能用模糊詞彙如「持續走高」「表現良好」替代真實數據
+- 分析要有深度：說明「為什麼」而不只是「是什麼」
+- 總長度控制在 1500-2000 字元"""
+
+    print("呼叫 Claude API 生成 MSG1...")
+    msg = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=2000,
+        system="你是台灣頂尖的金融市場分析師，專精於台股、美股、總體經濟分析。你的分析以數據驅動、邏輯清晰、洞察深刻著稱。",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return msg.content[0].text
+
+# ── 呼叫 Claude API 生成 MSG2 ──────────────────────────────────────────────────
+def generate_msg2(data_ctx):
+    prompt = f"""你是一位專業的台灣金融市場分析師。
+
+以下是今日（{date_str} {weekday}）最新市場數據與新聞（含連結）：
+
+{data_ctx}
+
+請根據以上新聞，整理第二則「重點新聞連結」。
+
+格式要求：
+📰 重點新聞連結｜{date_str}（{weekday}）
+
+🇹🇼 資金流向
+① [新聞標題]
+   [完整文章URL]
+② [新聞標題]
+   [完整文章URL]
+③ [新聞標題]
+   [完整文章URL]
+
+📋 重點財報
+① [新聞標題]
+   [完整文章URL]
+② [新聞標題]
+   [完整文章URL]
+
+🎯 預期受惠股
+① [新聞標題]
+   [完整文章URL]
+② [新聞標題]
+   [完整文章URL]
+
+🌏 美股動態
+① [新聞標題]
+   [完整文章URL]
+② [新聞標題]
+   [完整文章URL]
+③ [新聞標題]
+   [完整文章URL]
+
+📊 總體經濟
+① [新聞標題]
+   [完整文章URL]
+② [新聞標題]
+   [完整文章URL]
+
+規則：
+- 每條新聞必須使用上方原始資料中提供的真實 URL，不可捏造
+- 如果某分類沒有足夠新聞，可以少幾條，但不要放假連結
+- 標題保持原始新聞標題（可適當縮短）
+- 總長度控制在 1200 字元以內"""
+
+    print("呼叫 Claude API 生成 MSG2...")
+    msg = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1500,
+        system="你是台灣頂尖的金融市場分析師，擅長從大量新聞中精選最重要的資訊。",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return msg.content[0].text
+
+# ── 主流程 ────────────────────────────────────────────────────────────────────
+data_context = build_data_context()
+
+msg1 = generate_msg1(data_context)
+msg2 = generate_msg2(data_context)
+
 print("── 第一則：市場分析 ──")
-send("\n".join(L))
+print(msg1[:300], "...")
+send_telegram(msg1)
+
 print("── 第二則：新聞連結 ──")
-send("\n".join(R))
+print(msg2[:300], "...")
+send_telegram(msg2)
+
 print("✅ 完成")
