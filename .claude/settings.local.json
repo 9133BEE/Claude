@@ -21,7 +21,19 @@
       "WebFetch(domain:taichung.housetube.tw)",
       "WebFetch(domain:community.houseprice.tw)",
       "WebFetch(domain:www.jiac.com.tw)",
-      "Bash(Get-ChildItem \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\受眾包\" -Recurse)"
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\Authma\\\\Desktop\\\\Claude\\\\受眾包\" -Recurse)",
+      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\" -Depth 1 | Select-Object FullName, Attributes, LastWriteTime | Format-Table -AutoSize)",
+      "PowerShell(Test-Path \"$env:USERPROFILE\\\\.claude\\\\.git\")",
+      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\" -Depth 0 | ForEach-Object { $size = \\(Get-ChildItem $_.FullName -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum\\).Sum; [PSCustomObject]@{Name=$_.Name; Files=\\(Get-ChildItem $_.FullName -Recurse -File -ErrorAction SilentlyContinue\\).Count; SizeMB=[math]::Round\\($size/1MB,2\\)} })",
+      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\" | Select-Object Name)",
+      "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git init; git add -A; git status --short | Select-Object -First 20; Write-Host \"...and more\" -ForegroundColor Yellow)",
+      "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git status --short 2>&1 | Measure-Object -Line | Select-Object -ExpandProperty Lines)",
+      "PowerShell($size = \\(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\" -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum\\).Sum; [math]::Round\\($size/1MB,1\\))",
+      "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git commit -m \"initial sync: agents, projects, settings\")",
+      "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git config user.email \"13pheeb@gmail.com\"; git config user.name \"9133BEE\"; git commit -m \"initial sync: agents, projects, settings\")",
+      "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git ls-files projects/d--ClaudeRepo/)",
+      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\\\\d--ClaudeRepo\" -Recurse | Select-Object FullName)",
+      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\\\\d--ClaudeRepo\" -Force | Select-Object FullName, Attributes)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Authma\\.claude",

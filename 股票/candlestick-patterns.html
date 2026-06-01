@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K線型態圖鑑 — 股學筆記</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-primary:#1A56DB;--color-primary-light:#3B82F6;--color-accent:#6366F1;
+  --bg-page:#F8FAFC;--bg-card:#FFFFFF;--bg-dark:#0F172A;--bg-dark-card:#1E293B;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#475569;--text-faint:#94A3B8;
+  --border:#E2E8F0;
+  --shadow-card:0 1px 3px rgba(15,23,42,.06),0 4px 12px rgba(15,23,42,.04);
+  --shadow-hover:0 8px 32px rgba(26,86,219,.12),0 2px 8px rgba(15,23,42,.08);
+  --font:'Noto Sans TC',system-ui,sans-serif;
+  --font-en:'Inter','Noto Sans TC',sans-serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+  --radius:16px;--nav-h:64px;--tab-h:48px;
+  --bull:#EF4444;--bear:#334155;--neutral:#64748B;
+  --bull-bg:#FEF2F2;--bull-border:#FECACA;--bull-text:#DC2626;
+  --bear-bg:#F1F5F9;--bear-border:#CBD5E1;--bear-text:#334155;
+  --neutral-bg:#F8FAFC;--neutral-border:#E2E8F0;--neutral-text:#475569;
+  --beginner-bg:#D1FAE5;--beginner-text:#065F46;
+  --intermediate-bg:#FEF3C7;--intermediate-text:#92400E;
+  --advanced-bg:#FEE2E2;--advanced-text:#7F1D1D;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+button{font-family:var(--font);cursor:pointer;border:none;background:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:300;height:var(--nav-h);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;transition:box-shadow .2s}
+.nav.scrolled{box-shadow:0 1px 12px rgba(15,23,42,.08)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-primary);font-weight:800;font-family:var(--font-en);font-size:1.1rem;flex-shrink:0}
+.nav-logo svg{flex-shrink:0}
+.nav-logo span{color:var(--color-primary)}
+.nav-back{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-muted);font-size:.85rem;font-weight:500;padding:6px 12px;border:1px solid var(--border);border-radius:20px;transition:all .2s}
+.nav-back:hover{color:var(--color-primary);border-color:var(--color-primary-light);background:#EFF6FF}
+.nav-spacer{flex:1}
+.nav-search{position:relative;display:flex;align-items:center}
+.nav-search input{border:1px solid var(--border);border-radius:20px;padding:8px 16px 8px 38px;font-size:.875rem;font-family:var(--font);background:#F1F5F9;width:200px;transition:all .3s;outline:none;color:var(--text-primary)}
+.nav-search input:focus{width:280px;background:#fff;border-color:var(--color-primary-light)}
+.nav-search .search-icon{position:absolute;left:12px;color:var(--text-faint);pointer-events:none;width:16px;height:16px}
+#search-count{font-size:.8rem;color:var(--text-muted);flex-shrink:0;white-space:nowrap}
+
+/* HERO */
+.hero{background:var(--bg-dark);padding:44px 24px 36px;overflow:hidden;position:relative}
+.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center}
+.hero-label{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3B82F6;margin-bottom:8px;font-family:var(--font-en)}
+.hero-title{font-family:var(--font-en);font-weight:800;font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.2;color:#fff;margin-bottom:10px}
+.hero-title .grad{background:linear-gradient(90deg,#F87171,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{color:#94A3B8;font-size:.9rem;line-height:1.8;margin-bottom:20px}
+.hero-stats{display:flex;gap:28px}
+.hero-stat-num{font-family:var(--font-mono);font-size:1.3rem;font-weight:600;color:#60A5FA}
+.hero-stat-label{font-size:.72rem;color:#64748B;margin-top:2px}
+.hero-preview{display:flex;gap:8px;align-items:flex-end;opacity:.92}
+
+/* TABS */
+.tab-nav{position:sticky;top:var(--nav-h);z-index:200;background:#fff;border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-list{display:flex;max-width:1200px;margin:0 auto;padding:0 24px;position:relative;min-width:max-content}
+.tab-btn{padding:0 22px;height:var(--tab-h);font-size:.875rem;font-weight:500;color:var(--text-muted);display:flex;align-items:center;gap:7px;transition:color .2s;white-space:nowrap;position:relative}
+.tab-btn .tab-count{font-size:.7rem;background:#F1F5F9;color:var(--text-muted);padding:1px 7px;border-radius:100px;font-family:var(--font-mono)}
+.tab-btn.active{color:var(--color-primary);font-weight:700}
+.tab-btn.active .tab-count{background:#EFF6FF;color:var(--color-primary)}
+.tab-indicator{position:absolute;bottom:-2px;height:3px;border-radius:3px 3px 0 0;background:var(--color-primary);transition:left .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1)}
+
+/* FILTER BAR */
+.filter-bar{max-width:1200px;margin:0 auto;padding:14px 24px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;gap:8px}
+.filter-label{font-size:.78rem;color:var(--text-muted);font-weight:600;white-space:nowrap}
+.filter-btn{padding:4px 13px;border-radius:100px;font-size:.78rem;font-family:var(--font);border:1px solid var(--border);color:var(--text-muted);transition:all .15s;background:#fff;white-space:nowrap}
+.filter-btn.active-bull,.filter-btn:hover.bull-btn{background:var(--bull-bg);color:var(--bull-text);border-color:var(--bull-border)}
+.filter-btn.active-bear,.filter-btn:hover.bear-btn{background:var(--bear-bg);color:var(--bear-text);border-color:var(--bear-border)}
+.filter-btn.active-neutral,.filter-btn:hover.neutral-btn{background:var(--neutral-bg);color:var(--neutral-text);border-color:var(--neutral-border)}
+.filter-btn.active-diff,.filter-btn:hover.diff-btn{background:#EFF6FF;color:var(--color-primary);border-color:#BFDBFE}
+.filter-divider{width:1px;height:20px;background:var(--border)}
+.filter-spacer{flex:1}
+
+/* CARDS GRID */
+.cards-section{max-width:1200px;margin:0 auto;padding:20px 24px 64px}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:1024px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){
+  .cards-grid{grid-template-columns:1fr}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-preview{display:none}
+  .tab-btn{padding:0 16px}
+}
+
+/* CARD */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);overflow:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s;opacity:0;transform:translateY(20px)}
+.card.visible{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s ease,box-shadow .28s}
+.card.hidden-filter{display:none}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+
+/* CANDLE PREVIEW */
+.candle-preview{background:#0F172A;padding:16px 0 12px;display:flex;align-items:flex-end;justify-content:center;min-height:88px;position:relative}
+.candle-preview svg{display:block}
+.candle-preview .pattern-label{position:absolute;bottom:6px;right:10px;font-size:.62rem;font-family:var(--font-en);color:#334155;letter-spacing:.06em;text-transform:uppercase}
+
+/* DIRECTION BADGE */
+.dir-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:100px;font-size:.7rem;font-weight:700}
+.dir-bull{background:var(--bull-bg);color:var(--bull-text);border:1px solid var(--bull-border)}
+.dir-bear{background:var(--bear-bg);color:var(--bear-text);border:1px solid var(--bear-border)}
+.dir-neutral{background:var(--neutral-bg);color:var(--neutral-text);border:1px solid var(--neutral-border)}
+
+.card-header{padding:12px 16px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.card-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card-difficulty{padding:2px 9px;border-radius:100px;font-size:.68rem;font-weight:600;line-height:1.6}
+.difficulty-入門{background:var(--beginner-bg);color:var(--beginner-text)}
+.difficulty-進階{background:var(--intermediate-bg);color:var(--intermediate-text)}
+.difficulty-高階{background:var(--advanced-bg);color:var(--advanced-text)}
+.card-cat-badge{font-size:.65rem;font-weight:700;color:var(--text-faint);letter-spacing:.08em;text-transform:uppercase;font-family:var(--font-en)}
+
+.card-body{padding:8px 16px 12px}
+.card-title{font-size:.98rem;font-weight:700;line-height:1.4;margin-bottom:1px;color:var(--text-primary)}
+.card-en{font-size:.7rem;color:var(--text-faint);font-family:var(--font-en);margin-bottom:7px}
+.card-summary{font-size:.83rem;color:var(--text-muted);line-height:1.65;margin-bottom:9px}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.card-tag{padding:2px 8px;background:#F1F5F9;color:var(--text-muted);border-radius:6px;font-size:.7rem;border:1px solid var(--border);cursor:pointer;transition:all .15s}
+.card-tag:hover{background:#EFF6FF;color:var(--color-primary);border-color:#BFDBFE}
+
+/* EXPAND */
+.card-expand-btn{width:100%;padding:7px 0;font-size:.78rem;color:var(--color-primary);font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;border-top:1px dashed var(--border);transition:background .15s;border-radius:0 0 var(--radius) var(--radius)}
+.card-expand-btn:hover{background:#EFF6FF}
+.card-expand-btn .arrow{transition:transform .3s cubic-bezier(.4,0,.2,1);display:inline-block}
+.card.expanded .card-expand-btn .arrow{transform:rotate(180deg)}
+.card-detail{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.4,0,.2,1)}
+.card-detail-inner{padding:0 16px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--border)}
+.detail-block{border-radius:10px;overflow:hidden}
+.detail-block-title{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 12px 3px;display:flex;align-items:center;gap:6px}
+.detail-block-content{padding:3px 12px 10px;font-size:.83rem;line-height:1.75}
+.block-keypoints{background:#EFF6FF;border:1px solid #BFDBFE}
+.block-keypoints .detail-block-title{color:#1E40AF}
+.block-keypoints .detail-block-content{color:var(--text-secondary)}
+.block-keypoints ul{padding-left:16px}
+.block-keypoints li{margin-bottom:5px}
+.block-keypoints li::marker{color:var(--color-primary)}
+.block-example{background:#fff;border:1px solid var(--border);border-left:3px solid var(--color-primary)}
+.block-example .detail-block-title{color:var(--color-primary)}
+.block-example .detail-block-content{color:var(--text-secondary)}
+.block-tip{background:#FFFBEB;border:1px solid #FDE68A}
+.block-tip .detail-block-title{color:#92400E}
+.block-tip .detail-block-content{color:#78350F}
+.block-indicator{background:#F5F3FF;border:1px solid #DDD6FE}
+.block-indicator .detail-block-title{color:#5B21B6}
+.block-indicator .detail-block-content{color:#4C1D95}
+.block-indicator .detail-block-content span{display:inline-flex;align-items:center;gap:4px;background:#EDE9FE;border:1px solid #C4B5FD;border-radius:6px;padding:1px 8px;font-size:.75rem;margin:2px 3px 2px 0}
+
+/* FOOTER */
+.footer{background:var(--bg-dark);padding:36px 24px;text-align:center;color:#475569}
+.footer-logo{font-family:var(--font-en);font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px}
+.footer-logo span{color:#3B82F6}
+.footer-text{font-size:.8rem;line-height:1.8}
+.footer-disclaimer{margin-top:14px;font-size:.7rem;color:#334155;padding-top:14px;border-top:1px solid #1E293B}
+
+/* EMPTY STATE */
+.empty-state{grid-column:1/-1;text-align:center;padding:56px 24px;color:var(--text-muted)}
+.empty-state svg{width:44px;height:44px;margin:0 auto 14px;opacity:.4}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <a href="index.html" class="nav-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="7" fill="#1A56DB"/>
+      <polyline points="4,20 9,13 14,16 19,8 24,10" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="19" cy="8" r="2" fill="#60A5FA"/>
+    </svg>
+    <span>股學</span>筆記
+  </a>
+  <a href="index.html" class="nav-back">← 回主頁</a>
+  <div class="nav-spacer"></div>
+  <span id="search-count"></span>
+  <div class="nav-search">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="搜尋型態..." autocomplete="off">
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-label">Technical Analysis</div>
+      <h1 class="hero-title">K線型態<span class="grad">完整圖鑑</span></h1>
+      <p class="hero-subtitle">35 種經典K線型態一站收錄 — 從單根影線到五K延續型態<br>每種型態附帶 SVG 視覺圖示、台股實例與操作技巧</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">35</div><div class="hero-stat-label">型態總數</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">4</div><div class="hero-stat-label">型態分類</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">難度等級</div></div>
+      </div>
+    </div>
+    <div class="hero-preview" id="hero-preview"></div>
+  </div>
+</section>
+
+<!-- TABS -->
+<div class="tab-nav" id="tab-nav">
+  <div class="tab-list" id="tab-list">
+    <button class="tab-btn active" data-cat="all" onclick="switchCat('all',this)">全部 <span class="tab-count">35</span></button>
+    <button class="tab-btn" data-cat="single" onclick="switchCat('single',this)">單K型態 <span class="tab-count">11</span></button>
+    <button class="tab-btn" data-cat="double" onclick="switchCat('double',this)">雙K型態 <span class="tab-count">8</span></button>
+    <button class="tab-btn" data-cat="triple" onclick="switchCat('triple',this)">三K型態 <span class="tab-count">10</span></button>
+    <button class="tab-btn" data-cat="special" onclick="switchCat('special',this)">特殊型態 <span class="tab-count">6</span></button>
+    <div class="tab-indicator" id="tab-indicator"></div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <span class="filter-label">方向：</span>
+    <button class="filter-btn bull-btn active-bull" data-dir="all" onclick="filterDir('all',this)">全部</button>
+    <button class="filter-btn bull-btn" data-dir="true" onclick="filterDir('true',this)">🟢 看漲</button>
+    <button class="filter-btn bear-btn" data-dir="false" onclick="filterDir('false',this)">🔴 看跌</button>
+    <button class="filter-btn neutral-btn" data-dir="null" onclick="filterDir('null',this)">⚪ 中性</button>
+  </div>
+  <div class="filter-divider"></div>
+  <div class="filter-group">
+    <span class="filter-label">難度：</span>
+    <button class="filter-btn diff-btn active-diff" data-diff="all" onclick="filterDiff('all',this)">全部</button>
+    <button class="filter-btn diff-btn" data-diff="入門" onclick="filterDiff('入門',this)">🟢 入門</button>
+    <button class="filter-btn diff-btn" data-diff="進階" onclick="filterDiff('進階',this)">🟡 進階</button>
+    <button class="filter-btn diff-btn" data-diff="高階" onclick="filterDiff('高階',this)">🔴 高階</button>
+  </div>
+</div>
+
+<!-- CARDS -->
+<div class="cards-section">
+  <div class="cards-grid" id="cards-grid"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo"><span>股學</span>筆記</div>
+  <div class="footer-text">K線型態圖鑑 — 35種型態完整收錄</div>
+  <div class="footer-disclaimer">© 2025 股學筆記｜本站內容僅供教育參考，不構成任何投資建議。投資有風險，入市需謹慎。</div>
+</footer>
+
+<script>
+// ─── SVG DRAWING ENGINE ────────────────────────────────────────────────
+const BULL_C = '#EF4444', BEAR_C = '#94A3B8', NEU_C = '#64748B';
+const BULL_F = '#EF4444', BEAR_F = '#475569';
+
+function drawC(cx, c) {
+  const col = c.bull === true ? BULL_C : c.bull === false ? BEAR_C : NEU_C;
+  const fill = c.bull === true ? BULL_F : c.bull === false ? BEAR_F : NEU_C;
+  const bw = 14, hw = bw / 2;
+  let s = '';
+  if (c.h < c.bt - 0.5)
+    s += `<line x1="${cx}" y1="${c.h}" x2="${cx}" y2="${c.bt}" stroke="${col}" stroke-width="1.5" stroke-linecap="round"/>`;
+  if (c.bb > c.bt + 1.5) {
+    s += `<rect x="${cx-hw}" y="${c.bt}" width="${bw}" height="${c.bb-c.bt}" fill="${fill}" rx="1.5"/>`;
+  } else {
+    s += `<line x1="${cx-hw}" y1="${(c.bt+c.bb)/2}" x2="${cx+hw}" y2="${(c.bt+c.bb)/2}" stroke="${col}" stroke-width="2.5"/>`;
+  }
+  if (c.l > c.bb + 0.5)
+    s += `<line x1="${cx}" y1="${c.bb}" x2="${cx}" y2="${c.l}" stroke="${col}" stroke-width="1.5" stroke-linecap="round"/>`;
+  return s;
+}
+
+function psvg(id, cs, W, extras) {
+  const H = 84;
+  const N = cs.length;
+  const step = W / N;
+  let inner = '';
+  cs.forEach((c, i) => { inner += drawC(step * i + step / 2, c); });
+  if (extras) inner += extras;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+
+// Gap indicator helper
+function gapRect(x1, x2, y1, y2, up) {
+  const col = up ? 'rgba(239,68,68,.15)' : 'rgba(100,116,139,.15)';
+  const stroke = up ? 'rgba(239,68,68,.4)' : 'rgba(100,116,139,.4)';
+  return `<rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" fill="${col}" stroke="${stroke}" stroke-width="0.5" stroke-dasharray="3,2"/>`;
+}
+
+// ─── PATTERN DATA ───────────────────────────────────────────────────────
+const PATTERNS = [
+  // ── SINGLE K ──────────────────────────────────────────────────────────
+  {id:'hammer',cat:'single',title:'錘子線',en:'Hammer',bullish:true,diff:'入門',
+   tags:['底部反轉','下影線','單K'],
+   summary:'下跌趨勢末端的強力支撐訊號，下影線至少是實體2倍，代表空方無力繼續壓制。',
+   points:['出現在下跌趨勢中才具意義；下影線越長、實體越小、收紅實體更佳，反轉訊號越強','需等次日確認K線（跳空開高或收紅）再入場，避免假訊號','停損設於錘子線低點下方1%，風險報酬比佳'],
+   example:'台積電2022年10月落底時連續出現錘子線，配合量縮後形成底部，隨後從370元大幅反彈。',
+   tip:'錘子線當日不追買，等次日開盤站上實體上緣再進場。實體越短、下影越長訊號越強。',
+   indicators:['RSI低於30','KD值低檔黃金交叉','成交量萎縮至均量50%以下'],
+   svg: () => psvg('hammer',[{h:14,bt:14,bb:26,l:76,bull:true}],48)},
+
+  {id:'hanging_man',cat:'single',title:'上吊線',en:'Hanging Man',bullish:false,diff:'入門',
+   tags:['頭部反轉','下影線','單K'],
+   summary:'外觀與錘子線相同，但出現在上漲趨勢高點，代表買盤開始衰竭，是看跌警訊。',
+   points:['與錘子線外觀完全相同，差別只在趨勢位置：上漲高點才稱上吊線','出現後觀察次日是否跳空低開或收黑，確認趨勢轉弱','黑色實體（收黑）的上吊線訊號強於紅色實體'],
+   example:'大盤在短期高點搭配融資高位常見上吊線，往往是短線賣出訊號。',
+   tip:'持有多單可在次日開盤跌破上吊線實體下緣時減碼，不必等收盤確認。',
+   indicators:['RSI高於70','MACD出現負背離','成交量放大但價格漲幅縮小'],
+   svg: () => psvg('hanging_man',[{h:14,bt:14,bb:26,l:76,bull:false}],48)},
+
+  {id:'inverted_hammer',cat:'single',title:'倒錘線',en:'Inverted Hammer',bullish:true,diff:'入門',
+   tags:['底部反轉','上影線','單K'],
+   summary:'下跌趨勢低點出現長上影線，顯示買方試圖拉高但未成功，次日若確認則轉折。',
+   points:['上影線至少為實體2倍，幾乎無下影線，出現在明顯下跌趨勢後','本身訊號弱，強烈依賴次日確認K線（跳空開高或大紅K）','代表空方賣壓已出盡，買方開始試探，次日成交量放大更可信'],
+   example:'中小型股跌深後常見倒錘線搭配爆量，是法人或大戶開始低接的訊號之一。',
+   tip:'倒錘線本身不入場，次日跳空開高且站穩前日收盤上方才視為買點，訊號強度低於錘子線。',
+   indicators:['布林通道下軌','成交量是否出現異常放大','籌碼面是否有外資買超'],
+   svg: () => psvg('inverted_hammer',[{h:10,bt:60,bb:72,l:74,bull:true}],48)},
+
+  {id:'shooting_star',cat:'single',title:'射擊之星',en:'Shooting Star',bullish:false,diff:'入門',
+   tags:['頭部反轉','上影線','單K'],
+   summary:'上漲趨勢高點盤中大幅拉高後遭賣壓壓回，收盤接近低點，是強烈看跌訊號。',
+   points:['上影線至少為實體2倍，出現在上升趨勢高點；收黑實體比收紅更具警示意義','代表多方拉高後遭空方強力抵抗，上方套牢籌碼沉重','需等次日開盤確認是否繼續走弱再操作'],
+   example:'台股牛市後段主力護盤拉高吸引散戶進場後大量出貨，常在日線留下射擊之星。',
+   tip:'持多單見射擊之星先減倉，空單可在次日跌破射擊之星實體下緣時放空，停損設上影線高點。',
+   indicators:['RSI高於70超買','布林通道上軌附近','MACD柱狀體縮短'],
+   svg: () => psvg('shooting_star',[{h:10,bt:60,bb:72,l:74,bull:false}],48)},
+
+  {id:'doji',cat:'single',title:'十字線',en:'Doji',bullish:null,diff:'入門',
+   tags:['中性','猶豫','趨勢轉折預警','單K'],
+   summary:'開盤與收盤幾乎相同，多空力道完全平衡，趨勢可能即將改變的早期警訊。',
+   points:['單獨出現意義有限，需結合趨勢位置：上升高點=看跌警訊；下降低點=看漲警訊','上下影線越長，當日多空爭奪越激烈，不確定性越高','連續兩根十字線後的突破方向，往往是中期趨勢的起點'],
+   example:'大盤在關鍵整數關卡（如萬八、萬七）附近常出現十字線，是多空轉換的觀察點。',
+   tip:'十字線出現後採「等待策略」，次日收盤方向決定倉位；不在十字線當日建立新倉位。',
+   indicators:['成交量是否萎縮（萎縮=盤整，放大=重要轉折）','前後K線的趨勢方向','關鍵支撐壓力位置'],
+   svg: () => psvg('doji',[{h:10,bt:42,bb:42,l:76,bull:null}],48)},
+
+  {id:'long_legged_doji',cat:'single',title:'長腳十字線',en:'Long-Legged Doji',bullish:null,diff:'進階',
+   tags:['中性','高波動','猶豫','單K'],
+   summary:'上下影線都極長的十字線，當日多空激烈廝殺後平局，市場極度不確定。',
+   points:['上下影線均超過平均K線高度，實體近乎消失，是極端不確定性的象徵','在重要趨勢後出現，轉折概率高於普通十字線','配合成交量爆量出現，代表籌碼大幅換手，後續往往出現明確方向'],
+   example:'台股重大事件日（聯準會決策、總統大選）隔日常出現長腳十字線，代表市場消化不確定性。',
+   tip:'長腳十字後的第一根方向K線往往帶量，是順勢操作的入場機會，跟進勝率較高。',
+   indicators:['VIX（波動率指標）','成交量是否為近期高點','當日消息面是否有重大事件'],
+   svg: () => psvg('long_legged_doji',[{h:8,bt:42,bb:42,l:78,bull:null}],48)},
+
+  {id:'dragonfly_doji',cat:'single',title:'蜻蜓十字線',en:'Dragonfly Doji',bullish:true,diff:'進階',
+   tags:['底部反轉','下影線','十字變形','單K'],
+   summary:'開盤、最高價、收盤三者相同，只有長下影線，是強力底部支撐訊號。',
+   points:['開高走低後買盤強力回補，最終收盤回到開盤位置，空方完全失敗','出現在下跌趨勢末端或重要支撐位，可靠度高於普通錘子線','下影線越長、成交量越大，底部確認的可靠性越高'],
+   example:'指數季線或年線附近出現蜻蜓十字配合大量，是中長線布局的重要參考。',
+   tip:'隔日開盤站上蜻蜓十字的開收盤價格後積極做多，停損設下影線低點。',
+   indicators:['成交量需明顯大於前幾日','是否在重要技術支撐位（均線、前低）','RSI是否低於30'],
+   svg: () => psvg('dragonfly_doji',[{h:12,bt:12,bb:12,l:74,bull:null}],48)},
+
+  {id:'gravestone_doji',cat:'single',title:'墓碑十字線',en:'Gravestone Doji',bullish:false,diff:'進階',
+   tags:['頭部反轉','上影線','十字變形','單K'],
+   summary:'開盤、最低價、收盤三者相同，只有長上影線，是強力頭部壓力訊號。',
+   points:['開低走高後遭賣壓徹底壓回，多方完全失敗，代表上方壓力極重','出現在上升趨勢末端或重要壓力位，是高可靠度的賣出訊號','上影線越長、成交量越大，頭部確認越可信'],
+   example:'台股指數觸及前波高點或整數關卡（如萬八）時出現墓碑十字，通常是短中線高點。',
+   tip:'持多單見墓碑十字應立即減碼至少50%，次日跌破墓碑開收盤位置時清倉。',
+   indicators:['前波高點或整數關卡','成交量放大程度','RSI是否進入超買區'],
+   svg: () => psvg('gravestone_doji',[{h:10,bt:74,bb:74,l:76,bull:null}],48)},
+
+  {id:'marubozu_bull',cat:'single',title:'多頭禿頭線',en:'Bullish Marubozu',bullish:true,diff:'入門',
+   tags:['強勢多頭','無影線','趨勢延續','單K'],
+   summary:'無上下影線的大陽線，開盤即最低、收盤即最高，代表多方全程掌控，是最強單K看漲訊號。',
+   points:['整個交易日多方主導，沒有任何回調或壓力','出現在突破點或趨勢初期，代表趨勢強烈延續的可能性高','成交量放大的多頭禿頭線，是主力積極建倉的訊號'],
+   example:'台股電子股業績超預期公布後常出現多頭禿頭線，代表市場共識看好。',
+   tip:'順勢追買時注意量是否配合，若量不足的禿頭線隔日容易出現賣壓回測。',
+   indicators:['成交量是否達近期最大量','是否突破關鍵壓力位','MACD柱狀體是否快速放大'],
+   svg: () => psvg('marubozu_bull',[{h:10,bt:10,bb:76,l:76,bull:true}],48)},
+
+  {id:'marubozu_bear',cat:'single',title:'空頭禿頭線',en:'Bearish Marubozu',bullish:false,diff:'入門',
+   tags:['強勢空頭','無影線','趨勢延續','單K'],
+   summary:'無上下影線的大陰線，開盤即最高、收盤即最低，代表空方全程掌控，是最強單K看跌訊號。',
+   points:['整日空方主導，無任何反彈，是最強烈的單K看跌訊號','出現在破位（跌破支撐）時配合放量，代表趨勢加速下跌','若出現在下跌趨勢中段，後續往往還有一段跌幅，不宜輕易抄底'],
+   example:'台股重大利空公告日（景氣反轉、砍單）常出現空頭禿頭線，是清倉訊號。',
+   tip:'見空頭禿頭線不追空（當日跌幅已大），等次日反彈至前日收盤附近再放空，風險報酬更佳。',
+   indicators:['成交量放大程度（恐慌性拋售）','是否跌破重要支撐（年線、季線）','融資是否大量斷頭'],
+   svg: () => psvg('marubozu_bear',[{h:10,bt:10,bb:76,l:76,bull:false}],48)},
+
+  {id:'spinning_top',cat:'single',title:'紡錘線',en:'Spinning Top',bullish:null,diff:'入門',
+   tags:['中性','猶豫','盤整','單K'],
+   summary:'小實體搭配上下影線，多空勢均力敵，市場陷入猶豫，方向不明確。',
+   points:['實體小（約整根K線1/3以下），上下影線均存在且長度相近','單獨出現代表盤整，連續出現代表方向選擇即將到來','在趨勢末端出現，結合前後K線判斷可能的轉折方向'],
+   example:'個股在整理平台中常見紡錘線連續出現，代表籌碼換手中，突破時方向往往較明確。',
+   tip:'連續三根以上紡錘線後，第一根突破往往是方向確認，可跟進。',
+   indicators:['布林通道帶寬收窄（盤整確認）','成交量是否持續萎縮','ADX是否低於20'],
+   svg: () => psvg('spinning_top',[{h:10,bt:30,bb:56,l:76,bull:null}],48)},
+
+  // ── DOUBLE K ──────────────────────────────────────────────────────────
+  {id:'bullish_engulfing',cat:'double',title:'看漲吞噬',en:'Bullish Engulfing',bullish:true,diff:'入門',
+   tags:['底部反轉','吞噬型','雙K'],
+   summary:'下跌趨勢中，大陽線完全吞噬前一根陰線，代表多方強力反攻，底部反轉訊號。',
+   points:['第二根陽線的開盤低於前日收盤，收盤高於前日開盤（完整吞噬實體）','吞噬幅度越大、成交量越大，訊號越強','出現在明顯下跌趨勢後的低點，可靠性更高；盤整中出現意義較小'],
+   example:'台股在季線支撐位見到看漲吞噬且成交量倍增，往往是波段低點的有力確認。',
+   tip:'吞噬發生當日積極進場，停損設第一根陰線低點下方；次日繼續收紅可加倉。',
+   indicators:['成交量需大於前日（至少1.5倍）','KD低檔交叉','是否在重要均線支撐附近'],
+   svg: () => psvg('bullish_engulfing',[{h:20,bt:26,bb:56,l:60,bull:false},{h:14,bt:10,bb:68,l:72,bull:true}],96)},
+
+  {id:'bearish_engulfing',cat:'double',title:'看跌吞噬',en:'Bearish Engulfing',bullish:false,diff:'入門',
+   tags:['頭部反轉','吞噬型','雙K'],
+   summary:'上漲趨勢中，大陰線完全吞噬前一根陽線，代表空方強力壓制，頭部反轉訊號。',
+   points:['第二根陰線的開盤高於前日收盤，收盤低於前日開盤（完整吞噬實體）','吞噬幅度越大、成交量越大，看跌訊號越強烈','出現在上漲趨勢高點或重要壓力位，才是有意義的賣出訊號'],
+   example:'台股多頭末期法人出貨日常出現帶量看跌吞噬，是中期見頂的重要警訊。',
+   tip:'看跌吞噬出現後，次日繼續低開應立即減倉；跌破吞噬陰線低點，確認反轉。',
+   indicators:['成交量放大（法人出貨量）','MACD高位死叉','RSI由高位下滑'],
+   svg: () => psvg('bearish_engulfing',[{h:18,bt:20,bb:52,l:56,bull:true},{h:10,bt:8,bb:70,l:74,bull:false}],96)},
+
+  {id:'bullish_harami',cat:'double',title:'看漲孕線',en:'Bullish Harami',bullish:true,diff:'進階',
+   tags:['底部反轉','孕線型','雙K'],
+   summary:'大陰線後出現被完整包住的小陽線，代表空方動能衰竭，反轉初步形成。',
+   points:['第二根K線（子線）的實體完全在第一根K線（母線）實體範圍內','與吞噬型相反，孕線是被包住，訊號強度較吞噬型弱','子線越小（接近十字線）、位置越接近母線中間，訊號越強'],
+   example:'跌深個股在底部出現孕線配合RSI低於30，是中線布局的觀察點，需等第三天確認。',
+   tip:'孕線後等第三根K線確認方向再入場；若第三天大漲確認，停損設子線低點。',
+   indicators:['RSI低於30超賣區','布林通道下軌附近','成交量縮量（賣壓減少）'],
+   svg: () => psvg('bullish_harami',[{h:10,bt:10,bb:76,l:76,bull:false},{h:28,bt:32,bb:54,l:60,bull:true}],96)},
+
+  {id:'bearish_harami',cat:'double',title:'看跌孕線',en:'Bearish Harami',bullish:false,diff:'進階',
+   tags:['頭部反轉','孕線型','雙K'],
+   summary:'大陽線後出現被包住的小陰線，代表多方動能衰竭，高點反轉初步出現。',
+   points:['第二根陰線實體完全在前日大陽線實體內，代表多頭失去推升能力','出現在明顯上漲趨勢的高點，訊號才有意義','若第二根接近十字線（孕線十字），訊號更強，稱為「十字孕線」'],
+   example:'台股個股股價創新高後出現孕線，代表追高買盤開始觀望，是先行減碼的訊號。',
+   tip:'見看跌孕線可先減倉1/3，等第三天確認下跌（跌破子線低點）再進一步減碼。',
+   indicators:['成交量萎縮（多頭動能不足）','MACD柱狀體縮短','前方是否有重要壓力位'],
+   svg: () => psvg('bearish_harami',[{h:10,bt:10,bb:76,l:76,bull:true},{h:24,bt:28,bb:50,l:58,bull:false}],96)},
+
+  {id:'dark_cloud_cover',cat:'double',title:'烏雲罩頂',en:'Dark Cloud Cover',bullish:false,diff:'進階',
+   tags:['頭部反轉','雙K','強力看跌'],
+   summary:'上漲趨勢中，大陰線跳空高開後收盤跌入前日陽線實體中段以下，看跌訊號強烈。',
+   points:['第二根陰線必須跳空高開（高於前日收盤），且收盤跌入前日陽線實體50%以上','收盤穿入前日實體越深，看跌意義越強；若完全吞噬則升格為看跌吞噬','出現在重要壓力位或創新高後，是中短線賣出的強烈訊號'],
+   example:'台股多頭末段常見大陽線後隔日帶缺口高開卻被大量賣壓壓回，形成烏雲罩頂出貨型態。',
+   tip:'烏雲罩頂當日下午見收盤趨勢確認時減倉，次日開盤確認不反彈時清倉，停損設前日陽線高點。',
+   indicators:['成交量第二天是否放大（出貨量）','MACD高位死叉','RSI從超買區回頭'],
+   svg: () => psvg('dark_cloud_cover',[{h:22,bt:26,bb:64,l:68,bull:true},{h:12,bt:16,bb:52,l:66,bull:false}],96)},
+
+  {id:'piercing_line',cat:'double',title:'刺透線',en:'Piercing Line',bullish:true,diff:'進階',
+   tags:['底部反轉','雙K','強力看漲'],
+   summary:'下跌趨勢中，陽線跳空低開後強力拉升，收盤穿入前日陰線實體中段以上，看漲反轉。',
+   points:['第二根陽線跳空低開（低於前日收盤），但收盤至少穿入前日陰線實體50%','穿入深度越深，看漲訊號越強；若完全吞噬則升格為看漲吞噬','出現在重要支撐位或大幅下跌後，配合成交量放大可靠性高'],
+   example:'台股在季線或重要整數支撐附近出現刺透線，是波段買點的重要參考，勝率高於單純錘子線。',
+   tip:'刺透線形成後的次日可積極建倉，停損設刺透線第二日的低點（跳空低開價）下方。',
+   indicators:['成交量第二天需放大','KD低檔黃金交叉','布林通道下軌或重要均線支撐'],
+   svg: () => psvg('piercing_line',[{h:16,bt:20,bb:66,l:70,bull:false},{h:22,bt:38,bb:76,l:78,bull:true}],96)},
+
+  {id:'tweezer_top',cat:'double',title:'鑷子頂',en:'Tweezer Top',bullish:false,diff:'進階',
+   tags:['頭部反轉','雙K','高點相同'],
+   summary:'連續兩根K線最高點相同（或極接近），代表相同價位出現強力賣壓，壓力位確立。',
+   points:['兩根K線的最高點在相同或極接近的位置，多方二度衝高均失敗','通常第一根為陽線或中性，第二根為陰線','高點相同越精確、出現在越明顯的上升趨勢後，訊號越可靠'],
+   example:'台股個股在整數關卡（如100元、200元）反覆觸及同一高點，形成鑷子頂。',
+   tip:'第二根確認形成鑷子頂時，以第二根收盤賣出，停損設共同高點上方1%。',
+   indicators:['成交量是否在第二根放大（有人在相同高點出貨）','是否在前波高點或整數關卡附近','RSI背離'],
+   svg: () => psvg('tweezer_top',[{h:10,bt:16,bb:55,l:60,bull:true},{h:10,bt:14,bb:64,l:70,bull:false}],96)},
+
+  {id:'tweezer_bottom',cat:'double',title:'鑷子底',en:'Tweezer Bottom',bullish:true,diff:'進階',
+   tags:['底部反轉','雙K','低點相同'],
+   summary:'連續兩根K線最低點相同（或極接近），代表相同支撐位有強力買盤承接，支撐確立。',
+   points:['兩根K線的最低點在相同或極接近的位置，空方二度攻擊均被阻擋','通常第一根為陰線或中性，第二根為陽線','結合其他支撐訊號（均線、前低）出現，可靠性更高'],
+   example:'台股個股在歷史重要支撐位或整數關卡反覆守住同一低點，是安全的買入區。',
+   tip:'鑷子底第二根確認後可建立多單，停損設共同低點下方1%，是風險報酬極佳的買點。',
+   indicators:['是否在歷史支撐位（前低、均線）','成交量是否在第二根放大（低點積極承接）','KD黃金交叉'],
+   svg: () => psvg('tweezer_bottom',[{h:18,bt:24,bb:76,l:76,bull:false},{h:16,bt:18,bb:62,l:76,bull:true}],96)},
+
+  // ── TRIPLE K ──────────────────────────────────────────────────────────
+  {id:'morning_star',cat:'triple',title:'晨星',en:'Morning Star',bullish:true,diff:'進階',
+   tags:['底部反轉','三K','強力看漲'],
+   summary:'三根K線組成的底部反轉型態：大陰線 → 小實體過渡K線 → 大陽線，確認底部形成。',
+   points:['第一根大陰線、第二根為小實體（紡錘或十字），第三根大陽線收盤穿回第一根實體中段以上','第二根小K線是多空換手的關鍵，越接近十字線訊號越強（晨星十字型）','台股缺口不一定完整，但三根K線的方向與大小符合即可認定'],
+   example:'台股熊市末期或個股大幅修正後，晨星型態配合外資回補是最可靠的底部反轉型態之一。',
+   tip:'第三根大陽線收盤確認後，以第三根收盤價進場，停損設第二根（小K線）低點下方。',
+   indicators:['RSI低於30後回升','成交量第三天大幅放大','MACD低位黃金交叉'],
+   svg: () => psvg('morning_star',[{h:12,bt:14,bb:58,l:62,bull:false},{h:66,bt:68,bb:74,l:76,bull:null},{h:10,bt:12,bb:48,l:52,bull:true}],144)},
+
+  {id:'evening_star',cat:'triple',title:'夜星',en:'Evening Star',bullish:false,diff:'進階',
+   tags:['頭部反轉','三K','強力看跌'],
+   summary:'三根K線組成的頭部反轉型態：大陽線 → 小實體星星 → 大陰線，確認頭部形成。',
+   points:['第一根大陽線、第二根小實體（高點星星），第三根大陰線收盤跌入第一根實體中段以下','第二根高開形成缺口，代表多方最後衝高，隨後遭賣壓壓制','第三根陰線收盤越低（穿入第一根越深），反轉確認越強烈'],
+   example:'台股多頭末期重要壓力位（前波高點、整數關卡）常見夜星型態，是中線見頂的高可靠訊號。',
+   tip:'夜星完成後立即減倉，停損設第二根（星星）K線高點，為最重要的三K賣出型態之一。',
+   indicators:['RSI高於70後下滑','MACD高位死叉','成交量第三天放大（出貨確認）'],
+   svg: () => psvg('evening_star',[{h:10,bt:12,bb:54,l:58,bull:true},{h:4,bt:6,bb:12,l:16,bull:null},{h:18,bt:22,bb:64,l:68,bull:false}],144)},
+
+  {id:'morning_doji_star',cat:'triple',title:'晨星十字',en:'Morning Doji Star',bullish:true,diff:'高階',
+   tags:['底部反轉','三K','十字變形','最強看漲'],
+   summary:'晨星型態的加強版，中間的過渡K線為十字線，反轉訊號強度為所有三K型態之最高。',
+   points:['第二根必須是十字線（開收盤幾乎相同），代表多空力量最精確的轉折點','比普通晨星更強，因為十字線代表空方力量精確耗盡','出現概率低於普通晨星，但每次出現的可靠度極高，特別是在重要支撐位'],
+   example:'台股指數在歷史重要低點附近（如金融海嘯底部4,000點）曾出現晨星十字型態。',
+   tip:'晨星十字是最可靠的底部訊號之一，見到後可積極建立中長線倉位，停損設十字線低點。',
+   indicators:['RSI是否達到極度超賣（低於20）','成交量是否在十字線後放大','長期均線（年線、月線）支撐確認'],
+   svg: () => psvg('morning_doji_star',[{h:12,bt:14,bb:58,l:62,bull:false},{h:66,bt:72,bb:72,l:76,bull:null},{h:10,bt:12,bb:48,l:52,bull:true}],144)},
+
+  {id:'three_white_soldiers',cat:'triple',title:'三白兵（紅三兵）',en:'Three White Soldiers',bullish:true,diff:'入門',
+   tags:['趨勢反轉','趨勢延續','三K','強力看漲'],
+   summary:'連續三根漸進上升的大陽線，每根均在前根實體內開盤且收盤創新高，代表多頭全面主導。',
+   points:['三根陽線實體大小相近，每根開盤在前根實體中段附近，收盤持續創近期高點','理想型態下三根均無上影線，代表多頭極強','出現在底部盤整突破後意義最大；若出現在趨勢已走很長後，需警惕過熱反轉'],
+   example:'台股電子股業績轉佳確認後常出現三白兵，是趨勢確立的強力訊號，追漲勝率較高。',
+   tip:'三白兵第三日追漲需注意量能，若第三根成交量低於前兩根，代表動能衰減，勿追高。',
+   indicators:['成交量是否呈遞增狀態','MACD柱狀體是否持續放大','是否突破重要壓力後出現'],
+   svg: () => psvg('three_white_soldiers',[{h:36,bt:38,bb:70,l:72,bull:true},{h:22,bt:24,bb:56,l:58,bull:true},{h:8,bt:10,bb:42,l:44,bull:true}],144)},
+
+  {id:'three_black_crows',cat:'triple',title:'三黑鴉',en:'Three Black Crows',bullish:false,diff:'入門',
+   tags:['趨勢反轉','趨勢延續','三K','強力看跌'],
+   summary:'連續三根漸進下降的大陰線，代表空頭全面主導，下跌趨勢確立或加速。',
+   points:['三根陰線實體大小相近，每根開盤在前根實體中段附近，收盤持續創近期低點','理想型態下三根均無下影線，是極強烈的看跌訊號','出現在頭部反轉後意義最大，代表趨勢已確立向下，不宜逆勢抄底'],
+   example:'台股熊市初期或重大利空確認後常見三黑鴉，代表主力積極出貨，多方毫無抵抗能力。',
+   tip:'三黑鴉出現後不抄底，等第四天出現明確反彈型態（如錘子、蜻蜓十字）再評估。',
+   indicators:['成交量是否持續放大（恐慌拋售）','是否跌破重要均線（年線、季線）','RSI是否快速下滑'],
+   svg: () => psvg('three_black_crows',[{h:8,bt:10,bb:46,l:48,bull:false},{h:24,bt:26,bb:62,l:64,bull:false},{h:40,bt:42,bb:76,l:78,bull:false}],144)},
+
+  {id:'abandoned_baby_bull',cat:'triple',title:'看漲棄嬰',en:'Bullish Abandoned Baby',bullish:true,diff:'高階',
+   tags:['底部反轉','三K','缺口','極強看漲'],
+   summary:'下跌後出現跳空孤立的十字線，再跳空向上大陽線，是最罕見也最強力的底部反轉型態。',
+   points:['第二根十字線必須與前後兩根K線都有缺口（包括影線不重疊），「棄嬰」孤立於低點','此型態在台股日線極為罕見，在周線或月線偶爾可見，可靠性接近100%','三根K線中的任何一根缺口不完整，則降格為普通晨星十字，仍是強訊號'],
+   example:'此型態在台股日線幾乎不存在（因漲跌幅限制），在周線偶見，每次出現均為重大底部。',
+   tip:'見到完整棄嬰型態可大膽建立重倉，這是技術面最高可靠度的買入訊號，鮮少假訊號。',
+   indicators:['週線或月線RSI低於20','長期成交量萎縮後突然放大','基本面是否有超跌情況'],
+   svg: () => psvg('abandoned_baby_bull',[{h:10,bt:12,bb:56,l:60,bull:false},{h:66,bt:70,bb:70,l:74,bull:null},{h:8,bt:10,bb:52,l:54,bull:true}],144)},
+
+  {id:'abandoned_baby_bear',cat:'triple',title:'看跌棄嬰',en:'Bearish Abandoned Baby',bullish:false,diff:'高階',
+   tags:['頭部反轉','三K','缺口','極強看跌'],
+   summary:'上漲後跳空孤立十字線，再跳空向下大陰線，最罕見的頂部反轉型態，訊號極度可靠。',
+   points:['第二根十字線與前後K線都必須有缺口（影線也不重疊），完全孤立於高點','台股日線因漲跌幅限制極少出現，但在周線可見，每次均為重大頭部','形成條件嚴格，一旦確認幾乎100%有效，是中線見頂的最強訊號'],
+   example:'台股多頭主升段末期的周線偶有此型態，每次出現後均有至少20%以上的跌幅。',
+   tip:'完整看跌棄嬰出現時，應立即清倉所有多頭倉位，甚至可建立空頭部位，停損設十字線高點。',
+   indicators:['週線MACD高位死叉','週線RSI高於80後下滑','大盤成交量連續放大的高位'],
+   svg: () => psvg('abandoned_baby_bear',[{h:8,bt:10,bb:52,l:54,bull:true},{h:4,bt:6,bb:6,l:10,bull:null},{h:18,bt:22,bb:66,l:68,bull:false}],144)},
+
+  {id:'three_inside_up',cat:'triple',title:'三內升',en:'Three Inside Up',bullish:true,diff:'進階',
+   tags:['底部反轉','三K','孕線確認'],
+   summary:'看漲孕線的三K確認版：大陰線 → 孕線小陽線 → 確認大陽線，可靠性優於兩K孕線。',
+   points:['前兩根構成看漲孕線，第三根大陽線超過第一根陰線開盤價，完整確認反轉','三根K線缺一不可，第三根確認大陽線是關鍵','出現在下跌趨勢低點，配合成交量第三天放大，是中短線可靠的買入訊號'],
+   example:'台股底部整理後的三內升型態，是判斷底部確立、可以積極布局的型態之一。',
+   tip:'第三根陽線收盤後進場，停損設第二根（小陽線）低點，是比孕線更穩健的入場方式。',
+   indicators:['成交量逐日遞增','KD低檔完成黃金交叉','RSI從低點回升超過50'],
+   svg: () => psvg('three_inside_up',[{h:10,bt:12,bb:70,l:72,bull:false},{h:24,bt:28,bb:56,l:62,bull:true},{h:8,bt:10,bb:52,l:54,bull:true}],144)},
+
+  {id:'three_inside_down',cat:'triple',title:'三內降',en:'Three Inside Down',bullish:false,diff:'進階',
+   tags:['頭部反轉','三K','孕線確認'],
+   summary:'看跌孕線的三K確認版：大陽線 → 孕線小陰線 → 確認大陰線，確認頂部反轉。',
+   points:['前兩根構成看跌孕線，第三根大陰線跌破第一根陽線開盤價，完整確認下跌','第三根是最重要的確認，若第三天未能收大陰線，孕線反轉訊號仍存疑','出現在上漲趨勢高點，是比看跌孕線更可靠的賣出訊號'],
+   example:'個股到達目標價或歷史壓力區時出現三內降，是減倉或放空的明確訊號。',
+   tip:'第三根確認後賣出，停損設第二根（小陰線）高點；若持有空單，目標設前波低點。',
+   indicators:['成交量第三天放大（確認出貨）','MACD由正轉負','RSI從高位快速下滑'],
+   svg: () => psvg('three_inside_down',[{h:10,bt:12,bb:70,l:72,bull:true},{h:20,bt:24,bb:50,l:58,bull:false},{h:18,bt:22,bb:72,l:74,bull:false}],144)},
+
+  {id:'upside_gap_two_crows',cat:'triple',title:'上升跳空兩黑鴉',en:'Upside Gap Two Crows',bullish:false,diff:'高階',
+   tags:['頭部反轉','三K','缺口','看跌'],
+   summary:'大陽線後跳空形成的兩根陰線，雖未填補缺口但多頭動能明顯受阻，看跌訊號。',
+   points:['第一根大陽線，第二根跳空高開陰線，第三根再開高但收盤低於第二根開盤（吞噬第二根）','關鍵在於第三根陰線吞噬第二根，但兩根陰線均未填補第一根陽線後的缺口','代表多頭雖然衝高，但反覆遭賣壓壓制，頭部區域出現連續賣壓'],
+   example:'台股主力股在高位出現此型態，代表上方套牢籌碼沉重，主力開始分批出貨。',
+   tip:'此型態出現後若第四天繼續走弱應積極減倉；反彈至第一根陽線高點時，停損出場。',
+   indicators:['是否有重要壓力位（前高）在附近','成交量兩根陰線是否放大','融資餘額是否達高位'],
+   svg: () => psvg('upside_gap_two_crows',[{h:22,bt:26,bb:68,l:70,bull:true},{h:8,bt:10,bb:28,l:32,bull:false},{h:10,bt:12,bb:38,l:42,bull:false}],144)},
+
+  // ── SPECIAL ───────────────────────────────────────────────────────────
+  {id:'gap_up',cat:'special',title:'向上跳空缺口',en:'Gap Up',bullish:true,diff:'入門',
+   tags:['跳空缺口','強勢突破','特殊型態'],
+   summary:'開盤價高於前日最高價，形成價格空白區域，代表強烈的上漲動能或重大利多消化。',
+   points:['缺口分三類：突破缺口（最重要）、逃逸缺口（趨勢中段）、衰竭缺口（趨勢末期），判讀各異','突破缺口配合大量，填補缺口的可能性低，是最強的趨勢確立訊號','衰竭缺口出現後通常在短期內被填補，是趨勢即將反轉的警訊'],
+   example:'台積電法說會後或重大訂單公告後的跳空缺口，通常為逃逸缺口，代表趨勢加速。',
+   tip:'突破缺口出現時，若當日量為近期最大量可積極追買；缺口後量縮代表力道不足，謹慎。',
+   indicators:['成交量是否為近期最大','缺口大小相對於近期ATR','基本面是否有利多消息配合'],
+   svg: () => {
+     const extras = gapRect(34, 62, 30, 44, true);
+     return psvg('gap_up',[{h:22,bt:28,bb:64,l:66,bull:true},{h:12,bt:12,bb:46,l:48,bull:true}],96,extras);
+   }},
+
+  {id:'gap_down',cat:'special',title:'向下跳空缺口',en:'Gap Down',bullish:false,diff:'入門',
+   tags:['跳空缺口','強勢下跌','特殊型態'],
+   summary:'開盤價低於前日最低價，形成向下的價格空白，代表強烈賣壓或重大利空衝擊。',
+   points:['向下突破缺口代表支撐失守，之後的反彈至缺口下緣是較佳的放空點','逃逸缺口出現在下跌趨勢中段，代表跌勢加速，不宜抄底','若當日收出下影線錘子且成交量爆大，可能是衰竭缺口，需注意反轉'],
+   example:'台股個股獲利預警或重大利空時的跳空缺口，通常是逃逸缺口，不宜在缺口當日搶進。',
+   tip:'向下突破缺口後，反彈至缺口下緣附近是放空機會，停損設缺口完整填補位置。',
+   indicators:['成交量是否爆大（恐慌拋售）','是否跌破長期均線','消息面是否有重大利空'],
+   svg: () => {
+     const extras = gapRect(34, 62, 42, 54, false);
+     return psvg('gap_down',[{h:18,bt:24,bb:60,l:62,bull:false},{h:36,bt:36,bb:72,l:74,bull:false}],96,extras);
+   }},
+
+  {id:'island_reversal_top',cat:'special',title:'島型反轉頭部',en:'Island Reversal Top',bullish:false,diff:'高階',
+   tags:['頭部反轉','缺口','島型','特殊型態'],
+   summary:'向上跳空缺口後的K線群，隨後又以向下跳空缺口離開，形成孤立的「島嶼」，是頭部最強訊號。',
+   points:['上跳空缺口與下跳空缺口形成夾擊，中間的K線群完全孤立，是多頭陷阱的典型形態','島嶼範圍越大（天數越多）、成交量越大，反轉幅度通常越深','向下離開缺口出現後應立即出場，不等任何進一步確認，下跌往往快速且猛烈'],
+   example:'台股歷史上重要頭部（如2000年科技泡沫高點附近）可見島型反轉，之後有長達數月的跌勢。',
+   tip:'島型反轉頭部出現時，立即清倉所有多頭，可考慮建立空頭，目標設進入島嶼前的起漲點。',
+   indicators:['島嶼內的成交量高低分布','是否在多年高點或重要壓力位','MACD是否出現高位負背離'],
+   svg: () => {
+     const ex = gapRect(30,58,14,22,true)+gapRect(32,56,46,54,false);
+     return psvg('island_reversal_top',[
+       {h:28,bt:32,bb:64,l:66,bull:true},
+       {h:12,bt:14,bb:30,l:34,bull:true},
+       {h:16,bt:18,bb:28,l:32,bull:null},
+       {h:22,bt:26,bb:62,l:64,bull:false}],192,ex);
+   }},
+
+  {id:'island_reversal_bottom',cat:'special',title:'島型反轉底部',en:'Island Reversal Bottom',bullish:true,diff:'高階',
+   tags:['底部反轉','缺口','島型','特殊型態'],
+   summary:'向下跳空缺口後的K線群，隨後以向上跳空缺口離開，形成孤立島嶼，是底部反轉最強訊號。',
+   points:['下跳空缺口與上跳空缺口夾住島嶼，代表空方陷阱，空頭被徹底套牢','島嶼越大（天數越多、成交量越大），反彈幅度通常越強','向上離開缺口出現後應積極買入，後續上漲往往快速且強烈'],
+   example:'台股重大利空過後，若跌深且出現島型底部反轉，是中長線最重要的買入訊號之一。',
+   tip:'島型底部確認後，以向上缺口跳空日的開盤價附近買入，停損設島嶼最低點下方2%。',
+   indicators:['島嶼內是否有量縮（賣壓耗盡）','向上離開缺口的成交量是否爆大','長期均線是否已支撐'],
+   svg: () => {
+     const ex = gapRect(30,58,56,64,false)+gapRect(32,56,30,38,true);
+     return psvg('island_reversal_bottom',[
+       {h:16,bt:20,bb:56,l:58,bull:false},
+       {h:46,bt:50,bb:68,l:70,bull:false},
+       {h:48,bt:52,bb:66,l:68,bull:null},
+       {h:14,bt:18,bb:54,l:56,bull:true}],192,ex);
+   }},
+
+  {id:'rising_three_methods',cat:'special',title:'上升三法',en:'Rising Three Methods',bullish:true,diff:'高階',
+   tags:['趨勢延續','五K','整理型'],
+   summary:'大陽線後出現三根小回調K線，再以大陽線突破，代表上升趨勢中整理後繼續上攻。',
+   points:['五根K線：第一根大陽線、中間三根小陰線（均在第一根陽線實體內）、第五根大陽線收盤創新高','中間三根回調量需縮，代表賣壓輕微；第五根放量突破，代表多頭重新主導','是趨勢延續型態（不是反轉），適合判斷強勢整理後的追漲買點'],
+   example:'台股強勢個股在主升段中的盤整，若符合上升三法，是中繼整理後追漲的良好時機。',
+   tip:'第五根大陽線突破第一根高點當日進場，停損設中間三根回調的最低點，是趨勢交易的理想入場。',
+   indicators:['中間三根成交量是否縮量','第五根是否帶大量突破','布林通道是否呈開口向上'],
+   svg: () => psvg('rising_three_methods',[
+     {h:10,bt:12,bb:62,l:64,bull:true},
+     {h:26,bt:30,bb:50,l:54,bull:false},
+     {h:28,bt:32,bb:52,l:56,bull:false},
+     {h:24,bt:28,bb:48,l:52,bull:false},
+     {h:6,bt:8,bb:46,l:48,bull:true}],220)},
+
+  {id:'falling_three_methods',cat:'special',title:'下降三法',en:'Falling Three Methods',bullish:false,diff:'高階',
+   tags:['趨勢延續','五K','整理型'],
+   summary:'大陰線後出現三根小反彈K線，再以大陰線跌破，代表下降趨勢中整理後繼續下跌。',
+   points:['五根K線：第一根大陰線、中間三根小陽線（均在第一根陰線實體內）、第五根大陰線收盤創新低','中間三根反彈量需縮，代表買盤力道有限；第五根放量跌破，確認空頭延續','是趨勢延續型態，代表下跌趨勢中技術反彈結束，是追空的好時機'],
+   example:'台股空頭市場中個股反彈至季線附近遭壓，若出現下降三法，是放空的理想型態。',
+   tip:'第五根跌破第一根低點時放空，停損設中間三根反彈的最高點，目標設前波低點。',
+   indicators:['中間三根是否縮量（反彈無力）','第五根是否帶大量跌破','移動平均線（5日、10日）是否下彎'],
+   svg: () => psvg('falling_three_methods',[
+     {h:8,bt:10,bb:62,l:64,bull:false},
+     {h:30,bt:34,bb:54,l:58,bull:true},
+     {h:28,bt:32,bb:52,l:56,bull:true},
+     {h:32,bt:36,bb:56,l:60,bull:true},
+     {h:18,bt:22,bb:76,l:78,bull:false}],220)}
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────
+let currentCat = 'all', currentDir = 'all', currentDiff = 'all', searchTerm = '';
+let expandedCard = null;
+
+// ─── CATEGORY LABELS ───────────────────────────────────────────────────
+const CAT_LABEL = {single:'單K',double:'雙K',triple:'三K',special:'特殊'};
+
+// ─── DIRECTION BADGE ───────────────────────────────────────────────────
+function dirBadge(bullish) {
+  if (bullish === true)  return '<span class="dir-badge dir-bull">🟢 看漲</span>';
+  if (bullish === false) return '<span class="dir-badge dir-bear">🔴 看跌</span>';
+  return '<span class="dir-badge dir-neutral">⚪ 中性</span>';
+}
+
+// ─── RENDER CARD ──────────────────────────────────────────────────────
+function renderCard(p) {
+  const catLabel = CAT_LABEL[p.cat] || p.cat;
+  const diffClass = `difficulty-${p.diff}`;
+  const indHtml = p.indicators.map(i=>`<span>${i}</span>`).join('');
+  return `
+<div class="card" id="card-${p.id}"
+  data-id="${p.id}" data-cat="${p.cat}"
+  data-bullish="${p.bullish}" data-diff="${p.diff}"
+  data-tags="${p.tags.join(',')}" data-title="${p.title}" data-en="${p.en}" data-summary="${p.summary}">
+  <div class="candle-preview">${p.svg()}<span class="pattern-label">${catLabel}</span></div>
+  <div class="card-header">
+    <div class="card-badges">
+      ${dirBadge(p.bullish)}
+      <span class="card-difficulty ${diffClass}">${p.diff}</span>
+    </div>
+    <span class="card-cat-badge">${catLabel}</span>
+  </div>
+  <div class="card-body">
+    <div class="card-title">${p.title}</div>
+    <div class="card-en">${p.en}</div>
+    <div class="card-summary">${p.summary}</div>
+    <div class="card-tags">${p.tags.map(t=>`<span class="card-tag" onclick="filterTag('${t}',event)">#${t}</span>`).join('')}</div>
+  </div>
+  <div class="card-detail" id="detail-${p.id}">
+    <div class="card-detail-inner">
+      <div class="detail-block block-keypoints">
+        <div class="detail-block-title">📌 判讀重點</div>
+        <div class="detail-block-content"><ul>${p.points.map(pt=>`<li>${pt}</li>`).join('')}</ul></div>
+      </div>
+      <div class="detail-block block-example">
+        <div class="detail-block-title">📖 台股實例</div>
+        <div class="detail-block-content">${p.example}</div>
+      </div>
+      <div class="detail-block block-tip">
+        <div class="detail-block-title">💡 操作技巧</div>
+        <div class="detail-block-content">${p.tip}</div>
+      </div>
+      <div class="detail-block block-indicator">
+        <div class="detail-block-title">🔧 建議搭配指標</div>
+        <div class="detail-block-content">${indHtml}</div>
+      </div>
+    </div>
+  </div>
+  <button class="card-expand-btn" onclick="toggleCard('${p.id}')">
+    <i class="arrow">▼</i> <span class="expand-label">展開詳情</span>
+  </button>
+</div>`;
+}
+
+// ─── RENDER ALL ────────────────────────────────────────────────────────
+function renderAll() {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = PATTERNS.map(p => renderCard(p)).join('');
+  applyFilters();
+  observeCards();
+}
+
+// ─── FILTER FUNCTIONS ─────────────────────────────────────────────────
+function applyFilters() {
+  const cards = document.querySelectorAll('.card');
+  let visible = 0;
+  const sl = searchTerm.toLowerCase();
+  cards.forEach(card => {
+    const matchCat  = currentCat === 'all' || card.dataset.cat === currentCat;
+    const matchDir  = currentDir === 'all' || String(card.dataset.bullish) === currentDir;
+    const matchDiff = currentDiff === 'all' || card.dataset.diff === currentDiff;
+    const txt = (card.dataset.title + ' ' + card.dataset.en + ' ' + card.dataset.summary + ' ' + card.dataset.tags).toLowerCase();
+    const matchSearch = !sl || txt.includes(sl);
+    const hide = !matchCat || !matchDir || !matchDiff || !matchSearch;
+    card.classList.toggle('hidden-filter', hide);
+    if (!hide) visible++;
+  });
+  const total = PATTERNS.length;
+  document.getElementById('search-count').textContent = (sl || currentCat !== 'all' || currentDir !== 'all' || currentDiff !== 'all') ? `${visible} / ${total} 種` : '';
+  const existing = document.querySelector('.empty-state');
+  if (visible === 0 && !existing) {
+    document.getElementById('cards-grid').insertAdjacentHTML('beforeend',
+      `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>找不到符合條件的型態</p><small>試試其他關鍵字或調整篩選條件</small></div>`);
+  } else if (visible > 0 && existing) existing.remove();
+}
+
+function switchCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  updateTabIndicator();
+  if (expandedCard) { collapseCard(expandedCard); }
+  applyFilters();
+  observeCards();
+}
+
+function filterDir(dir, btn) {
+  currentDir = dir;
+  document.querySelectorAll('[data-dir]').forEach(b => {
+    b.classList.remove('active-bull','active-bear','active-neutral','active-diff');
+  });
+  if (dir === 'all') btn.classList.add('active-bull');
+  else if (dir === 'true') btn.classList.add('active-bull');
+  else if (dir === 'false') btn.classList.add('active-bear');
+  else btn.classList.add('active-neutral');
+  applyFilters();
+}
+
+function filterDiff(diff, btn) {
+  currentDiff = diff;
+  document.querySelectorAll('[data-diff]').forEach(b => b.classList.remove('active-diff'));
+  btn.classList.add('active-diff');
+  applyFilters();
+}
+
+function filterTag(tag, e) {
+  e.stopPropagation();
+  searchTerm = tag;
+  document.getElementById('search-input').value = tag;
+  applyFilters();
+}
+
+// ─── CARD TOGGLE ──────────────────────────────────────────────────────
+function toggleCard(id) {
+  if (expandedCard && expandedCard !== id) collapseCard(expandedCard);
+  const card = document.getElementById('card-' + id);
+  const detail = document.getElementById('detail-' + id);
+  if (card.classList.contains('expanded')) {
+    collapseCard(id);
+  } else {
+    detail.style.maxHeight = detail.scrollHeight + 'px';
+    card.classList.add('expanded');
+    card.querySelector('.expand-label').textContent = '收合詳情';
+    expandedCard = id;
+  }
+}
+function collapseCard(id) {
+  const card = document.getElementById('card-' + id);
+  const detail = document.getElementById('detail-' + id);
+  if (!card) return;
+  detail.style.maxHeight = '0';
+  card.classList.remove('expanded');
+  card.querySelector('.expand-label').textContent = '展開詳情';
+  if (expandedCard === id) expandedCard = null;
+}
+
+// ─── TAB INDICATOR ────────────────────────────────────────────────────
+function updateTabIndicator() {
+  const active = document.querySelector('.tab-btn.active');
+  const ind = document.getElementById('tab-indicator');
+  if (active) {
+    ind.style.left = active.offsetLeft + 'px';
+    ind.style.width = active.offsetWidth + 'px';
+  }
+}
+
+// ─── INTERSECTION OBSERVER ────────────────────────────────────────────
+function observeCards() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), Math.min(i * 60, 360));
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.06});
+  document.querySelectorAll('.card:not(.visible)').forEach(c => observer.observe(c));
+}
+
+// ─── HERO PREVIEW ─────────────────────────────────────────────────────
+function buildHeroPreview() {
+  const samples = [
+    {h:14,bt:14,bb:26,l:76,bull:true},
+    {h:10,bt:10,bb:76,l:76,bull:true},
+    {h:10,bt:42,bb:42,l:76,bull:null},
+    {h:10,bt:10,bb:76,l:76,bull:false},
+    {h:10,bt:60,bb:72,l:74,bull:false},
+  ];
+  const H = 84, slotW = 44;
+  const W = samples.length * slotW;
+  let inner = '';
+  samples.forEach((c,i) => { inner += drawC(i * slotW + slotW/2, c); });
+  document.getElementById('hero-preview').innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+
+// ─── NAV SCROLL ───────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 10);
+});
+document.getElementById('search-input').addEventListener('input', function() {
+  searchTerm = this.value.trim();
+  applyFilters();
+});
+window.addEventListener('resize', updateTabIndicator);
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildHeroPreview();
+  renderAll();
+  requestAnimationFrame(updateTabIndicator);
+});
+</script>
+</body>
+</html>

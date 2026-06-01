@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股學筆記 — 台股知識精華庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-primary: #1A56DB;
+  --color-primary-light: #3B82F6;
+  --color-accent: #6366F1;
+  --bg-page: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-dark: #0F172A;
+  --bg-dark-card: #1E293B;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #475569;
+  --text-faint: #94A3B8;
+  --border: #E2E8F0;
+  --shadow-card: 0 1px 3px rgba(15,23,42,.06),0 4px 12px rgba(15,23,42,.04);
+  --shadow-hover: 0 8px 32px rgba(26,86,219,.12),0 2px 8px rgba(15,23,42,.08);
+  --font: 'Noto Sans TC',system-ui,sans-serif;
+  --font-en: 'Inter','Noto Sans TC',sans-serif;
+  --font-mono: 'JetBrains Mono','Courier New',monospace;
+  --radius: 16px;
+  --nav-h: 64px;
+  --tab-h: 52px;
+
+  --technical-main: #3B82F6;
+  --technical-bg: #EFF6FF;
+  --technical-border: #BFDBFE;
+  --technical-text: #1E40AF;
+  --technical-grad: linear-gradient(135deg,#1D4ED8,#3B82F6);
+
+  --fundamental-main: #10B981;
+  --fundamental-bg: #ECFDF5;
+  --fundamental-border: #A7F3D0;
+  --fundamental-text: #065F46;
+  --fundamental-grad: linear-gradient(135deg,#059669,#10B981);
+
+  --chip-main: #F59E0B;
+  --chip-bg: #FFFBEB;
+  --chip-border: #FDE68A;
+  --chip-text: #92400E;
+  --chip-grad: linear-gradient(135deg,#D97706,#F59E0B);
+
+  --news-main: #8B5CF6;
+  --news-bg: #F5F3FF;
+  --news-border: #DDD6FE;
+  --news-text: #4C1D95;
+  --news-grad: linear-gradient(135deg,#7C3AED,#8B5CF6);
+
+  --beginner-bg: #D1FAE5;
+  --beginner-text: #065F46;
+  --intermediate-bg: #FEF3C7;
+  --intermediate-text: #92400E;
+  --advanced-bg: #FEE2E2;
+  --advanced-text: #7F1D1D;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+button{font-family:var(--font);cursor:pointer;border:none;background:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:300;height:var(--nav-h);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;transition:box-shadow .2s}
+.nav.scrolled{box-shadow:0 1px 12px rgba(15,23,42,.08)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-primary);font-weight:800;font-family:var(--font-en);font-size:1.1rem;flex-shrink:0}
+.nav-logo svg{flex-shrink:0}
+.nav-logo span{color:var(--color-primary)}
+.nav-spacer{flex:1}
+.nav-search{position:relative;display:flex;align-items:center}
+.nav-search input{border:1px solid var(--border);border-radius:20px;padding:8px 16px 8px 38px;font-size:.875rem;font-family:var(--font);background:#F1F5F9;width:220px;transition:all .3s;outline:none;color:var(--text-primary)}
+.nav-search input:focus{width:300px;background:#fff;border-color:var(--color-primary-light)}
+.nav-search .search-icon{position:absolute;left:12px;color:var(--text-faint);pointer-events:none;width:16px;height:16px}
+#search-count{font-size:.8rem;color:var(--text-muted);flex-shrink:0;white-space:nowrap}
+
+/* HERO */
+.hero{background:var(--bg-dark);padding:64px 24px;overflow:hidden;position:relative}
+.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.hero-title{font-family:var(--font-en);font-weight:800;font-size:clamp(2rem,4vw,3rem);line-height:1.15;color:#fff;margin-bottom:16px}
+.hero-title .grad{background:linear-gradient(90deg,#60A5FA,#818CF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{color:#94A3B8;font-size:1rem;line-height:1.8;margin-bottom:28px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
+.hero-badge{padding:6px 16px;border-radius:100px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.hero-badge:nth-child(1){background:rgba(59,130,246,.15);color:#60A5FA;border-color:rgba(59,130,246,.3)}
+.hero-badge:nth-child(2){background:rgba(16,185,129,.15);color:#34D399;border-color:rgba(16,185,129,.3)}
+.hero-badge:nth-child(3){background:rgba(245,158,11,.15);color:#FCD34D;border-color:rgba(245,158,11,.3)}
+.hero-badge:nth-child(4){background:rgba(139,92,246,.15);color:#A78BFA;border-color:rgba(139,92,246,.3)}
+.hero-badge:hover{transform:translateY(-2px);filter:brightness(1.2)}
+.hero-stats{display:flex;gap:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,.08)}
+.hero-stat{text-align:center}
+.hero-stat-num{font-family:var(--font-mono);font-size:1.5rem;font-weight:600;color:#60A5FA}
+.hero-stat-label{font-size:.75rem;color:#64748B;margin-top:2px}
+.hero-visual{display:flex;align-items:center;justify-content:center;opacity:.9}
+.hero-visual svg{width:100%;max-width:380px;filter:drop-shadow(0 0 40px rgba(96,165,250,.2))}
+
+/* TABS */
+.tab-nav{position:sticky;top:var(--nav-h);z-index:200;background:#fff;border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-list{display:flex;max-width:1200px;margin:0 auto;padding:0 24px;gap:0;position:relative;min-width:max-content}
+.tab-btn{padding:0 28px;height:var(--tab-h);font-size:.9rem;font-weight:500;color:var(--text-muted);display:flex;align-items:center;gap:8px;transition:color .2s;white-space:nowrap;position:relative;font-family:var(--font)}
+.tab-btn .tab-icon{font-size:1.1rem}
+.tab-btn.active{color:var(--section-color,var(--color-primary));font-weight:700}
+.tab-btn:hover:not(.active){color:var(--text-secondary)}
+.tab-indicator{position:absolute;bottom:-2px;height:3px;border-radius:3px 3px 0 0;background:var(--color-primary);transition:left .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1)}
+
+/* FILTER BAR */
+.filter-bar{max-width:1200px;margin:0 auto;padding:16px 24px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-label{font-size:.8rem;color:var(--text-muted);font-weight:500}
+.filter-btn{padding:4px 14px;border-radius:100px;font-size:.8rem;font-family:var(--font);border:1px solid var(--border);color:var(--text-muted);transition:all .15s;background:#fff}
+.filter-btn.active,.filter-btn:hover{background:var(--section-bg,#EFF6FF);color:var(--section-color,var(--color-primary));border-color:var(--section-border,#BFDBFE)}
+.filter-spacer{flex:1}
+
+/* CARDS GRID */
+.cards-section{max-width:1200px;margin:0 auto;padding:24px 24px 64px}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:1024px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){
+  .cards-grid{grid-template-columns:1fr}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-visual{display:none}
+  .tab-btn{padding:0 18px}
+}
+
+/* CARD */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);overflow:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s cubic-bezier(.4,0,.2,1);opacity:0;transform:translateY(20px)}
+.card.visible{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s ease,box-shadow .28s cubic-bezier(.4,0,.2,1)}
+.card.hidden-filter{display:none}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--card-border,#BFDBFE)}
+.card-top-bar{height:4px;background:var(--card-grad)}
+.card-header{padding:16px 18px 0;display:flex;align-items:flex-start;gap:10px}
+.card-icon-wrap{width:34px;height:34px;border-radius:8px;background:var(--card-grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;transition:transform .2s}
+.card:hover .card-icon-wrap{transform:scale(1.08) rotate(5deg)}
+.card-meta{flex:1;min-width:0}
+.card-category{font-size:.7rem;font-weight:600;color:var(--card-color);letter-spacing:.08em;text-transform:uppercase;font-family:var(--font-en)}
+.card-difficulty{float:right;padding:2px 10px;border-radius:100px;font-size:.7rem;font-weight:600;line-height:1.6}
+.difficulty-入門{background:var(--beginner-bg);color:var(--beginner-text)}
+.difficulty-進階{background:var(--intermediate-bg);color:var(--intermediate-text)}
+.difficulty-高階{background:var(--advanced-bg);color:var(--advanced-text)}
+.card-body{padding:10px 18px 14px}
+.card-title{font-size:1rem;font-weight:700;line-height:1.4;margin-bottom:2px;color:var(--text-primary)}
+.card-en{font-size:.72rem;color:var(--text-faint);font-family:var(--font-en);margin-bottom:8px}
+.card-summary{font-size:.85rem;color:var(--text-muted);line-height:1.65;margin-bottom:10px}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.card-tag{padding:2px 9px;background:#F1F5F9;color:var(--text-muted);border-radius:6px;font-size:.72rem;border:1px solid var(--border);cursor:pointer;transition:all .15s}
+.card-tag:hover,.card-tag.active-tag{background:var(--card-bg,#EFF6FF);color:var(--card-color,var(--color-primary));border-color:var(--card-border,#BFDBFE)}
+.card-expand-btn{width:100%;padding:8px 0;font-size:.8rem;color:var(--card-color);font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;border-top:1px dashed var(--border);transition:background .15s,color .15s;border-radius:0 0 var(--radius) var(--radius);font-family:var(--font)}
+.card-expand-btn:hover{background:var(--card-bg)}
+.card-expand-btn .arrow{transition:transform .3s cubic-bezier(.4,0,.2,1);display:inline-block;font-style:normal}
+.card.expanded .card-expand-btn .arrow{transform:rotate(180deg)}
+
+/* CARD DETAIL */
+.card-detail{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.4,0,.2,1)}
+.card-detail-inner{padding:0 18px 16px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--border)}
+.detail-block{border-radius:10px;overflow:hidden}
+.detail-block-title{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 14px 4px;display:flex;align-items:center;gap:6px}
+.detail-block-content{padding:4px 14px 12px;font-size:.84rem;line-height:1.75}
+.block-keypoints{background:var(--card-bg,#EFF6FF);border:1px solid var(--card-border,#BFDBFE)}
+.block-keypoints .detail-block-title{color:var(--card-text,#1E40AF)}
+.block-keypoints .detail-block-content{color:var(--text-secondary)}
+.block-keypoints ul{padding-left:18px}
+.block-keypoints li{margin-bottom:6px}
+.block-keypoints li::marker{color:var(--card-color)}
+.block-formula{background:#1E293B;border:1px solid #334155}
+.block-formula .detail-block-title{color:#94A3B8;display:flex;justify-content:space-between;align-items:center}
+.block-formula .detail-block-content{font-family:var(--font-mono);font-size:.8rem;color:#E2E8F0;white-space:pre-wrap;line-height:1.9}
+.copy-btn{padding:2px 10px;border-radius:6px;background:#334155;color:#94A3B8;font-size:.7rem;font-family:var(--font);transition:all .15s;cursor:pointer;border:none}
+.copy-btn:hover{background:#475569;color:#e2e8f0}
+.copy-btn.copied{background:#059669;color:#fff}
+.block-example{background:#fff;border:1px solid var(--border);border-left:3px solid var(--card-color,#3B82F6)}
+.block-example .detail-block-title{color:var(--card-color,#3B82F6)}
+.block-example .detail-block-content{color:var(--text-secondary)}
+.block-tip{background:#FFFBEB;border:1px solid #FDE68A}
+.block-tip .detail-block-title{color:#92400E}
+.block-tip .detail-block-content{color:#78350F}
+
+/* FOOTER */
+.footer{background:var(--bg-dark);padding:40px 24px;text-align:center;color:#475569}
+.footer-logo{font-family:var(--font-en);font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px}
+.footer-logo span{color:#3B82F6}
+.footer-text{font-size:.8rem;line-height:1.8}
+.footer-disclaimer{margin-top:16px;font-size:.72rem;color:#334155;padding-top:16px;border-top:1px solid #1E293B}
+
+/* EMPTY STATE */
+.empty-state{grid-column:1/-1;text-align:center;padding:64px 24px;color:var(--text-muted)}
+.empty-state svg{width:48px;height:48px;margin:0 auto 16px;opacity:.4}
+.empty-state p{font-size:1rem;margin-bottom:4px}
+.empty-state small{font-size:.85rem;color:var(--text-faint)}
+
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav" id="main-nav">
+  <a href="#" class="nav-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="7" fill="#1A56DB"/>
+      <polyline points="4,20 9,13 14,16 19,8 24,10" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="19" cy="8" r="2" fill="#60A5FA"/>
+    </svg>
+    <span>股學</span>筆記
+  </a>
+  <div class="nav-spacer"></div>
+  <span id="search-count"></span>
+  <div class="nav-search">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" id="search-input" placeholder="搜尋知識卡片..." autocomplete="off">
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <h1 class="hero-title">掌握<span class="grad">股市知識</span><br>成為聰明投資人</h1>
+      <p class="hero-subtitle">系統化整理台股技術面、基本面、籌碼面、消息面知識<br>從K線基礎到總體經濟，一站式學習平台</p>
+      <div class="hero-badges">
+        <span class="hero-badge" onclick="switchTab('technical')">📈 技術面</span>
+        <span class="hero-badge" onclick="switchTab('fundamental')">📊 基本面</span>
+        <span class="hero-badge" onclick="switchTab('chip')">🔍 籌碼面</span>
+        <a href="candlestick-patterns.html" class="hero-badge" style="text-decoration:none">🕯️ K線型態圖鑑</a>
+        <span class="hero-badge" onclick="switchTab('news')">📰 消息面</span>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">4</div><div class="hero-stat-label">大面向</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">37+</div><div class="hero-stat-label">知識卡片</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">難度等級</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">台股實例</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <svg viewBox="0 0 380 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid lines -->
+        <line x1="20" y1="40" x2="360" y2="40" stroke="#1E293B" stroke-width="1"/>
+        <line x1="20" y1="90" x2="360" y2="90" stroke="#1E293B" stroke-width="1"/>
+        <line x1="20" y1="140" x2="360" y2="140" stroke="#1E293B" stroke-width="1"/>
+        <line x1="20" y1="190" x2="360" y2="190" stroke="#1E293B" stroke-width="1"/>
+        <!-- Chart area fill -->
+        <path d="M30,190 L70,160 L110,170 L150,120 L190,130 L230,80 L270,60 L310,40 L350,30 L350,220 L30,220 Z" fill="url(#chartGrad)" opacity="0.3"/>
+        <!-- Main line -->
+        <polyline points="30,190 70,160 110,170 150,120 190,130 230,80 270,60 310,40 350,30" stroke="#3B82F6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Volume bars -->
+        <rect x="25" y="205" width="10" height="10" fill="#1D4ED8" opacity="0.6" rx="1"/>
+        <rect x="65" y="208" width="10" height="7" fill="#1D4ED8" opacity="0.6" rx="1"/>
+        <rect x="105" y="210" width="10" height="5" fill="#DC2626" opacity="0.6" rx="1"/>
+        <rect x="145" y="203" width="10" height="12" fill="#1D4ED8" opacity="0.6" rx="1"/>
+        <rect x="185" y="207" width="10" height="8" fill="#DC2626" opacity="0.6" rx="1"/>
+        <rect x="225" y="200" width="10" height="15" fill="#1D4ED8" opacity="0.6" rx="1"/>
+        <rect x="265" y="199" width="10" height="16" fill="#1D4ED8" opacity="0.6" rx="1"/>
+        <rect x="305" y="197" width="10" height="18" fill="#1D4ED8" opacity="0.6" rx="1"/>
+        <rect x="345" y="196" width="10" height="19" fill="#1D4ED8" opacity="0.6" rx="1"/>
+        <!-- MA line -->
+        <polyline points="30,195 70,175 110,165 150,145 190,135 230,110 270,90 310,70 350,55" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="4,3" opacity="0.8"/>
+        <!-- Highlight point -->
+        <circle cx="310" cy="40" r="5" fill="#3B82F6"/>
+        <circle cx="310" cy="40" r="10" fill="#3B82F6" opacity="0.2"/>
+        <!-- Info card -->
+        <rect x="230" y="15" width="120" height="40" rx="8" fill="#1E293B" stroke="#334155"/>
+        <text x="242" y="32" font-family="JetBrains Mono,monospace" font-size="10" fill="#60A5FA" font-weight="600">TSM +5.3%</text>
+        <text x="242" y="47" font-family="JetBrains Mono,monospace" font-size="9" fill="#94A3B8">RSI: 64.2</text>
+        <defs>
+          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3B82F6"/>
+            <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- TABS -->
+<div class="tab-nav" id="tab-nav">
+  <div class="tab-list" id="tab-list">
+    <button class="tab-btn active" data-id="technical" style="--section-color:var(--technical-main)" onclick="switchTab('technical')">
+      <span class="tab-icon">📈</span> 技術面
+    </button>
+    <button class="tab-btn" data-id="fundamental" style="--section-color:var(--fundamental-main)" onclick="switchTab('fundamental')">
+      <span class="tab-icon">📊</span> 基本面
+    </button>
+    <button class="tab-btn" data-id="chip" style="--section-color:var(--chip-main)" onclick="switchTab('chip')">
+      <span class="tab-icon">🔍</span> 籌碼面
+    </button>
+    <button class="tab-btn" data-id="news" style="--section-color:var(--news-main)" onclick="switchTab('news')">
+      <span class="tab-icon">📰</span> 消息面
+    </button>
+    <div class="tab-indicator" id="tab-indicator"></div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar" id="filter-bar">
+  <span class="filter-label">難度：</span>
+  <button class="filter-btn active" data-diff="all" onclick="filterDifficulty('all',this)">全部</button>
+  <button class="filter-btn" data-diff="入門" onclick="filterDifficulty('入門',this)">🟢 入門</button>
+  <button class="filter-btn" data-diff="進階" onclick="filterDifficulty('進階',this)">🟡 進階</button>
+  <button class="filter-btn" data-diff="高階" onclick="filterDifficulty('高階',this)">🔴 高階</button>
+</div>
+
+<!-- CARDS -->
+<div class="cards-section">
+  <div class="cards-grid" id="cards-grid"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo"><span>股學</span>筆記</div>
+  <div class="footer-text">台股知識精華庫 — 技術面 · 基本面 · 籌碼面 · 消息面</div>
+  <div class="footer-disclaimer">© 2025 股學筆記｜本站內容僅供教育參考，不構成任何投資建議。投資有風險，入市需謹慎。</div>
+</footer>
+
+<script>
+const DATA = [
+  {
+    id:"technical",title:"技術面",icon:"📈",
+    grad:"var(--technical-grad)",main:"var(--technical-main)",bg:"var(--technical-bg)",
+    border:"var(--technical-border)",text:"var(--technical-text)",
+    cards:[
+      {id:"candlestick",title:"K線基礎判讀",en:"Candlestick Analysis",diff:"入門",
+       tags:["K線","型態","多空判斷"],
+       summary:"一根K線說盡當日多空攻防，讀懂實體與影線才能看穿市場意圖",
+       points:["陽線（紅K）：收盤 > 開盤，代表買方主導；陰線（黑/綠K）：收盤 < 開盤，賣方主導","上影線長表示上方賣壓重，下影線長表示下方買盤強，實體大小代表多空力道","關鍵型態：十字線（猶豫訊號）、錘子線（底部反轉）、射擊之星（頭部反轉）、吞噬K線（強力反轉）"],
+       formula:"實體大小 = |收盤價 - 開盤價|\n上影線 = 最高價 - max(開盤, 收盤)\n下影線 = min(開盤, 收盤) - 最低價",
+       example:"台積電2022年10月低點附近出現連續下影線長的錘子線，代表空方無力再壓，隨後股價從370元反彈至2023年初的500元以上",
+       tip:"單一K線意義有限，需搭配前後K線及成交量確認，量縮的十字線訊號遠比量放更具反轉意義"},
+      {id:"moving-average",title:"均線系統 MA/EMA",en:"Moving Average System",diff:"入門",
+       tags:["均線","趨勢","多頭排列","黃金交叉"],
+       summary:"均線是趨勢的照妖鏡，多頭排列買、空頭排列賣是最基本的操作邏輯",
+       points:["常用均線：5日（週線）、20日（月線）、60日（季線）、240日（年線）；台股常用「月季年」三線","多頭排列：5MA > 10MA > 20MA > 60MA，代表趨勢向上；黃金交叉（短均穿越長均向上）為買進訊號","EMA對近期價格加權更重，反應速度快於SMA，適合短線；SMA平滑適合判斷中長期趨勢"],
+       formula:"SMA(N) = 前N日收盤價總和 / N\nEMA(N) = 前日EMA × (N-1)/(N+1) + 今日收盤 × 2/(N+1)",
+       example:"鴻海2023年AI題材啟動時，股價從100元附近突破季線（60MA）且月線翻揚，形成多頭排列，隨後一路漲至200元以上",
+       tip:"均線不是精確的支撐壓力，而是「區域」概念。年線（240MA）在台股是機構法人的重要參考基準"},
+      {id:"rsi-kd",title:"RSI 與 KD 指標",en:"RSI & Stochastic Oscillator",diff:"入門",
+       tags:["RSI","KD","超買超賣","背離"],
+       summary:"RSI測量漲跌力道強弱，KD捕捉短期超買超賣，兩者搭配可提高勝率",
+       points:["RSI(14)：高於70為超買、低於30為超賣；但強勢股RSI可長期維持70以上，弱勢股可長期低於30","KD指標：K線與D線在20以下黃金交叉為買訊，80以上死亡交叉為賣訊；KD鈍化代表趨勢強勁","背離訊號最重要：股價創新高但RSI未過前高（頂背離），是趨勢即將反轉的早期訊號"],
+       formula:"RSI = 100 - 100/(1 + RS)\nRS = N日平均上漲幅度 / N日平均下跌幅度（N通常取14）\nK = 2/3 × 前日K + 1/3 × RSV\nD = 2/3 × 前日D + 1/3 × K",
+       example:"台積電2022年10月RSI跌至25的超賣區，同時出現KD低檔黃金交叉，加上底背離訊號，股價隨後從370元展開強勁反彈",
+       tip:"日KD適合短線（3-5天），週KD適合波段（3-8週）。初學者建議先學週KD判斷大方向，再用日KD抓進出點"},
+      {id:"macd",title:"MACD 趨勢確認指標",en:"MACD Indicator",diff:"進階",
+       tags:["MACD","趨勢","黃金交叉","柱狀圖"],
+       summary:"MACD是最可靠的趨勢確認工具，柱狀圖縮短是趨勢轉折的最早預警",
+       points:["MACD三部分：DIF線（快線，12日EMA-26日EMA）、MACD線（慢線，DIF的9日EMA）、柱狀圖（DIF-MACD差值）","買進訊號：DIF由下向上穿越MACD（黃金交叉）且在零軸以上更有效","柱狀圖縮短（紅柱變短或黑柱縮減）是趨勢轉折最早的預警，比均線交叉提前3-5天給訊號"],
+       formula:"DIF = EMA(12) - EMA(26)\nMACD Signal = EMA(DIF, 9)\nHistogram = DIF - MACD Signal",
+       example:"2023年台積電週線MACD在零軸以上黃金交叉，且柱狀圖持續走揚，確認多頭趨勢，完整捕捉500→800元的波段",
+       tip:"MACD最適合判斷趨勢，不適合判斷超買超賣。在震盪盤整時訊號雜訊多，週線MACD比日線更可靠，假訊號更少"},
+      {id:"bollinger",title:"布林通道 Bollinger Bands",en:"Bollinger Bands",diff:"進階",
+       tags:["布林通道","波動率","帶寬","突破"],
+       summary:"布林通道是動態支撐壓力帶，帶寬收縮是大行情啟動前的蓄勢訊號",
+       points:["上軌 = 20日MA + 2倍標準差（壓力）；中軌 = 20日MA；下軌 = 20日MA - 2倍標準差（支撐）","帶寬收縮（通道變窄）代表波動率降低、盤整蓄勢，後續通常有方向性突破","觸碰上軌不一定賣：強勢股會沿著上軌爬行；觸碰下軌不一定買：弱勢股會沿著下軌下跌，需結合趨勢"],
+       formula:"中軌 = MA(20)\n上軌 = MA(20) + 2σ\n下軌 = MA(20) - 2σ\nσ = 20日收盤價標準差\n帶寬 = (上軌 - 下軌) / 中軌",
+       example:"聯發科2024年初布林通道帶寬持續收縮約3週，股價在800-850元橫盤，隨後向上突破上軌並放量，展開漲至1,000元以上的波段",
+       tip:"帶寬低於歷史均值50%時需特別留意方向性突破；突破方向通常與前期趨勢一致"},
+      {id:"volume-price",title:"量價關係分析",en:"Volume-Price Analysis",diff:"入門",
+       tags:["成交量","量價關係","OBV","突破確認"],
+       summary:"價是結果，量是原因；量先價行，無量的漲跌都是假動作",
+       points:["四種量價關係：量增價漲（多頭確認）、量縮價跌（正常回檔）、量增價跌（主力出貨警訊）、量縮價漲（浮籌少但需謹慎）","突破需要爆量確認：關鍵壓力突破時，成交量需放大至近期均量的1.5倍以上，否則易遭假突破","台股量能參考：日均量 < 1,500億（冷清）、2,000-3,000億（正常）、> 4,000億（過熱）"],
+       formula:"相對量 = 今日成交量 / 近20日平均成交量\n量比 > 1.5 代表爆量\nOBV = 昨日OBV + 今日量（上漲為正，下跌為負）",
+       example:"台積電2023年6月AI題材發酵，單日成交量放大至平日3倍以上並同時突破前高，OBV同步創新高，確認主力資金積極進場",
+       tip:"底部連續出現量縮但股價不再破低，代表賣壓竭盡。高點量增但股價漲幅縮小（價量背離），是主力出貨最重要的警訊"},
+      {id:"support-resistance",title:"支撐與壓力",en:"Support & Resistance",diff:"入門",
+       tags:["支撐","壓力","整數關口","角色互換"],
+       summary:"支撐壓力是市場集體記憶的體現，突破後角色互換是最可靠的交易依據",
+       points:["支撐：股價下跌時出現買盤的價格區域（前低、整數關口、均線、成本密集區）","突破後角色互換原則：壓力有效突破後即轉為支撐（需收盤站上且維持2-3日確認）","成交量密集區（籌碼密集處）是最強的支撐壓力，因為套牢成本集中在此區域"],
+       formula:"壓力強度評估：前高測試次數越多、越近期、量能越大，壓力越強\n整數關口（如100、200、500元）具有心理支撐壓力效果",
+       example:"台積電500元整數關口在2022-2023年多次形成強力壓力，終於2023年底放量突破後，500元轉為強力支撐，每次回測均獲買盤承接",
+       tip:"支撐壓力越多次測試越容易被突破（韌性消耗原理）。三次測試同一支撐後若無法反彈，很可能跌破"},
+      {id:"chart-patterns",title:"型態學：頭肩頂與雙底",en:"Chart Patterns",diff:"進階",
+       tags:["頭肩頂","雙底","型態學","頸線"],
+       summary:"經典型態是市場群體心理的圖形化呈現，量能配合才是型態成立的關鍵",
+       points:["頭肩頂（反轉下跌）：左肩→頭（創新高）→右肩（未破前高）→跌破頸線確認，目標跌幅 = 頭部到頸線距離","雙底/W底（反轉上漲）：兩個低點相近、中間有反彈、第二底縮量、突破頸線放量確認","其他重要型態：三角收斂、旗形（趨勢中繼）、杯柄形態（長線多頭）"],
+       formula:"頭肩頂目標跌幅 = 頸線 - (頭部高點 - 頸線)\n雙底目標漲幅 = 頸線 + (頸線 - 底部低點)\n型態越大（時間越長），後續行情幅度通常越大",
+       example:"台積電2022年初在688元附近形成頭肩頂，頸線約550元，跌破後目標跌幅138元，最終跌至370元，超額完成型態目標",
+       tip:"判斷標準：型態要對稱、時間要足夠（至少2-6個月以上）、量能要配合。強行解讀是型態分析最大的陷阱"},
+      {id:"trendline",title:"趨勢線與趨勢通道",en:"Trendline & Channel",diff:"入門",
+       tags:["趨勢線","趨勢通道","道氏理論","上升趨勢"],
+       summary:"趨勢是你最好的朋友，順著趨勢操作勝率最高，逆勢摸頂抄底是最危險的行為",
+       points:["上升趨勢線：連接兩個以上的波段低點，每次回測趨勢線均獲支撐代表趨勢完整","趨勢通道：上升趨勢線（支撐線）+ 平行的上方壓力線，在支撐線附近買、壓力線附近減碼","道氏理論三段論：主趨勢（6個月以上）、次級趨勢（3週至數月）、短期趨勢（3週以內）"],
+       formula:"趨勢線斜率越大（超過45度），趨勢越強但越容易被打破\n理想趨勢線斜率15-30度最具可持續性\n至少需3個接觸點才能確認趨勢線有效",
+       example:"2020年3月台股觸底後建立的上升趨勢線，此趨勢線維持有效直到2022年初俄烏戰爭時才被跌破，在跌破時出場可成功避開2022年大跌",
+       tip:"趨勢線需要「三點確認」（至少接觸3次）才算有效。破趨勢線後若股價迅速收回，可能是假突破"},
+      {id:"chip-technical",title:"籌碼與技術面結合",en:"Chip + Technical Fusion",diff:"進階",
+       tags:["籌碼","外資","融資","技術共鳴"],
+       summary:"技術面看方向，籌碼面看誰在推動，兩者共鳴才是最高確信度的進場訊號",
+       points:["外資買超 + 技術面突破：外資持續買超同時出現技術突破，可信度大增，是最佳進場訊號組合","融資增加 + 股價下跌：散戶加碼攤平但股價不漲，是籌碼惡化的警訊","主力成本區：當股價回到主力成本區時往往是支撐（主力不願讓股價跌破成本）"],
+       formula:"籌碼集中度 = 前20大股東持股比例\n融資使用率 = 融資餘額 / 融資限額\n券資比 = 融券餘額 / 融資餘額",
+       example:"台積電2023年AI行情，外資連續30日以上買超同時日線出現多頭排列，技術面與籌碼面共鳴確認，之後一路從500元漲至800元以上",
+       tip:"籌碼面是技術面的「內幕」，技術面是籌碼面的「表現」。兩者出現矛盾時，應以籌碼面優先，因為反映真實資金流向"}
+    ]
+  },
+  {
+    id:"fundamental",title:"基本面",icon:"📊",
+    grad:"var(--fundamental-grad)",main:"var(--fundamental-main)",bg:"var(--fundamental-bg)",
+    border:"var(--fundamental-border)",text:"var(--fundamental-text)",
+    cards:[
+      {id:"eps-pe",title:"EPS 與本益比 P/E",en:"EPS & P/E Ratio",diff:"入門",
+       tags:["EPS","本益比","PE","估值"],
+       summary:"本益比告訴你市場願意為每一塊盈利付出多少錢，是評估股票貴賤最直觀的指標",
+       points:["EPS（每股盈餘）= 稅後淨利 / 流通在外股數；反映公司每股創造的獲利能力","P/E（本益比）= 股價 / EPS；台股歷史平均本益比約15-18倍，高成長科技股可達30-60倍","本益比的限制：使用歷史EPS為落後指標，更重要的是Forward P/E = 股價 / 未來12個月預估EPS"],
+       formula:"EPS = 稅後淨利 / 加權平均流通股數\nP/E = 股價 / EPS\n合理股價 = 預估EPS × 合理本益比倍數\nPEG = P/E / EPS年成長率（PEG < 1 通常代表便宜）",
+       example:"台積電2023年EPS約32元，股價700元，本益比約22倍。相較於同期輝達本益比超過60倍，台積電顯示相對低估，加上AI需求驅動EPS成長預期，支撐股價後續上漲至800元以上",
+       tip:"本益比必須與「成長率」搭配（看PEG）、與「同業比較」、與「自身歷史區間比較」。成長30%的公司，給30倍本益比其實不貴（PEG=1）"},
+      {id:"roe",title:"ROE 股東權益報酬率",en:"Return on Equity",diff:"進階",
+       tags:["ROE","杜邦分析","股東權益","競爭優勢"],
+       summary:"ROE是判斷公司是否能有效運用股東資金的核心指標，巴菲特最看重這個數字",
+       points:["ROE = 稅後淨利 / 股東權益 × 100%；持續ROE > 15%通常代表具有競爭優勢的好公司","杜邦分析：ROE = 淨利率 × 資產週轉率 × 財務槓桿；三維度分別反映獲利能力、營運效率、財務結構","ROE的陷阱：高負債可以人為拉高ROE；需搭配負債比判斷，低負債下仍維持高ROE才是真正護城河"],
+       formula:"ROE = 淨利率 × 資產週轉率 × 權益乘數\n= (淨利/營收) × (營收/總資產) × (總資產/股東權益)\nROIC = EBIT(1-稅率) / 投入資本",
+       example:"台積電過去10年ROE平均約25-30%，且主要來源是高淨利率（近40%）和資產週轉效率，負債比合理，代表真實的競爭優勢",
+       tip:"連續5年ROE > 15%且穩定（非忽高忽低），且扣除財務槓桿因素後仍維持高ROE，才是真正值得長期持有的優質企業"},
+      {id:"revenue",title:"營收月增/年增率分析",en:"Revenue Growth Analysis",diff:"入門",
+       tags:["月營收","年增率","MoM","YoY"],
+       summary:"月營收是最早期的財務預警系統，連續3個月趨勢改變往往預示EPS的轉折",
+       points:["台灣上市櫃公司每月10日前公布上月營收，是最即時的財務數據；月增率（MoM）看短期動能，年增率（YoY）看成長趨勢","淡旺季調整：需用年增率（同期比較）排除季節性因素，月增高不一定代表真正成長","連續3個月年增率加速成長，且逐月創新高，往往是股價領先上漲的訊號"],
+       formula:"月增率 MoM = (本月營收 - 上月營收) / 上月營收 × 100%\n年增率 YoY = (本月營收 - 去年同月) / 去年同月 × 100%\n累計年增率 = (今年累計 - 去年同期累計) / 去年同期累計 × 100%",
+       example:"聯發科2023年底至2024年初營收年增率從-30%逐月收斂至轉正，連續4個月年增率改善，市場提前預期EPS回升，股價從700元提前半年開始上漲至1,000元以上",
+       tip:"觀察營收要同時看「絕對金額」和「增速趨勢」。增速放緩不代表壞事（基期效應），增速加速才是真正的催化劑"},
+      {id:"margins",title:"毛利率與淨利率",en:"Gross & Net Margin",diff:"入門",
+       tags:["毛利率","淨利率","獲利能力","費用控管"],
+       summary:"毛利率反映產品競爭力，淨利率反映整體經營效率，兩者的差距藏著費用管控能力",
+       points:["毛利率 = (營收 - 銷貨成本) / 營收；台積電晶圓代工毛利率長期維持50%以上，代表強大的定價權","淨利率 = 稅後淨利 / 營收；毛利率高但淨利率低，代表費用控管有問題（研發/行銷/管理費用過高）","毛利率趨勢比絕對值更重要：毛利率持續下降代表競爭加劇；毛利率上升代表產品組合優化"],
+       formula:"毛利率 = (營收 - 銷貨成本) / 營收\n營業利益率（EBIT margin）= 營業利益 / 營收\n淨利率 = 稅後淨利 / 營收\n費用率 = 毛利率 - 營業利益率",
+       example:"鴻海毛利率長期僅6-7%（組裝代工業特性）；台積電毛利率50%、淨利率35%以上，同為電子業但商業模式天差地遠，估值倍數也大相徑庭",
+       tip:"比較毛利率時必須在「同產業內比較」，不同產業毛利率差異極大（軟體業可達80%、組裝業僅5-10%）"},
+      {id:"debt",title:"負債比與財務健全度",en:"Debt Ratio & Financial Health",diff:"進階",
+       tags:["負債比","流動比率","財務健全","利息保障"],
+       summary:"負債不是壞事，但過高的財務槓桿在景氣反轉時可能讓公司瞬間陷入危機",
+       points:["負債比 = 總負債 / 總資產；一般製造業 < 50%為健康，金融業天生高負債比需另行評估","流動比率 = 流動資產 / 流動負債（> 2 理想，> 1.5 可接受）；衡量短期償債能力","利息保障倍數 = EBIT / 利息費用；< 3倍代表利息負擔沉重；> 5倍代表財務健康"],
+       formula:"負債比 = 總負債 / 總資產\n流動比率 = 流動資產 / 流動負債\n速動比率 = (現金+應收帳款+短期投資) / 流動負債\n淨負債/EBITDA < 3倍為健康",
+       example:"台積電現金部位超過1兆元，淨現金部位為正，即使面對景氣下滑或年度CapEx約3,000億，財務安全墊極厚，是台股中財務最安全的公司之一",
+       tip:"財務健全度捷徑：現金及約當現金至少要能覆蓋12個月的營運費用加上近期到期債務。現金快速減少但獲利沒同步成長，是財務惡化的早期警訊"},
+      {id:"cashflow",title:"現金流量分析",en:"Cash Flow Analysis",diff:"進階",
+       tags:["現金流量","自由現金流","FCF","營業現金流"],
+       summary:"損益表可以被操控，現金流量表造假最難，自由現金流才是公司真實賺錢能力的最終裁判",
+       points:["現金流量表三大部分：營業活動現金流（核心業務賺的錢）、投資活動現金流（CapEx/投資）、融資活動現金流","自由現金流（FCF）= 營業活動現金流 - 資本支出（CapEx）；FCF > 0 且成長代表公司真正在創造價值","警訊：淨利高但營業現金流低（應收帳款暴增、存貨膨脹），可能是財報美化"],
+       formula:"FCF = CFO（營業現金流）- CapEx\nFCF Yield = FCF / 市值（> 5%代表便宜）\nDSO（應收帳款天數）= 應收帳款 / (營收/365)\nCCC = DSO + DIO - DPO",
+       example:"台積電年度FCF通常在2,000-4,000億元台幣，FCF殖利率維持3-5%，即使每年大量CapEx擴廠，仍能持續產生大量自由現金流，是持續配發高現金股利的財務基礎",
+       tip:"「淨利 ≠ 現金」是最重要的財務觀念。看完損益表一定要看現金流量表確認。若淨利連續成長但FCF停滯甚至為負，需深入了解原因"},
+      {id:"dividend",title:"股利政策與殖利率",en:"Dividend Policy & Yield",diff:"入門",
+       tags:["股利","殖利率","除息","存股"],
+       summary:"穩定且成長的股利政策是公司獲利品質最有力的背書，高殖利率是價值投資的核心吸引力",
+       points:["現金殖利率 = 每股現金股利 / 股價；台股高殖利率股（> 5%）常受存股族追捧","股利政策類型：現金股利（直接分配現金）、股票股利（配發股票，股本膨脹稀釋EPS）","台股除息注意事項：除息日股價向下調整；填息（股價回到除息前）才算真正賺到股利"],
+       formula:"現金殖利率 = 每股現金股利 / 股價\n股利發放率 = 每股股利 / EPS\n72法則：72 / 殖利率 = 本金翻倍年數\n殖利率5% → 約14.4年翻倍",
+       example:"中華電信長期維持每股4-4.8元現金股利，殖利率約4-5%。台積電雖殖利率僅2-3%，但股利持續成長（從2元到13元），長期總報酬遠超高殖利率定存股",
+       tip:"殖利率3%但每年成長10%的股票，長期報酬遠優於殖利率7%但停滯的股票。選存股要看「股利成長趨勢」不只是當前殖利率"},
+      {id:"moat",title:"護城河與競爭優勢",en:"Economic Moat",diff:"高階",
+       tags:["護城河","競爭優勢","ROIC","長期投資"],
+       summary:"護城河決定一家公司優勢能持續多久，沒有護城河的高獲利終將被競爭侵蝕",
+       points:["五種主要護城河：無形資產（品牌/專利）、轉換成本高（客戶不易更換）、網路效應（用戶越多越有價值）、成本優勢（規模/製程）、有效規模","如何驗證護城河：過去10年ROE是否持續 > 15%？遭受競爭對手攻擊後毛利率是否維持？","台積電護城河：製程技術壁壘（3nm/2nm領先競爭者3-5年）、客戶轉換成本極高（設計到量產需2-3年驗證）"],
+       formula:"護城河強度：ROIC - WACC > 0 且差距越大越持久，代表護城河越深\n超額ROIC維持10年以上，代表極強的競爭護城河",
+       example:"台積電是台股最典型的護城河案例：技術領先壁壘讓三星、Intel花費數千億美元仍無法追平；蘋果、輝達等頂級客戶高度依賴台積電先進製程，形成相互鎖定關係",
+       tip:"最快速判斷護城河的問題：「如果有人投入1兆元來搶這家公司的市場，5年後這家公司的獲利會下降多少？」答案是「幾乎不受影響」才算是真正的護城河"},
+      {id:"financial-report",title:"財報季重點解讀",en:"Earnings Season Guide",diff:"進階",
+       tags:["財報","法說會","EPS驚喜","展望"],
+       summary:"財報是公司過去的成績單，更重要的是展望（Guidance）透露的未來方向",
+       points:["台灣財報時程：Q1→5/15前；Q2→8/14前；Q3→11/14前；Q4→隔年3/31前（年報）","解讀財報重點順序：①營收符合預期？②毛利率趨勢？③EPS超預期？④現金流健康？⑤管理層展望語氣？","買預期賣事實（Buy the rumor, sell the fact）：財報前股價因預期上漲，公布後若符合預期反而下跌（利多出盡）"],
+       formula:"EPS驚喜度 = (實際EPS - 分析師預估EPS) / |分析師預估EPS| × 100%\n超預期 > +5% 通常有正面股價反應\n低於預期 < -5% 通常引發賣壓",
+       example:"台積電每季法說會（1/4/7/10月）是全球半導體業風向球：2024年4月法說會上修全年美元營收成長展望，超越市場預期，單日股價大漲超過5%",
+       tip:"財報公布後要重點看「展望（Guidance）」的措辭改變。從「謹慎樂觀」轉為「明確成長」是重要升評訊號；措辭轉謹慎往往比EPS本身影響更大"}
+    ]
+  },
+  {
+    id:"chip",title:"籌碼面",icon:"🔍",
+    grad:"var(--chip-grad)",main:"var(--chip-main)",bg:"var(--chip-bg)",
+    border:"var(--chip-border)",text:"var(--chip-text)",
+    cards:[
+      {id:"three-institutions",title:"三大法人買賣超",en:"Three Major Institutions",diff:"入門",
+       tags:["外資","投信","自營商","三大法人"],
+       summary:"外資、投信、自營商是台股最主要的機構力量，法人持續買超的個股往往能走出波段行情",
+       points:["外資持有台股市值約40-45%，是最大的機構投資者；外資持續買超通常帶動趨勢，對台幣匯率敏感（台幣升值時傾向買台股）","投信：國內基金公司，通常在季底（3/6/9/12月）有作帳需求；投信連買超的小型股籌碼效果更明顯","自營商：券商自有資金操作，含避險部位，訊號雜訊較多；需扣除「避險」後的淨部位更具參考價值"],
+       formula:"三大法人合計買超 = 外資買賣超 + 投信買賣超 + 自營商買賣超\n法人持股比例變化 = (本期持股張數 - 上期持股張數) / 流通股數\n連續買超天數越長，籌碼面訊號越強",
+       example:"台積電2023年AI題材爆發期間，外資連續40個交易日買超，合計買超超過50萬張，外資持股比例從73%升至76%，股價從500元漲至800元，外資持續買超是最清晰的多頭訊號",
+       tip:"觀察三大法人要看「趨勢」，不看單日數字。連續5日以上同方向操作才具意義。外資單日買超100億不如連續10日每日買超30億更具說服力"},
+      {id:"margin-trading",title:"融資融券分析",en:"Margin & Short Interest",diff:"進階",
+       tags:["融資","融券","券資比","軋空"],
+       summary:"融資代表散戶信心，融券代表空方力量，券資比高是潛在軋空行情的火藥庫",
+       points:["融資（Margin Lending）：投資人借錢買股，台股融資成數最高4成（自備6成）；融資持續增加但股價不漲是危險訊號（籌碼沉重）","融券（Short Selling）：借券做空，融券餘額增加代表看空者增多；高融券是潛在的軋空動力","券資比 = 融券餘額 / 融資餘額；券資比 > 15-20%代表空頭力量相對強，若股價同時上漲，可能引發軋空行情"],
+       formula:"融資使用率 = 融資餘額 / 融資限額（接近100%代表籌碼沉重）\n融資維持率 = 股票市值 / 融資金額\n（跌破130%觸發追繳，低於120%強制平倉）\n券資比 = 融券 / 融資",
+       example:"融資持續減少（洗籌碼）後股價反而創高，是籌碼乾淨後主力拉抬的典型模式；融資使用率達90%時，小幅拉回就可能引發斷頭賣壓",
+       tip:"「融資增加股價不漲」= 危險；「融資減少股價反漲」= 健康。理想強勢股是融資持續減少、融券持續增加、股價緩步創高，這是最可能引發軋空的籌碼結構"},
+      {id:"major-players",title:"主力進出追蹤",en:"Smart Money Tracking",diff:"進階",
+       tags:["主力","分點進出","庫藏股","籌碼集中"],
+       summary:"主力（大戶）的進出成本是股價的隱形支撐，摸清主力成本才能判斷後續行為",
+       points:["透過「分點進出」分析（各券商分點的買賣資料）可以追蹤特定主力的操作行為；持續在同一分點大量買進代表建倉","主力成本估算：用加權平均法計算主力在某價格區間的平均買進成本；當股價跌回主力成本區時，主力通常有護盤動機","庫藏股（Buy-Back）：公司用自有資金買回自家股票，是最明確的護盤訊號；台股規定最多可買回10%流通股數"],
+       formula:"主力成本估算 = Σ(各日買超張數 × 當日均價) / 總買超張數\n持股集中度 = 前10大股東持股比例 / 流通股數\n主力獲利空間 = (現價 - 主力成本) / 主力成本",
+       example:"某科技股董事長宣布庫藏股，以平均成本80元買回5%流通股，當股價跌回80元附近，公司有動機護盤，消息公布後股價從75元快速反彈至90元，庫藏股宣告成為短線強力買進訊號",
+       tip:"庫藏股不等於股價必漲。關鍵是：①買回的實際進度 ②買回目的（員工認股 vs. 真正護盤） ③公司財務是否健全（用借來的錢買庫藏股是警訊）"},
+      {id:"director",title:"董監持股與大股東動態",en:"Insider Ownership",diff:"進階",
+       tags:["董監持股","質押","內部人交易","籌碼"],
+       summary:"內部人持股變化是最直接的公司價值訊號，大股東悄悄增持比任何分析師報告都有說服力",
+       points:["台灣規定董監事持股異動超過股本0.5%需在2日內申報；每月10日前公布上月持股異動","持股質押比例：董監以持股向銀行借款；質押比例過高（> 50%）代表財務壓力大，股價大跌時被迫補保證金可能引發賣壓","內部人連續增持：管理層/董事以自有資金公開市場買進，是最強的多頭訊號，因為內部人最了解公司真實狀況"],
+       formula:"董監持股比例 = 董監合計持股 / 流通股數\n質押比例 = 質押股數 / 董監持股總數\n流通籌碼 = 流通股數 - 機構及大股東鎖定股數",
+       example:"某IC設計公司董事長及高管在股價低檔連續3個月公開市場買進自家股票，累積買進金額超過1億元，同期外資也開始悄悄加碼，隨後半年股價翻倍",
+       tip:"查詢董監持股：公開資訊觀測站（MOPS）→「股東股權」→「董監事持股」。重點是觀察「趨勢」：持續增持 vs. 悄悄減碼是截然不同的訊號"},
+      {id:"analyst-conf",title:"法說會前後動態",en:"Earnings Call Dynamics",diff:"進階",
+       tags:["法說會","展望","外資反應","機構動向"],
+       summary:"法說會是機構投資人與管理層的正式對話，會前的籌碼布局往往洩漏市場預期方向",
+       points:["法說會前1-2週：知情的外資/投信通常已取得管道資訊，股價若提前大漲或大跌，代表市場對結果有預判","法說會重點觀察：①展望是否上修/下修 ②毛利率指引 ③CapEx計畫 ④訂單能見度 ⑤管理層措辭（謹慎/樂觀）","法說會後動作：外資是否連續買超或賣超，是驗證法說會品質的最直接指標"],
+       formula:"法說會後超額報酬率 = 個股報酬率 - 大盤報酬率（觀察5/10/20日）\n法說會前後成交量比 = 法說會後5日均量 / 前5日均量（> 1.5 代表關注度提升）",
+       example:"台積電2024年Q2法說會管理層上修全年美元營收成長展望，外資當天買超超過3萬張，確認機構資金正面解讀，帶動股價在隨後兩週上漲8%",
+       tip:"法說會「聽展望，不聽已知結果」。真正影響後市的是Q3展望，不是剛公布的Q2 EPS。措辭從「審慎」變「樂觀」是最重要的轉折訊號"},
+      {id:"concentration",title:"籌碼集中度分析",en:"Share Concentration",diff:"高階",
+       tags:["籌碼集中度","周轉率","大戶持股","浮動籌碼"],
+       summary:"籌碼越集中，主力越容易控盤，股票的「可控性」越強，波動幅度越大",
+       points:["籌碼集中度：前10大股東持股比例越高，浮動籌碼越少，主力越容易推升股價；但集中度過高也代表流動性差","周轉率（換手率）= 成交量 / 流通股數；突然爆量代表大量籌碼易手，可能是主力換手或出貨","集中度增加通常在底部吸籌阶段出現；集中度降低（籌碼發散）常在高點出現，是主力出貨的跡象"],
+       formula:"籌碼集中度 = 前10大股東持股 / 流通股數\n日均周轉率 = 日成交量 / 流通股數\n持股1,000張以上大戶比例 = 大戶持股 / 流通股數（每週更新）",
+       example:"某生技股前10大股東持股達65%，流通籌碼僅35%，當外資在某週突然大幅減持5%，集中度快速下降，伴隨成交量放大，後續股價大跌30%",
+       tip:"免費查詢：台灣證交所每週公布「大股東持股分級表」；籌碼K線、CMoney均有視覺化呈現。重點是觀察「趨勢變化」而非單一快照"},
+      {id:"short-long",title:"券資比與軋空行情",en:"Short-to-Margin & Short Squeeze",diff:"高階",
+       tags:["券資比","軋空","融券回補","除息前效應"],
+       summary:"券資比是衡量多空力量對比的溫度計，高券資比是潛在軋空行情的火藥庫",
+       points:["券資比 = 融券餘額（張）/ 融資餘額（張）；券資比 > 25%代表空頭集中，軋空風險高","軋空行情觸發條件：①個股利多消息 ②融券到期回補（除息前空頭必須回補） ③股價突破重要壓力","除息前軋空：台股除息前一日為融券最後回補日，高券資比個股在除息前常出現強勁拉抬行情"],
+       formula:"軋空潛力指數 = 融券餘額 / 近10日均量（回補所需天數）\n回補天數越多，軋空力道越大\n理論軋空漲幅無上限（連鎖回補效應）",
+       example:"某電子股融券餘額達1萬張，每日均量僅2,000張，理論回補需5天；公司宣布重大合約後，外資同步買超，空頭恐慌性回補，5個交易日連續漲停，股價從80元拉至130元（漲幅超過60%）",
+       tip:"操作軋空行情需要「催化劑」。通常需要外資買超 + 技術突破 + 高券資比三者同時出現，軋空勝率最高。單純高券資比不代表股價必漲"},
+      {id:"consecutive-buy",title:"法人連續買超天數",en:"Consecutive Institutional Buying",diff:"進階",
+       tags:["連買超","外資","投信","籌碼趨勢"],
+       summary:"法人連續買超的持續性比單日金額更重要，連買10日以上代表系統性布局而非短線操作",
+       points:["法人連續買超天數：連買3日為短線關注、連買10日為中期布局、連買30日以上代表長期系統性配置","投信連買超效應：投信因資金規模較小，對中小型股影響更大；投信連續買超中小型股，往往在1-3個月內推升30-50%漲幅","法人買超質量差異：買超集中在「上漲日」代表積極追高（強多頭）；買超集中在「下跌日」代表逢低承接（長線布局）"],
+       formula:"法人連買超貢獻度 = 法人累計買超張數 / 流通股數 × 100%\n若連買30日累計買超達流通股數5%以上，代表籌碼結構顯著改善",
+       example:"某IC設計公司投信連續買超28個交易日，累計買超12,000張，佔流通股數7%，期間股價從200元漲至320元，漲幅60%；法人合計買超確認強勢格局",
+       tip:"監控法人連買超：CMoney籌碼K線、XQ全球贏家均有「法人連買超天數」篩選功能。建議篩選：外資連買 ≥ 10日 + 投信連買 ≥ 5日 + 股價站上季線"}
+    ]
+  },
+  {
+    id:"news",title:"消息面",icon:"📰",
+    grad:"var(--news-grad)",main:"var(--news-main)",bg:"var(--news-bg)",
+    border:"var(--news-border)",text:"var(--news-text)",
+    cards:[
+      {id:"material-news",title:"重大訊息公告判讀",en:"Material Announcement Analysis",diff:"進階",
+       tags:["重大訊息","利多利空","催化劑","市場反應"],
+       summary:"重大訊息是市場最直接的催化劑，但判讀方向比看到訊息本身更重要",
+       points:["台灣上市櫃公司重大訊息需即時公告（重訊平台）：包含重大合約、財務預測變動、董監改選、大股東持股異動、合併分割等","重大訊息分類：確定性利多（大額合約）、不確定性利多（潛在訂單）、確定性利空（財報重大虧損）、不確定性利空（調查/訴訟）","市場反應速度：重大利多若在開盤前公告，開盤常以漲停反應；但若訊息已流傳，公告後反而因「利多出盡」下跌"],
+       formula:"重大訊息影響評估框架：\n①訊息真實性（已確認 vs. 傳言）\n②財務影響量化（增加EPS多少？）\n③持續性（一次性 vs. 長期）\n④市場已消化多少（股價是否已提前反映）",
+       example:"台積電2023年獲輝達大量CoWoS先進封裝訂單確認，競爭對手無法短期複製，訂單規模逐季擴大（持續性高），且市場事前沒有完全預期，公告後股價連續上漲，是典型的「有效利多」",
+       tip:"判斷是否「有效利多」的四個問題：①這件事可持續嗎？②競爭對手能多快複製？③市場事前已預期多少（股價是否已漲一段）？④財務影響是否顯著（對EPS影響 > 5%才值得關注）"},
+      {id:"analyst-report",title:"法人報告解讀",en:"Analyst Report Reading",diff:"進階",
+       tags:["券商報告","目標價","評等","外資"],
+       summary:"券商報告是有意見的分析，不是客觀事實；理解報告背後的利益結構才能正確使用",
+       points:["評等意義：Buy/Strong Buy（買進）、Outperform（優於大盤）、Neutral/Hold（持有）、Underperform/Sell（賣出）；實際上Sell評等極少見（< 5%），Hold往往是委婉的賣出","目標價計算方法：本益比法（預估EPS × 目標PE倍數）、DCF法（未來現金流折現）、EV/EBITDA法","升評/降評的市場效應：大型外資機構（高盛、摩根士丹利等）對台積電升評，通常帶來外資買超資金流入"],
+       formula:"隱含報酬率 = (目標價 - 現價) / 現價 × 100%\n若隱含報酬率 > 20%，通常給Buy評等\n機構覆蓋率 = 發布研究報告的券商家數（覆蓋率越高，股價越有效率）",
+       example:"摩根大通將台積電目標價從700元上調至1,100元，引發外資跟風買超，隔日成交量放大3倍，股價大漲5%；但需注意：外資報告常在持股已建立後才發布，需對照其實際買賣超交叉驗證",
+       tip:"使用法人報告的正確方式：①把重點放在「假設改變」而非評等升降 ②比較多家機構的歧異（歧異大代表不確定性高） ③驗證機構在報告發出前後的實際買賣動作（言行是否一致）"},
+      {id:"bullish-bearish",title:"利多利空辨別技巧",en:"Identifying Market Catalysts",diff:"進階",
+       tags:["利多","利空","預期差","利多出盡"],
+       summary:"同樣的消息可以是利多也可以是利空，關鍵在於市場預期與現實的差距",
+       points:["真正的利多三要素：①超越市場預期（Surprise）②具持續性（不是一次性）③市場尚未充分反映（股價未提前大漲）；三者缺一不可","陷阱型利多（利多出盡）：利多消息公布時股價已漲50-100%，代表市場早已預期，公布當天反而是出貨賣點","真正的利空判斷：區分「系統性利空」（產業整體衰退）vs. 「個股利空」（公司特有問題）；系統性利空需縮短持股；個股一次性利空可能是買進機會"],
+       formula:"利多/利空強度評分（1-5分）：\n①超預期程度（EPS超預期幅度）\n②持續性（1次性=1分，長期=5分）\n③市場預期程度（充分預期=1分，完全意外=5分）\n總分 > 10分才是值得操作的強力訊號",
+       example:"台積電宣布調漲晶圓代工價格10-20%：幅度超預期、漲價效果持續數年、部分已反映但未完全消化→有效利多，股價公告後繼續上漲",
+       tip:"面對重大消息最重要的問題：「相較於市場預期，這個消息是更好還是更差？」好消息不一定帶動股價上漲（若已充分預期），壞消息也不一定下跌（若已充分反映）"},
+      {id:"sentiment",title:"市場情緒指標",en:"Market Sentiment Indicators",diff:"進階",
+       tags:["市場情緒","VIX","融資","貪婪恐慌"],
+       summary:"市場情緒是最強大也最危險的力量，在貪婪中保持理性，在恐慌中尋找機會",
+       points:["恐慌貪婪指數：VIX（波動率指數）> 30代表市場恐慌，是歷史上重要的買進區間；VIX < 15代表市場自滿，需提高警惕","融資餘額作為散戶情緒指標：台股融資總額在高峰時（如2021年底超過4,500億）通常是市場過熱訊號；融資萎縮至2,000億以下是散戶悲觀的底部訊號","新開戶人數與交易量：牛市尾聲常見開戶人數暴增、日均成交量創歷史新高，是「最後買家進場」的典型現象，是市場頂部的反指標"],
+       formula:"巴菲特指標 = 股市總市值 / GDP\n台股此比率 > 200%通常被視為高估警訊\n台股日均成交量：< 1,500億（冷清）、2,000-3,000億（正常）、> 4,000億（過熱）",
+       example:"2021年11月台股日均成交量連續突破4,000-5,000億元，融資餘額創歷史新高超過4,500億，3個月後加權指數從18,619點跌至12,629點，跌幅32%，情緒指標提前給出頂部警訊",
+       tip:"班傑明·葛拉漢名言：「市場短期是投票機，長期是體重機」。極度恐慌時（全部人都說要跌）反而是建倉好時機；極度貪婪時是降低倉位的信號"},
+      {id:"macro",title:"總體經濟指標解讀",en:"Macroeconomic Indicators",diff:"高階",
+       tags:["CPI","Fed","PMI","總體經濟"],
+       summary:"CPI、Fed利率、PMI是影響全球資金流向的三大指揮棒，讀懂總經才能在趨勢中順水推舟",
+       points:["Fed利率政策：升息循環壓縮估值（本益比下降）；降息循環推升估值。關鍵在「預期」：市場通常提前6-12個月反映利率轉向","CPI（消費者物價指數）：CPI持續高於2%觸發Fed升息；核心CPI（扣除食品能源）是Fed最關注的指標。通膨降溫是降息的前提","PMI（採購經理人指數）：> 50代表製造業擴張，< 50代表收縮；PMI連續3個月 > 50 是景氣復甦的確認訊號"],
+       formula:"美國10年期公債殖利率是全球資產定價基準\n殖利率上升 → 成長股本益比承壓\n殖利率曲線倒掛（2年>10年）是衰退領先指標（通常領先12-18個月）",
+       example:"2022年美聯儲全年升息17碼（4.25%），台積電從688元跌至370元（-46%）；2023年底市場預期2024年降息，台積電提前在2023年大幅反彈，印證「市場提前反映政策轉向」",
+       tip:"總經指標「交通號誌」框架：Fed鴿派+PMI回升+CPI下行 = 三燈全綠（牛市最佳環境）；Fed鷹派+PMI下行+CPI高 = 三燈全紅（降低股票倉位）"},
+      {id:"taiwan-rules",title:"台灣特殊市場規則",en:"Taiwan Market Rules",diff:"入門",
+       tags:["漲跌停","T+2交割","處置股票","台股規則"],
+       summary:"台股獨特的交易規則創造了特有的市場現象，理解規則才能避免陷阱並掌握機會",
+       points:["漲跌停板制度：台股個股每日漲跌幅限制為±10%；連續漲停的股票進入「注意股票」、「處置股票」機制，每30分鐘才能委託一次","T+2交割制度：台股採T+2交割（買進後第2個交易日才需付款）；台股不允許當日沖銷（除非開通信用交易或使用當沖帳戶）","盤中零股交易：自2021年10月起開放盤中零股交易，讓資金不足的投資人可買進1股；但零股流動性差，買賣價差大"],
+       formula:"漲停價 = 前日收盤 × 1.1（取整至0.01元）\n跌停價 = 前日收盤 × 0.9\n進入注意股票：5日內漲停達3次或10日內達6次",
+       example:"某熱門AI概念股連續7個漲停後被列為處置股票，每30分鐘委託一次導致流動性大降，投機資金撤離，股價從高點快速回落40%",
+       tip:"台股特殊規則的操作機會：①除息後前段股價往往是買點（填息行情）②月底/季底投信作帳效應 ③處置股票在解除處置前往往有反彈（流動性恢復效應）"},
+      {id:"ex-dividend",title:"除息除權效應",en:"Ex-Dividend Effect",diff:"入門",
+       tags:["除息","除權","填息","股利稅"],
+       summary:"除息前後是台股獨特的投資節點，填息效應與稅賦優化創造了特有的套利機會",
+       points:["除息：發放現金股利當日，股價向下調整（除息參考價 = 前收盤 - 現金股利）；投資人實際報酬取決於能否「填息」","除權：發放股票股利，股本膨脹、每股盈餘稀釋；配股越多稀釋效果越大，若公司獲利沒有同步成長，除權後股價通常難以填權","稅賦考量：台灣股利算入個人綜合所得稅，但可選擇「分開計稅」（28%固定稅率）"],
+       formula:"除息參考價 = 除息前一日收盤價 - 每股現金股利\n填息報酬率 = (現價 - 除息參考價) / 除息參考價\n含息總報酬率 = (賣出價 - 買進價 + 股利) / 買進價\n填息天數越少，代表股票越強勢",
+       example:"中華電信每年6-7月除息（每股約4.35元），近5年平均填息天數約60-90天；台積電除息（2024年每股約13元），通常在2-3個月內完成填息並繼續創高",
+       tip:"選擇存股標的的填息評估：歷史填息成功率、填息天數（越短越好）、EPS成長趨勢（EPS成長才能支撐填息）。連續5年填息且EPS穩定成長的公司最值得存"},
+      {id:"theme-stocks",title:"題材股操作邏輯",en:"Theme Stock Strategy",diff:"高階",
+       tags:["題材股","AI概念","生命週期","題材邏輯"],
+       summary:"題材股靠「夢想定價」，邏輯清晰的題材可以跑很長，但需要嚴格的停損紀律",
+       points:["題材股三個生命週期：①主題引爆期（第一波，漲幅最快）②基本面驗證期（市場等待實際獲利兌現，股價盤整）③兌現期（第二波）或泡沫破滅","判斷題材持續性的三大問題：①產業規模夠大嗎？②公司是否真的有獨特定位？③多久能看到財務數字（EPS）兌現？","2023-2024年台股最大題材：AI伺服器（台積電/廣達/緯創/英業達）、CoWoS先進封裝（日月光/矽格）、散熱（雙鴻/奇鋐）"],
+       formula:"題材泡沫指標：本夢比（P/Dream）= 股價 / 未來理想情境下的EPS\n若現有股價已反映5-10年後的樂觀EPS，下行風險極大",
+       example:"2023年AI題材爆發，廣達從100元漲至330元，本益比從12倍擴張至40倍以上；題材支撐點是AI伺服器訂單實際成長（基本面逐季驗證），每季法說會訂單能見度持續提升，讓題材得以延續",
+       tip:"題材股最重要的風控原則：「題材邏輯改變就出場，不等基本面惡化再走」。一旦核心邏輯改變（如獨家供應商地位喪失），無論股價漲跌都應先出場"},
+      {id:"shareholders",title:"股東會效應與公司治理",en:"Shareholder Meeting Effects",diff:"入門",
+       tags:["股東會","股利宣告","公司治理","填息"],
+       summary:"股東會季節是台股特有的年度資訊節點，股利政策宣布往往是股價重要的催化劑",
+       points:["台股股東會旺季：每年5-7月（以6月最集中），公司公布年度股利及股東常會議程；股利優於預期帶動填息行情","股東會前哨戰：董事會通過股利決議通常在3-5月，是股利金額的第一次確認；董事改選年（每3年一次）是大股東整合籌碼的機會","公司治理評分（CG Score）：金管會推動公司治理評鑑，評分高的公司透明度高、股東友善"],
+       formula:"股利驚喜度 = (宣告股利 - 市場預估股利) / 市場預估股利\n差距 > 10%通常有正面股價反應\n年度股東會若有重大章程修改，可能是大股東保護控制權的訊號",
+       example:"聯發科2023年宣布每股配發75元現金股利（高於市場預期的68元），驚喜度+10%，公告後股價單日上漲7%，外資同步買超確認正面反應",
+       tip:"股東會季節操作心法：在3月底至4月初（董事會宣布股利前）觀察高殖利率標的，若基本面確認且預估殖利率 > 5%，可在正式宣告前布局"}
+    ]
+  }
+];
+
+let currentSection = 'technical';
+let currentDiff = 'all';
+let searchTerm = '';
+let expandedCard = null;
+
+function getSection(id) { return DATA.find(s => s.id === id); }
+
+function renderCard(card, section) {
+  const cssVars = `--card-grad:${section.grad};--card-main:${section.main};--card-bg:${section.bg};--card-border:${section.border};--card-color:${section.main};--card-text:${section.text}`;
+  const diffClass = `difficulty-${card.diff}`;
+  return `
+<div class="card" id="card-${card.id}" style="${cssVars}" data-id="${card.id}" data-diff="${card.diff}" data-section="${section.id}" data-tags="${card.tags.join(',')}">
+  <div class="card-top-bar"></div>
+  <div class="card-header">
+    <div class="card-icon-wrap">${section.icon}</div>
+    <div class="card-meta">
+      <span class="card-category">${section.title}</span>
+      <span class="card-difficulty ${diffClass}">${card.diff}</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-title">${card.title}</div>
+    <div class="card-en">${card.en}</div>
+    <div class="card-summary">${card.summary}</div>
+    <div class="card-tags">${card.tags.map(t=>`<span class="card-tag" onclick="filterTag('${t}',event)">#${t}</span>`).join('')}</div>
+  </div>
+  <div class="card-detail" id="detail-${card.id}">
+    <div class="card-detail-inner">
+      <div class="detail-block block-keypoints">
+        <div class="detail-block-title">📌 核心重點</div>
+        <div class="detail-block-content"><ul>${card.points.map(p=>`<li>${p}</li>`).join('')}</ul></div>
+      </div>
+      <div class="detail-block block-formula">
+        <div class="detail-block-title">🔢 公式 / 定義 <button class="copy-btn" onclick="copyFormula('${card.id}',this)">複製</button></div>
+        <div class="detail-block-content" id="formula-${card.id}">${card.formula}</div>
+      </div>
+      <div class="detail-block block-example">
+        <div class="detail-block-title">📖 實際案例</div>
+        <div class="detail-block-content">${card.example}</div>
+      </div>
+      <div class="detail-block block-tip">
+        <div class="detail-block-title">💡 操作技巧</div>
+        <div class="detail-block-content">${card.tip}</div>
+      </div>
+    </div>
+  </div>
+  <button class="card-expand-btn" onclick="toggleCard('${card.id}')">
+    <i class="arrow">▼</i> <span class="expand-label">展開詳情</span>
+  </button>
+</div>`;
+}
+
+function renderSection(sectionId) {
+  const section = getSection(sectionId);
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = section.cards.map(c => renderCard(c, section)).join('');
+  applyFilters();
+  observeCards();
+}
+
+function switchTab(id) {
+  if (currentSection === id) {
+    document.getElementById('tab-nav').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  currentSection = id;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+  updateTabIndicator();
+  renderSection(id);
+  updateFilterBarColors();
+  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth'});
+}
+
+function updateTabIndicator() {
+  const active = document.querySelector('.tab-btn.active');
+  const indicator = document.getElementById('tab-indicator');
+  const section = getSection(currentSection);
+  if (active) {
+    indicator.style.left = active.offsetLeft + 'px';
+    indicator.style.width = active.offsetWidth + 'px';
+    indicator.style.background = section.main.replace('var(--','').replace(')','');
+    indicator.style.background = `var(--${currentSection}-main)`;
+  }
+}
+
+function updateFilterBarColors() {
+  const section = getSection(currentSection);
+  const fb = document.getElementById('filter-bar');
+  fb.style.setProperty('--section-bg', section.bg);
+  fb.style.setProperty('--section-color', section.main);
+  fb.style.setProperty('--section-border', section.border);
+}
+
+function filterDifficulty(diff, btn) {
+  currentDiff = diff;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.diff === diff));
+  applyFilters();
+}
+
+function filterTag(tag, e) {
+  e.stopPropagation();
+  searchTerm = tag;
+  document.getElementById('search-input').value = tag;
+  applyFilters();
+}
+
+function applyFilters() {
+  const cards = document.querySelectorAll('.card');
+  let visible = 0;
+  cards.forEach(card => {
+    const matchDiff = currentDiff === 'all' || card.dataset.diff === currentDiff;
+    const searchLower = searchTerm.toLowerCase();
+    const cardText = (card.querySelector('.card-title').textContent + ' ' +
+                      card.querySelector('.card-summary').textContent + ' ' +
+                      card.dataset.tags + ' ' +
+                      card.querySelector('.card-en').textContent).toLowerCase();
+    const matchSearch = !searchTerm || cardText.includes(searchLower);
+    const hide = !matchDiff || !matchSearch;
+    card.classList.toggle('hidden-filter', hide);
+    if (!hide) visible++;
+  });
+  const total = cards.length;
+  document.getElementById('search-count').textContent = searchTerm || currentDiff !== 'all' ? `${visible} / ${total} 張` : '';
+  // Show empty state
+  let empty = document.querySelector('.empty-state');
+  if (visible === 0) {
+    if (!empty) {
+      const grid = document.getElementById('cards-grid');
+      grid.insertAdjacentHTML('beforeend', `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>找不到符合條件的知識卡片</p><small>試試其他關鍵字或調整篩選條件</small></div>`);
+    }
+  } else {
+    if (empty) empty.remove();
+  }
+}
+
+function toggleCard(id) {
+  if (expandedCard && expandedCard !== id) {
+    collapseCard(expandedCard);
+  }
+  const card = document.getElementById('card-' + id);
+  const detail = document.getElementById('detail-' + id);
+  if (card.classList.contains('expanded')) {
+    collapseCard(id);
+  } else {
+    detail.style.maxHeight = detail.scrollHeight + 'px';
+    card.classList.add('expanded');
+    card.querySelector('.expand-label').textContent = '收合詳情';
+    expandedCard = id;
+  }
+}
+
+function collapseCard(id) {
+  const card = document.getElementById('card-' + id);
+  const detail = document.getElementById('detail-' + id);
+  if (!card) return;
+  detail.style.maxHeight = '0';
+  card.classList.remove('expanded');
+  card.querySelector('.expand-label').textContent = '展開詳情';
+  if (expandedCard === id) expandedCard = null;
+}
+
+function copyFormula(id, btn) {
+  const text = document.getElementById('formula-' + id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已複製 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function observeCards() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, Math.min(i * 80, 400));
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.card:not(.visible)').forEach(c => observer.observe(c));
+}
+
+// Nav scroll shadow
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 10);
+});
+
+// Search
+document.getElementById('search-input').addEventListener('input', function() {
+  searchTerm = this.value.trim();
+  applyFilters();
+});
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  renderSection('technical');
+  updateFilterBarColors();
+  requestAnimationFrame(updateTabIndicator);
+});
+
+// Update indicator on resize
+window.addEventListener('resize', updateTabIndicator);
+</script>
+</body>
+</html>

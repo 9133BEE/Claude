@@ -206,7 +206,9 @@
       "Read(//c/Users/Authma/Downloads/**)",
       "PowerShell(Get-ScheduledTask | Where-Object { $_.TaskName -match \"backup|push|claude|git|auto\" -or $_.Actions.Execute -match \"auto_push|backup\" } | Select-Object TaskName, State | Format-Table -AutoSize)",
       "PowerShell(Get-ScheduledTask -TaskName \"Claude_AutoPush\")",
-      "Bash(git remote *)"
+      "Bash(git remote *)",
+      "Bash(git pull *)",
+      "Bash(git rm *)"
     ],
     "additionalDirectories": [
       "\\tmp",

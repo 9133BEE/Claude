@@ -1,0 +1,24 @@
+name: 每日台股財經簡報
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 每天 09:00 台灣時間（早盤簡報）
+    - cron: '0 10 * * *'  # 每天 18:00 台灣時間（收盤復盤）
+  workflow_dispatch:       # 允許手動觸發測試
+
+jobs:
+  send-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 安裝 Python 套件
+        run: pip install requests feedparser --quiet
+
+      - name: Groq AI 分析並推播 Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python3 .github/workflows/send_news.py
