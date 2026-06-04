@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GA4 × Google Ads 連結設定教學</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f8f9fa;
+      color: #202124;
+      line-height: 1.7;
+      padding: 40px 20px 80px;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(60,64,67,0.10);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #4285F4 0%, #1a73e8 100%);
+      color: #fff;
+      text-align: center;
+      padding: 44px 32px 40px;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+    }
+
+    .header-badge .dot {
+      width: 6px; height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .header h1 {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    .header h1 .x-mark {
+      color: #fdd663;
+      margin: 0 6px;
+      font-weight: 400;
+    }
+
+    .header .subtitle {
+      font-size: 15px;
+      color: rgba(255,255,255,0.85);
+      font-weight: 400;
+    }
+
+    /* ── Content wrapper ── */
+    .content {
+      padding: 40px 40px 48px;
+    }
+
+    /* ── Step block ── */
+    .step-block {
+      margin-bottom: 0;
+    }
+
+    .step-divider {
+      border: none;
+      border-top: 2px dashed #e0e0e0;
+      margin: 36px 0;
+    }
+
+    /* Step number badge */
+    .step-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #4285F4;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-num.red    { background: #EA4335; }
+    .step-num.green  { background: #34A853; }
+    .step-num.yellow { background: #FBBC04; color: #202124; }
+
+    .step-title-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #202124;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: #5f6368;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    /* ── ILLUSTRATION WRAPPER ── */
+    .illustration {
+      background: #f8f9fa;
+      border: 1.5px solid #e8eaed;
+      border-radius: 12px;
+      padding: 28px 28px 24px;
+      position: relative;
+    }
+
+    /* ===== STEP 1: Simulated GA4 Sidebar ===== */
+    .ga4-mockup {
+      display: flex;
+      gap: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1.5px solid #dadce0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .ga4-sidebar {
+      width: 220px;
+      background: #202124;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ga4-sidebar-logo {
+      padding: 14px 16px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      border-bottom: 1px solid #3c4043;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ga4-logo-mark {
+      width: 20px; height: 20px;
+      border-radius: 4px;
+      background: #fbbc04;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      color: #202124;
+    }
+
+    .ga4-nav {
+      flex: 1;
+      padding: 10px 0;
+    }
+
+    .ga4-nav-item {
+      padding: 9px 16px;
+      font-size: 12.5px;
+      color: #9aa0a6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: default;
+    }
+
+    .ga4-nav-item .nav-icon { font-size: 14px; }
+
+    .ga4-nav-item.active {
+      background: rgba(66,133,244,0.18);
+      color: #8ab4f8;
+    }
+
+    .ga4-nav-item.indent {
+      padding-left: 38px;
+      font-size: 12px;
+    }
+
+    .ga4-nav-item.indent-2 {
+      padding-left: 52px;
+      font-size: 12px;
+    }
+
+    .ga4-nav-item.target {
+      background: rgba(234,67,53,0.15);
+      color: #f28b82;
+      font-weight: 700;
+      border-left: 3px solid #EA4335;
+      padding-left: 49px;
+    }
+
+    .ga4-nav-separator {
+      height: 1px;
+      background: #3c4043;
+      margin: 6px 0;
+    }
+
+    .ga4-nav-admin {
+      padding: 12px 16px 14px;
+      border-top: 1px solid #3c4043;
+    }
+
+    .ga4-nav-admin-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: #9aa0a6;
+      padding: 6px 4px;
+      cursor: default;
+    }
+
+    .admin-gear-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .red-circle {
+      position: absolute;
+      top: -6px; right: -8px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 2.5px solid #EA4335;
+      background: transparent;
+      pointer-events: none;
+    }
+
+    /* arrow path on the right panel */
+    .ga4-main {
+      flex: 1;
+      background: #fff;
+      padding: 20px 16px;
+    }
+
+    .ga4-main-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #5f6368;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .path-step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .path-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #5f6368;
+    }
+
+    .path-step .ps-box {
+      background: #f1f3f4;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 12.5px;
+      color: #3c4043;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .path-step .ps-box.active {
+      background: #e8f0fe;
+      border-color: #4285F4;
+      color: #1a73e8;
+      font-weight: 700;
+    }
+
+    .path-step .ps-box.target {
+      background: #fce8e6;
+      border-color: #EA4335;
+      color: #d93025;
+      font-weight: 700;
+      box-shadow: 0 0 0 2px rgba(234,67,53,0.2);
+    }
+
+    .path-arrow {
+      color: #9aa0a6;
+      font-size: 14px;
+    }
+
+    .annotation-red {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #EA4335;
+      font-weight: 600;
+    }
+
+    /* ===== STEP 2: Modal card ===== */
+    .modal-scene {
+      position: relative;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .modal-backdrop {
+      background: rgba(0,0,0,0.10);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: #f8f9fa;
+      border-bottom: 1px solid #e8eaed;
+      padding: 14px 20px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-header-icon {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #e8f0fe;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+
+    .modal-header-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #202124;
+    }
+
+    .modal-header-sub {
+      font-size: 11.5px;
+      color: #5f6368;
+    }
+
+    .modal-body {
+      padding: 16px 20px 14px;
+    }
+
+    .modal-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f3f4;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      padding: 7px 12px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #9aa0a6;
+    }
+
+    .modal-account-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 8px;
+      border-radius: 6px;
+      background: #e8f0fe;
+      border: 1.5px solid #4285F4;
+      position: relative;
+    }
+
+    .modal-checkbox {
+      width: 18px; height: 18px;
+      border-radius: 3px;
+      background: #4285F4;
+      border: 2px solid #4285F4;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .modal-checkbox svg {
+      width: 12px; height: 12px;
+    }
+
+    .modal-account-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #202124;
+    }
+
+    .modal-account-id {
+      font-size: 11.5px;
+      color: #5f6368;
+    }
+
+    .modal-footer {
+      padding: 10px 20px 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .modal-btn-cancel {
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #5f6368;
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+
+    .modal-btn-next {
+      padding: 8px 22px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: #4285F4;
+      border: none;
+      cursor: default;
+      box-shadow: 0 1px 4px rgba(66,133,244,0.35);
+    }
+
+    /* Red annotation arrows */
+    .annotation-group {
+      position: relative;
+      margin-top: 16px;
+    }
+
+    .callout-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #EA4335;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .callout-arrow {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* ===== STEP 3: Toggle Switches ===== */
+    .toggle-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1.5px solid #e8eaed;
+      border-radius: 10px;
+      padding: 16px 20px;
+      gap: 12px;
+    }
+
+    .toggle-info {
+      flex: 1;
+    }
+
+    .toggle-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #202124;
+      margin-bottom: 3px;
+    }
+
+    .toggle-hint {
+      font-size: 12px;
+      color: #5f6368;
+    }
+
+    .toggle-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .toggle-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .toggle-tag.recommend {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    .toggle-tag.required {
+      background: #fce8e6;
+      color: #d93025;
+    }
+
+    /* CSS toggle switch */
+    .toggle-switch {
+      width: 48px; height: 26px;
+      border-radius: 13px;
+      background: #4285F4;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 3px; right: 3px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+
+    .toggle-row.required-row {
+      border-color: #EA4335;
+      background: #fffbfb;
+    }
+
+    /* ===== STEP 4: Flow diagram ===== */
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      padding: 10px 0;
+    }
+
+    .flow-box {
+      background: #fff;
+      border: 2px solid #dadce0;
+      border-radius: 10px;
+      padding: 18px 24px;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .flow-box .fb-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .flow-box .fb-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #202124;
+    }
+
+    .flow-box .fb-sub {
+      font-size: 11.5px;
+      color: #5f6368;
+      margin-top: 2px;
+    }
+
+    .flow-box.ga4-box {
+      border-color: #FBBC04;
+    }
+
+    .flow-box.ads-box {
+      border-color: #4285F4;
+    }
+
+    .flow-arrow-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 8px;
+    }
+
+    .flow-arrow-line {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .flow-arrow-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #34A853;
+    }
+
+    .flow-connector {
+      width: 64px; height: 3px;
+      background: linear-gradient(to right, #34A853, #34A853);
+      border-radius: 2px;
+    }
+
+    .flow-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #34A853;
+      margin-top: 5px;
+      text-align: center;
+    }
+
+    .flow-note {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #5f6368;
+    }
+
+    .flow-note strong {
+      color: #34A853;
+    }
+
+    /* ── Notice box ── */
+    .notice-box {
+      background: #fafafa;
+      border: 1.5px solid #e8eaed;
+      border-left: 4px solid #FBBC04;
+      border-radius: 10px;
+      padding: 18px 22px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-top: 36px;
+    }
+
+    .notice-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    .notice-content {
+      font-size: 13.5px;
+      color: #5f6368;
+      line-height: 1.8;
+    }
+
+    .notice-content strong { color: #202124; font-weight: 700; }
+
+    .perm-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .perm-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .perm-tag.ga4 {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    .perm-tag.ads {
+      background: #e6f4ea;
+      color: #137333;
+    }
+
+    .perm-plus {
+      font-size: 16px;
+      font-weight: 700;
+      color: #9aa0a6;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 20px 40px 28px;
+      border-top: 1px solid #f1f3f4;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: #bdc1c6;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; }
+      .illustration { break-inside: avoid; }
+    }
+
+    /* ── RWD ── */
+    @media (max-width: 640px) {
+      body { padding: 0 0 60px; }
+
+      .page { border-radius: 0; }
+
+      .header { padding: 32px 20px 28px; }
+      .header h1 { font-size: 22px; }
+
+      .content { padding: 28px 20px 36px; }
+
+      .ga4-mockup { flex-direction: column; }
+      .ga4-sidebar { width: 100%; }
+
+      .flow-diagram { flex-direction: column; gap: 4px; }
+      .flow-arrow-wrap { transform: rotate(90deg); padding: 4px 0; }
+
+      .modal-card { font-size: 13px; }
+
+      .toggle-row { padding: 12px 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-badge">
+      <span class="dot"></span>
+      圖解操作教學
+    </div>
+    <h1>GA4<span class="x-mark">×</span>Google Ads 連結設定</h1>
+    <p class="subtitle">5 分鐘完成設定，廣告轉換數據自動同步</p>
+  </header>
+
+  <!-- ── Content ── -->
+  <div class="content">
+
+    <!-- ══ STEP 1 ══ -->
+    <div class="step-block">
+      <div class="step-label">
+        <div class="step-num">①</div>
+        <div>
+          <div class="step-title-text">進入 GA4 管理後台</div>
+          <div class="step-desc">從左側導覽列依序進入設定路徑</div>
+        </div>
+      </div>
+
+      <div class="illustration">
+        <div class="ga4-mockup">
+          <!-- Sidebar -->
+          <div class="ga4-sidebar">
+            <div class="ga4-sidebar-logo">
+              <div class="ga4-logo-mark">G</div>
+              Analytics
+            </div>
+            <div class="ga4-nav">
+              <div class="ga4-nav-item">
+                <span class="nav-icon">🏠</span> 首頁
+              </div>
+              <div class="ga4-nav-item">
+                <span class="nav-icon">📊</span> 報表
+              </div>
+              <div class="ga4-nav-item">
+                <span class="nav-icon">🔍</span> 探索
+              </div>
+              <div class="ga4-nav-item">
+                <span class="nav-icon">📣</span> 廣告
+              </div>
+              <div class="ga4-nav-separator"></div>
+            </div>
+            <div class="ga4-nav-admin">
+              <div class="ga4-nav-admin-item">
+                <span class="admin-gear-wrap">
+                  ⚙️
+                  <span class="red-circle"></span>
+                </span>
+                管理
+              </div>
+            </div>
+          </div>
+
+          <!-- Main panel: path -->
+          <div class="ga4-main">
+            <div class="ga4-main-title">導覽路徑</div>
+            <div class="path-step-list">
+              <div class="path-step">
+                <span class="ps-box">⚙️ 管理</span>
+              </div>
+              <div class="path-step">
+                <span class="path-arrow">↓</span>
+              </div>
+              <div class="path-step">
+                <span class="ps-box active">資源設定</span>
+              </div>
+              <div class="path-step">
+                <span class="path-arrow">↓</span>
+              </div>
+              <div class="path-step">
+                <span class="ps-box active">產品連結</span>
+              </div>
+              <div class="path-step">
+                <span class="path-arrow">↓</span>
+              </div>
+              <div class="path-step">
+                <span class="ps-box target">Google Ads 連結</span>
+              </div>
+              <div class="path-step">
+                <span class="path-arrow">↓</span>
+              </div>
+              <div class="path-step">
+                <span class="ps-box target">點右上角「連結」</span>
+              </div>
+            </div>
+            <div class="annotation-red">
+              <span>◀</span>
+              點擊左下角管理齒輪開始
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="step-divider">
+
+    <!-- ══ STEP 2 ══ -->
+    <div class="step-block">
+      <div class="step-label">
+        <div class="step-num red">②</div>
+        <div>
+          <div class="step-title-text">選擇 Google Ads 帳戶</div>
+          <div class="step-desc">勾選與廣告投放相同的帳戶後點「下一步」</div>
+        </div>
+      </div>
+
+      <div class="illustration">
+        <div class="modal-scene">
+          <div class="modal-backdrop">
+            <div class="modal-card">
+              <div class="modal-header">
+                <div class="modal-header-icon">🔗</div>
+                <div>
+                  <div class="modal-header-title">選擇 Google Ads 帳戶</div>
+                  <div class="modal-header-sub">選取要連結的廣告帳戶</div>
+                </div>
+              </div>
+              <div class="modal-body">
+                <div class="modal-search">
+                  🔍 &nbsp;搜尋帳戶名稱或 ID
+                </div>
+                <div class="modal-account-row">
+                  <div class="modal-checkbox">
+                    <svg viewBox="0 0 12 12" fill="none">
+                      <polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="modal-account-name">我的廣告帳戶</div>
+                    <div class="modal-account-id">XXXXXX-XXXXXX</div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <span class="modal-btn-cancel">取消</span>
+                <span class="modal-btn-next">下一步</span>
+              </div>
+            </div>
+          </div>
+          <div class="annotation-group">
+            <div class="callout-row">
+              <span class="callout-arrow">↑</span>
+              勾選此帳戶（與廣告投放使用同一組帳號）
+            </div>
+            <div class="callout-row">
+              <span class="callout-arrow">↗</span>
+              確認後點「下一步」繼續
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="step-divider">
+
+    <!-- ══ STEP 3 ══ -->
+    <div class="step-block">
+      <div class="step-label">
+        <div class="step-num green">③</div>
+        <div>
+          <div class="step-title-text">確認關鍵設定開關</div>
+          <div class="step-desc">兩個開關都必須開啟，才能確保數據正確追蹤</div>
+        </div>
+      </div>
+
+      <div class="illustration">
+        <div class="toggle-panel">
+          <!-- Toggle 1: 個人化廣告 -->
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-name">個人化廣告</div>
+              <div class="toggle-hint">讓 GA4 受眾可匯入 Google Ads 再行銷</div>
+            </div>
+            <div class="toggle-right">
+              <span class="toggle-tag recommend">建議開啟</span>
+              <div class="toggle-switch">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toggle 2: 自動標記 -->
+          <div class="toggle-row required-row">
+            <div class="toggle-info">
+              <div class="toggle-name">自動標記（Auto-tagging）</div>
+              <div class="toggle-hint">⚠️ 開啟後才能追蹤廣告點擊來源與轉換數據</div>
+            </div>
+            <div class="toggle-right">
+              <span class="toggle-tag required">⚠️ 必須開啟</span>
+              <div class="toggle-switch">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="step-divider">
+
+    <!-- ══ STEP 4 ══ -->
+    <div class="step-block">
+      <div class="step-label">
+        <div class="step-num yellow">④</div>
+        <div>
+          <div class="step-title-text">連結完成</div>
+          <div class="step-desc">設定提交後兩個平台即開始雙向同步</div>
+        </div>
+      </div>
+
+      <div class="illustration">
+        <div class="flow-diagram">
+          <div class="flow-box ga4-box">
+            <div class="fb-icon">📊</div>
+            <div class="fb-name">GA4 資源</div>
+            <div class="fb-sub">轉換事件 / 受眾</div>
+          </div>
+
+          <div class="flow-arrow-wrap">
+            <div class="flow-arrow-line">
+              <div class="flow-arrow-dot"></div>
+              <div class="flow-connector"></div>
+              <div class="flow-arrow-dot"></div>
+            </div>
+            <div class="flow-label">雙向同步</div>
+          </div>
+
+          <div class="flow-box ads-box">
+            <div class="fb-icon">📣</div>
+            <div class="fb-name">Google Ads 帳戶</div>
+            <div class="fb-sub">廣告活動 / 轉換追蹤</div>
+          </div>
+        </div>
+
+        <div class="flow-note">
+          連結後約 <strong>24 小時內</strong>，資料開始自動同步
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Notice ── -->
+    <div class="notice-box">
+      <div class="notice-icon">🔑</div>
+      <div class="notice-content">
+        <strong>操作者須同時具備以下兩項權限，缺一則無法完成連結</strong>
+        <div class="perm-row">
+          <span class="perm-tag ga4">GA4 編輯者 權限</span>
+          <span class="perm-plus">＋</span>
+          <span class="perm-tag ads">Google Ads 管理員 權限</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <p>GA4 × Google Ads 連結設定教學　｜　如有問題請洽廣告投手協助操作</p>
+  </div>
+
+</div><!-- end .page -->
+</body>
+</html>
