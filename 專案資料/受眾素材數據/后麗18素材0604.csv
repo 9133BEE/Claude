@@ -1,0 +1,18 @@
+分析報告開始,分析報告結束,廣告名稱,廣告投遞,曝光次數,觸及人數,貼文留言數,訊息對話開始次數,潛在顧客,每次成果成本,成果指標,"花費金額 (TWD)",廣告組合預算,廣告組合預算類型,點擊次數（全部）,CTR（連結點閱率）,頻率,開始,結束時間
+2026-03-02,2026-06-04,0302_大樓價,inactive,15153,4048,6,19,2,154.47368421,actions:onsite_conversion.messaging_conversation_started_7d,2935,150,每日,929,0.494951,3.74333,2026-03-02,進行中
+2026-03-02,2026-06-04,0302_大樓價,not_delivering,9195,3677,3,9,,187.44444444,actions:onsite_conversion.messaging_conversation_started_7d,1687,200,每日,679,0.391517,2.50068,2026-03-02,進行中
+2026-03-02,2026-06-04,0302_大樓價,not_delivering,4655,2356,1,5,1,255.8,actions:onsite_conversion.messaging_conversation_started_7d,1279,200,每日,344,0.537057,1.975806,2026-03-12,進行中
+2026-03-02,2026-06-04,0302_大樓價(單圖),not_delivering,34400,9879,,24,1,193.16666667,actions:onsite_conversion.messaging_conversation_started_7d,4636,200,每日,1317,1.200581,3.482134,2026-03-18,進行中
+2026-03-02,2026-06-04,0302_大樓價(單圖),inactive,16997,5724,,16,1,167.1875,actions:onsite_conversion.messaging_conversation_started_7d,2675,200,每日,758,1.276696,2.969427,2026-03-18,進行中
+2026-03-02,2026-06-04,0401_宜居后里,not_delivering,15831,5106,,11,,188.09090909,actions:onsite_conversion.messaging_conversation_started_7d,2069,200,每日,457,0.682206,3.10047,2026-03-18,進行中
+2026-03-02,2026-06-04,0401_宜居后里,not_delivering,860,557,,1,,83,actions:onsite_conversion.messaging_conversation_started_7d,83,200,每日,18,0.348837,1.543986,2026-03-18,進行中
+2026-03-02,2026-06-04,0302_大樓價(單圖),inactive,36468,9539,1,35,,180.71428571,actions:onsite_conversion.messaging_conversation_started_7d,6325,200,每日,1388,1.283317,3.823042,2026-04-16,進行中
+2026-03-02,2026-06-04,0401_宜居后里,inactive,2132,1107,,1,,395,actions:onsite_conversion.messaging_conversation_started_7d,395,200,每日,50,0.562852,1.925926,2026-04-16,進行中
+2026-03-02,2026-06-04,0401_宜居后里,active,35074,8311,,24,1,233.33333333,actions:onsite_conversion.messaging_conversation_started_7d,5600,200,每日,951,0.861037,4.22019,2026-04-16,進行中
+2026-03-02,2026-06-04,0302_大樓價(單圖),inactive,16594,5509,1,16,,170.875,actions:onsite_conversion.messaging_conversation_started_7d,2734,200,每日,683,1.235386,3.012162,2026-04-16,進行中
+2026-03-02,2026-06-04,0430_1488萬,inactive,519,329,,1,,103,actions:onsite_conversion.messaging_conversation_started_7d,103,200,每日,25,1.348748,1.577508,2026-04-16,進行中
+2026-03-02,2026-06-04,0430_1488萬,not_delivering,820,450,,1,,210,actions:onsite_conversion.messaging_conversation_started_7d,210,200,每日,39,1.463415,1.822222,2026-04-16,進行中
+2026-03-02,2026-06-04,0430_1488萬,not_delivering,3205,1161,,2,,365.5,actions:onsite_conversion.messaging_conversation_started_7d,731,150,每日,85,0.74883,2.760551,2026-03-02,進行中
+2026-03-02,2026-06-04,0401_宜居后里,not_delivering,522,329,,,,,,123,150,每日,10,0.383142,1.586626,2026-03-02,進行中
+2026-03-02,2026-06-04,20260601_后科鄰距離,active,508,296,,1,,127,actions:onsite_conversion.messaging_conversation_started_7d,127,200,每日,26,1.377953,1.716216,2026-04-16,進行中
+2026-03-02,2026-06-04,20260601_后科鄰距離,not_delivering,4842,1808,,1,,813,actions:onsite_conversion.messaging_conversation_started_7d,813,200,每日,175,1.073936,2.678097,2026-04-16,進行中
