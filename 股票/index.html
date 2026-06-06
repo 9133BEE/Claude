@@ -4,195 +4,432 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>股學筆記 — 台股知識精華庫</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ── DESIGN TOKENS ──────────────────────────────────────────────────── */
 :root {
-  --color-primary: #1A56DB;
-  --color-primary-light: #3B82F6;
-  --color-accent: #6366F1;
-  --bg-page: #F8FAFC;
-  --bg-card: #FFFFFF;
-  --bg-dark: #0F172A;
-  --bg-dark-card: #1E293B;
-  --text-primary: #0F172A;
+  /* Surface */
+  --bg-base:        #f8fafc;
+  --bg-raised:      #f1f5f9;
+  --bg-card:        #ffffff;
+  --bg-card-hover:  #fafbff;
+  --bg-inset:       #f1f5f9;
+
+  /* Border */
+  --border-subtle:  rgba(15,23,42,.06);
+  --border-default: rgba(15,23,42,.10);
+  --border-strong:  rgba(15,23,42,.16);
+
+  /* Text */
+  --text-primary:   #0f172a;
   --text-secondary: #334155;
-  --text-muted: #475569;
-  --text-faint: #94A3B8;
-  --border: #E2E8F0;
-  --shadow-card: 0 1px 3px rgba(15,23,42,.06),0 4px 12px rgba(15,23,42,.04);
-  --shadow-hover: 0 8px 32px rgba(26,86,219,.12),0 2px 8px rgba(15,23,42,.08);
-  --font: 'Noto Sans TC',system-ui,sans-serif;
-  --font-en: 'Inter','Noto Sans TC',sans-serif;
-  --font-mono: 'JetBrains Mono','Courier New',monospace;
-  --radius: 16px;
-  --nav-h: 64px;
-  --tab-h: 52px;
+  --text-muted:     #64748b;
+  --text-faint:     #94a3b8;
 
-  --technical-main: #3B82F6;
-  --technical-bg: #EFF6FF;
-  --technical-border: #BFDBFE;
-  --technical-text: #1E40AF;
-  --technical-grad: linear-gradient(135deg,#1D4ED8,#3B82F6);
+  /* Accent — single blue */
+  --accent:         #1d4ed8;
+  --accent-dim:     rgba(29,78,216,.08);
+  --accent-border:  rgba(29,78,216,.2);
 
-  --fundamental-main: #10B981;
-  --fundamental-bg: #ECFDF5;
-  --fundamental-border: #A7F3D0;
-  --fundamental-text: #065F46;
-  --fundamental-grad: linear-gradient(135deg,#059669,#10B981);
+  /* Semantic */
+  --bull:           #059669;
+  --bull-dim:       rgba(5,150,105,.10);
+  --bear:           #dc2626;
+  --bear-dim:       rgba(220,38,38,.10);
+  --warn:           #d97706;
+  --warn-dim:       rgba(217,119,6,.10);
+  --purple:         #7c3aed;
+  --purple-dim:     rgba(124,58,237,.10);
 
-  --chip-main: #F59E0B;
-  --chip-bg: #FFFBEB;
-  --chip-border: #FDE68A;
-  --chip-text: #92400E;
-  --chip-grad: linear-gradient(135deg,#D97706,#F59E0B);
+  /* Section accent colours */
+  --technical-c:    #1d4ed8;
+  --technical-dim:  rgba(29,78,216,.08);
+  --technical-border: rgba(29,78,216,.2);
 
-  --news-main: #8B5CF6;
-  --news-bg: #F5F3FF;
-  --news-border: #DDD6FE;
-  --news-text: #4C1D95;
-  --news-grad: linear-gradient(135deg,#7C3AED,#8B5CF6);
+  --fundamental-c:  #059669;
+  --fundamental-dim: rgba(5,150,105,.08);
+  --fundamental-border: rgba(5,150,105,.2);
 
-  --beginner-bg: #D1FAE5;
-  --beginner-text: #065F46;
-  --intermediate-bg: #FEF3C7;
-  --intermediate-text: #92400E;
-  --advanced-bg: #FEE2E2;
-  --advanced-text: #7F1D1D;
+  --chip-c:         #d97706;
+  --chip-dim:       rgba(217,119,6,.08);
+  --chip-border:    rgba(217,119,6,.2);
+
+  --news-c:         #7c3aed;
+  --news-dim:       rgba(124,58,237,.08);
+  --news-border:    rgba(124,58,237,.2);
+
+  --futures-c:      #ea580c;
+  --futures-dim:    rgba(234,88,12,.08);
+  --futures-border: rgba(234,88,12,.2);
+
+  /* Typography */
+  --font:           'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  --font-en:        'Inter', 'Noto Sans TC', sans-serif;
+  --font-mono:      'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* Geometry */
+  --radius-sm:      6px;
+  --radius:         10px;
+  --radius-lg:      14px;
+  --nav-h:          60px;
+  --tab-h:          48px;
+
+  /* Shadow */
+  --shadow-card:    0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+  --shadow-hover:   0 4px 16px rgba(0,0,0,.10), 0 1px 4px rgba(0,0,0,.06);
+
+  /* Transition */
+  --t-fast:         150ms cubic-bezier(.4,0,.2,1);
+  --t-normal:       260ms cubic-bezier(.4,0,.2,1);
 }
 
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
-button{font-family:var(--font);cursor:pointer;border:none;background:none}
+/* ── FONT IMPORTS ───────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
-/* NAV */
-.nav{position:sticky;top:0;z-index:300;height:var(--nav-h);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;transition:box-shadow .2s}
-.nav.scrolled{box-shadow:0 1px 12px rgba(15,23,42,.08)}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-primary);font-weight:800;font-family:var(--font-en);font-size:1.1rem;flex-shrink:0}
-.nav-logo svg{flex-shrink:0}
-.nav-logo span{color:var(--color-primary)}
-.nav-spacer{flex:1}
-.nav-search{position:relative;display:flex;align-items:center}
-.nav-search input{border:1px solid var(--border);border-radius:20px;padding:8px 16px 8px 38px;font-size:.875rem;font-family:var(--font);background:#F1F5F9;width:220px;transition:all .3s;outline:none;color:var(--text-primary)}
-.nav-search input:focus{width:300px;background:#fff;border-color:var(--color-primary-light)}
-.nav-search .search-icon{position:absolute;left:12px;color:var(--text-faint);pointer-events:none;width:16px;height:16px}
-#search-count{font-size:.8rem;color:var(--text-muted);flex-shrink:0;white-space:nowrap}
+/* ── RESET ──────────────────────────────────────────────────────────── */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: var(--font); cursor: pointer; border: none; background: none; }
+a { color: inherit; text-decoration: none; }
 
-/* HERO */
-.hero{background:var(--bg-dark);padding:64px 24px;overflow:hidden;position:relative}
-.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-.hero-title{font-family:var(--font-en);font-weight:800;font-size:clamp(2rem,4vw,3rem);line-height:1.15;color:#fff;margin-bottom:16px}
-.hero-title .grad{background:linear-gradient(90deg,#60A5FA,#818CF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-subtitle{color:#94A3B8;font-size:1rem;line-height:1.8;margin-bottom:28px}
-.hero-badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
-.hero-badge{padding:6px 16px;border-radius:100px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid transparent}
-.hero-badge:nth-child(1){background:rgba(59,130,246,.15);color:#60A5FA;border-color:rgba(59,130,246,.3)}
-.hero-badge:nth-child(2){background:rgba(16,185,129,.15);color:#34D399;border-color:rgba(16,185,129,.3)}
-.hero-badge:nth-child(3){background:rgba(245,158,11,.15);color:#FCD34D;border-color:rgba(245,158,11,.3)}
-.hero-badge:nth-child(4){background:rgba(139,92,246,.15);color:#A78BFA;border-color:rgba(139,92,246,.3)}
-.hero-badge:hover{transform:translateY(-2px);filter:brightness(1.2)}
-.hero-stats{display:flex;gap:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,.08)}
-.hero-stat{text-align:center}
-.hero-stat-num{font-family:var(--font-mono);font-size:1.5rem;font-weight:600;color:#60A5FA}
-.hero-stat-label{font-size:.75rem;color:#64748B;margin-top:2px}
-.hero-visual{display:flex;align-items:center;justify-content:center;opacity:.9}
-.hero-visual svg{width:100%;max-width:380px;filter:drop-shadow(0 0 40px rgba(96,165,250,.2))}
-
-/* TABS */
-.tab-nav{position:sticky;top:var(--nav-h);z-index:200;background:#fff;border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none}
-.tab-nav::-webkit-scrollbar{display:none}
-.tab-list{display:flex;max-width:1200px;margin:0 auto;padding:0 24px;gap:0;position:relative;min-width:max-content}
-.tab-btn{padding:0 28px;height:var(--tab-h);font-size:.9rem;font-weight:500;color:var(--text-muted);display:flex;align-items:center;gap:8px;transition:color .2s;white-space:nowrap;position:relative;font-family:var(--font)}
-.tab-btn .tab-icon{font-size:1.1rem}
-.tab-btn.active{color:var(--section-color,var(--color-primary));font-weight:700}
-.tab-btn:hover:not(.active){color:var(--text-secondary)}
-.tab-indicator{position:absolute;bottom:-2px;height:3px;border-radius:3px 3px 0 0;background:var(--color-primary);transition:left .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1)}
-
-/* FILTER BAR */
-.filter-bar{max-width:1200px;margin:0 auto;padding:16px 24px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.filter-label{font-size:.8rem;color:var(--text-muted);font-weight:500}
-.filter-btn{padding:4px 14px;border-radius:100px;font-size:.8rem;font-family:var(--font);border:1px solid var(--border);color:var(--text-muted);transition:all .15s;background:#fff}
-.filter-btn.active,.filter-btn:hover{background:var(--section-bg,#EFF6FF);color:var(--section-color,var(--color-primary));border-color:var(--section-border,#BFDBFE)}
-.filter-spacer{flex:1}
-
-/* CARDS GRID */
-.cards-section{max-width:1200px;margin:0 auto;padding:24px 24px 64px}
-.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-@media(max-width:1024px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){
-  .cards-grid{grid-template-columns:1fr}
-  .hero-inner{grid-template-columns:1fr}
-  .hero-visual{display:none}
-  .tab-btn{padding:0 18px}
+/* ── NAVIGATION ─────────────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 300;
+  height: var(--nav-h);
+  background: rgba(255,255,255,.95);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center;
+  padding: 0 28px; gap: 16px;
+  transition: border-color var(--t-normal), box-shadow var(--t-normal);
+}
+.nav.scrolled {
+  border-bottom-color: var(--border-default);
+  box-shadow: 0 1px 8px rgba(15,23,42,.06);
 }
 
-/* CARD */
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);overflow:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s cubic-bezier(.4,0,.2,1);opacity:0;transform:translateY(20px)}
-.card.visible{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s ease,box-shadow .28s cubic-bezier(.4,0,.2,1)}
-.card.hidden-filter{display:none}
-.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--card-border,#BFDBFE)}
-.card-top-bar{height:4px;background:var(--card-grad)}
-.card-header{padding:16px 18px 0;display:flex;align-items:flex-start;gap:10px}
-.card-icon-wrap{width:34px;height:34px;border-radius:8px;background:var(--card-grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;transition:transform .2s}
-.card:hover .card-icon-wrap{transform:scale(1.08) rotate(5deg)}
-.card-meta{flex:1;min-width:0}
-.card-category{font-size:.7rem;font-weight:600;color:var(--card-color);letter-spacing:.08em;text-transform:uppercase;font-family:var(--font-en)}
-.card-difficulty{float:right;padding:2px 10px;border-radius:100px;font-size:.7rem;font-weight:600;line-height:1.6}
-.difficulty-入門{background:var(--beginner-bg);color:var(--beginner-text)}
-.difficulty-進階{background:var(--intermediate-bg);color:var(--intermediate-text)}
-.difficulty-高階{background:var(--advanced-bg);color:var(--advanced-text)}
-.card-body{padding:10px 18px 14px}
-.card-title{font-size:1rem;font-weight:700;line-height:1.4;margin-bottom:2px;color:var(--text-primary)}
-.card-en{font-size:.72rem;color:var(--text-faint);font-family:var(--font-en);margin-bottom:8px}
-.card-summary{font-size:.85rem;color:var(--text-muted);line-height:1.65;margin-bottom:10px}
-.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.card-tag{padding:2px 9px;background:#F1F5F9;color:var(--text-muted);border-radius:6px;font-size:.72rem;border:1px solid var(--border);cursor:pointer;transition:all .15s}
-.card-tag:hover,.card-tag.active-tag{background:var(--card-bg,#EFF6FF);color:var(--card-color,var(--color-primary));border-color:var(--card-border,#BFDBFE)}
-.card-expand-btn{width:100%;padding:8px 0;font-size:.8rem;color:var(--card-color);font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;border-top:1px dashed var(--border);transition:background .15s,color .15s;border-radius:0 0 var(--radius) var(--radius);font-family:var(--font)}
-.card-expand-btn:hover{background:var(--card-bg)}
-.card-expand-btn .arrow{transition:transform .3s cubic-bezier(.4,0,.2,1);display:inline-block;font-style:normal}
-.card.expanded .card-expand-btn .arrow{transform:rotate(180deg)}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+  font-weight: 700; font-family: var(--font-en); font-size: 1rem;
+  color: var(--text-primary); flex-shrink: 0;
+  letter-spacing: -.01em;
+}
+.nav-logo-mark {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-logo-mark svg { display: block; }
+.nav-logo-text { color: var(--text-secondary); }
+.nav-logo-text strong { color: var(--text-primary); }
 
-/* CARD DETAIL */
-.card-detail{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.4,0,.2,1)}
-.card-detail-inner{padding:0 18px 16px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--border)}
-.detail-block{border-radius:10px;overflow:hidden}
-.detail-block-title{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 14px 4px;display:flex;align-items:center;gap:6px}
-.detail-block-content{padding:4px 14px 12px;font-size:.84rem;line-height:1.75}
-.block-keypoints{background:var(--card-bg,#EFF6FF);border:1px solid var(--card-border,#BFDBFE)}
-.block-keypoints .detail-block-title{color:var(--card-text,#1E40AF)}
-.block-keypoints .detail-block-content{color:var(--text-secondary)}
-.block-keypoints ul{padding-left:18px}
-.block-keypoints li{margin-bottom:6px}
-.block-keypoints li::marker{color:var(--card-color)}
-.block-formula{background:#1E293B;border:1px solid #334155}
-.block-formula .detail-block-title{color:#94A3B8;display:flex;justify-content:space-between;align-items:center}
-.block-formula .detail-block-content{font-family:var(--font-mono);font-size:.8rem;color:#E2E8F0;white-space:pre-wrap;line-height:1.9}
-.copy-btn{padding:2px 10px;border-radius:6px;background:#334155;color:#94A3B8;font-size:.7rem;font-family:var(--font);transition:all .15s;cursor:pointer;border:none}
-.copy-btn:hover{background:#475569;color:#e2e8f0}
-.copy-btn.copied{background:#059669;color:#fff}
-.block-example{background:#fff;border:1px solid var(--border);border-left:3px solid var(--card-color,#3B82F6)}
-.block-example .detail-block-title{color:var(--card-color,#3B82F6)}
-.block-example .detail-block-content{color:var(--text-secondary)}
-.block-tip{background:#FFFBEB;border:1px solid #FDE68A}
-.block-tip .detail-block-title{color:#92400E}
-.block-tip .detail-block-content{color:#78350F}
+.nav-spacer { flex: 1; }
+.nav-link-btn {
+  padding: 6px 14px; border-radius: 8px; font-size: .8rem; font-weight: 500;
+  color: var(--text-secondary); text-decoration: none; white-space: nowrap;
+  border: 1px solid var(--border-default); background: var(--bg-raised);
+  transition: all var(--t-fast); flex-shrink: 0;
+}
+.nav-link-btn:hover {
+  color: var(--accent); border-color: var(--accent-border);
+  background: var(--accent-dim);
+}
 
-/* FOOTER */
-.footer{background:var(--bg-dark);padding:40px 24px;text-align:center;color:#475569}
-.footer-logo{font-family:var(--font-en);font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px}
-.footer-logo span{color:#3B82F6}
-.footer-text{font-size:.8rem;line-height:1.8}
-.footer-disclaimer{margin-top:16px;font-size:.72rem;color:#334155;padding-top:16px;border-top:1px solid #1E293B}
+.nav-search { position: relative; display: flex; align-items: center; }
+.nav-search input {
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
+  padding: 7px 16px 7px 36px;
+  font-size: .825rem; font-family: var(--font);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  width: 200px; transition: all var(--t-normal); outline: none;
+}
+.nav-search input::placeholder { color: var(--text-muted); }
+.nav-search input:focus {
+  width: 280px;
+  background: #fff;
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.nav-search .search-icon {
+  position: absolute; left: 11px;
+  color: var(--text-muted); pointer-events: none; width: 15px; height: 15px;
+}
+#search-count {
+  font-size: .75rem; color: var(--text-muted);
+  font-family: var(--font-mono); flex-shrink: 0; white-space: nowrap;
+}
 
-/* EMPTY STATE */
-.empty-state{grid-column:1/-1;text-align:center;padding:64px 24px;color:var(--text-muted)}
-.empty-state svg{width:48px;height:48px;margin:0 auto 16px;opacity:.4}
-.empty-state p{font-size:1rem;margin-bottom:4px}
-.empty-state small{font-size:.85rem;color:var(--text-faint)}
+/* Hide search input on very small screens, show icon only */
+@media (max-width: 480px) {
+  .nav-search input { display: none; }
+  .nav-search .search-icon { position: static; width: 18px; height: 18px; color: var(--text-secondary); }
+  .nav-search { cursor: pointer; padding: 8px; }
+  #search-count { display: none; }
+  .nav-link-btn { display: none; }
+}
 
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* ── TABS ────────────────────────────────────────────────────────────── */
+.tab-nav {
+  position: sticky; top: var(--nav-h); z-index: 200;
+  background: #fff;
+  border-bottom: 1px solid var(--border-default);
+  overflow-x: auto; scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-list {
+  display: flex; max-width: 1200px; margin: 0 auto;
+  padding: 0 28px; position: relative; min-width: max-content;
+}
+.tab-btn {
+  padding: 0 24px; height: var(--tab-h);
+  font-size: .85rem; font-weight: 500;
+  color: var(--text-muted);
+  display: flex; align-items: center; gap: 8px;
+  transition: color var(--t-fast); white-space: nowrap;
+  position: relative; font-family: var(--font);
+}
+.tab-btn .tab-icon { font-size: 1rem; }
+.tab-btn.active { color: var(--section-color, var(--accent)); font-weight: 600; }
+.tab-btn:hover:not(.active) { color: var(--text-secondary); }
+.tab-indicator {
+  position: absolute; bottom: 0; height: 2px; border-radius: 2px;
+  background: var(--accent);
+  transition: left .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* Mobile tab spacing */
+@media (max-width: 640px) {
+  .tab-btn { padding: 0 16px; font-size: .8rem; }
+  .tab-list { padding: 0 12px; }
+}
+
+/* ── FILTER BAR ──────────────────────────────────────────────────────── */
+.filter-bar {
+  max-width: 1200px; margin: 0 auto;
+  padding: 14px 28px 0;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.filter-label {
+  font-size: .75rem; color: var(--text-muted); font-weight: 500;
+  margin-right: 2px;
+}
+.filter-btn {
+  padding: 4px 14px; border-radius: 100px; font-size: .75rem;
+  font-family: var(--font);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  background: var(--bg-raised);
+  transition: all var(--t-fast);
+}
+.filter-btn.active,
+.filter-btn:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+.filter-spacer { flex: 1; }
+
+@media (max-width: 640px) {
+  .filter-bar { padding: 12px 16px 0; gap: 6px; }
+}
+
+/* ── CARDS SECTION ───────────────────────────────────────────────────── */
+.cards-section { max-width: 1200px; margin: 0 auto; padding: 22px 28px 72px; }
+.cards-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+}
+@media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 640px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-visual { display: none; }
+  .hero { padding: 40px 20px 36px; }
+  .nav { padding: 0 16px; }
+  .cards-section { padding: 16px 16px 56px; }
+  .filter-bar { padding: 12px 16px 0; }
+}
+
+/* ── CARD ────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: transform var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal);
+  opacity: 0; transform: translateY(16px);
+}
+.card.visible {
+  opacity: 1; transform: translateY(0);
+  transition: opacity .4s ease, transform .4s ease,
+              box-shadow var(--t-normal), border-color var(--t-normal);
+}
+.card.hidden-filter { display: none; }
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--border-strong);
+}
+
+/* Card accent bar */
+.card-accent-bar {
+  height: 3px;
+  background: var(--card-accent, var(--accent));
+  opacity: 1;
+}
+
+.card-header { padding: 14px 16px 0; display: flex; align-items: flex-start; gap: 10px; }
+.card-icon-wrap {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--card-icon-bg, var(--accent-dim));
+  border: 1px solid var(--card-icon-border, var(--accent-border));
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: .9rem;
+  transition: transform var(--t-fast);
+}
+.card:hover .card-icon-wrap { transform: scale(1.06); }
+.card-meta { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; }
+.card-category {
+  font-size: .65rem; font-weight: 700;
+  color: var(--card-accent, var(--accent));
+  letter-spacing: .1em; text-transform: uppercase; font-family: var(--font-en);
+}
+.card-difficulty {
+  padding: 2px 9px; border-radius: 100px;
+  font-size: .65rem; font-weight: 600; line-height: 1.7;
+}
+.difficulty-入門 { background: rgba(5,150,105,.10); color: #059669; border: 1px solid rgba(5,150,105,.22); }
+.difficulty-進階 { background: rgba(217,119,6,.10); color: #d97706; border: 1px solid rgba(217,119,6,.22); }
+.difficulty-高階 { background: rgba(220,38,38,.10); color: #dc2626; border: 1px solid rgba(220,38,38,.22); }
+
+.card-body { padding: 10px 16px 12px; }
+.card-title { font-size: .95rem; font-weight: 700; line-height: 1.4; margin-bottom: 2px; color: var(--text-primary); }
+.card-en { font-size: .68rem; color: var(--text-muted); font-family: var(--font-en); margin-bottom: 8px; letter-spacing: .01em; }
+.card-summary { font-size: .82rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.card-tag {
+  padding: 2px 8px;
+  background: var(--bg-raised); color: var(--text-muted);
+  border-radius: 4px; font-size: .68rem;
+  border: 1px solid var(--border-default);
+  cursor: pointer; transition: all var(--t-fast);
+}
+.card-tag:hover {
+  background: var(--accent-dim); color: var(--accent);
+  border-color: var(--accent-border);
+}
+.card-expand-btn {
+  width: 100%; padding: 9px 0;
+  font-size: .75rem; color: var(--text-muted); font-weight: 500;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  border-top: 1px solid var(--border-subtle);
+  transition: background var(--t-fast), color var(--t-fast);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  font-family: var(--font);
+}
+.card-expand-btn:hover { background: var(--bg-raised); color: var(--text-secondary); }
+.card.expanded .card-expand-btn { color: var(--card-accent, var(--accent)); }
+.card-expand-btn .arrow {
+  transition: transform .3s cubic-bezier(.4,0,.2,1); display: inline-block;
+  font-size: .6rem; opacity: .5;
+}
+.card.expanded .card-expand-btn .arrow { transform: rotate(180deg); }
+
+/* ── CARD DETAIL ─────────────────────────────────────────────────────── */
+.card-detail { max-height: 0; overflow: hidden; transition: max-height .32s cubic-bezier(.4,0,.2,1); }
+.card-detail-inner {
+  padding: 0 16px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+.detail-block { border-radius: var(--radius); overflow: hidden; }
+.detail-block-title {
+  font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 9px 14px 4px; display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-en);
+}
+.detail-block-content { padding: 4px 14px 12px; font-size: .82rem; line-height: 1.8; }
+
+.block-keypoints {
+  background: var(--card-kp-bg, rgba(29,78,216,.06));
+  border: 1px solid var(--card-kp-border, rgba(29,78,216,.15));
+}
+.block-keypoints .detail-block-title { color: var(--card-accent, var(--accent)); }
+.block-keypoints .detail-block-content { color: var(--text-secondary); }
+.block-keypoints ul { padding-left: 16px; }
+.block-keypoints li { margin-bottom: 6px; }
+.block-keypoints li::marker { color: var(--card-accent, var(--accent)); }
+
+.block-formula {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-default);
+}
+.block-formula .detail-block-title { color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+.block-formula .detail-block-content {
+  font-family: var(--font-mono); font-size: .78rem;
+  color: var(--text-secondary); white-space: pre-wrap; line-height: 2;
+}
+.copy-btn {
+  padding: 2px 10px; border-radius: 4px;
+  background: #fff; color: var(--text-muted);
+  font-size: .65rem; font-family: var(--font);
+  transition: all var(--t-fast); cursor: pointer;
+  border: 1px solid var(--border-default);
+}
+.copy-btn:hover { background: var(--bg-raised); color: var(--text-secondary); border-color: var(--border-strong); }
+.copy-btn.copied { background: rgba(5,150,105,.1); color: #059669; border-color: rgba(5,150,105,.25); }
+
+.block-example {
+  background: #fff;
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--card-accent, var(--accent));
+}
+.block-example .detail-block-title { color: var(--card-accent, var(--accent)); }
+.block-example .detail-block-content { color: var(--text-secondary); }
+
+.block-tip {
+  background: rgba(217,119,6,.06);
+  border: 1px solid rgba(217,119,6,.16);
+}
+.block-tip .detail-block-title { color: var(--warn); }
+.block-tip .detail-block-content { color: var(--text-secondary); }
+
+/* ── FOOTER ──────────────────────────────────────────────────────────── */
+.footer {
+  background: var(--bg-inset);
+  border-top: 1px solid var(--border-default);
+  padding: 40px 28px; text-align: center;
+  color: var(--text-muted);
+}
+.footer-logo {
+  font-family: var(--font-en); font-size: 1rem; font-weight: 700;
+  color: var(--text-secondary); margin-bottom: 6px;
+}
+.footer-logo span { color: var(--accent); }
+.footer-text { font-size: .78rem; line-height: 1.8; color: var(--text-muted); }
+.footer-disclaimer {
+  margin-top: 16px; font-size: .7rem; color: var(--text-faint);
+  padding-top: 16px; border-top: 1px solid var(--border-default);
+}
+
+/* ── EMPTY STATE ─────────────────────────────────────────────────────── */
+.empty-state { grid-column: 1/-1; text-align: center; padding: 64px 24px; color: var(--text-muted); }
+.empty-state svg { width: 40px; height: 40px; margin: 0 auto 14px; opacity: .25; }
+.empty-state p { font-size: .95rem; margin-bottom: 4px; color: var(--text-secondary); }
+.empty-state small { font-size: .8rem; color: var(--text-faint); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
@@ -200,14 +437,15 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 <!-- NAVIGATION -->
 <nav class="nav" id="main-nav">
   <a href="#" class="nav-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <rect width="28" height="28" rx="7" fill="#1A56DB"/>
-      <polyline points="4,20 9,13 14,16 19,8 24,10" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="19" cy="8" r="2" fill="#60A5FA"/>
-    </svg>
-    <span>股學</span>筆記
+    <div class="nav-logo-mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <polyline points="1,12 4.5,7.5 8,9.5 11.5,4.5 15,6" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text"><strong>股學</strong>筆記</span>
   </a>
   <div class="nav-spacer"></div>
+  <a href="candlestick-patterns.html" class="nav-link-btn">📊 K線型態圖鑑</a>
   <span id="search-count"></span>
   <div class="nav-search">
     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -217,81 +455,23 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero" id="hero">
-  <div class="hero-inner">
-    <div class="hero-content">
-      <h1 class="hero-title">掌握<span class="grad">股市知識</span><br>成為聰明投資人</h1>
-      <p class="hero-subtitle">系統化整理台股技術面、基本面、籌碼面、消息面知識<br>從K線基礎到總體經濟，一站式學習平台</p>
-      <div class="hero-badges">
-        <span class="hero-badge" onclick="switchTab('technical')">📈 技術面</span>
-        <span class="hero-badge" onclick="switchTab('fundamental')">📊 基本面</span>
-        <span class="hero-badge" onclick="switchTab('chip')">🔍 籌碼面</span>
-        <a href="candlestick-patterns.html" class="hero-badge" style="text-decoration:none">🕯️ K線型態圖鑑</a>
-        <span class="hero-badge" onclick="switchTab('news')">📰 消息面</span>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num">4</div><div class="hero-stat-label">大面向</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">37+</div><div class="hero-stat-label">知識卡片</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">難度等級</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">台股實例</div></div>
-      </div>
-    </div>
-    <div class="hero-visual">
-      <svg viewBox="0 0 380 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Grid lines -->
-        <line x1="20" y1="40" x2="360" y2="40" stroke="#1E293B" stroke-width="1"/>
-        <line x1="20" y1="90" x2="360" y2="90" stroke="#1E293B" stroke-width="1"/>
-        <line x1="20" y1="140" x2="360" y2="140" stroke="#1E293B" stroke-width="1"/>
-        <line x1="20" y1="190" x2="360" y2="190" stroke="#1E293B" stroke-width="1"/>
-        <!-- Chart area fill -->
-        <path d="M30,190 L70,160 L110,170 L150,120 L190,130 L230,80 L270,60 L310,40 L350,30 L350,220 L30,220 Z" fill="url(#chartGrad)" opacity="0.3"/>
-        <!-- Main line -->
-        <polyline points="30,190 70,160 110,170 150,120 190,130 230,80 270,60 310,40 350,30" stroke="#3B82F6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Volume bars -->
-        <rect x="25" y="205" width="10" height="10" fill="#1D4ED8" opacity="0.6" rx="1"/>
-        <rect x="65" y="208" width="10" height="7" fill="#1D4ED8" opacity="0.6" rx="1"/>
-        <rect x="105" y="210" width="10" height="5" fill="#DC2626" opacity="0.6" rx="1"/>
-        <rect x="145" y="203" width="10" height="12" fill="#1D4ED8" opacity="0.6" rx="1"/>
-        <rect x="185" y="207" width="10" height="8" fill="#DC2626" opacity="0.6" rx="1"/>
-        <rect x="225" y="200" width="10" height="15" fill="#1D4ED8" opacity="0.6" rx="1"/>
-        <rect x="265" y="199" width="10" height="16" fill="#1D4ED8" opacity="0.6" rx="1"/>
-        <rect x="305" y="197" width="10" height="18" fill="#1D4ED8" opacity="0.6" rx="1"/>
-        <rect x="345" y="196" width="10" height="19" fill="#1D4ED8" opacity="0.6" rx="1"/>
-        <!-- MA line -->
-        <polyline points="30,195 70,175 110,165 150,145 190,135 230,110 270,90 310,70 350,55" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="4,3" opacity="0.8"/>
-        <!-- Highlight point -->
-        <circle cx="310" cy="40" r="5" fill="#3B82F6"/>
-        <circle cx="310" cy="40" r="10" fill="#3B82F6" opacity="0.2"/>
-        <!-- Info card -->
-        <rect x="230" y="15" width="120" height="40" rx="8" fill="#1E293B" stroke="#334155"/>
-        <text x="242" y="32" font-family="JetBrains Mono,monospace" font-size="10" fill="#60A5FA" font-weight="600">TSM +5.3%</text>
-        <text x="242" y="47" font-family="JetBrains Mono,monospace" font-size="9" fill="#94A3B8">RSI: 64.2</text>
-        <defs>
-          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#3B82F6"/>
-            <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-  </div>
-</section>
-
 <!-- TABS -->
 <div class="tab-nav" id="tab-nav">
   <div class="tab-list" id="tab-list">
-    <button class="tab-btn active" data-id="technical" style="--section-color:var(--technical-main)" onclick="switchTab('technical')">
+    <button class="tab-btn active" data-id="technical" style="--section-color:var(--technical-c)" onclick="switchTab('technical')">
       <span class="tab-icon">📈</span> 技術面
     </button>
-    <button class="tab-btn" data-id="fundamental" style="--section-color:var(--fundamental-main)" onclick="switchTab('fundamental')">
+    <button class="tab-btn" data-id="fundamental" style="--section-color:var(--fundamental-c)" onclick="switchTab('fundamental')">
       <span class="tab-icon">📊</span> 基本面
     </button>
-    <button class="tab-btn" data-id="chip" style="--section-color:var(--chip-main)" onclick="switchTab('chip')">
+    <button class="tab-btn" data-id="chip" style="--section-color:var(--chip-c)" onclick="switchTab('chip')">
       <span class="tab-icon">🔍</span> 籌碼面
     </button>
-    <button class="tab-btn" data-id="news" style="--section-color:var(--news-main)" onclick="switchTab('news')">
+    <button class="tab-btn" data-id="news" style="--section-color:var(--news-c)" onclick="switchTab('news')">
       <span class="tab-icon">📰</span> 消息面
+    </button>
+    <button class="tab-btn" data-id="futures" style="--section-color:var(--futures-c)" onclick="switchTab('futures')">
+      <span class="tab-icon">📉</span> 期貨
     </button>
     <div class="tab-indicator" id="tab-indicator"></div>
   </div>
@@ -299,11 +479,11 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 
 <!-- FILTER BAR -->
 <div class="filter-bar" id="filter-bar">
-  <span class="filter-label">難度：</span>
+  <span class="filter-label">難度</span>
   <button class="filter-btn active" data-diff="all" onclick="filterDifficulty('all',this)">全部</button>
-  <button class="filter-btn" data-diff="入門" onclick="filterDifficulty('入門',this)">🟢 入門</button>
-  <button class="filter-btn" data-diff="進階" onclick="filterDifficulty('進階',this)">🟡 進階</button>
-  <button class="filter-btn" data-diff="高階" onclick="filterDifficulty('高階',this)">🔴 高階</button>
+  <button class="filter-btn" data-diff="入門" onclick="filterDifficulty('入門',this)">入門</button>
+  <button class="filter-btn" data-diff="進階" onclick="filterDifficulty('進階',this)">進階</button>
+  <button class="filter-btn" data-diff="高階" onclick="filterDifficulty('高階',this)">高階</button>
 </div>
 
 <!-- CARDS -->
@@ -314,7 +494,7 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-logo"><span>股學</span>筆記</div>
-  <div class="footer-text">台股知識精華庫 — 技術面 · 基本面 · 籌碼面 · 消息面</div>
+  <div class="footer-text">台股知識精華庫 — 技術面 · 基本面 · 籌碼面 · 消息面 · 期貨</div>
   <div class="footer-disclaimer">© 2025 股學筆記｜本站內容僅供教育參考，不構成任何投資建議。投資有風險，入市需謹慎。</div>
 </footer>
 
@@ -322,8 +502,8 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 const DATA = [
   {
     id:"technical",title:"技術面",icon:"📈",
-    grad:"var(--technical-grad)",main:"var(--technical-main)",bg:"var(--technical-bg)",
-    border:"var(--technical-border)",text:"var(--technical-text)",
+    accent:"var(--technical-c)",
+    kpBg:"rgba(29,78,216,.06)",kpBorder:"rgba(29,78,216,.18)",
     cards:[
       {id:"candlestick",title:"K線基礎判讀",en:"Candlestick Analysis",diff:"入門",
        tags:["K線","型態","多空判斷"],
@@ -399,8 +579,8 @@ const DATA = [
   },
   {
     id:"fundamental",title:"基本面",icon:"📊",
-    grad:"var(--fundamental-grad)",main:"var(--fundamental-main)",bg:"var(--fundamental-bg)",
-    border:"var(--fundamental-border)",text:"var(--fundamental-text)",
+    accent:"var(--fundamental-c)",
+    kpBg:"rgba(5,150,105,.06)",kpBorder:"rgba(5,150,105,.18)",
     cards:[
       {id:"eps-pe",title:"EPS 與本益比 P/E",en:"EPS & P/E Ratio",diff:"入門",
        tags:["EPS","本益比","PE","估值"],
@@ -469,8 +649,8 @@ const DATA = [
   },
   {
     id:"chip",title:"籌碼面",icon:"🔍",
-    grad:"var(--chip-grad)",main:"var(--chip-main)",bg:"var(--chip-bg)",
-    border:"var(--chip-border)",text:"var(--chip-text)",
+    accent:"var(--chip-c)",
+    kpBg:"rgba(217,119,6,.06)",kpBorder:"rgba(217,119,6,.18)",
     cards:[
       {id:"three-institutions",title:"三大法人買賣超",en:"Three Major Institutions",diff:"入門",
        tags:["外資","投信","自營商","三大法人"],
@@ -532,8 +712,8 @@ const DATA = [
   },
   {
     id:"news",title:"消息面",icon:"📰",
-    grad:"var(--news-grad)",main:"var(--news-main)",bg:"var(--news-bg)",
-    border:"var(--news-border)",text:"var(--news-text)",
+    accent:"var(--news-c)",
+    kpBg:"rgba(124,58,237,.06)",kpBorder:"rgba(124,58,237,.18)",
     cards:[
       {id:"material-news",title:"重大訊息公告判讀",en:"Material Announcement Analysis",diff:"進階",
        tags:["重大訊息","利多利空","催化劑","市場反應"],
@@ -600,6 +780,76 @@ const DATA = [
        tip:"股東會季節操作心法：在3月底至4月初（董事會宣布股利前）觀察高殖利率標的，若基本面確認且預估殖利率 > 5%，可在正式宣告前布局"}
     ]
   }
+  ,{
+    id:"futures",title:"期貨",icon:"📉",
+    accent:"var(--futures-c)",
+    kpBg:"rgba(234,88,12,.06)",kpBorder:"rgba(234,88,12,.18)",
+    cards:[
+      {id:"futures-basics",title:"期貨基本概念",en:"Futures Contract Fundamentals",diff:"入門",
+       tags:["期貨","合約","槓桿","到期日","結算"],
+       summary:"期貨合約是雙方約定在未來特定日期以特定價格買賣標的資產的標準化契約，買賣雙方均負有履約義務。",
+       points:["期貨合約具有標準化規格：包含標的物、合約規模、到期日、報價單位，不可任意更改條款","買方（多頭）有義務在到期日買入，賣方（空頭）有義務賣出，不像選擇權買方可放棄履約","台灣期貨多採現金結算（Cash Settlement），到期時依結算價計算損益，不需實際交割股票","到期前可隨時平倉了結部位，大多數交易人在到期前就已平倉，不持有至最後結算日","槓桿效果：只需繳付保證金（合約價值的5%-15%）即可控制全額合約，放大獲利也放大虧損"],
+       formula:"合約損益 = (結算價 - 成交價) × 合約乘數 × 口數\n\n範例（做多台指期大台）：\n買入價格 = 18,500點，結算價 = 18,800點\n損益 = (18,800 - 18,500) × 200 × 1口 = +60,000元",
+       example:"2024年台股加權指數在AI題材帶動下一度突破22,000點，持有台指期大台多單1口的交易人，若從21,000點持有至22,000點，獲利 = 1,000點 × 200元 = 200,000元，但同樣槓桿下若判斷錯誤跌1,000點則虧損200,000元，顯示期貨雙向風險的對稱性。",
+       tip:"新手最常犯的錯誤是把期貨當股票持有，忘記期貨有到期日。台指期每月第三個星期三為結算日，每逢結算前一週市場波動往往加劇，初學者應提前平倉避免被動結算。"},
+      {id:"taiex-futures",title:"台指期基礎操作",en:"TAIEX Futures Operations",diff:"入門",
+       tags:["台指期","大台","小台","微台","保證金","交易時間"],
+       summary:"台灣期貨交易所提供大台、小台、微台三種規格的加權指數期貨，滿足不同資金規模交易人的需求。",
+       points:["大台（TX）：每點200元，適合資金較充裕的法人或專業投資人，流動性最佳","小台（MTX）：每點50元，為大台的1/4合約，適合資金有限的散戶入門，一口保證金約46,000元","微台（TMF）：每點10元，為大台的1/20，最低門檻入場，適合練習操作技巧，保證金約9,200元","交易時間：日盤08:45–13:45，夜盤15:00–次日05:00（美股開盤可即時反應），結算日日盤縮短至13:30","每月結算一次（第三週週三），但同時有近月、次月、季月等多個合約可選擇交易"],
+       formula:"合約價值 = 指數點數 × 合約乘數\n\n大台：18,500點 × 200元 = 3,700,000元\n小台：18,500點 × 50元 = 925,000元\n微台：18,500點 × 10元 = 185,000元\n\n槓桿倍數（大台）= 合約價值 ÷ 原始保證金\n= 3,700,000 ÷ 184,000 ≈ 20.1倍",
+       example:"2023年3月矽谷銀行事件爆發，台股隔日跌逾500點，持有大台空單1口的交易人獲利 500 × 200 = 100,000元，而持有大台多單者則單日虧損100,000元。夜盤功能讓交易人可在美股收盤後即時反應，不必等待台股開盤才能對沖風險。",
+       tip:"初學者建議先用微台練習至少3個月，熟悉指數期貨的跳動節奏與保證金管理後再升級到小台。微台每點僅10元，一次大波動頂多虧損幾千元，是最低成本的學習工具。"},
+      {id:"futures-margin",title:"保證金管理",en:"Futures Margin Management",diff:"入門",
+       tags:["保證金","追繳","槓桿","風險控管","原始保證金","維持保證金"],
+       summary:"保證金是期貨交易的信用擔保，當帳戶淨值低於維持保證金時將收到追繳通知，必須立即補足否則遭強制平倉。",
+       points:["原始保證金（Initial Margin）：開倉時必須繳付的金額，台指期大台約184,000元（依交易所公告隨市況調整）","維持保證金（Maintenance Margin）：帳戶最低門檻，台指期大台約141,000元，低於此水位即收追繳通知","追繳差額（Margin Call）：需補足至原始保證金水位，而非只補到維持保證金，常被新手誤解","過度槓桿的致命陷阱：帳戶只放保證金最低限額，一旦虧損超過43,000元（184,000 - 141,000）即遭強制平倉","建議保留2–3倍緩衝：帳戶資金應為原始保證金的2至3倍，避免小波動觸發強制平倉"],
+       formula:"可承受最大虧損點數（大台）：\n緩衝金額 = 帳戶資金 - 維持保證金\n緩衝點數 = 緩衝金額 ÷ 200\n\n範例：帳戶300,000元，持有大台1口\n緩衝 = 300,000 - 141,000 = 159,000元\n可承受跌幅 = 159,000 ÷ 200 = 795點\n（台指18,500點的4.3%波動即觸及警戒）",
+       example:"2020年3月新冠疫情爆發，台股單週跌幅逾14%，加權指數從約11,000點跌至9,400點，單週跌1,600點。持有大台多單且僅放最低保證金的投資人，虧損 = 1,600 × 200 = 320,000元，遠超原始保證金184,000元，不僅遭強制平倉還須補繳超額虧損，多人因此爆倉負債。",
+       tip:"設定「軟性停損」與「硬性停損」兩道防線：軟性停損是你主動認賠的點位，硬性停損是帳戶資金觸及維持保證金的緊急防線。永遠讓軟性停損先觸發，別讓券商替你決定何時離場。"},
+      {id:"basis-arbitrage",title:"基差與期現貨套利",en:"Basis and Cash-and-Carry Arbitrage",diff:"進階",
+       tags:["基差","期現貨","套利","正價差","逆價差","收斂"],
+       summary:"基差是期貨價格與現貨價格的差值，反映市場對未來的預期，基差交易與套利策略正是利用這一價差的系統性規律獲利。",
+       points:["基差定義：基差 = 期貨價格 - 現貨價格；正基差（Contango/正價差）表示期貨溢價，為台股常態","正價差成因：持有成本（無風險利率）+ 市場樂觀預期；正常情況下台指期比現貨高30–80點","逆價差（Backwardation）：期貨低於現貨，常出現在大跌恐慌或除息季節，代表市場悲觀或短期拋壓","基差必然收斂：到期結算日當天，期貨與現貨價格必然相等（結算價以當日現貨收盤前均價計算）","期現套利門檻高：需同時建立期貨與ETF/一籃子股票的反向部位，法人才有規模優勢，散戶幾乎無法執行"],
+       formula:"理論期貨公允價值（Cost of Carry Model）：\nF ≈ S × (1 + r - d) × T/365\nS = 現貨指數，r = 無風險利率（1.5%），d = 指數殖利率（3.5%）\nT = 距到期天數（30天）\n\nF ≈ 18,500 × (1 - 0.00164) ≈ 18,470\n（因除息效應導致理論上出現逆價差）",
+       example:"台股每年7–8月為集中除息旺季，大量成分股除息導致現貨指數下跌但期貨已反映除息，此時常出現台指期逆價差（期貨低於現貨）。2023年除息旺季高峰時，台指期近月合約一度較現貨低約150點，了解此機制的交易人可避免誤判為空頭訊號。",
+       tip:"觀察期現貨價差是判斷市場情緒的好工具：正價差持續擴大（超過100點以上）代表市場過熱，法人做多意願強；若突然轉為逆價差，往往是外資或法人開始大量做空的先行訊號，值得高度警惕。"},
+      {id:"futures-strategy",title:"期貨多空操作策略",en:"Futures Long/Short Trading Strategies",diff:"進階",
+       tags:["多頭","空頭","移動平均","停損","波段交易","當沖"],
+       summary:"期貨可做多也可做空，善用趨勢追蹤與嚴格停損紀律，是期貨交易長期存活的核心關鍵。",
+       points:["趨勢追蹤：以5日/20日均線交叉作為進出訊號，5日線上穿20日線做多，下穿做空，適合波段操作","當沖策略：開盤30分鐘觀察方向確立後入場，以當日高低點為停損依據，收盤前必須平倉，不留倉過夜","停損紀律是生死線：建議每筆交易最大虧損不超過帳戶資金的2%，大台每口停損約40點（8,000元）","避免逆勢加碼：虧損時加碼攤平是期貨交易最危險的行為，方向錯誤時應減碼或停損，絕不加碼","波段交易注意持倉成本：隔夜持有需承擔跳空風險，重大事件前（如聯準會決策、台灣選舉）應降低部位"],
+       formula:"風險報酬比計算：\n目標利潤 ÷ 最大停損 ≥ 2:1（最低要求）\n\n範例（大台多單）：\n入場：18,500點 → 停損：18,460（損40點=8,000元）\n目標：18,580點（獲利80點=16,000元）\n風險報酬比 = 16,000 ÷ 8,000 = 2:1 ✓\n\n勝率60% + 賠率2:1：\n期望值 = 0.6×2 - 0.4×1 = +0.8（正期望值策略）",
+       example:"2024年1月台灣總統大選前夕，市場因地緣政治不確定性大幅震盪，台指期單日波動逾400點。採用當沖策略且嚴格執行停損的交易人安然度過；而持有隔夜波段多單且未設停損的投資人，開盤跳空低開300點，單口虧損60,000元，等於一次就虧掉三個月的波段獲利。",
+       tip:"建立「交易日誌」是進階期貨交易人與新手的最大差距。每筆交易記錄進出場依據、情緒狀態、結果檢討，3個月後你會發現自己90%的虧損來自同樣幾個錯誤，改掉它們比學習新策略更有效。"},
+      {id:"options-basics",title:"選擇權基礎",en:"Options Contract Fundamentals",diff:"進階",
+       tags:["選擇權","買權","賣權","履約價","權利金","Delta","Theta"],
+       summary:"選擇權賦予買方在特定期間以特定價格買入（Call）或賣出（Put）標的的權利，而非義務，風險與報酬結構與期貨截然不同。",
+       points:["Call（買權）：買方有權以履約價買入標的；Put（賣權）：買方有權以履約價賣出標的，買方最大虧損為權利金","權利金由內含價值與時間價值組成：內含價值 = 價內程度（實際有利可圖的部分），時間價值隨時間遞減","Delta：選擇權價格相對標的變動的敏感度。價平Call的Delta約0.5，深度價內趨近1，深度價外趨近0","Theta（時間損耗）：每天自動侵蝕時間價值，對選擇權買方不利，對賣方有利；到期前最後一週加速衰減","台指選擇權（TXO）：標的為台灣加權指數，提供每週到期（Weekly Options）及月選，流動性極佳"],
+       formula:"選擇權損益計算：\n買進Call損益 = MAX(結算價 - 履約價, 0) - 已付權利金\n買進Put損益 = MAX(履約價 - 結算價, 0) - 已付權利金\n\n範例（買進台指Call）：\n履約價：18,500，支付權利金：150點（×50元 = 7,500元）\n結算價：18,800點\n損益 = (18,800 - 18,500) × 50 - 7,500 = +7,500元（獲利100%）\n若結算價 &lt; 18,500：損益 = -7,500元（全損）",
+       example:"2024年台積電法說會前夕，台指選擇權隱含波動率（IV）飆升，履約價18,500的近月Call權利金從100點暴漲至250點。法說會後台股上漲300點，該Call結算獲利 (300 - 150) × 50 = 7,500元，但隔日IV回落，持有次月Call的投資人反而因Vega效應使權利金縮水，即使指數上漲仍小虧，說明選擇權不只是方向性工具。",
+       tip:"新手買選擇權常犯「買便宜的價外選擇權」錯誤，以為風險低。實際上深度價外的勝率極低（常低於10%），Theta每天吃掉時間價值，到期歸零是常態而非例外。入門建議從買進接近價平（ATM）的選擇權開始，理解Greeks後再探索價外策略。"},
+      {id:"options-strategy",title:"選擇權策略",en:"Options Trading Strategies",diff:"高階",
+       tags:["備兌Call","保護性Put","價差策略","跨式策略","週選","波動率"],
+       summary:"選擇權策略可精確裁量風險與報酬的形狀，從保守的備兌賣Call到激進的跨式策略，每種都有其適用的市場環境。",
+       points:["備兌Call（Covered Call）：持有現貨（或ETF）同時賣出Call，收取權利金降低持倉成本，適合盤整市場","保護性Put（Protective Put）：持有現股同時買入Put，等同為股票購買保險，對沖大跌風險","牛市價差（Bull Spread）：買低履約價Call + 賣高履約價Call，降低成本換取有限獲利，適合溫和上漲預期","跨式策略（Straddle）：同時買入相同履約價的Call + Put，押注大幅波動但不確定方向，財報季或重大事件前適用","台指週選特性：每週三到期，時間價值衰減極快，適合短線賣方策略，但需嚴格控管突發黑天鵝風險"],
+       formula:"牛市價差最大獲利與損失：\n買18,500 Call（付200點）+ 賣18,700 Call（收100點）\n淨成本 = 100點（×50 = 5,000元）\n最大獲利 = (18,700 - 18,500 - 100) × 50 = 5,000元\n最大損失 = 5,000元\n損益兩平點 = 18,600點\n\n跨式策略損益兩平：\n履約價 ± (Call + Put權利金)\n= 18,500 ± 300點 → 18,200或18,800點才獲利",
+       example:"2024年美國總統大選前夕，台指波動率指數飆升，市場預期大幅波動。採用跨式策略（買18,500 Call + Put各300點，總成本600點）的交易人，選舉結果確定後台股跳漲500點，Put歸零但Call獲利超過1,000點，淨獲利約400點 × 50元 = 20,000元。但若台股僅小漲100點，雙邊權利金皆大幅縮水，虧損超過50%。",
+       tip:"賣出選擇權（尤其週選賣方）看似穩定收租，實為「撿硬幣在壓路機前」。建議賣方策略必須搭配停損機制：當未實現虧損達到收取權利金的2倍時必須強制回補，這是專業選擇權賣方的生存鐵律。"},
+      {id:"futures-risk",title:"期貨風險管理",en:"Futures Risk Management",diff:"進階",
+       tags:["部位管理","Kelly公式","停損","跳空風險","假期風險","過夜風險"],
+       summary:"期貨的槓桿特性使風險管理比選股更重要，科學化的部位規模計算與嚴格的停損執行是長期存活的唯一路徑。",
+       points:["Kelly公式調整版：最佳下注比例 = (勝率 × 賠率 - 敗率) ÷ 賠率，實務上建議使用半凱利降低波動","過夜風險：持倉隔夜需承受跳空風險，美股盤後重大消息可能導致台指期夜盤大幅波動，縮短停損距離","假期風險：台灣連假期間台指期停盤，但美股、港股繼續交易，連假後開盤常出現大幅跳空，假前應降低部位","近結算日風險：到期前最後兩天，現貨與期貨的基差快速收斂，異常波動增加，避免在此時建立新部位","集中度風險：不要同時做多台指期又做多電子類股，方向一致的多重部位在市場大跌時造成加倍損失"],
+       formula:"半凱利部位規模計算：\n策略歷史數據：勝率55%，平均獲利150點，平均虧損100點\n賠率 = 1.5\nKelly% = (0.55×1.5 - 0.45) ÷ 1.5 = 25%\n半Kelly = 12.5%\n\n帳戶500,000元：\n最大風險資金 = 500,000 × 12.5% = 62,500元\n大台每口停損100點 = 20,000元\n建議口數 = 62,500 ÷ 20,000 ≈ 3口",
+       example:"2021年5月台灣本土疫情爆發（三級警戒），台股單日跌逾660點創歷史單日最大跌點紀錄。前一日持有大台多單未設停損的交易人，單口虧損 660 × 200 = 132,000元，超過原始保證金，被迫追繳。而設有200點停損（損失40,000元）的交易人雖然虧損，帳戶仍完整，得以在隔週反彈時重新布局。",
+       tip:"每逢三節（春節、清明連假、國慶連假）前最後一個交易日，務必將部位降至平常的50%以下或全部平倉。台股連假期間全球市場繼續運作，假期風險是免費送給你的損失，不必要地承擔它是紀律問題，不是分析問題。"},
+      {id:"commodity-futures",title:"台灣其他期貨商品",en:"Other Taiwan Futures Products",diff:"入門",
+       tags:["電子期","金融期","黃金期","原油期","外匯期","TAIFEX"],
+       summary:"台灣期貨交易所（TAIFEX）提供涵蓋股票指數、商品、外匯等多元期貨商品，各有不同的合約規格與風險特性。",
+       points:["電子期（TE）：標的為電子類股指數，乘數每點4,000元；與台積電、聯發科等科技股連動性強，波動幅度大於台指期","金融期（TF）：標的為金融保險類股指數，乘數每點1,000元；受央行政策、升降息影響顯著，波動相對溫和","黃金期（GDF）：以台幣計價的黃金期貨，每口100金衡盎司，同時受國際金價與台幣匯率雙重影響","布蘭特原油期（BRF）：連結國際布蘭特原油價格，每口200桶，台幣計價，適合對能源市場有判斷的投資人","美元兌台幣期貨（NDF）：每口100,000美元，對有外幣資產或進出口商需求的投資人提供避險工具"],
+       formula:"電子期損益計算：\n每點 = 4,000元（遠高於台指期200元）\n\n買進電子期於900點，漲至920點：\n獲利 = (920 - 900) × 4,000 = 80,000元\n\n黃金期損益計算：\n金價2,300美元/盎司，台幣匯率32元\n合約價值 = 2,300 × 100 × 32 = 7,360,000元\n金價漲50美元：獲利 = 50 × 100 × 32 = 160,000元",
+       example:"2024年以巴衝突加劇，國際原油價格波動劇烈，布蘭特原油從每桶80美元一度飆至90美元。同期台灣布蘭特原油期貨（BRF）每口獲利 = 10美元 × 200桶 × 32（匯率）= 64,000元。同年美聯儲降息預期推升黃金突破2,400美元，持有黃金期貨多單的投資人，從2,200至2,400美元漲幅中每口獲利 = 200 × 100 × 32 = 640,000元。",
+       tip:"電子期每點4,000元是台指期的20倍，初學者極易低估其波動風險。電子類股指數單日波動3%很常見，相當於電子期單日每口損益達數十萬元。建議完全熟悉台指期操作後再接觸電子期，且初始以最小口數試單，切勿以台指期的停損點數直接套用。"}
+    ]
+  }
 ];
 
 let currentSection = 'technical';
@@ -610,13 +860,13 @@ let expandedCard = null;
 function getSection(id) { return DATA.find(s => s.id === id); }
 
 function renderCard(card, section) {
-  const cssVars = `--card-grad:${section.grad};--card-main:${section.main};--card-bg:${section.bg};--card-border:${section.border};--card-color:${section.main};--card-text:${section.text}`;
   const diffClass = `difficulty-${card.diff}`;
+  const cssVars = `--card-accent:${section.accent};--card-kp-bg:${section.kpBg};--card-kp-border:${section.kpBorder};--card-accent-border:${section.accent.replace('var(--','').replace(')','')};`;
   return `
 <div class="card" id="card-${card.id}" style="${cssVars}" data-id="${card.id}" data-diff="${card.diff}" data-section="${section.id}" data-tags="${card.tags.join(',')}">
-  <div class="card-top-bar"></div>
+  <div class="card-accent-bar"></div>
   <div class="card-header">
-    <div class="card-icon-wrap">${section.icon}</div>
+    <div class="card-icon-wrap" style="--card-icon-bg:${section.kpBg};--card-icon-border:${section.kpBorder}">${section.icon}</div>
     <div class="card-meta">
       <span class="card-category">${section.title}</span>
       <span class="card-difficulty ${diffClass}">${card.diff}</span>
@@ -631,19 +881,19 @@ function renderCard(card, section) {
   <div class="card-detail" id="detail-${card.id}">
     <div class="card-detail-inner">
       <div class="detail-block block-keypoints">
-        <div class="detail-block-title">📌 核心重點</div>
+        <div class="detail-block-title">核心重點</div>
         <div class="detail-block-content"><ul>${card.points.map(p=>`<li>${p}</li>`).join('')}</ul></div>
       </div>
       <div class="detail-block block-formula">
-        <div class="detail-block-title">🔢 公式 / 定義 <button class="copy-btn" onclick="copyFormula('${card.id}',this)">複製</button></div>
+        <div class="detail-block-title">公式 / 定義 <button class="copy-btn" onclick="copyFormula('${card.id}',this)">複製</button></div>
         <div class="detail-block-content" id="formula-${card.id}">${card.formula}</div>
       </div>
       <div class="detail-block block-example">
-        <div class="detail-block-title">📖 實際案例</div>
+        <div class="detail-block-title">台股實例</div>
         <div class="detail-block-content">${card.example}</div>
       </div>
       <div class="detail-block block-tip">
-        <div class="detail-block-title">💡 操作技巧</div>
+        <div class="detail-block-title">操作技巧</div>
         <div class="detail-block-content">${card.tip}</div>
       </div>
     </div>
@@ -672,7 +922,6 @@ function switchTab(id) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
   updateTabIndicator();
   renderSection(id);
-  updateFilterBarColors();
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth'});
 }
 
@@ -683,17 +932,9 @@ function updateTabIndicator() {
   if (active) {
     indicator.style.left = active.offsetLeft + 'px';
     indicator.style.width = active.offsetWidth + 'px';
-    indicator.style.background = section.main.replace('var(--','').replace(')','');
-    indicator.style.background = `var(--${currentSection}-main)`;
+    const colorMap = { technical:'#1d4ed8', fundamental:'#059669', chip:'#d97706', news:'#7c3aed', futures:'#ea580c' };
+    indicator.style.background = colorMap[currentSection] || '#1d4ed8';
   }
-}
-
-function updateFilterBarColors() {
-  const section = getSection(currentSection);
-  const fb = document.getElementById('filter-bar');
-  fb.style.setProperty('--section-bg', section.bg);
-  fb.style.setProperty('--section-color', section.main);
-  fb.style.setProperty('--section-border', section.border);
 }
 
 function filterDifficulty(diff, btn) {
@@ -725,8 +966,7 @@ function applyFilters() {
     if (!hide) visible++;
   });
   const total = cards.length;
-  document.getElementById('search-count').textContent = searchTerm || currentDiff !== 'all' ? `${visible} / ${total} 張` : '';
-  // Show empty state
+  document.getElementById('search-count').textContent = searchTerm || currentDiff !== 'all' ? `${visible} / ${total}` : '';
   let empty = document.querySelector('.empty-state');
   if (visible === 0) {
     if (!empty) {
@@ -739,9 +979,7 @@ function applyFilters() {
 }
 
 function toggleCard(id) {
-  if (expandedCard && expandedCard !== id) {
-    collapseCard(expandedCard);
-  }
+  if (expandedCard && expandedCard !== id) collapseCard(expandedCard);
   const card = document.getElementById('card-' + id);
   const detail = document.getElementById('detail-' + id);
   if (card.classList.contains('expanded')) {
@@ -767,7 +1005,7 @@ function collapseCard(id) {
 function copyFormula(id, btn) {
   const text = document.getElementById('formula-' + id).textContent;
   navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '已複製 ✓';
+    btn.textContent = '已複製';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
   });
@@ -777,35 +1015,28 @@ function observeCards() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
       if (entry.isIntersecting) {
-        setTimeout(() => {
-          entry.target.classList.add('visible');
-        }, Math.min(i * 80, 400));
+        setTimeout(() => entry.target.classList.add('visible'), Math.min(i * 70, 420));
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1 });
+  }, { threshold: 0.08 });
   document.querySelectorAll('.card:not(.visible)').forEach(c => observer.observe(c));
 }
 
-// Nav scroll shadow
 window.addEventListener('scroll', () => {
   document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 10);
 });
 
-// Search
 document.getElementById('search-input').addEventListener('input', function() {
   searchTerm = this.value.trim();
   applyFilters();
 });
 
-// Init
 document.addEventListener('DOMContentLoaded', () => {
   renderSection('technical');
-  updateFilterBarColors();
   requestAnimationFrame(updateTabIndicator);
 });
 
-// Update indicator on resize
 window.addEventListener('resize', updateTabIndicator);
 </script>
 </body>

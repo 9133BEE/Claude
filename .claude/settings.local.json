@@ -1,4 +1,17 @@
 {
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat | powershell.exe -NonInteractive -File 'd:/ClaudeRepo/.claude/finance-hook.ps1'",
+            "statusMessage": "偵測金融關鍵字..."
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(gh repo *)",
@@ -33,7 +46,40 @@
       "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git config user.email \"13pheeb@gmail.com\"; git config user.name \"9133BEE\"; git commit -m \"initial sync: agents, projects, settings\")",
       "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git ls-files projects/d--ClaudeRepo/)",
       "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\\\\d--ClaudeRepo\" -Recurse | Select-Object FullName)",
-      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\\\\d--ClaudeRepo\" -Force | Select-Object FullName, Attributes)"
+      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.claude\\\\projects\\\\d--ClaudeRepo\" -Force | Select-Object FullName, Attributes)",
+      "PowerShell(Set-Location \"$env:USERPROFILE\\\\.claude\"; git remote add origin https://github.com/9133BEE/claude-sync.git; git push -u origin master)",
+      "PowerShell(& \"$env:USERPROFILE\\\\.claude\\\\sync-up.ps1\")",
+      "PowerShell(schtasks /Run /TN \"ClaudeSyncMonitor\")",
+      "Bash(start \"\" \"d:\\\\ClaudeRepo\\\\股票\\\\index.html\")",
+      "Bash(curl -s -X POST https://api.telegram.org/bot8951788442:AAHvHZYKhmAvV9NJ-lf-81i9Z5lUjkEZ3ls/sendMessage -d chat_id=8868379618 -d parse_mode=HTML -d 'text=📈 <b>股學筆記財經助理</b>%0A%0A✅ 連線測試成功！%0A每日早上 9:00 將自動推播台股財經新聞給你。%0A%0A🔔 涵蓋內容：台股大盤 · 熱門個股 · 美股外資 · 總體經濟')",
+      "Bash(python3 -c ' *)",
+      "Skill(schedule)",
+      "Skill(schedule:*)",
+      "Bash(gh run *)",
+      "Bash(curl -s \"https://api.github.com/repos/9133BEE/Claude/actions/runs?per_page=3\")",
+      "Bash(powershell.exe -Command ' *)",
+      "Bash(python3 -c \"from PIL import Image; print\\('Pillow OK'\\)\")",
+      "Bash(pip install *)",
+      "Bash(powershell.exe -Command \"python -c 'from PIL import Image; print\\(\\\\\"Pillow OK\\\\\"\\)' 2>&1\")",
+      "Bash(powershell.exe -Command \"pip install Pillow feedparser requests --quiet; python -c 'from PIL import Image; print\\(\\\\\"Pillow OK\\\\\"\\)'\")",
+      "Bash(powershell.exe -Command \"python --version; python -m pip install Pillow feedparser requests --quiet; python -c 'from PIL import Image; print\\(\\\\\"Pillow OK\\\\\"\\)'\")",
+      "Bash(powershell.exe -Command \"Get-Command python3,python,py -ErrorAction SilentlyContinue | Select-Object Name,Source\")",
+      "Bash(powershell.exe -Command \"py -3 --version; py -3 -m pip install Pillow feedparser requests --quiet; py -3 -c 'from PIL import Image; print\\(\\\\\"Pillow OK\\\\\"\\)'\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Programs\\\\Python' -ErrorAction SilentlyContinue; Get-ChildItem 'C:\\\\Python*' -ErrorAction SilentlyContinue\")",
+      "WebFetch(domain:m.cnyes.com)",
+      "WebFetch(domain:tw.stock.yahoo.com)",
+      "WebFetch(domain:finance.yahoo.com)",
+      "WebFetch(domain:histock.tw)",
+      "WebFetch(domain:www.thestreet.com)",
+      "WebFetch(domain:am.jpmorgan.com)",
+      "WebFetch(domain:udn.com)",
+      "PowerShell(gh workflow run daily-finance-news.yml --repo 9133BEE/Claude)",
+      "PowerShell($token = \"8951788442:AAHvHZYKhmAvV9NJ-lf-81i9Z5lUjkEZ3ls\")",
+      "PowerShell($chatId = \"8868379618\")",
+      "PowerShell(Start-Process \"D:\\\\ClaudeRepo\\\\�Ѳ�\\\\candlestick-patterns.html\")",
+      "PowerShell(Start-Process \"https://9133bee.github.io/Claude/�Ѳ�/\")",
+      "PowerShell(Start-Process \"https://github.com/9133BEE/Claude/actions\")",
+      "PowerShell(Start-Process \"https://9133bee.github.io/Claude/%E8%82%A1%E7%A5%A8/\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\Authma\\.claude",
