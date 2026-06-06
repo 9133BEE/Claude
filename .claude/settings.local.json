@@ -1,5 +1,18 @@
 {
   "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat | powershell.exe -NonInteractive -File 'd:/ClaudeRepo/.claude/open-html-preview.ps1'",
+            "async": true,
+            "statusMessage": "開啟預覽..."
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [

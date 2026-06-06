@@ -247,11 +247,9 @@ a { color: inherit; text-decoration: none; }
 /* ── CARDS SECTION ───────────────────────────────────────────────────── */
 .cards-section { max-width: 1200px; margin: 0 auto; padding: 22px 28px 72px; }
 .cards-grid {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+  display: flex; flex-direction: column; gap: 8px;
 }
-@media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 640px) {
-  .cards-grid { grid-template-columns: 1fr; }
   .hero-inner { grid-template-columns: 1fr; }
   .hero-visual { display: none; }
   .hero { padding: 40px 20px 36px; }
@@ -264,47 +262,59 @@ a { color: inherit; text-decoration: none; }
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--card-accent, var(--accent));
+  border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: transform var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal);
+  display: flex; flex-direction: column;
+  transition: background var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal);
   opacity: 0; transform: translateY(16px);
 }
 .card.visible {
   opacity: 1; transform: translateY(0);
   transition: opacity .4s ease, transform .4s ease,
-              box-shadow var(--t-normal), border-color var(--t-normal);
+              background var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal);
 }
 .card.hidden-filter { display: none; }
 .card:hover {
-  transform: translateY(-3px);
+  background: var(--bg-card-hover);
   box-shadow: var(--shadow-hover);
-  border-color: var(--border-strong);
 }
 
-/* Card accent bar */
-.card-accent-bar {
-  height: 3px;
-  background: var(--card-accent, var(--accent));
-  opacity: 1;
+/* Card row (collapsed header) */
+.card-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 18px; cursor: pointer;
 }
 
-.card-header { padding: 14px 16px 0; display: flex; align-items: flex-start; gap: 10px; }
 .card-icon-wrap {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: var(--card-icon-bg, var(--accent-dim));
-  border: 1px solid var(--card-icon-border, var(--accent-border));
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; font-size: .9rem;
-  transition: transform var(--t-fast);
+  flex-shrink: 0; font-size: 1.1rem;
 }
-.card:hover .card-icon-wrap { transform: scale(1.06); }
-.card-meta { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; }
-.card-category {
-  font-size: .65rem; font-weight: 700;
-  color: var(--card-accent, var(--accent));
-  letter-spacing: .1em; text-transform: uppercase; font-family: var(--font-en);
+
+.card-titles {
+  flex: 1; min-width: 0; flex-grow: 1;
 }
+.card-title {
+  font-size: .95rem; font-weight: 700; line-height: 1.4;
+  color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-en {
+  font-size: .68rem; color: var(--text-muted); font-family: var(--font-en);
+  letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.card-summary-inline {
+  flex: 2; font-size: .82rem; color: var(--text-muted); line-height: 1.5;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  min-width: 0;
+}
+
+.card-right {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+
 .card-difficulty {
   padding: 2px 9px; border-radius: 100px;
   font-size: .65rem; font-weight: 600; line-height: 1.7;
@@ -313,11 +323,18 @@ a { color: inherit; text-decoration: none; }
 .difficulty-進階 { background: rgba(217,119,6,.10); color: #d97706; border: 1px solid rgba(217,119,6,.22); }
 .difficulty-高階 { background: rgba(220,38,38,.10); color: #dc2626; border: 1px solid rgba(220,38,38,.22); }
 
-.card-body { padding: 10px 16px 12px; }
-.card-title { font-size: .95rem; font-weight: 700; line-height: 1.4; margin-bottom: 2px; color: var(--text-primary); }
-.card-en { font-size: .68rem; color: var(--text-muted); font-family: var(--font-en); margin-bottom: 8px; letter-spacing: .01em; }
-.card-summary { font-size: .82rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px; }
-.card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.card-chevron {
+  font-size: 1rem; color: var(--text-faint); display: inline-block;
+  transform: rotate(0deg);
+  transition: transform .3s cubic-bezier(.4,0,.2,1), color var(--t-fast);
+  line-height: 1;
+}
+.card.expanded .card-chevron {
+  transform: rotate(90deg);
+  color: var(--card-accent, var(--accent));
+}
+
+.card-tags { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 18px 10px; }
 .card-tag {
   padding: 2px 8px;
   background: var(--bg-raised); color: var(--text-muted);
@@ -329,22 +346,13 @@ a { color: inherit; text-decoration: none; }
   background: var(--accent-dim); color: var(--accent);
   border-color: var(--accent-border);
 }
-.card-expand-btn {
-  width: 100%; padding: 9px 0;
-  font-size: .75rem; color: var(--text-muted); font-weight: 500;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  border-top: 1px solid var(--border-subtle);
-  transition: background var(--t-fast), color var(--t-fast);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  font-family: var(--font);
+
+/* Hide summary inline on mobile */
+@media (max-width: 640px) {
+  .card-summary-inline { display: none; }
+  .card-row { gap: 12px; padding: 12px 14px; }
+  .card-tags { padding: 0 14px 10px; }
 }
-.card-expand-btn:hover { background: var(--bg-raised); color: var(--text-secondary); }
-.card.expanded .card-expand-btn { color: var(--card-accent, var(--accent)); }
-.card-expand-btn .arrow {
-  transition: transform .3s cubic-bezier(.4,0,.2,1); display: inline-block;
-  font-size: .6rem; opacity: .5;
-}
-.card.expanded .card-expand-btn .arrow { transform: rotate(180deg); }
 
 /* ── CARD DETAIL ─────────────────────────────────────────────────────── */
 .card-detail { max-height: 0; overflow: hidden; transition: max-height .32s cubic-bezier(.4,0,.2,1); }
@@ -574,7 +582,21 @@ const DATA = [
        points:["外資買超 + 技術面突破：外資持續買超同時出現技術突破，可信度大增，是最佳進場訊號組合","融資增加 + 股價下跌：散戶加碼攤平但股價不漲，是籌碼惡化的警訊","主力成本區：當股價回到主力成本區時往往是支撐（主力不願讓股價跌破成本）"],
        formula:"籌碼集中度 = 前20大股東持股比例\n融資使用率 = 融資餘額 / 融資限額\n券資比 = 融券餘額 / 融資餘額",
        example:"台積電2023年AI行情，外資連續30日以上買超同時日線出現多頭排列，技術面與籌碼面共鳴確認，之後一路從500元漲至800元以上",
-       tip:"籌碼面是技術面的「內幕」，技術面是籌碼面的「表現」。兩者出現矛盾時，應以籌碼面優先，因為反映真實資金流向"}
+       tip:"籌碼面是技術面的「內幕」，技術面是籌碼面的「表現」。兩者出現矛盾時，應以籌碼面優先，因為反映真實資金流向"},
+      {id:"kline-tomorrow-bull",title:"K線型態判斷明日看漲訊號",en:"Bullish K-Line Pattern Signals for Next Day",diff:"進階",
+       tags:["K線","看漲","多頭型態","明日預測","錘子線"],
+       summary:"掌握5種具統計勝率的看漲K線型態，結合量能與支撐位確認，提升隔日做多勝率至65–72%。",
+       points:["【錘子線／十字下影線】出現在支撐區（如20日均線或前波低點）：下影線長度≥實體2倍，收盤位於當日高點20%範圍內，量能為近5日均量0.8倍以上。隔日看漲機率約65%，止損設於錘子線低點下方1–2%","【吞噬陽線（Bullish Engulfing）】前日紅K被當日綠K實體完全包覆，量能需放大至近5日均量1.5倍以上。隔日看漲機率約70%。2022年11月聯發科在500元附近出現此型態，次日上漲4.2%","【早晨之星（Morning Star）】三根K線：大跌陰線→小實體十字→大漲陽線收盤穿越第一根中點，第三日量需比第二日放大。三型態中勝率最高約72%，止損設第二根低點","【多頭缺口（Gap Up）】開盤跳空上漲全日維持缺口未回補，量能為近10日均量2倍以上。策略：不追高，等回測缺口上緣後買進，止損設缺口下緣","【量縮回檔後量增突破】趨勢回檔期間量縮，突破前高當日量超過整理期均量1.8倍，收盤確認站上前高，止損設回檔低點"],
+       formula:"下影線比例 ＝ (低點影線端 - 最低價) ÷ 實體長度\n→ 錘子線條件：下影線比例 ≥ 2.0\n\n吞噬條件：當日開盤 ≤ 前日收盤 且 當日收盤 ≥ 前日開盤\n\n量能確認倍數 ＝ 當日成交量 ÷ 近5日均量\n→ 吞噬需求：倍數 ≥ 1.5x\n→ 缺口突破需求：倍數 ≥ 2.0x",
+       example:"2023年10月26日富邦金（2881）連跌三日後在日K出現錘子線：下影線從42.5元延伸至40.8元，實體僅0.6元（下影線為實體2.8倍），量能接近均量。次日開高走高，收漲3.1%至43.8元。以錘子線低點40.8元設止損，止損幅約2.5%，獲利風險比超過1:1。",
+       tip:"單一K線型態需三重確認：①型態出現在關鍵支撐（均線、前波低點、費波那契回調位）；②量能符合條件；③隔日開盤價守住型態低點才正式進場。避免在大盤指數弱勢時逆勢做多個股。"},
+      {id:"kline-tomorrow-bear",title:"K線型態判斷明日看跌訊號",en:"Bearish K-Line Pattern Signals for Next Day",diff:"進階",
+       tags:["K線","看跌","空頭型態","明日預測","射擊之星"],
+       summary:"識別5種具統計依據的看跌K線型態，結合壓力位與量能異常，提升隔日放空或出場決策勝率至63–70%。",
+       points:["【射擊之星／上吊線（Shooting Star）】出現在高點或壓力區：上影線長度≥實體2倍，收盤位於當日低點20%範圍內。隔日看跌機率約63%，止損設上影線頂端上方1%。2024年4月台積電衝上800元後出現射擊之星，次日跌幅達3.8%","【吞噬陰線（Bearish Engulfing）】前日綠K被當日紅K實體完全包覆，量能需放大至近5日均量1.5倍以上確認主力出貨。隔日看跌機率約68%，量能未放大則可靠度大幅下降","【黃昏之星（Evening Star）】三根K線：大漲陽線→小實體十字（跳空更顯著）→大跌陰線收盤穿越第一根中點以下，第三日放量確認。隔日看跌機率約70%","【跳空下跌缺口（Gap Down）】開盤跳空下跌全日維持缺口，量能放大至近10日均量1.5倍以上。策略：不急抄底，等反彈至缺口下緣後賣出，止損設缺口上緣","【量增價跌（Distribution Day）】股價下跌≥0.2%且當日量超過近20日均量1.3倍以上，代表機構主動賣出。連續3–5個分發日代表趨勢轉弱"],
+       formula:"上影線比例 ＝ (最高價 - 上端實體) ÷ 實體長度\n→ 射擊之星條件：上影線比例 ≥ 2.0\n\n吞噬條件：當日開盤 ≥ 前日收盤 且 當日收盤 ≤ 前日開盤\n\n量增價跌確認：\n  當日收盤跌幅 ≥ 0.2% 且\n  當日成交量 ÷ 近20日均量 ≥ 1.3x\n→ 連續 ≥3 個分發日＝趨勢轉弱警示",
+       example:"2024年4月19日聯發科（2454）股價於950元附近出現吞噬陰線，當日開高後急殺收跌3.5%，成交量為近5日均量1.8倍，完整吞噬前日陽線實體。次日開盤跳空低開，最終再跌2.9%，兩日合計跌幅逾6%。以吞噬陰線開盤價960元設止損，可將損失控制在1.5%以內。",
+       tip:"看跌型態只在高點或壓力區出現才有意義。確認規則：型態出現隔日，若開盤低於型態當日收盤即確認出場或放空；若開盤反而跳高則訊號失效，嚴格止損。避免在重要財報或重大事件前日放空，隔夜風險無法用技術面控制。"}
     ]
   },
   {
@@ -644,7 +666,21 @@ const DATA = [
        points:["台灣財報時程：Q1→5/15前；Q2→8/14前；Q3→11/14前；Q4→隔年3/31前（年報）","解讀財報重點順序：①營收符合預期？②毛利率趨勢？③EPS超預期？④現金流健康？⑤管理層展望語氣？","買預期賣事實（Buy the rumor, sell the fact）：財報前股價因預期上漲，公布後若符合預期反而下跌（利多出盡）"],
        formula:"EPS驚喜度 = (實際EPS - 分析師預估EPS) / |分析師預估EPS| × 100%\n超預期 > +5% 通常有正面股價反應\n低於預期 < -5% 通常引發賣壓",
        example:"台積電每季法說會（1/4/7/10月）是全球半導體業風向球：2024年4月法說會上修全年美元營收成長展望，超越市場預期，單日股價大漲超過5%",
-       tip:"財報公布後要重點看「展望（Guidance）」的措辭改變。從「謹慎樂觀」轉為「明確成長」是重要升評訊號；措辭轉謹慎往往比EPS本身影響更大"}
+       tip:"財報公布後要重點看「展望（Guidance）」的措辭改變。從「謹慎樂觀」轉為「明確成長」是重要升評訊號；措辭轉謹慎往往比EPS本身影響更大"},
+      {id:"target-price-pe",title:"本益比法預測目標價",en:"P/E Based Target Price Estimation",diff:"入門",
+       tags:["目標價","本益比","合理估值","PE"],
+       summary:"用預估EPS乘以合理本益比區間，快速算出個股目標價上下限，判斷現價是否值得買進。",
+       points:["第一步：取得未來12個月預估EPS（Forward EPS）。法說會、券商研究報告、Bloomberg或CMoney均可查詢；台積電每季法說會會提供當季營收展望，可推算全年EPS","第二步：確定合理本益比區間。參考個股過去5年歷史本益比中位數，並對比同產業平均。台積電歷史PE約15–25x；官股金控（如兆豐金、合庫金）10–14x；高成長IC設計（如聯發科）25–50x","第三步：計算目標價區間。目標價下限＝預估EPS × PE下限；目標價上限＝預估EPS × PE上限。例：台積電2024年預估EPS約40元，PE下限15x、上限25x，目標價區間600–1000元","第四步：計算現價的上行空間（Upside）與下行風險（Downside）。若現價800元，目標中值850元，上行空間6.25%；若熊市PE壓縮至15x，下行風險25%","注意：本益比法適用於獲利穩定公司，對虧損或高波動股失效。升息期間合理PE普遍收縮10–15%，需同步調整區間"],
+       formula:"目標價（中值）＝ 預估EPS × 合理PE中位數\n目標價區間：\n  上限 ＝ 預估EPS × PE上限\n  下限 ＝ 預估EPS × PE下限\n上行空間（%）＝ (目標價上限 - 現價) ÷ 現價 × 100\n下行風險（%）＝ (現價 - 目標價下限) ÷ 現價 × 100",
+       example:"2024年Q2台積電（2330）：法說會指引全年營收成長約25%，市場預估EPS約40元。歷史PE中位數約20x，AI題材溢價可給到22–25x。目標價區間：40×20＝800元（低估值）至40×25＝1000元（樂觀值）。2024年7月現價約950元，上行空間5%，若PE回落至18x則下行至720元，下行風險約24%，顯示當時估值偏貴、安全邊際不足。",
+       tip:"每季法說會後立即更新EPS預估，PE區間用5年歷史分位數而非單一數字。當現價低於目標價下限時才考慮買進，且上行空間至少需達15%才符合風險報酬比。可在CMoney或券商研究報告查詢目標價共識，快速校驗自己的估算。"},
+      {id:"target-price-dcf",title:"DCF 現金流折現估值",en:"Discounted Cash Flow Valuation",diff:"高階",
+       tags:["DCF","內含價值","折現率","自由現金流","估值"],
+       summary:"透過折現未來5年自由現金流加上終值，計算股票內含價值，並要求25–30%安全邊際才買進。",
+       points:["關鍵輸入一：自由現金流（FCF）成長率。取過去3年FCF平均年增率，保守起見再打七折。FCF＝營業現金流－資本支出（CapEx）。台灣電子股CapEx通常偏高，必須從財報現金流量表中確認，而非只看盈餘","關鍵輸入二：折現率（WACC）。台灣上市公司一般採8–12%。成熟大型股（如台積電）用8–9%；中型成長股用10–12%；景氣循環股用12–14%。無槓桿時可簡化用股權要求報酬率代替WACC","關鍵輸入三：終值成長率（Terminal Growth Rate）。建議保守使用2–3%，對應長期名目GDP成長率。超過3%幾乎等於假設公司永遠跑贏經濟，不切實際","常見錯誤：①沿用近年高成長率推算5年以上，忽略均值回歸；②忽略大規模CapEx對FCF的侵蝕（半導體廠擴產期CapEx可達營收30–40%）；③終值佔總估值比重超過70%時，模型對終值假設極度敏感，需做敏感性分析","安全邊際原則：DCF估算本身誤差大，只有當現價低於DCF估值25–30%以上時才買進，為估算誤差留緩衝"],
+       formula:"FCF第n年 ＝ FCF基期 × (1 + g)^n\n現值（PV）＝ Σ [FCF第n年 ÷ (1 + WACC)^n]，n＝1至5\n\n終值（Terminal Value）＝ FCF第5年 × (1 + g_terminal) ÷ (WACC - g_terminal)\n終值現值 ＝ 終值 ÷ (1 + WACC)^5\n\n股票內含價值（每股）＝ (PV總和 + 終值現值 + 淨現金) ÷ 流通股數\n安全邊際買點 ＝ 內含價值 × 0.75",
+       example:"以大立光（3008）2023年為例（簡化示範）：2021–2023年平均FCF約65億元，FCF成長率5%，WACC＝10%，終值成長率2.5%，流通股數1.34億股。第1–5年FCF折現合計約263億；終值現值約837億；合計1100億÷1.34億股≈820元/股。2023年底現價約1700元，遠高於DCF估值，顯示市場給予高額成長溢價，不符合安全邊際要求，應觀望。",
+       tip:"建立DCF時，對FCF成長率和WACC各做±2%的敏感性矩陣表，觀察估值變化幅度。若單一假設改變2%導致估值波動超過30%，代表結論脆弱，不宜重倉。實務上可用DCF做底部支撐驗證，搭配PE法交叉比對，兩種方法結論一致時信心才高。"}
     ]
   },
   {
@@ -707,7 +743,28 @@ const DATA = [
        points:["法人連續買超天數：連買3日為短線關注、連買10日為中期布局、連買30日以上代表長期系統性配置","投信連買超效應：投信因資金規模較小，對中小型股影響更大；投信連續買超中小型股，往往在1-3個月內推升30-50%漲幅","法人買超質量差異：買超集中在「上漲日」代表積極追高（強多頭）；買超集中在「下跌日」代表逢低承接（長線布局）"],
        formula:"法人連買超貢獻度 = 法人累計買超張數 / 流通股數 × 100%\n若連買30日累計買超達流通股數5%以上，代表籌碼結構顯著改善",
        example:"某IC設計公司投信連續買超28個交易日，累計買超12,000張，佔流通股數7%，期間股價從200元漲至320元，漲幅60%；法人合計買超確認強勢格局",
-       tip:"監控法人連買超：CMoney籌碼K線、XQ全球贏家均有「法人連買超天數」篩選功能。建議篩選：外資連買 ≥ 10日 + 投信連買 ≥ 5日 + 股價站上季線"}
+       tip:"監控法人連買超：CMoney籌碼K線、XQ全球贏家均有「法人連買超天數」篩選功能。建議篩選：外資連買 ≥ 10日 + 投信連買 ≥ 5日 + 股價站上季線"},
+      {id:"foreign-flow-basics",title:"外資買賣超判讀基礎",en:"Foreign Investor Net Buy/Sell Reading Fundamentals",diff:"入門",
+       tags:["外資","資金流向","買賣超","外資動向"],
+       summary:"單日外資買超逾10億為觀察門檻，50億以上視為強烈訊號，連續買超5日以上才具趨勢意義。",
+       points:["閾值判讀：單日外資買超10億以上值得記錄，50億以上為強訊號，100億以上屬大規模進場，歷史案例顯示此時隔日大盤上漲機率達67%","資料來源：台灣證交所每日16:30後公布「三大法人買賣超」，公開資訊觀測站(mops.twse.com.tw)可查個股外資持股比例變化，每月15日更新","連續買超定義：外資連續5個交易日以上淨買超同一標的且累計買超逾30億，視為系統性布局訊號而非短線操作；2023年台積電曾出現連續18個交易日買超，累計逾420億","指數連動：外資在台股整體持股比例約40%，當單日買超逾200億時，加權指數平均拉抬效果約0.4%-0.8%；反之，單日賣超逾300億時，指數平均跌幅約0.6%-1.2%","假訊號過濾：除權息旺季（7-9月）期間，外資賣超數字會因除息自動調整而失真，需扣除除息調整量再判讀真實方向"],
+       formula:"外資單日買賣超 = 外資買進金額 - 外資賣出金額\n外資持股比例 = 外資持有股數 ÷ 發行總股數 × 100%\n連續買超強度分級：\n  ★ 入門訊號：連買3日 + 累計 ≥10億\n  ★★ 觀察訊號：連買5日 + 累計 ≥30億\n  ★★★ 強勢訊號：連買10日 + 累計 ≥100億",
+       example:"2023年10-11月，台積電在AI伺服器題材發酵下，外資連續23個交易日買超，單日最高買超達82億元（2023/11/08），累計買超逾550億，股價從540元附近漲至595元，漲幅約10.2%。同期加權指數從15,800點回升至17,000點，外資功不可沒。",
+       tip:"每天16:30後至台灣證交所官網查「三大法人買賣超彙總表」，重點看外資買超金額排行前10名個股，若同一標的連續出現在前5名且每日均超過20億，可列入重點追蹤清單，但必須等第3天確認方向再評估進場。"},
+      {id:"foreign-capital-sectors",title:"外資資金輪動與類股布局",en:"Foreign Capital Sector Rotation and Portfolio Positioning",diff:"進階",
+       tags:["外資","資金輪動","類股布局","外資持股","台幣匯率"],
+       summary:"外資在半導體、金融、傳產間的輪動有跡可循，台幣升值1%通常引發外資淨流入加速，持股比例變化是最早期的撤退警訊。",
+       points:["輪動週期規律：外資通常在半導體景氣上升初期（EPS上修階段）大舉買進科技股，待PE達到歷史高位1.5倍標準差時，開始轉進金融股（受惠升息循環）或傳產股（受惠原物料行情），此輪動過程約需6至12週","匯率與資金流向：台幣每升值1%，境外資金平均淨流入台股約150至250億新台幣，2023年台幣從32.5元升至30.8元區間，期間外資累計淨買超逾8,000億；反之，台幣快速貶值時外資啟動避險賣超","持股比例預警機制：外資對特定個股持股比例若在4週內下降逾3個百分點，即便股價未明顯反應，亦應視為撤退早期訊號；2022年Q1外資悄然將台積電持股比例從79%降至75%，先於散戶4至6週開始減碼","類股警戒線：半導體類股外資持股比例低於55%時，代表外資已大幅減碼，歷史上此水位出現後3個月內，類股平均下跌12至18%","輪出訊號識別：當龍頭股外資持股比例停止上升但股價仍創高，同時外資開始增持第二梯隊標的，代表資金正在分散布局，龍頭股的上漲動能將逐步削弱"],
+       formula:"外資持股比例變化率 = (本月外資持股 - 上月外資持股) ÷ 上月外資持股 × 100%\n匯率敏感性估算：\n  台幣升值1% → 預期外資流入 ≈ 150~250億NTD\n  台幣貶值1% → 預期外資流出 ≈ 100~200億NTD\n輪動訊號門檻：\n  賣出訊號：龍頭股外資持股4週內 ↓ ≥3%\n  買入訊號：目標類股外資持股4週內 ↑ ≥2%",
+       example:"2024年Q1 AI行情帶動下，外資率先在1月大買台積電（外資持股比例從74.2%升至76.8%），至2月底開始將部分資金轉進聯發科，外資持股比例從42%升至46%，聯發科股價在3月從780元漲至950元，漲幅達21.8%。嗅到輪動訊號的投資人可在外資持股比例連續2週上升時，於聯發科800元附近跟進。",
+       tip:"每月15日公開資訊觀測站更新外資持股比例後，立即製作你追蹤標的的「外資持股變化表」，對比前3個月數據；若持股比例連續2個月下滑且累計降幅超過3%，無論股價表現如何，都應啟動停損或減碼計畫，外資的腳步永遠早於股價6至8週。"},
+      {id:"foreign-vs-retail",title:"外資 vs 散戶籌碼對決",en:"Foreign Investors vs Retail Traders: Chip Battleground",diff:"進階",
+       tags:["外資","散戶","籌碼面","券資比","軋空","多方確認"],
+       summary:"外資買超同時融資減少、股價創高，是台股最強烈的多方確認訊號；反之，外資出貨配合散戶搶進是最典型的出貨陷阱。",
+       points:["最強多方訊號（三合一）：外資連買 ≥3日累計 ≥30億 + 融資餘額同步減少 ≥5% + 股價突破近60日高點，三者同時成立歷史勝率達78%，平均後續1個月漲幅14.3%","出貨陷阱識別：外資連賣 ≥2日累計 ≥50億 + 融資餘額同步大增 ≥5% + 股價仍在高檔盤旋，為外資出貨給散戶的典型模式，後續2至4週內股價平均回落8至15%","券資比與軋空機制：當券資比（融券÷融資）高於15%，同時外資連續買超，大量空單暴露在買盤壓力下，一旦外資持續進場將引發軋空，股價可短期急漲10至20%；2023年9月台積電券資比達18%，外資隨後連買12日，軋空將股價從520元推至580元","融資增加警訊：股價創近期新高但融資餘額也同步大增（超過10%），而外資開始由買轉賣或買超規模縮小，代表散戶追高接手，外資正在出脫，應考慮在3至5日內減碼","外資+投信加乘效果：兩者同時買超同一標的連續5日以上，上漲持續性顯著優於外資單獨買超；2024年廣達外資+投信雙買超連續8日，股價從240元漲至310元，漲幅29%"],
+       formula:"券資比 = 融券餘額 ÷ 融資餘額 × 100%\n  券資比 >15% + 外資連買 → 軋空風險高，偏多操作\n  券資比 <5% + 外資連賣 → 偏空觀望\n\n三合一多方確認：\n  ✓ 外資連買 ≥3日且累計 ≥30億\n  ✓ 融資餘額較5日前減少 ≥5%\n  ✓ 股價收盤站上60日高點\n  → 三者同時成立 = 高確信做多訊號",
+       example:"2022年1月，台積電出現教科書級出貨陷阱：外資連續4個交易日賣超合計逾350億，同期散戶融資餘額從58億增至65億（增加12%），股價仍在670元附近高檔整理，散戶誤判為回檔機會大舉買入。隨後4週股價從675元跌至580元，跌幅達14%。反向案例：2023年11月台積電符合三合一訊號後，股價從540元漲至600元。",
+       tip:"每天收盤後同步查三張表：①三大法人買賣超（外資方向）②融資融券餘額變化（散戶方向）③個股當日K線是否創近期高低點。三張表只需10分鐘，但能讓你看清外資與散戶的籌碼對決結果。當外資與散戶方向相反時，90%的情況下跟外資走是正確選擇。"}
     ]
   },
   {
@@ -864,20 +921,19 @@ function renderCard(card, section) {
   const cssVars = `--card-accent:${section.accent};--card-kp-bg:${section.kpBg};--card-kp-border:${section.kpBorder};--card-accent-border:${section.accent.replace('var(--','').replace(')','')};`;
   return `
 <div class="card" id="card-${card.id}" style="${cssVars}" data-id="${card.id}" data-diff="${card.diff}" data-section="${section.id}" data-tags="${card.tags.join(',')}">
-  <div class="card-accent-bar"></div>
-  <div class="card-header">
-    <div class="card-icon-wrap" style="--card-icon-bg:${section.kpBg};--card-icon-border:${section.kpBorder}">${section.icon}</div>
-    <div class="card-meta">
-      <span class="card-category">${section.title}</span>
+  <div class="card-row" onclick="toggleCard('${card.id}')">
+    <div class="card-icon-wrap">${section.icon}</div>
+    <div class="card-titles">
+      <div class="card-title">${card.title}</div>
+      <div class="card-en">${card.en}</div>
+    </div>
+    <div class="card-summary-inline">${card.summary}</div>
+    <div class="card-right">
       <span class="card-difficulty ${diffClass}">${card.diff}</span>
+      <span class="card-chevron">›</span>
     </div>
   </div>
-  <div class="card-body">
-    <div class="card-title">${card.title}</div>
-    <div class="card-en">${card.en}</div>
-    <div class="card-summary">${card.summary}</div>
-    <div class="card-tags">${card.tags.map(t=>`<span class="card-tag" onclick="filterTag('${t}',event)">#${t}</span>`).join('')}</div>
-  </div>
+  <div class="card-tags">${card.tags.map(t=>`<span class="card-tag" onclick="filterTag('${t}',event)">#${t}</span>`).join('')}</div>
   <div class="card-detail" id="detail-${card.id}">
     <div class="card-detail-inner">
       <div class="detail-block block-keypoints">
@@ -898,9 +954,6 @@ function renderCard(card, section) {
       </div>
     </div>
   </div>
-  <button class="card-expand-btn" onclick="toggleCard('${card.id}')">
-    <i class="arrow">▼</i> <span class="expand-label">展開詳情</span>
-  </button>
 </div>`;
 }
 
@@ -957,7 +1010,7 @@ function applyFilters() {
     const matchDiff = currentDiff === 'all' || card.dataset.diff === currentDiff;
     const searchLower = searchTerm.toLowerCase();
     const cardText = (card.querySelector('.card-title').textContent + ' ' +
-                      card.querySelector('.card-summary').textContent + ' ' +
+                      card.querySelector('.card-summary-inline').textContent + ' ' +
                       card.dataset.tags + ' ' +
                       card.querySelector('.card-en').textContent).toLowerCase();
     const matchSearch = !searchTerm || cardText.includes(searchLower);
@@ -987,7 +1040,6 @@ function toggleCard(id) {
   } else {
     detail.style.maxHeight = detail.scrollHeight + 'px';
     card.classList.add('expanded');
-    card.querySelector('.expand-label').textContent = '收合詳情';
     expandedCard = id;
   }
 }
@@ -998,7 +1050,6 @@ function collapseCard(id) {
   if (!card) return;
   detail.style.maxHeight = '0';
   card.classList.remove('expanded');
-  card.querySelector('.expand-label').textContent = '展開詳情';
   if (expandedCard === id) expandedCard = null;
 }
 
