@@ -326,8 +326,8 @@ svg:`<svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="font-f
 <rect x="62" y="17" width="96" height="146" fill="#e2e8f0" rx="4"/>
 <rect x="62" y="71" width="96" height="92" fill="#3b82f6" rx="0 0 4 4"/>
 <line x1="62" y1="71" x2="158" y2="71" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="4,2"/>
-<text x="110" y="60" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">184,000</text>
-<text x="110" y="72" text-anchor="middle" fill="#1d4ed8" font-size="9">原始保證金</text>
+<text x="110" y="56" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">184,000</text>
+<text x="110" y="67" text-anchor="middle" fill="#1d4ed8" font-size="9">原始保證金</text>
 <rect x="62" y="104" width="96" height="59" fill="#f59e0b" rx="0"/>
 <line x1="62" y1="104" x2="158" y2="104" stroke="#d97706" stroke-width="2" stroke-dasharray="4,2"/>
 <text x="110" y="118" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">142,000</text>
@@ -335,8 +335,8 @@ svg:`<svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="font-f
 <rect x="62" y="137" width="96" height="26" fill="#ef4444" rx="0 0 4 4"/>
 <line x1="62" y1="137" x2="158" y2="137" stroke="#dc2626" stroke-width="1.5"/>
 <text x="110" y="155" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">追繳線</text>
-<text x="190" y="75" fill="#3b82f6" font-size="11" font-weight="600">← 原始保證金 184,000</text>
-<text x="190" y="92" fill="#64748b" font-size="9">帳戶資金正常水位</text>
+<text x="190" y="69" fill="#3b82f6" font-size="11" font-weight="600">← 原始保證金 184,000</text>
+<text x="190" y="82" fill="#64748b" font-size="9">帳戶資金正常水位</text>
 <text x="190" y="115" fill="#d97706" font-size="11" font-weight="600">← 維持保證金 142,000</text>
 <text x="190" y="132" fill="#64748b" font-size="9">低於此線 → 收到追繳通知</text>
 <text x="190" y="150" fill="#ef4444" font-size="11" font-weight="600">← 危險水位</text>
@@ -652,22 +652,22 @@ pts:['限價單：指定價格成交，不滑價但可能未成交','市價單�
 /* 8 */
 {num:'3-3',title:'做多做空雙向操作',sub:'漲跌都能賺錢，這才是期貨的核心優勢',ch:'第三章：下單操作實務',rt:'8 分鐘',
 cap:'做多與做空的損益對比圖',
-svg:`<svg viewBox="0 0 580 165" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-<rect width="580" height="165" fill="#f8fafc" rx="8"/>
-<rect x="15" y="15" width="255" height="135" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="10"/>
-<text x="142" y="40" text-anchor="middle" fill="#166534" font-size="14" font-weight="800">做多（Multi-Long）</text>
-<text x="142" y="58" text-anchor="middle" fill="#374151" font-size="10">看好市場會漲 → 先買進，等漲再賣出</text>
-<polygon points="85,75 100,120 130,75 160,120 190,75 220,120 235,75" fill="none" stroke="#10b981" stroke-width="2.5"/>
-<line x1="40" y1="120" x2="260" y2="120" stroke="#e2e8f0" stroke-width="1"/>
-<text x="142" y="138" text-anchor="middle" fill="#059669" font-size="11" font-weight="700">↑ 指數漲 → 賺錢 ↑</text>
-<text x="142" y="150" text-anchor="middle" fill="#ef4444" font-size="10">↓ 指數跌 → 虧錢 ↓</text>
-<rect x="310" y="15" width="255" height="135" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5" rx="10"/>
-<text x="437" y="40" text-anchor="middle" fill="#9f1239" font-size="14" font-weight="800">做空（Short-Sell）</text>
-<text x="437" y="58" text-anchor="middle" fill="#374151" font-size="10">預期市場會跌 → 先賣出，等跌再買回</text>
-<polygon points="380,75 395,120 425,75 455,120 485,75 515,120 530,75" fill="none" stroke="#ef4444" stroke-width="2.5" transform="scale(1,-1) translate(0,-195)"/>
-<line x1="335" y1="120" x2="555" y2="120" stroke="#e2e8f0" stroke-width="1"/>
-<text x="437" y="138" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">↓ 指數跌 → 賺錢 ↓</text>
-<text x="437" y="150" text-anchor="middle" fill="#059669" font-size="10">↑ 指數漲 → 虧錢 ↑</text>
+svg:`<svg viewBox="0 0 580 188" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="188" fill="#f8fafc" rx="8"/>
+<rect x="15" y="15" width="255" height="162" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="10"/>
+<text x="142" y="40" text-anchor="middle" fill="#166534" font-size="14" font-weight="800">做多（Long）</text>
+<text x="142" y="56" text-anchor="middle" fill="#374151" font-size="10">看好市場上漲 → 先買進，等漲再賣出</text>
+<polygon points="38,120 62,90 90,110 118,74 148,98 178,66 208,90 238,60 258,74" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linejoin="round"/>
+<line x1="28" y1="126" x2="263" y2="126" stroke="#bbf7d0" stroke-width="1.5"/>
+<text x="142" y="153" text-anchor="middle" fill="#059669" font-size="12" font-weight="700">↑ 指數漲 → 賺錢 ↑</text>
+<text x="142" y="169" text-anchor="middle" fill="#ef4444" font-size="10">↓ 指數跌 → 虧錢 ↓</text>
+<rect x="310" y="15" width="255" height="162" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5" rx="10"/>
+<text x="437" y="40" text-anchor="middle" fill="#9f1239" font-size="14" font-weight="800">做空（Short）</text>
+<text x="437" y="56" text-anchor="middle" fill="#374151" font-size="10">預期市場下跌 → 先賣出，等跌再買回</text>
+<polygon points="325,65 352,90 380,72 410,104 438,84 468,118 496,98 526,128 550,114" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linejoin="round"/>
+<line x1="318" y1="62" x2="562" y2="62" stroke="#fecdd3" stroke-width="1.5"/>
+<text x="437" y="153" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="700">↓ 指數跌 → 賺錢 ↓</text>
+<text x="437" y="169" text-anchor="middle" fill="#059669" font-size="10">↑ 指數漲 → 虧錢 ↑</text>
 </svg>`,
 body:`<h3>做多（Buy / Long）：看漲操作</h3>
 <p>做多就是<strong>先買進、後賣出</strong>，預期價格會上漲後賣出獲利。這和買股票的邏輯一樣，只是期貨只需繳保證金，不需全額付款。</p>
@@ -707,29 +707,33 @@ pts:['做多：先買進後賣出，看漲獲利','做空：先賣出後買回�
 /* 9 */
 {num:'3-4',title:'換倉操作與結算日',sub:'不懂換倉，持倉到期就被結算了',ch:'第三章：下單操作實務',rt:'8 分鐘',
 cap:'台指期換倉時間軸示意',
-svg:`<svg viewBox="0 0 580 155" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-<rect width="580" height="155" fill="#f8fafc" rx="8"/>
-<line x1="40" y1="60" x2="540" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-<polygon points="540,55 555,60 540,65" fill="#cbd5e1"/>
-<circle cx="100" cy="60" r="7" fill="#3b82f6"/>
-<text x="100" y="48" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">月初</text>
-<text x="100" y="80" text-anchor="middle" fill="#3b82f6" font-size="9">近月流動性最佳</text>
-<circle cx="290" cy="60" r="9" fill="#f59e0b"/>
-<text x="290" y="45" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">換倉區間</text>
-<text x="290" y="38" text-anchor="middle" fill="#64748b" font-size="9">結算日前3–5天</text>
-<text x="290" y="80" text-anchor="middle" fill="#d97706" font-size="9">建議此時換倉</text>
-<text x="290" y="93" text-anchor="middle" fill="#64748b" font-size="8">近月成交量下滑</text>
-<circle cx="430" cy="60" r="10" fill="#ef4444"/>
-<text x="430" y="48" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">結算日</text>
-<text x="430" y="38" text-anchor="middle" fill="#64748b" font-size="9">每月第三週三</text>
-<text x="430" y="80" text-anchor="middle" fill="#ef4444" font-size="9">近月合約到期</text>
-<text x="430" y="93" text-anchor="middle" fill="#64748b" font-size="8">按結算價強制結清</text>
-<rect x="40" y="110" width="160" height="30" fill="#eff6ff" stroke="#bfdbfe" rx="6"/>
-<text x="120" y="129" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="600">①平近月 @ 18,650</text>
-<rect x="220" y="110" width="160" height="30" fill="#f0fdf4" stroke="#bbf7d0" rx="6"/>
-<text x="300" y="129" text-anchor="middle" fill="#166534" font-size="10" font-weight="600">②買次月 @ 18,680</text>
-<rect x="400" y="110" width="160" height="30" fill="#fffbeb" stroke="#fde68a" rx="6"/>
-<text x="480" y="129" text-anchor="middle" fill="#92400e" font-size="10" font-weight="600">換倉成本 30點 ＝ 6,000元</text>
+svg:`<svg viewBox="0 0 580 158" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="158" fill="#f8fafc" rx="8"/>
+<line x1="40" y1="78" x2="540" y2="78" stroke="#cbd5e1" stroke-width="2"/>
+<polygon points="540,73 555,78 540,83" fill="#cbd5e1"/>
+<!-- 月初 -->
+<circle cx="100" cy="78" r="7" fill="#3b82f6"/>
+<text x="100" y="63" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">月初</text>
+<text x="100" y="97" text-anchor="middle" fill="#3b82f6" font-size="9">近月流動性最佳</text>
+<!-- 換倉區間（標籤在圓點上方留足空間）-->
+<circle cx="290" cy="78" r="9" fill="#f59e0b"/>
+<text x="290" y="55" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">換倉區間</text>
+<text x="290" y="44" text-anchor="middle" fill="#64748b" font-size="9">結算日前 3–5 天</text>
+<text x="290" y="99" text-anchor="middle" fill="#d97706" font-size="9">建議此時換倉</text>
+<text x="290" y="111" text-anchor="middle" fill="#64748b" font-size="8">近月成交量下滑</text>
+<!-- 結算日（標籤上移避開圓點）-->
+<circle cx="430" cy="78" r="10" fill="#ef4444"/>
+<text x="430" y="55" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">結算日</text>
+<text x="430" y="44" text-anchor="middle" fill="#64748b" font-size="9">每月第三週三</text>
+<text x="430" y="99" text-anchor="middle" fill="#ef4444" font-size="9">近月合約到期</text>
+<text x="430" y="111" text-anchor="middle" fill="#64748b" font-size="8">按結算價強制結清</text>
+<!-- 換倉操作步驟 -->
+<rect x="30" y="122" width="162" height="26" fill="#eff6ff" stroke="#bfdbfe" rx="5"/>
+<text x="111" y="139" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="600">①平近月 @ 18,650</text>
+<rect x="209" y="122" width="162" height="26" fill="#f0fdf4" stroke="#bbf7d0" rx="5"/>
+<text x="290" y="139" text-anchor="middle" fill="#166534" font-size="10" font-weight="600">②買次月 @ 18,680</text>
+<rect x="388" y="122" width="172" height="26" fill="#fffbeb" stroke="#fde68a" rx="5"/>
+<text x="474" y="139" text-anchor="middle" fill="#92400e" font-size="10" font-weight="600">換倉成本 30點 ＝ 6,000元</text>
 </svg>`,
 body:`<h3>什麼是換倉（Roll Over）？</h3>
 <p>台指期每月到期（每月第三週三），如果你想繼續持有部位，必須在到期前進行「換倉」：<strong>同時平掉近月合約，買入次月合約</strong>，讓部位延續。</p>
