@@ -176,7 +176,7 @@ a { color: inherit; text-decoration: none; }
   .nav-search .search-icon { position: static; width: 18px; height: 18px; color: var(--text-secondary); }
   .nav-search { cursor: pointer; padding: 8px; }
   #search-count { display: none; }
-  .nav-link-btn { display: none; }
+  .nav-link-btn { font-size: 12px; padding: 5px 8px; }
 }
 
 /* ── TABS ────────────────────────────────────────────────────────────── */
@@ -202,6 +202,7 @@ a { color: inherit; text-decoration: none; }
 .tab-btn .tab-icon { font-size: 1rem; }
 .tab-btn.active { color: var(--section-color, var(--accent)); font-weight: 600; }
 .tab-btn:hover:not(.active) { color: var(--text-secondary); }
+.tab-btn-link { text-decoration: none; border-left: 1px solid var(--border-default); margin-left: 4px; padding-left: 20px; }
 .tab-indicator {
   position: absolute; bottom: 0; height: 2px; border-radius: 2px;
   background: var(--accent);
@@ -481,6 +482,9 @@ a { color: inherit; text-decoration: none; }
     <button class="tab-btn" data-id="futures" style="--section-color:var(--futures-c)" onclick="switchTab('futures')">
       <span class="tab-icon">📉</span> 期貨
     </button>
+    <a href="candlestick-patterns.html" class="tab-btn tab-btn-link" style="--section-color:#7c3aed">
+      <span class="tab-icon">📊</span> K線圖鑑
+    </a>
     <div class="tab-indicator" id="tab-indicator"></div>
   </div>
 </div>
