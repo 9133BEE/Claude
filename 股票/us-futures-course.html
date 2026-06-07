@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美股期貨 × TOPSTEP 完整課程</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f1f5f9;display:flex;min-height:100vh}
+a{color:inherit;text-decoration:none}
+/* Sidebar */
+.sidebar{width:272px;min-height:100vh;background:#0f172a;color:#f1f5f9;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;transition:transform .25s}
+.sb-head{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid #1e293b}
+.sb-logo{font-size:28px;line-height:1}
+.sb-title{font-size:13px;font-weight:700;color:#f1f5f9;line-height:1.3}
+.sb-sub{font-size:11px;color:#64748b;margin-top:2px}
+.sb-close{display:none;background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;margin-left:auto}
+.progress-wrap{padding:12px 16px;border-bottom:1px solid #1e293b}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:6px}
+.progress-bar{height:4px;background:#1e293b;border-radius:2px}
+.progress-fill{height:4px;background:#10b981;border-radius:2px;transition:width .4s}
+#chList{flex:1;overflow-y:auto;padding:8px 0}
+.ch-label{font-size:10px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px 4px}
+.ls-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .15s;border-left:3px solid transparent}
+.ls-item:hover{background:#1e293b}
+.ls-item.active{background:#1e293b;border-left-color:#10b981}
+.ls-item.done{opacity:.65}
+.ls-item.done .ls-num{background:#10b981;color:#fff}
+.ls-num{width:28px;height:28px;border-radius:6px;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#94a3b8;flex-shrink:0}
+.ls-item span{font-size:12px;color:#cbd5e1;flex:1;line-height:1.35}
+.ls-check{color:#10b981;font-size:12px}
+.sb-footer{padding:14px 16px;border-top:1px solid #1e293b;display:flex;flex-direction:column;gap:6px}
+.sb-footer a{font-size:11px;color:#64748b;padding:4px 0}
+.sb-footer a:hover{color:#94a3b8}
+/* Main */
+.main{margin-left:272px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:50}
+.menu-btn{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:#374151}
+.topbar-title{font-size:14px;font-weight:600;color:#374151;flex:1}
+.topbar-home{font-size:12px;color:#10b981;font-weight:600;padding:6px 14px;border:1px solid #10b981;border-radius:6px}
+#lw{padding:28px 32px;max-width:860px}
+/* Lesson card */
+.lc{background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:24px}
+.lc-cap{background:#f8fafc;padding:0;overflow:hidden;border-bottom:1px solid #e2e8f0}
+.lc-cap img,.lc-cap svg{width:100%;display:block}
+.lc-body{padding:28px 32px}
+.lc-meta{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.lc-ch{font-size:11px;color:#10b981;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.lc-rt{font-size:11px;color:#94a3b8}
+.lc-title{font-size:22px;font-weight:800;color:#0f172a;line-height:1.25}
+.lc-sub{font-size:13px;color:#64748b;margin-top:4px}
+.lc-content{margin-top:22px;font-size:14px;line-height:1.75;color:#374151}
+.lc-content h3{font-size:15px;font-weight:700;color:#0f172a;margin:20px 0 10px}
+.lc-content p{margin-bottom:10px}
+.lc-content ul,.lc-content ol{padding-left:20px;margin-bottom:10px}
+.lc-content li{margin-bottom:5px}
+.lc-content strong{color:#0f172a}
+.hl{background:#ecfdf5;border-left:3px solid #10b981;padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:13px;line-height:1.65}
+.eg{background:#f0f9ff;border-left:3px solid #38bdf8;padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:13px;line-height:1.65}
+.warn{background:#fff7ed;border-left:3px solid #f97316;padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:13px;line-height:1.65}
+.formula{background:#0f172a;color:#e2e8f0;padding:14px 18px;border-radius:8px;margin:12px 0;font-size:12.5px;line-height:1.8;white-space:pre-wrap;font-family:monospace}
+.kp-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin:10px 0;font-size:13px;line-height:1.65}
+.cmp-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.cmp-table th{background:#0f172a;color:#f1f5f9;padding:8px 12px;text-align:left;font-size:11px;font-weight:700}
+.cmp-table td{padding:8px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.cmp-table tr:nth-child(even) td{background:#f8fafc}
+/* Key points */
+.kp-wrap{background:#f8fafc;border-radius:10px;padding:18px 22px;margin-top:20px}
+.kp-wrap h4{font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.kp-list{display:flex;flex-direction:column;gap:8px}
+.kp-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#374151;line-height:1.5}
+.kp-dot{width:6px;height:6px;border-radius:50%;background:#10b981;margin-top:6px;flex-shrink:0}
+/* Nav */
+.lc-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;border-top:1px solid #f1f5f9}
+.nav-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#374151;transition:all .15s}
+.nav-btn:hover{background:#f8fafc}
+.nav-btn.primary{background:#10b981;color:#fff;border-color:#10b981}
+.nav-btn.primary:hover{background:#059669}
+.done-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid #10b981;color:#10b981;background:#fff}
+.done-btn.marked{background:#10b981;color:#fff}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sb-close{display:block}
+  .overlay.show{display:block}
+  .main{margin-left:0}
+  .menu-btn{display:block}
+  #lw{padding:16px}
+  .lc-body{padding:18px 16px}
+  .lc-nav{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+<nav class="sidebar" id="sb">
+  <div class="sb-head">
+    <div class="sb-logo">🇺🇸</div>
+    <div>
+      <div class="sb-title">美股期貨 × TOPSTEP</div>
+      <div class="sb-sub">完整課程 14堂課</div>
+    </div>
+    <button class="sb-close" onclick="closeSB()">✕</button>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>學習進度</span><span id="pct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="pfill" style="width:0%"></div></div>
+  </div>
+  <div id="chList"></div>
+  <div class="sb-footer">
+    <a href="futures-course.html">← 台指期課程</a>
+    <a href="index.html">← 返回學習中心</a>
+  </div>
+</nav>
+<div class="overlay" id="ov" onclick="closeSB()"></div>
+<main class="main">
+  <div class="topbar">
+    <button class="menu-btn" onclick="openSB()">☰</button>
+    <span class="topbar-title">美股期貨 × TOPSTEP 完整課程</span>
+    <a href="index.html" class="topbar-home">返回首頁</a>
+  </div>
+  <div id="lw"></div>
+</main>
+<script>
+const CHAPTERS = [
+  {label:'第一章：認識美股期貨', ids:[0,1,2]},
+  {label:'第二章：美股市場基礎', ids:[3,4,5]},
+  {label:'第三章：TOPSTEP完整解析', ids:[6,7,8]},
+  {label:'第四章：日內交易實戰', ids:[9,10,11]},
+  {label:'第五章：工具書速查', ids:[12,13]}
+];
+
+const LESSONS = [
+/* 0 */
+{num:'1-1',title:'美股期貨 vs 台指期',sub:'5大關鍵差異，讓你快速上手',ch:'第一章：認識美股期貨',rt:'8 分鐘',
+cap:'美股期貨 vs 台指期規格對比',
+svg:`<svg viewBox="0 0 580 170" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="170" fill="#f8fafc" rx="8"/>
+<text x="290" y="20" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">美股期貨（ES/NQ）vs 台指期（TX）比較</text>
+<rect x="10" y="28" width="270" height="130" fill="#0a2540" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="145" y="46" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="700">台指期（TX）</text>
+<text x="145" y="63" text-anchor="middle" fill="#94a3b8" font-size="9">點值：200元 / 點</text>
+<text x="145" y="78" text-anchor="middle" fill="#94a3b8" font-size="9">保證金：約 NT$184,000</text>
+<text x="145" y="93" text-anchor="middle" fill="#94a3b8" font-size="9">交易時段：日盤+夜盤（共18小時）</text>
+<text x="145" y="108" text-anchor="middle" fill="#94a3b8" font-size="9">計價單位：新台幣（NT$）</text>
+<text x="145" y="123" text-anchor="middle" fill="#94a3b8" font-size="9">標的：台灣加權指數</text>
+<text x="145" y="140" text-anchor="middle" fill="#fbbf24" font-size="9">主要參與者：外資、散戶</text>
+<text x="145" y="153" text-anchor="middle" fill="#64748b" font-size="8">日均成交量：約20萬口</text>
+<rect x="300" y="28" width="270" height="130" fill="#052e16" rx="6" stroke="#10b981" stroke-width="0.8"/>
+<text x="435" y="46" text-anchor="middle" fill="#34d399" font-size="11" font-weight="700">ES / NQ（美股期貨）</text>
+<text x="435" y="63" text-anchor="middle" fill="#94a3b8" font-size="9">ES點值：$50/點；NQ：$20/點</text>
+<text x="435" y="78" text-anchor="middle" fill="#94a3b8" font-size="9">保證金：約 US$11,000–17,000</text>
+<text x="435" y="93" text-anchor="middle" fill="#94a3b8" font-size="9">交易時段：幾乎24小時（週日-週五）</text>
+<text x="435" y="108" text-anchor="middle" fill="#94a3b8" font-size="9">計價單位：美元（US$）</text>
+<text x="435" y="123" text-anchor="middle" fill="#94a3b8" font-size="9">標的：S&amp;P500 / NASDAQ100</text>
+<text x="435" y="140" text-anchor="middle" fill="#fbbf24" font-size="9">主要參與者：機構、法人、演算法</text>
+<text x="435" y="153" text-anchor="middle" fill="#64748b" font-size="8">ES日均成交量：約100萬口（全球最大）</text>
+</svg>`,
+body:`<h3>美股期貨的5大關鍵優勢</h3>
+<div class="hl"><b>1. 全球最大的期貨市場</b><br>
+ES（E-mini S&amp;P 500）是全球成交量最大的期貨合約，每天超過100萬口。流動性極佳，買賣價差極小（通常只有1個tick = $12.5），滑價問題遠小於台指期夜盤。</div>
+<div class="hl"><b>2. 幾乎24小時交易</b><br>
+CME美股期貨從週日17:00（美東時間）開到週五16:00，幾乎全天候運作。台灣時間週一早上6:00開市，週六凌晨4:00收市。</div>
+<div class="hl"><b>3. 微型合約大幅降低門檻</b><br>
+MES（Micro E-mini S&amp;P 500）每點只有$5，保證金約$1,200美元。MNQ每點$2，保證金約$1,600。新手可用極低風險實戰練習。</div>
+<div class="hl"><b>4. 與全球市場高度連動</b><br>
+美股期貨反映全球資金動向——聯準會（Fed）決策、科技股財報、地緣政治，都即時反映在ES/NQ上。學會解讀，也能更準確判斷隔日台指期開盤方向。</div>
+<div class="hl"><b>5. Prop Trading（TOPSTEP）機制</b><br>
+美股期貨有完整的Funded Trader生態。通過TOPSTEP評估後，用公司資金交易，獲利90%歸自己。這在台灣期貨市場沒有對應機制。</div>
+<h3>美股期貨 vs 台指期：關鍵差異對比</h3>
+<table class="cmp-table">
+<tr><th>項目</th><th>台指期（TX）</th><th>E-mini ES</th><th>Micro MES</th></tr>
+<tr><td>點值</td><td>NT$200/點</td><td>US$50/點</td><td>US$5/點</td></tr>
+<tr><td>最小跳動</td><td>1點=NT$200</td><td>0.25點=$12.5</td><td>0.25點=$1.25</td></tr>
+<tr><td>原始保證金</td><td>~NT$184,000</td><td>~US$11,000</td><td>~US$1,200</td></tr>
+<tr><td>交易幣別</td><td>新台幣</td><td>美元</td><td>美元</td></tr>
+<tr><td>到期結算</td><td>每月第三週三</td><td>每季（3月/6月/9月/12月）</td><td>同ES</td></tr>
+<tr><td>最佳流動性</td><td>日盤08:45–13:45</td><td>美股市場時段（22:30–4:00台灣時間）</td><td>同ES</td></tr>
+</table>
+<div class="warn"><b>⚠️ 匯率風險</b>美股期貨以美元計價。台灣投資人需承擔匯率風險（美元升/貶值直接影響折算成台幣的損益）。若美元兌台幣匯率從30→31（美元升值），獲利折算台幣可多3.3%；反之若貶值則損失。</div>`,
+pts:['ES是全球最大期貨合約，流動性遠優於台指期夜盤','MES微型合約保證金約US$1,200，門檻低，新手可用真錢練習','美股期貨幾乎24小時交易，週一台灣早上6:00開市','TOPSTEP等Prop Firm提供「用公司資金交易」機制，這是美股特有優勢']},
+
+/* 1 */
+{num:'1-2',title:'CME交易時段完整解析',sub:'美東時間 vs 台灣時間，重要時間點一次看清楚',ch:'第一章：認識美股期貨',rt:'7 分鐘',
+cap:'台灣時間24小時交易時段與重要節點',
+svg:`<svg viewBox="0 0 580 158" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="158" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="10.5" font-weight="600">美股期貨 24小時時段（台灣時間，UTC+8）</text>
+<rect x="20" y="26" width="540" height="16" fill="#1e293b" rx="3"/>
+<rect x="20" y="26" width="540" height="16" fill="#1e3a5f" rx="3"/>
+<rect x="20" y="26" width="234" height="16" fill="#7c3aed" rx="3 0 0 3"/>
+<text x="137" y="38" text-anchor="middle" fill="#e9d5ff" font-size="8.5">夜盤（延續）00:00–05:00</text>
+<rect x="254" y="26" width="306" height="16" fill="#7c3aed" rx="0 3 3 0"/>
+<text x="407" y="38" text-anchor="middle" fill="#e9d5ff" font-size="8.5">夜盤 15:00–24:00</text>
+<rect x="117" y="26" width="130" height="16" fill="#3b82f6"/>
+<text x="182" y="38" text-anchor="middle" fill="#fff" font-size="8.5">歐盤活躍 16:30–22:00</text>
+<line x1="20" y1="55" x2="560" y2="55" stroke="#1e293b" stroke-width="1"/>
+<circle cx="57" cy="55" r="3" fill="#7c3aed"/>
+<text x="57" y="70" text-anchor="middle" fill="#a78bfa" font-size="7.5">00:00</text>
+<circle cx="108" cy="55" r="3" fill="#7c3aed"/>
+<text x="108" y="70" text-anchor="middle" fill="#a78bfa" font-size="7.5">05:00</text>
+<text x="108" y="80" text-anchor="middle" fill="#64748b" font-size="7">夜盤收</text>
+<circle cx="188" cy="55" r="3" fill="#64748b"/>
+<text x="188" y="70" text-anchor="middle" fill="#64748b" font-size="7.5">06:00</text>
+<text x="188" y="80" text-anchor="middle" fill="#10b981" font-size="7">CME週一開</text>
+<circle cx="296" cy="55" r="4" fill="#ef4444"/>
+<text x="296" y="70" text-anchor="middle" fill="#f87171" font-size="7.5">20:30</text>
+<text x="296" y="80" text-anchor="middle" fill="#f87171" font-size="7">數據發布</text>
+<text x="296" y="90" text-anchor="middle" fill="#f87171" font-size="7">(CPI/非農)</text>
+<circle cx="376" cy="55" r="6" fill="#f59e0b"/>
+<text x="376" y="70" text-anchor="middle" fill="#fbbf24" font-size="7.5">21:30</text>
+<text x="376" y="80" text-anchor="middle" fill="#fbbf24" font-size="7">美股預熱</text>
+<circle cx="430" cy="55" r="7" fill="#10b981"/>
+<text x="430" y="70" text-anchor="middle" fill="#34d399" font-size="7.5">21:30</text>
+<text x="430" y="80" text-anchor="middle" fill="#34d399" font-size="7">美股開盤</text>
+<text x="430" y="90" text-anchor="middle" fill="#34d399" font-size="7">最活躍</text>
+<circle cx="508" cy="55" r="5" fill="#f97316"/>
+<text x="508" y="70" text-anchor="middle" fill="#fb923c" font-size="7.5">02:00</text>
+<text x="508" y="80" text-anchor="middle" fill="#fb923c" font-size="7">FOMC</text>
+<circle cx="543" cy="55" r="4" fill="#94a3b8"/>
+<text x="543" y="70" text-anchor="middle" fill="#94a3b8" font-size="7.5">04:00</text>
+<text x="543" y="80" text-anchor="middle" fill="#94a3b8" font-size="7">美股收盤</text>
+<text x="290" y="110" text-anchor="middle" fill="#34d399" font-size="10" font-weight="600">最佳交易時段（台灣時間）：21:30–23:30 開盤1–2小時</text>
+<text x="290" y="126" text-anchor="middle" fill="#f59e0b" font-size="9">重要數據時間：CPI / 非農 = 20:30 台灣時間（美東 8:30am）</text>
+<text x="290" y="142" text-anchor="middle" fill="#f97316" font-size="9">FOMC聲明：台灣時間凌晨 02:00–03:00（美東 2:00pm）</text>
+</svg>`,
+body:`<h3>每日完整時間表（台灣時間）</h3>
+<table class="cmp-table">
+<tr><th>台灣時間</th><th>美東時間</th><th>事件/說明</th><th>交易建議</th></tr>
+<tr><td>05:00–06:00</td><td>21:00–22:00 前日</td><td>CME電子盤維護關閉（週一除外）</td><td>不可交易</td></tr>
+<tr><td>06:00</td><td>17:00（週日）</td><td>週一CME開盤（含ES/NQ）</td><td>觀察週末缺口方向</td></tr>
+<tr><td>15:00–17:00</td><td>03:00–05:00</td><td>亞洲時段，流動性低</td><td>謹慎，限價單優先</td></tr>
+<tr><td>16:30–17:30</td><td>08:30–09:30</td><td>美國重要數據發布（CPI/非農/就業）</td><td>數據前後高波動，謹慎</td></tr>
+<tr><td>21:30</td><td>09:30</td><td>紐約證交所正式開盤（最重要！）</td><td>最佳交易窗口開始</td></tr>
+<tr><td>21:30–23:30</td><td>09:30–11:30</td><td>美股開盤前2小時，波動最大、機會最多</td><td>主要交易時段</td></tr>
+<tr><td>23:30–01:30</td><td>11:30–13:30</td><td>午盤，成交量萎縮，偽突破多</td><td>減少操作</td></tr>
+<tr><td>01:30–04:00</td><td>13:30–16:00</td><td>尾盤，方向性再次明確，成交量回升</td><td>可操作，注意收盤力道</td></tr>
+<tr><td>02:00–02:30</td><td>14:00–14:30</td><td>FOMC利率決策公布（每年8次）</td><td>決策前平倉，決策後看方向</td></tr>
+<tr><td>04:00</td><td>16:00</td><td>美股正式收盤，RTH結束</td><td>大多數交易者收工</td></tr>
+</table>
+<h3>RTH vs ETH — 兩種交易時段</h3>
+<div class="kp-box">
+<b>RTH（Regular Trading Hours）</b>：美股正式盤（21:30–04:00台灣時間）<br>
+流動性最好、成交量最大、新聞反應最快速。大多數策略專注在RTH。<br><br>
+<b>ETH（Extended Trading Hours）</b>：美股盤前/盤後+亞洲/歐洲時段<br>
+流動性較低、滑價風險較大，但24小時都可持倉。Prop Firm通常不建議在ETH持太大倉位。
+</div>
+<h3>每週重要日程</h3>
+<div class="formula">每週行事曆：
+週一：無特定數據，觀察上週走勢延續方向
+週二：消費者信心指數（偶爾）
+週三：Fed官員講話（頻繁）、ADP就業數據（每月首週三）
+週四：每週初領失業救濟金人數（重要！每週例行）
+週五：非農就業報告（每月首個週五，最重要！）</div>
+<div class="warn"><b>⚠️ 重大數據前後操作原則</b>
+非農/CPI等重大數據公布前15分鐘：縮倉或平倉，等數據出來再看方向。
+數據後5分鐘可能出現「先噴再回」假動作——等方向確認（第一根5分鐘K線收盤後）再進場。</div>`,
+pts:['CME美股期貨幾乎24小時交易，台灣週一早上6:00開市','最佳交易時段：台灣時間21:30–23:30（美股開盤後1–2小時）','CPI/非農數據：台灣時間20:30；FOMC：凌晨02:00','RTH（正式盤）流動性最好，ETH流動性低，謹慎操作']},
+
+/* 2 */
+{num:'1-3',title:'四大合約規格：ES / NQ / YM / MES',sub:'搞懂合約大小，才能控制風險',ch:'第一章：認識美股期貨',rt:'8 分鐘',
+cap:'四大美股期貨合約規格一覽',
+svg:`<svg viewBox="0 0 580 168" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="168" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="10.5" font-weight="600">四大美股期貨合約比較（2024年）</text>
+<rect x="8" y="25" width="133" height="136" fill="#0a2540" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="74" y="44" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="700">ES</text>
+<text x="74" y="58" text-anchor="middle" fill="#94a3b8" font-size="8.5">E-mini S&amp;P 500</text>
+<text x="74" y="74" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="700">$50 / 點</text>
+<text x="74" y="88" text-anchor="middle" fill="#94a3b8" font-size="8">跳動：0.25點=$12.5</text>
+<text x="74" y="102" text-anchor="middle" fill="#fbbf24" font-size="9">保證金~$11,000</text>
+<text x="74" y="116" text-anchor="middle" fill="#34d399" font-size="8.5">全球最大流動性</text>
+<text x="74" y="132" text-anchor="middle" fill="#94a3b8" font-size="8">標準合約</text>
+<text x="74" y="151" text-anchor="middle" fill="#60a5fa" font-size="8" font-weight="700">熟練交易者</text>
+<rect x="152" y="25" width="133" height="136" fill="#052e16" rx="6" stroke="#10b981" stroke-width="0.8"/>
+<text x="218" y="44" text-anchor="middle" fill="#34d399" font-size="11" font-weight="700">NQ</text>
+<text x="218" y="58" text-anchor="middle" fill="#94a3b8" font-size="8.5">E-mini NASDAQ 100</text>
+<text x="218" y="74" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="700">$20 / 點</text>
+<text x="218" y="88" text-anchor="middle" fill="#94a3b8" font-size="8">跳動：0.25點=$5</text>
+<text x="218" y="102" text-anchor="middle" fill="#fbbf24" font-size="9">保證金~$17,000</text>
+<text x="218" y="116" text-anchor="middle" fill="#34d399" font-size="8.5">波動大，機會多</text>
+<text x="218" y="132" text-anchor="middle" fill="#94a3b8" font-size="8">科技股敏感度高</text>
+<text x="218" y="151" text-anchor="middle" fill="#10b981" font-size="8" font-weight="700">主流選擇</text>
+<rect x="296" y="25" width="133" height="136" fill="#1a1a0a" rx="6" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="362" y="44" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="700">MES</text>
+<text x="362" y="58" text-anchor="middle" fill="#94a3b8" font-size="8.5">Micro E-mini S&amp;P</text>
+<text x="362" y="74" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="700">$5 / 點</text>
+<text x="362" y="88" text-anchor="middle" fill="#94a3b8" font-size="8">跳動：0.25點=$1.25</text>
+<text x="362" y="102" text-anchor="middle" fill="#fbbf24" font-size="9">保證金~$1,200</text>
+<text x="362" y="116" text-anchor="middle" fill="#34d399" font-size="8.5">ES的1/10規格</text>
+<text x="362" y="132" text-anchor="middle" fill="#94a3b8" font-size="8">低風險實戰練習</text>
+<text x="362" y="151" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="700">新手首選</text>
+<rect x="440" y="25" width="133" height="136" fill="#1a0a1a" rx="6" stroke="#a78bfa" stroke-width="0.8"/>
+<text x="506" y="44" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="700">MNQ</text>
+<text x="506" y="58" text-anchor="middle" fill="#94a3b8" font-size="8.5">Micro NASDAQ 100</text>
+<text x="506" y="74" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="700">$2 / 點</text>
+<text x="506" y="88" text-anchor="middle" fill="#94a3b8" font-size="8">跳動：0.25點=$0.5</text>
+<text x="506" y="102" text-anchor="middle" fill="#fbbf24" font-size="9">保證金~$1,600</text>
+<text x="506" y="116" text-anchor="middle" fill="#34d399" font-size="8.5">NQ的1/10規格</text>
+<text x="506" y="132" text-anchor="middle" fill="#94a3b8" font-size="8">高波動低門檻</text>
+<text x="506" y="151" text-anchor="middle" fill="#a78bfa" font-size="8" font-weight="700">科技股愛好者</text>
+</svg>`,
+body:`<h3>ES — 全球最重要的期貨合約</h3>
+<p>ES追蹤S&amp;P 500指數，每點價值$50美元，最小跳動0.25點=$12.5。若S&amp;P 500在5,000點，一口ES合約市值 = 5,000 × $50 = $250,000美元。日均成交量超過100萬口，是全球流動性最好的期貨。</p>
+<div class="formula">ES損益計算範例：
+買入ES @ 5,000點，賣出 @ 5,020點
+獲利 = (5,020 - 5,000) × $50 = $1,000 USD（約3萬台幣）
+
+跌10點（-0.2%）虧損 = 10 × $50 = $500 USD（約1.5萬台幣）
+（保證金$11,000，跌10點 = -4.5%的保證金）</div>
+<h3>NQ — 科技股高槓桿代表</h3>
+<p>NQ追蹤NASDAQ 100指數，成分股包含蘋果、微軟、Nvidia、Google等科技巨頭。每點$20，但NASDAQ波動幅度通常比S&amp;P 500大50–80%，每日波動50–150點（ES只有30–80點）。</p>
+<div class="formula">NQ損益計算：
+NQ @ 20,000點時，1口合約市值 = 20,000 × $20 = $400,000
+漲50點獲利 = 50 × $20 = $1,000
+跌100點虧損 = 100 × $20 = $2,000（大約-11.8%保證金）</div>
+<h3>MES / MNQ — 新手的最佳起點</h3>
+<div class="hl"><b>為什麼從Micro合約開始？</b><br>
+MES是ES的1/10，MNQ是NQ的1/10。保證金約$1,200–$1,600，每次盈虧也是ES/NQ的1/10。<br>
+重要的是：MES和ES走勢完全一樣，只是每點金額不同。用MES練習，學到的技術完全可以轉移到ES。</div>
+<table class="cmp-table">
+<tr><th>合約</th><th>標的</th><th>每點</th><th>最小跳動</th><th>保證金（約）</th><th>適合</th></tr>
+<tr><td>ES</td><td>S&amp;P 500</td><td>$50</td><td>$12.5</td><td>$11,000</td><td>熟練交易者</td></tr>
+<tr><td>NQ</td><td>NASDAQ 100</td><td>$20</td><td>$5</td><td>$17,000</td><td>波段/高波動偏好</td></tr>
+<tr><td>MES</td><td>S&amp;P 500</td><td>$5</td><td>$1.25</td><td>$1,200</td><td>新手/初學</td></tr>
+<tr><td>MNQ</td><td>NASDAQ 100</td><td>$2</td><td>$0.5</td><td>$1,600</td><td>新手/NASDAQ偏好</td></tr>
+<tr><td>YM</td><td>道瓊工業（30檔）</td><td>$5/點</td><td>$5</td><td>$9,000</td><td>進階</td></tr>
+</table>
+<h3>合約到期與展倉</h3>
+<div class="kp-box">
+ES/NQ採季度到期（3月/6月/9月/12月第三個週五）。<br>
+到期前一週，成交量會移至下一季合約（換倉）。<br>
+近月合約（最活躍）代碼：ES H4（H=3月, M=6月, U=9月, Z=12月）<br>
+換倉成本：正逆價差，通常1–3點，遠小於台指期。
+</div>`,
+pts:['ES每點$50，NQ每點$20，MES是ES的1/10（每點$5）','MES保證金約$1,200，是新手進入美股期貨最低門檻','ES日均100萬口，滑價極小，流動性遠優於台指期夜盤','ES/NQ每季到期（3/6/9/12月第三週五），換倉成本小']},
+
+/* 3 */
+{num:'2-1',title:'S&P500、NASDAQ、道瓊解析',sub:'三大指數的差異、相關性與選擇策略',ch:'第二章：美股市場基礎',rt:'9 分鐘',
+cap:'三大指數成分股結構與特性對比',
+svg:`<svg viewBox="0 0 580 168" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="168" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="10.5" font-weight="600">三大指數成分股結構比較</text>
+<rect x="8" y="25" width="176" height="136" fill="#0a1628" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="96" y="43" text-anchor="middle" fill="#60a5fa" font-size="10.5" font-weight="700">S&amp;P 500</text>
+<text x="96" y="57" text-anchor="middle" fill="#94a3b8" font-size="8.5">美國500大企業</text>
+<text x="96" y="73" text-anchor="middle" fill="#e2e8f0" font-size="8.5">科技：28% | 金融：13%</text>
+<text x="96" y="87" text-anchor="middle" fill="#e2e8f0" font-size="8.5">醫療：12% | 消費：10%</text>
+<text x="96" y="101" text-anchor="middle" fill="#e2e8f0" font-size="8.5">工業：9% | 其他：28%</text>
+<text x="96" y="116" text-anchor="middle" fill="#fbbf24" font-size="8.5">最具代表性、最穩定</text>
+<text x="96" y="130" text-anchor="middle" fill="#94a3b8" font-size="7.5">市值加權</text>
+<text x="96" y="151" text-anchor="middle" fill="#60a5fa" font-size="8" font-weight="700">期貨：ES / MES</text>
+<rect x="200" y="25" width="176" height="136" fill="#052e16" rx="6" stroke="#10b981" stroke-width="0.8"/>
+<text x="288" y="43" text-anchor="middle" fill="#34d399" font-size="10.5" font-weight="700">NASDAQ 100</text>
+<text x="288" y="57" text-anchor="middle" fill="#94a3b8" font-size="8.5">非金融類100大企業</text>
+<text x="288" y="73" text-anchor="middle" fill="#e2e8f0" font-size="8.5">科技：60%（含AI/半導體）</text>
+<text x="288" y="87" text-anchor="middle" fill="#e2e8f0" font-size="8.5">消費：18% | 醫療：7%</text>
+<text x="288" y="101" text-anchor="middle" fill="#e2e8f0" font-size="8.5">前10大佔比55%+</text>
+<text x="288" y="116" text-anchor="middle" fill="#fbbf24" font-size="8.5">波動大、科技股連動強</text>
+<text x="288" y="130" text-anchor="middle" fill="#94a3b8" font-size="7.5">市值加權（前10大佔主導）</text>
+<text x="288" y="151" text-anchor="middle" fill="#10b981" font-size="8" font-weight="700">期貨：NQ / MNQ</text>
+<rect x="392" y="25" width="176" height="136" fill="#1a1000" rx="6" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="480" y="43" text-anchor="middle" fill="#f59e0b" font-size="10.5" font-weight="700">道瓊工業（DJIA）</text>
+<text x="480" y="57" text-anchor="middle" fill="#94a3b8" font-size="8.5">30檔藍籌股</text>
+<text x="480" y="73" text-anchor="middle" fill="#e2e8f0" font-size="8.5">科技：17% | 金融：18%</text>
+<text x="480" y="87" text-anchor="middle" fill="#e2e8f0" font-size="8.5">工業：16% | 消費：12%</text>
+<text x="480" y="101" text-anchor="middle" fill="#e2e8f0" font-size="8.5">麥當勞/波音/嬌生等傳統股</text>
+<text x="480" y="116" text-anchor="middle" fill="#fbbf24" font-size="8.5">最老牌，參考意義稍低</text>
+<text x="480" y="130" text-anchor="middle" fill="#94a3b8" font-size="7.5">股價加權（非市值加權）</text>
+<text x="480" y="151" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="700">期貨：YM</text>
+</svg>`,
+body:`<h3>S&P 500 — 最代表性的美股指數</h3>
+<p>S&amp;P 500涵蓋美國500家最大上市公司，採市值加權法。當市場說「美股漲跌多少」，通常指的就是S&amp;P 500。前5大成分股（蘋果、微軟、Nvidia、Google、Amazon）合計佔比約26%。</p>
+<div class="kp-box">
+<b>S&amp;P 500 重要特性：</b><br>
+• 最穩定、波動相對最小的大型指數<br>
+• ES（期貨）是全球日均成交量最大的期貨合約<br>
+• 聯準會貨幣政策、利率變化對S&amp;P影響最直接<br>
+• TOPSTEP評估帳戶最主流的交易標的
+</div>
+<h3>NASDAQ 100 — 科技股主宰</h3>
+<p>NASDAQ 100只包含在納斯達克上市的100大非金融企業，科技股佔比高達60%。AI概念股（Nvidia）、雲端（微軟/Google）、消費科技（蘋果/Amazon）是主要驅動力。NQ波動幅度通常比ES大50–80%。</p>
+<div class="eg"><b>NASDAQ vs S&P 波動差異範例</b><br>
+同一天市場大跌：S&amp;P 500跌2% vs NASDAQ 100跌3.5%<br>
+同一天財報利多：S&amp;P 500漲1.5% vs NASDAQ 100漲2.8%<br>
+台積電（TSMC ADR）在NASDAQ，對NQ有一定影響力。</div>
+<h3>該選ES還是NQ？</h3>
+<table class="cmp-table">
+<tr><th>你的情況</th><th>推薦選擇</th><th>理由</th></tr>
+<tr><td>剛開始學美股期貨</td><td>MES（微型ES）</td><td>最穩定、流動性最好、門檻最低</td></tr>
+<tr><td>關注AI/科技板塊</td><td>MNQ（微型NQ）</td><td>Nvidia/蘋果財報對NQ影響最直接</td></tr>
+<tr><td>TOPSTEP評估帳戶</td><td>ES或NQ（標準合約）</td><td>Micro合約保證金過低，不符合Combine帳戶要求</td></tr>
+<tr><td>波段操作（持倉數天）</td><td>ES</td><td>波動相對可控，隔夜風險較小</td></tr>
+<tr><td>日內短線（當沖）</td><td>NQ</td><td>日內波動大，獲利機會更多</td></tr>
+</table>
+<h3>相關性與市場連動</h3>
+<div class="formula">指數相關性（長期）：
+ES 與 NQ：相關係數 ≈ 0.92（高度相關，但NQ放大）
+ES 與 DJIA：相關係數 ≈ 0.88（較高但有差異）
+
+台指期 與 ES：相關係數 ≈ 0.7–0.8（美股漲，台指通常跟）
+台積電比重大，NQ財報季對台指有直接影響
+
+黃金 與 ES：負相關（恐慌時黃金↑，ES↓）
+美元指數（DXY）：與ES負相關（美元強→ES承壓）</div>`,
+pts:['S&P500最代表性、最穩定；NASDAQ100科技佔比60%，波動較大','DJIA只有30檔股票，股價加權法較不精確，參考意義低於前兩者','新手從MES開始，關注科技股選MNQ；TOPSTEP評估用ES或NQ','美股期貨與台指期高度相關，美股走勢是判斷台指方向的重要依據']},
+
+/* 4 */
+{num:'2-2',title:'重要經濟數據行事曆',sub:'非農、CPI、FOMC——這些時刻決定市場方向',ch:'第二章：美股市場基礎',rt:'9 分鐘',
+cap:'美股最重要經濟數據時間表',
+svg:`<svg viewBox="0 0 580 162" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="162" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="10.5" font-weight="600">美國重要經濟數據（台灣時間）</text>
+<rect x="8" y="25" width="85" height="130" fill="#1a0505" rx="5" stroke="#ef4444" stroke-width="0.8"/>
+<text x="50" y="42" text-anchor="middle" fill="#f87171" font-size="9" font-weight="700">非農就業</text>
+<text x="50" y="55" text-anchor="middle" fill="#94a3b8" font-size="7.5">每月首個週五</text>
+<text x="50" y="68" text-anchor="middle" fill="#fbbf24" font-size="8">台灣 20:30</text>
+<text x="50" y="84" text-anchor="middle" fill="#e2e8f0" font-size="7.5">★★★★★</text>
+<text x="50" y="98" text-anchor="middle" fill="#94a3b8" font-size="7">全年最重要數據</text>
+<text x="50" y="112" text-anchor="middle" fill="#94a3b8" font-size="7">就業=Fed政策</text>
+<text x="50" y="126" text-anchor="middle" fill="#94a3b8" font-size="7">決策基礎</text>
+<text x="50" y="145" text-anchor="middle" fill="#f87171" font-size="7.5" font-weight="700">波動：極大</text>
+<rect x="102" y="25" width="85" height="130" fill="#1a0505" rx="5" stroke="#f97316" stroke-width="0.8"/>
+<text x="144" y="42" text-anchor="middle" fill="#fb923c" font-size="9" font-weight="700">CPI通膨</text>
+<text x="144" y="55" text-anchor="middle" fill="#94a3b8" font-size="7.5">每月中旬週二/三</text>
+<text x="144" y="68" text-anchor="middle" fill="#fbbf24" font-size="8">台灣 20:30</text>
+<text x="144" y="84" text-anchor="middle" fill="#e2e8f0" font-size="7.5">★★★★★</text>
+<text x="144" y="98" text-anchor="middle" fill="#94a3b8" font-size="7">通膨數據直接</text>
+<text x="144" y="112" text-anchor="middle" fill="#94a3b8" font-size="7">影響Fed升降息</text>
+<text x="144" y="126" text-anchor="middle" fill="#94a3b8" font-size="7">決策，股債均動</text>
+<text x="144" y="145" text-anchor="middle" fill="#f97316" font-size="7.5" font-weight="700">波動：極大</text>
+<rect x="196" y="25" width="85" height="130" fill="#172554" rx="5" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="238" y="42" text-anchor="middle" fill="#60a5fa" font-size="9" font-weight="700">FOMC決策</text>
+<text x="238" y="55" text-anchor="middle" fill="#94a3b8" font-size="7.5">每年8次（6週一次）</text>
+<text x="238" y="68" text-anchor="middle" fill="#fbbf24" font-size="8">台灣凌晨 02:00</text>
+<text x="238" y="84" text-anchor="middle" fill="#e2e8f0" font-size="7.5">★★★★★</text>
+<text x="238" y="98" text-anchor="middle" fill="#94a3b8" font-size="7">聯準會利率決策</text>
+<text x="238" y="112" text-anchor="middle" fill="#94a3b8" font-size="7">+記者會聲明</text>
+<text x="238" y="126" text-anchor="middle" fill="#94a3b8" font-size="7">全球最大風險事件</text>
+<text x="238" y="145" text-anchor="middle" fill="#3b82f6" font-size="7.5" font-weight="700">波動：超大</text>
+<rect x="290" y="25" width="85" height="130" fill="#1a1a0a" rx="5" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="332" y="42" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="700">初領失業金</text>
+<text x="332" y="55" text-anchor="middle" fill="#94a3b8" font-size="7.5">每週四</text>
+<text x="332" y="68" text-anchor="middle" fill="#fbbf24" font-size="8">台灣 20:30</text>
+<text x="332" y="84" text-anchor="middle" fill="#e2e8f0" font-size="7.5">★★★</text>
+<text x="332" y="98" text-anchor="middle" fill="#94a3b8" font-size="7">每週就業市場</text>
+<text x="332" y="112" text-anchor="middle" fill="#94a3b8" font-size="7">健康指標</text>
+<text x="332" y="126" text-anchor="middle" fill="#94a3b8" font-size="7">數字低=就業佳</text>
+<text x="332" y="145" text-anchor="middle" fill="#f59e0b" font-size="7.5" font-weight="700">波動：中等</text>
+<rect x="384" y="25" width="85" height="130" fill="#0a1a14" rx="5" stroke="#10b981" stroke-width="0.8"/>
+<text x="426" y="42" text-anchor="middle" fill="#34d399" font-size="9" font-weight="700">GDP數據</text>
+<text x="426" y="55" text-anchor="middle" fill="#94a3b8" font-size="7.5">每季（初值/修正值）</text>
+<text x="426" y="68" text-anchor="middle" fill="#fbbf24" font-size="8">台灣 20:30</text>
+<text x="426" y="84" text-anchor="middle" fill="#e2e8f0" font-size="7.5">★★★★</text>
+<text x="426" y="98" text-anchor="middle" fill="#94a3b8" font-size="7">經濟增速指標</text>
+<text x="426" y="112" text-anchor="middle" fill="#94a3b8" font-size="7">衰退/擴張訊號</text>
+<text x="426" y="126" text-anchor="middle" fill="#94a3b8" font-size="7">連兩季負成長</text>
+<text x="426" y="145" text-anchor="middle" fill="#10b981" font-size="7.5" font-weight="700">=技術性衰退</text>
+<rect x="478" y="25" width="94" height="130" fill="#0a0a2e" rx="5" stroke="#a78bfa" stroke-width="0.8"/>
+<text x="525" y="42" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="700">企業財報季</text>
+<text x="525" y="55" text-anchor="middle" fill="#94a3b8" font-size="7.5">每季（1/4/7/10月）</text>
+<text x="525" y="68" text-anchor="middle" fill="#fbbf24" font-size="8">盤後/盤前公布</text>
+<text x="525" y="84" text-anchor="middle" fill="#e2e8f0" font-size="7.5">★★★★</text>
+<text x="525" y="98" text-anchor="middle" fill="#94a3b8" font-size="7">蘋果/Nvidia等</text>
+<text x="525" y="112" text-anchor="middle" fill="#94a3b8" font-size="7">大型股財報直接</text>
+<text x="525" y="126" text-anchor="middle" fill="#94a3b8" font-size="7">影響指數走向</text>
+<text x="525" y="145" text-anchor="middle" fill="#a78bfa" font-size="7.5" font-weight="700">波動：個股大</text>
+</svg>`,
+body:`<h3>最重要：非農就業報告（NFP）</h3>
+<div class="hl"><b>每月第一個週五，台灣時間20:30（冬令時21:30）發布</b><br>
+非農就業（Non-Farm Payrolls）是美國最重要的就業數據。Fed的雙重任務：「物價穩定」和「充分就業」——就業數據直接影響Fed的利率決策。</div>
+<div class="formula">非農解讀框架：
+預期就業新增18萬人
+實際數據 &gt; 預期（如25萬）：
+  就業強勁 → Fed可能維持高利率更久 → 股市短期承壓
+  但若通膨同步下降，市場可能反應正面
+
+實際數據 &lt; 預期（如8萬）：
+  就業疲弱 → Fed可能更快降息 → 股市短期受惠
+  但若擔憂經濟衰退，市場可能恐慌式下跌
+
+讀取關鍵：一次數據不算趨勢，連續3個月看趨勢方向</div>
+<h3>CPI通貨膨脹數據</h3>
+<div class="kp-box">
+<b>發布時間：</b>每月中旬，台灣時間20:30（美東8:30 AM）<br>
+<b>核心CPI</b>（排除食品能源）才是Fed最重視的數字。<br>
+CPI年增率&gt;目標（2%）→ 偏鷹派 → 升息/維持高利率<br>
+CPI年增率&lt;目標 → 偏鴿派 → 降息預期升溫<br><br>
+<b>交易策略</b>：數據公布前不持大倉，公布後等5分鐘K線確認方向再進場。
+</div>
+<h3>FOMC利率決策（最大風險事件）</h3>
+<div class="formula">FOMC 2024年日程（台灣時間凌晨02:00）：
+1月31日、3月20日、5月1日、6月12日
+7月31日、9月18日、11月7日、12月18日
+
+決策當天操作建議：
+1. 凌晨01:45前：縮倉至1/4正常倉位
+2. 02:00：聯準會聲明發布，ES可能跳動50–150點
+3. 02:30左右：鮑爾記者會開始，更大的波動來源
+4. 03:00後：方向確認後才考慮建立部位</div>
+<h3>財報季（每季一次）</h3>
+<div class="eg"><b>財報季對NQ的影響最大</b><br>
+NASDAQ 100的前10大成分股（蘋果/微軟/Nvidia等）財報發布時，NQ可能在1小時內波動150–300點。<br>
+Nvidia財報（通常5月/8月）近年對台積電ADR、半導體ETF影響巨大，也連帶影響台指期開盤。<br><br>
+<b>策略</b>：財報前日減半倉位，財報後視反應方向再加倉。</div>
+<div class="warn"><b>⚠️ 重大數據前的TOPSTEP規則</b>在使用TOPSTEP帳戶時，高波動數據（非農、CPI、FOMC）前後1小時的倉位必須特別謹慎。一次不良的數據反應就可能觸發每日虧損上限，導致當天被停止交易。</div>`,
+pts:['非農就業（NFP）：每月首個週五台灣20:30，美股最重要數據','CPI通膨：每月中旬20:30，低於預期→降息預期→股市正面','FOMC決策：每年8次，台灣凌晨02:00，全年最大風險事件','重大數據前縮倉或平倉，等確認方向後再進場']},
+
+/* 5 */
+{num:'2-3',title:'VIX恐慌指數完整解讀',sub:'市場的情緒溫度計——讀懂它才能控制風險',ch:'第二章：美股市場基礎',rt:'7 分鐘',
+cap:'VIX水位與市場情緒對應關係',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="10.5" font-weight="600">VIX指數水位與市場狀態</text>
+<rect x="10" y="26" width="115" height="125" fill="#052e16" rx="6" stroke="#10b981" stroke-width="0.8"/>
+<text x="67" y="44" text-anchor="middle" fill="#34d399" font-size="11" font-weight="700">VIX &lt; 15</text>
+<text x="67" y="60" text-anchor="middle" fill="#94a3b8" font-size="9">極度平靜</text>
+<text x="67" y="76" text-anchor="middle" fill="#e2e8f0" font-size="8.5">市場無憂慮</text>
+<text x="67" y="90" text-anchor="middle" fill="#e2e8f0" font-size="8.5">牛市持續期</text>
+<text x="67" y="106" text-anchor="middle" fill="#34d399" font-size="9">做多有利</text>
+<text x="67" y="122" text-anchor="middle" fill="#94a3b8" font-size="8">可用趨勢策略</text>
+<text x="67" y="140" text-anchor="middle" fill="#34d399" font-size="8" font-weight="700">2023–24年常態</text>
+<rect x="135" y="26" width="115" height="125" fill="#1a2a0a" rx="6" stroke="#84cc16" stroke-width="0.8"/>
+<text x="192" y="44" text-anchor="middle" fill="#bef264" font-size="11" font-weight="700">VIX 15–20</text>
+<text x="192" y="60" text-anchor="middle" fill="#94a3b8" font-size="9">正常波動</text>
+<text x="192" y="76" text-anchor="middle" fill="#e2e8f0" font-size="8.5">市場健康</text>
+<text x="192" y="90" text-anchor="middle" fill="#e2e8f0" font-size="8.5">情緒中性</text>
+<text x="192" y="106" text-anchor="middle" fill="#bef264" font-size="9">兩向機會均等</text>
+<text x="192" y="122" text-anchor="middle" fill="#94a3b8" font-size="8">正常操作即可</text>
+<text x="192" y="140" text-anchor="middle" fill="#bef264" font-size="8" font-weight="700">歷史平均值</text>
+<rect x="260" y="26" width="115" height="125" fill="#1a1500" rx="6" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="317" y="44" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700">VIX 20–30</text>
+<text x="317" y="60" text-anchor="middle" fill="#94a3b8" font-size="9">市場緊張</text>
+<text x="317" y="76" text-anchor="middle" fill="#e2e8f0" font-size="8.5">波動加劇</text>
+<text x="317" y="90" text-anchor="middle" fill="#e2e8f0" font-size="8.5">機構開始避險</text>
+<text x="317" y="106" text-anchor="middle" fill="#fbbf24" font-size="9">縮小倉位</text>
+<text x="317" y="122" text-anchor="middle" fill="#94a3b8" font-size="8">停損要更寬</text>
+<text x="317" y="140" text-anchor="middle" fill="#fbbf24" font-size="8" font-weight="700">謹慎交易</text>
+<rect x="385" y="26" width="115" height="125" fill="#1a0505" rx="6" stroke="#f97316" stroke-width="0.8"/>
+<text x="442" y="44" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="700">VIX 30–50</text>
+<text x="442" y="60" text-anchor="middle" fill="#94a3b8" font-size="9">市場恐慌</text>
+<text x="442" y="76" text-anchor="middle" fill="#e2e8f0" font-size="8.5">急跌行情</text>
+<text x="442" y="90" text-anchor="middle" fill="#e2e8f0" font-size="8.5">恐慌性拋售</text>
+<text x="442" y="106" text-anchor="middle" fill="#fb923c" font-size="9">極輕倉或觀望</text>
+<text x="442" y="122" text-anchor="middle" fill="#94a3b8" font-size="8">超跌後反彈機會</text>
+<text x="442" y="140" text-anchor="middle" fill="#fb923c" font-size="8" font-weight="700">2020疫情崩盤</text>
+<rect x="510" y="26" width="60" height="125" fill="#3a0505" rx="6" stroke="#ef4444" stroke-width="0.8"/>
+<text x="540" y="44" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">VIX&gt;50</text>
+<text x="540" y="60" text-anchor="middle" fill="#94a3b8" font-size="8">系統性</text>
+<text x="540" y="74" text-anchor="middle" fill="#94a3b8" font-size="8">崩盤</text>
+<text x="540" y="90" text-anchor="middle" fill="#f87171" font-size="9">出場</text>
+<text x="540" y="104" text-anchor="middle" fill="#f87171" font-size="9">觀望</text>
+<text x="540" y="120" text-anchor="middle" fill="#64748b" font-size="7">2008金融</text>
+<text x="540" y="133" text-anchor="middle" fill="#64748b" font-size="7">危機/疫情</text>
+</svg>`,
+body:`<h3>什麼是VIX？</h3>
+<p>VIX（CBOE波動率指數）代表市場對未來30天S&amp;P 500波動率的「預期」。它由S&amp;P 500選擇權的隱含波動率計算得出，俗稱「恐慌指數」。VIX和ES/NQ通常呈<strong>負相關</strong>：市場跌，VIX漲；市場漲，VIX跌。</p>
+<div class="formula">VIX 解讀規則：
+VIX = 20 → 市場預期未來30天S&amp;P 500年化波動率為20%
+  換算為日波動：20% / 16（sqrt 252） ≈ 1.25%/天
+  ES在5,000點：預期每天波動 5,000 × 1.25% = 62.5點
+
+VIX = 40 時（恐慌）：
+  預期日波動 = 40% / 16 = 2.5%/天 = 125點（ES在5,000點）
+  停損必須設得更寬，否則會被震出去</div>
+<h3>VIX的交易應用</h3>
+<table class="cmp-table">
+<tr><th>VIX水位</th><th>市場狀態</th><th>期貨策略調整</th></tr>
+<tr><td>&lt;15</td><td>極度平靜/貪婪</td><td>可積極做多趨勢；停損可略緊</td></tr>
+<tr><td>15–20</td><td>正常</td><td>標準操作，風險報酬比2:1即可</td></tr>
+<tr><td>20–30</td><td>緊張/不確定</td><td>縮倉50%；停損放寬1.5倍</td></tr>
+<tr><td>30–50</td><td>恐慌</td><td>縮倉至25%；以短線小目標為主</td></tr>
+<tr><td>&gt;50</td><td>崩盤</td><td>停止交易或只做反彈；優先保本</td></tr>
+</table>
+<h3>VIX期貨（/VX）與TOPSTEP的關係</h3>
+<div class="eg"><b>VIX急升時TOPSTEP的風險</b><br>
+VIX從15突然升至30+（常發生在黑天鵝事件），ES可能在15分鐘內跌80–150點。<br>
+TOPSTEP 100K帳戶每日虧損上限$2,000，一旦觸發即停止當天交易。<br>
+高VIX環境下，ES每10點=$500，只需20點反向就觸發日虧損上限。<br>
+→ 高VIX時必須縮小合約口數或不交易。</div>
+<h3>如何查看VIX？</h3>
+<div class="kp-box">
+• TradingView：搜尋「VIX」或「CBOE:VIX」<br>
+• Yahoo Finance：搜尋「^VIX」<br>
+• CNBC / Bloomberg：首頁常態顯示<br>
+• 交易平台（thinkorswim / NinjaTrader）：內建VIX顯示<br><br>
+建議：每天開盤前先看一眼VIX水位，決定當天的倉位大小。
+</div>`,
+pts:['VIX=恐慌指數，與S&P500負相關：市場跌→VIX漲','VIX<15為平靜牛市；VIX>30為恐慌；VIX>50為崩盤','VIX越高，每日波動越大，倉位應相應縮小','TOPSTEP帳戶在高VIX環境下更容易觸發日虧損上限']},
+
+/* 6 */
+{num:'3-1',title:'什麼是Prop Trading？',sub:'不用自己的錢，用公司資金交易——TOPSTEP介紹',ch:'第三章：TOPSTEP完整解析',rt:'8 分鐘',
+cap:'Prop Trading流程：評估→通過→真實獲利',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<text x="290" y="20" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">Prop Trading三階段：評估→通過→真實獲利</text>
+<rect x="20" y="32" width="155" height="110" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" rx="10"/>
+<text x="97" y="55" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="700">第一階段</text>
+<text x="97" y="72" text-anchor="middle" fill="#1d4ed8" font-size="11">Trading Combine</text>
+<line x1="37" y1="80" x2="157" y2="80" stroke="#bfdbfe" stroke-width="1"/>
+<text x="97" y="97" text-anchor="middle" fill="#374151" font-size="10">用模擬帳號按規則交易</text>
+<text x="97" y="112" text-anchor="middle" fill="#374151" font-size="10">達成獲利目標</text>
+<text x="97" y="128" text-anchor="middle" fill="#3b82f6" font-size="10" font-weight="600">月費：$49–$165/月</text>
+<line x1="175" y1="87" x2="212" y2="87" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+<polygon points="212,82 224,87 212,92" fill="#94a3b8"/>
+<rect x="212" y="32" width="155" height="110" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="10"/>
+<text x="289" y="55" text-anchor="middle" fill="#166534" font-size="13" font-weight="700">通過評估</text>
+<text x="289" y="72" text-anchor="middle" fill="#166534" font-size="11">Funded Trader 資格</text>
+<line x1="229" y1="80" x2="349" y2="80" stroke="#bbf7d0" stroke-width="1"/>
+<text x="289" y="97" text-anchor="middle" fill="#374151" font-size="10">獲得公司撥款帳號</text>
+<text x="289" y="112" text-anchor="middle" fill="#374151" font-size="10">50K / 100K / 150K</text>
+<text x="289" y="128" text-anchor="middle" fill="#059669" font-size="10" font-weight="600">無月費！</text>
+<line x1="367" y1="87" x2="404" y2="87" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+<polygon points="404,82 416,87 404,92" fill="#94a3b8"/>
+<rect x="404" y="32" width="155" height="110" fill="#fef9c3" stroke="#fde68a" stroke-width="1.5" rx="10"/>
+<text x="481" y="55" text-anchor="middle" fill="#854d0e" font-size="13" font-weight="700">真實獲利</text>
+<text x="481" y="72" text-anchor="middle" fill="#854d0e" font-size="11">提領獲利</text>
+<line x1="421" y1="80" x2="541" y2="80" stroke="#fde68a" stroke-width="1"/>
+<text x="481" y="97" text-anchor="middle" fill="#374151" font-size="10">獲利 90% 歸自己</text>
+<text x="481" y="112" text-anchor="middle" fill="#374151" font-size="10">公司承擔虧損風險</text>
+<text x="481" y="128" text-anchor="middle" fill="#d97706" font-size="10" font-weight="600">每週可申請出金</text>
+</svg>`,
+body:`<h3>Proprietary Trading（自營交易）是什麼？</h3>
+<p>Prop Trading（自營交易）是指交易人使用<strong>公司資金</strong>進行交易，並依約定比例分享獲利。傳統上，Prop Firm是大型金融機構的自營部門（如高盛、摩根）。但近年來出現了「線上Prop Firm」，讓散戶通過線上評估即可取得資金進行交易。</p>
+<div class="hl"><b>為什麼Prop Trading對散戶有吸引力？</b><br>
+1. <strong>有限資本放大效益</strong>：只需繳付月費（約$49–$165），就能操作$50,000–$150,000的帳戶<br>
+2. <strong>公司承擔虧損</strong>：超過規定的最大虧損由公司承擔，個人最多損失已付的月費<br>
+3. <strong>學習激勵</strong>：有明確的評估標準，強迫交易人建立紀律</div>
+<h3>TOPSTEP是什麼？</h3>
+<p>TOPSTEP成立於2012年，是美股期貨Prop Trading市場的先驅。提供<strong>Trading Combine</strong>（評估帳戶），讓交易人在模擬環境下按真實市場數據交易，通過後取得真實資金帳戶。</p>
+<table class="cmp-table">
+<tr><th>指標</th><th>TOPSTEP</th><th>其他主流Prop Firm</th></tr>
+<tr><td>成立年份</td><td>2012年（最老牌）</td><td>Apex 2021、Earn2Trade 2016</td></tr>
+<tr><td>主要商品</td><td>CME期貨（ES/NQ/YM等）</td><td>各家不同</td></tr>
+<tr><td>評估方式</td><td>一步驟（Trading Combine）</td><td>多家採兩步驟</td></tr>
+<tr><td>獲利分成</td><td>90%（前$10K可達100%）</td><td>80%–90%不等</td></tr>
+<tr><td>出金頻率</td><td>每週可申請</td><td>各家不同</td></tr>
+</table>
+<h3>主流Prop Firm比較</h3>
+<table class="cmp-table">
+<tr><th>Prop Firm</th><th>特色</th><th>適合對象</th></tr>
+<tr><td>TOPSTEP</td><td>最老牌、最知名、規則清晰</td><td>初入Prop Trading者</td></tr>
+<tr><td>Apex Trader Funding</td><td>費率低、評估規則較寬鬆</td><td>預算有限者</td></tr>
+<tr><td>Earn2Trade</td><td>提供教育資源，雙步驟評估</td><td>想系統學習者</td></tr>
+<tr><td>TradeDay</td><td>費率極低、一步驟評估</td><td>有交易經驗者</td></tr>
+</table>
+<div class="warn"><b>⚠️ Prop Firm的風險</b>
+月費持續繳付是沉沒成本。如果一直無法通過評估，月費累積的成本可能超過自行小額交易的損失。
+建議：先在模擬帳號練習至穩定獲利（連續30天正報酬）後，再考慮付費參加Prop Firm評估。</div>`,
+pts:['Prop Trading讓散戶用公司資金交易，只需繳月費，獲利90%歸己','TOPSTEP成立2012年，是最老牌的美股期貨Prop Firm','通過Trading Combine後取得50K/100K/150K帳戶，每週可出金','未通過評估者最大損失為月費，公司不追索額外虧損']},
+
+/* 7 */
+{num:'3-2',title:'Trading Combine規則完整解析',sub:'每一條規則都是生死線——一次全部搞清楚',ch:'第三章：TOPSTEP完整解析',rt:'12 分鐘',
+cap:'三種帳戶規格：目標/日限/追蹤回撤',
+svg:`<svg viewBox="0 0 580 168" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="168" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">TOPSTEP Trading Combine 三種帳戶規格</text>
+<rect x="8" y="26" width="176" height="134" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" rx="8"/>
+<text x="96" y="46" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="700">50K 帳戶</text>
+<text x="96" y="62" text-anchor="middle" fill="#374151" font-size="9.5">月費：$49 / 月</text>
+<line x1="20" y1="68" x2="172" y2="68" stroke="#bfdbfe" stroke-width="1"/>
+<text x="96" y="85" text-anchor="middle" fill="#059669" font-size="10" font-weight="700">獲利目標：$3,000</text>
+<text x="96" y="102" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">每日虧損上限：$1,000</text>
+<text x="96" y="119" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">追蹤回撤：$2,000</text>
+<text x="96" y="136" text-anchor="middle" fill="#374151" font-size="9">最大合約數：5口</text>
+<text x="96" y="152" text-anchor="middle" fill="#374151" font-size="9">（ES/NQ等大台合約）</text>
+<rect x="202" y="26" width="176" height="134" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5" rx="8"/>
+<text x="290" y="46" text-anchor="middle" fill="#065f46" font-size="13" font-weight="700">100K 帳戶</text>
+<text x="290" y="62" text-anchor="middle" fill="#374151" font-size="9.5">月費：$99 / 月</text>
+<line x1="214" y1="68" x2="366" y2="68" stroke="#a7f3d0" stroke-width="1"/>
+<text x="290" y="85" text-anchor="middle" fill="#059669" font-size="10" font-weight="700">獲利目標：$6,000</text>
+<text x="290" y="102" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">每日虧損上限：$2,000</text>
+<text x="290" y="119" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">追蹤回撤：$3,000</text>
+<text x="290" y="136" text-anchor="middle" fill="#374151" font-size="9">最大合約數：10口</text>
+<text x="290" y="152" text-anchor="middle" fill="#059669" font-size="9" font-weight="600">★ 最熱門選擇</text>
+<rect x="396" y="26" width="176" height="134" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5" rx="8"/>
+<text x="484" y="46" text-anchor="middle" fill="#9a3412" font-size="13" font-weight="700">150K 帳戶</text>
+<text x="484" y="62" text-anchor="middle" fill="#374151" font-size="9.5">月費：$149 / 月</text>
+<line x1="408" y1="68" x2="560" y2="68" stroke="#fed7aa" stroke-width="1"/>
+<text x="484" y="85" text-anchor="middle" fill="#059669" font-size="10" font-weight="700">獲利目標：$9,000</text>
+<text x="484" y="102" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">每日虧損上限：$3,000</text>
+<text x="484" y="119" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">追蹤回撤：$4,500</text>
+<text x="484" y="136" text-anchor="middle" fill="#374151" font-size="9">最大合約數：15口</text>
+<text x="484" y="152" text-anchor="middle" fill="#374151" font-size="9">適合有經驗者</text>
+</svg>`,
+body:`<h3>核心規則一：獲利目標（Profit Target）</h3>
+<div class="kp-box">
+帳戶必須累積到<strong>獲利目標</strong>才算通過評估。<br>
+50K→$3,000 / 100K→$6,000 / 150K→$9,000<br><br>
+沒有時間限制——你可以花1週或3個月達成，沒關係。<br>
+唯一要求：在達成獲利目標之前，不能違反其他任何規則。
+</div>
+<h3>核心規則二：每日最大虧損限制（Daily Loss Limit）</h3>
+<div class="formula">每日虧損上限（以100K帳戶為例）：$2,000
+
+計算方式：
+今日開盤帳戶餘額：$100,000
+每日最大允許虧損：$2,000
+今日帳戶不得低於：$100,000 - $2,000 = $98,000
+
+實際範例：
+早上交易虧損$1,800後，帳戶剩$98,200
+再虧$200就觸發日限，當天被強制停止交易
+→ 即使後來行情反轉，今天也不能再交易了！</div>
+<div class="warn"><b>⚠️ 最常見的失敗原因</b>
+觸發每日虧損上限！很多人在連虧幾筆後試圖「加倍攤平」，結果超過日限被強制停止。
+<strong>原則：每天若虧損超過50%日限，立即停止交易，明天再來。</strong></div>
+<h3>核心規則三：追蹤最大虧損（Trailing Drawdown）</h3>
+<div class="formula">追蹤回撤（Trailing Drawdown）是最重要也最特殊的規則：
+
+初始帳戶：$100,000（100K帳戶）
+初始追蹤回撤下限：$100,000 - $3,000 = $97,000
+
+情景一：帳戶獲利上升到$103,000
+→ 追蹤回撤下限上移至：$103,000 - $3,000 = $100,000
+→ 帳戶不得低於$100,000，否則評估失敗
+
+情景二：帳戶進一步漲到$106,000
+→ 追蹤下限：$106,000 - $3,000 = $103,000
+→ 之前已獲利$3,000，但帳戶不能回落到$103,000以下
+
+注意：追蹤下限只往上走，不往下走！
+一旦帳戶歷史最高點上移，下限就永久鎖定在新的高點-$3,000</div>
+<div class="eg"><b>追蹤回撤的陷阱</b><br>
+帳戶漲到$110,000後（追蹤下限=$107,000），接著連虧$4,000→帳戶剩$106,000&lt;$107,000→評估失敗！<br>
+即使帳戶還比初始多$6,000，也算失敗。<br>
+→ 必須先達到獲利目標（$6,000），並且不讓帳戶回撤超過$3,000。</div>
+<h3>合約數量限制</h3>
+<table class="cmp-table">
+<tr><th>帳戶規模</th><th>最大持倉（ES/NQ等）</th><th>換算MES/MNQ</th></tr>
+<tr><td>50K</td><td>5口</td><td>50口MES</td></tr>
+<tr><td>100K</td><td>10口</td><td>100口MES</td></tr>
+<tr><td>150K</td><td>15口</td><td>150口MES</td></tr>
+</table>
+<h3>通過後的Funded帳戶規則</h3>
+<div class="kp-box">
+通過評估後：<br>
+• 獲利分成：<strong>90%歸自己</strong>（初始$10,000可達100%，視方案）<br>
+• 每日虧損上限：仍然存在，同樣嚴格<br>
+• 靜態回撤：Funded帳戶改為靜態（固定下限，不再追蹤）<br>
+• 出金：每週可申請，最快5個工作天到帳<br>
+• 縮放：持續盈利可申請更大帳號
+</div>
+<div class="warn"><b>⚠️ 規則可能變更</b>
+TOPSTEP的規則和費率每年都可能調整。以上數字為參考值，操作前務必查閱<strong>TOPSTEP官網最新條款</strong>（topstep.com）。</div>`,
+pts:['100K帳戶最熱門：月費$99，目標$6,000，日限$2,000，追蹤回撤$3,000','每日虧損上限是最嚴格的規則——超過就當天停止，不能再繼續','追蹤回撤只往上移，獲利越高下限越高，不能讓帳戶大幅回撤','通過後90%獲利歸自己，每週可申請出金']},
+
+/* 8 */
+{num:'3-3',title:'通關策略與常見失敗原因',sub:'怎麼做才能穩穩通過？9成人在哪裡失敗？',ch:'第三章：TOPSTEP完整解析',rt:'10 分鐘',
+cap:'TOPSTEP通關路線圖與風險管控',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">100K帳戶通關路線示意（20天計畫）</text>
+<line x1="30" y1="90" x2="550" y2="90" stroke="#e2e8f0" stroke-width="2"/>
+<text x="30" y="108" text-anchor="middle" fill="#94a3b8" font-size="8">Day 1</text>
+<text x="110" y="108" text-anchor="middle" fill="#94a3b8" font-size="8">Day 5</text>
+<text x="210" y="108" text-anchor="middle" fill="#94a3b8" font-size="8">Day 10</text>
+<text x="330" y="108" text-anchor="middle" fill="#94a3b8" font-size="8">Day 15</text>
+<text x="440" y="108" text-anchor="middle" fill="#94a3b8" font-size="8">Day 18</text>
+<text x="550" y="108" text-anchor="middle" fill="#94a3b8" font-size="8">Day 20</text>
+<polyline points="30,90 110,75 210,62 330,50 440,42 550,36" fill="none" stroke="#10b981" stroke-width="2.5"/>
+<circle cx="30" cy="90" r="4" fill="#10b981"/>
+<circle cx="110" cy="75" r="4" fill="#10b981"/>
+<circle cx="210" cy="62" r="4" fill="#10b981"/>
+<circle cx="330" cy="50" r="4" fill="#10b981"/>
+<circle cx="440" cy="42" r="4" fill="#10b981"/>
+<circle cx="550" cy="36" r="5" fill="#f59e0b"/>
+<text x="550" y="26" text-anchor="middle" fill="#d97706" font-size="9" font-weight="700">$6,000 達標!</text>
+<line x1="30" y1="125" x2="550" y2="125" stroke="#ef4444" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="20" y="128" fill="#ef4444" font-size="8">追蹤回撤下限（動態）</text>
+<polyline points="30,125 110,118 210,111 330,105 440,101 550,98" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+<text x="290" y="148" text-anchor="middle" fill="#64748b" font-size="9">每天平均獲利$300（$6,000目標÷20天）= 每天1.5個ES點</text>
+</svg>`,
+body:`<h3>通關策略的核心思想</h3>
+<div class="hl"><b>通過TOPSTEP不是靠運氣，是靠紀律</b><br>
+目標不是「盡快賺$6,000」，而是「每天穩定小賺，讓時間累積到目標」。<br>
+100K帳戶：目標$6,000÷20天 = 每天只需賺$300 = ES漲6點 × 1口</div>
+<h3>建議的通關計畫（100K帳戶）</h3>
+<div class="formula">每日作戰計畫：
+每日獲利目標：$300（ES漲6點，1口 × $50/點）
+每日虧損停止：$600（日限$2,000的30%，提前離場保留空間）
+風險報酬比：最少2:1（停損6點，目標12點以上）
+每天最多交易次數：5次
+連續虧損3次：立即停止當天交易
+
+帳戶成長計畫（20天版本）：
+Week 1（Day 1–5）：保守為主，每天$200–300，不求快
+Week 2（Day 6–10）：找到節奏，每天$300–400
+Week 3（Day 11–15）：維持節奏，不要貪心加倉
+Week 4（Day 16–20）：接近目標時更謹慎，最後幾天縮倉</div>
+<h3>9成人失敗的5大原因</h3>
+<table class="cmp-table">
+<tr><th>失敗原因</th><th>具體表現</th><th>如何避免</th></tr>
+<tr><td>觸發日虧損上限</td><td>虧損後不停損，加碼攤平</td><td>每日設自我停損在50%日限，達到即停手</td></tr>
+<tr><td>追求快速通過</td><td>用超大口數想1週衝完</td><td>按計畫每天$300，20天穩穩通過</td></tr>
+<tr><td>FOMO情緒交易</td><td>看到行情跑了才追進去</td><td>錯過機會不追，等下一個設定好的機會</td></tr>
+<tr><td>不執行停損</td><td>「再等一下」讓虧損越來越大</td><td>進場前設好停損單，觸發就接受</td></tr>
+<tr><td>結算日前爆倉</td><td>離目標差$500時加大賭注</td><td>越接近目標越縮倉，保住成果優先</td></tr>
+</table>
+<h3>Funded帳戶通過後怎麼做？</h3>
+<div class="eg"><b>首次提款流程</b><br>
+1. 完成至少1個交易日（某些方案需達到最低獲利門檻）<br>
+2. 登入TOPSTEP後台 → 申請提款<br>
+3. 5–7個工作天後出金到你的銀行或PayPal<br>
+4. 首次$10,000獲利100%歸己；之後每筆90%<br><br>
+<b>提款後帳戶重置嗎？</b><br>
+不會！帳戶繼續使用，但追蹤回撤下限根據已實現損益重新計算。</div>
+<div class="warn"><b>⚠️ 台灣人使用TOPSTEP的實務注意</b>
+1. 需要一個國際銀行帳號（如台灣銀行美金帳號）或PayPal接收出金<br>
+2. 費用以美金計算，需考慮匯率和手續費<br>
+3. TOPSTEP平台需連接第三方下單平台（NinjaTrader / Rithmic）<br>
+4. 台灣網路連至CME伺服器延遲約150–200ms，建議用VPN優化（選美西節點）</div>`,
+pts:['不求快，每天穩定小賺：100K帳戶每天$300，20天達標','日虧損自我上限設在官方日限的50%——達到就停，保護通關資格','離目標越近越要縮倉，最後$500絕對不要加大賭注','台灣用戶需準備美金出金帳號，並考慮VPN優化連線']},
+
+/* 9 */
+{num:'4-1',title:'美股期貨日內交易框架',sub:'開盤1小時是黃金時段——掌握這個窗口就掌握美股',ch:'第四章：日內交易實戰',rt:'11 分鐘',
+cap:'美股日內交易時段結構（台灣時間）',
+svg:`<svg viewBox="0 0 580 162" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="162" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">美股日內交易時段結構（台灣時間）</text>
+<rect x="10" y="26" width="110" height="128" fill="#e0e7ff" rx="6" stroke="#818cf8" stroke-width="1"/>
+<text x="65" y="44" text-anchor="middle" fill="#3730a3" font-size="9.5" font-weight="700">預熱時段</text>
+<text x="65" y="58" text-anchor="middle" fill="#3730a3" font-size="8.5">19:00–21:30</text>
+<text x="65" y="74" text-anchor="middle" fill="#374151" font-size="8">期貨已在跑</text>
+<text x="65" y="88" text-anchor="middle" fill="#374151" font-size="8">流動性低</text>
+<text x="65" y="102" text-anchor="middle" fill="#374151" font-size="8">觀察方向</text>
+<text x="65" y="116" text-anchor="middle" fill="#374151" font-size="8">不建議大單</text>
+<text x="65" y="130" text-anchor="middle" fill="#818cf8" font-size="8" font-weight="600">觀察為主</text>
+<text x="65" y="147" text-anchor="middle" fill="#64748b" font-size="7">波動：低</text>
+<rect x="128" y="26" width="160" height="128" fill="#dcfce7" rx="6" stroke="#22c55e" stroke-width="1.5"/>
+<text x="208" y="44" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">黃金開盤</text>
+<text x="208" y="58" text-anchor="middle" fill="#166534" font-size="9">21:30–23:30</text>
+<text x="208" y="74" text-anchor="middle" fill="#374151" font-size="8">全年最佳交易時段</text>
+<text x="208" y="88" text-anchor="middle" fill="#374151" font-size="8">方向確立、趨勢明確</text>
+<text x="208" y="102" text-anchor="middle" fill="#374151" font-size="8">機構大單主導走勢</text>
+<text x="208" y="116" text-anchor="middle" fill="#374151" font-size="8">波動大但有方向</text>
+<text x="208" y="130" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="600">積極操作</text>
+<text x="208" y="147" text-anchor="middle" fill="#064e3b" font-size="7" font-weight="700">波動：★★★★★</text>
+<rect x="296" y="26" width="130" height="128" fill="#fef9c3" rx="6" stroke="#facc15" stroke-width="1"/>
+<text x="361" y="44" text-anchor="middle" fill="#854d0e" font-size="9.5" font-weight="700">午盤低潮</text>
+<text x="361" y="58" text-anchor="middle" fill="#854d0e" font-size="8.5">23:30–01:30</text>
+<text x="361" y="74" text-anchor="middle" fill="#374151" font-size="8">機構休息</text>
+<text x="361" y="88" text-anchor="middle" fill="#374151" font-size="8">成交量萎縮</text>
+<text x="361" y="102" text-anchor="middle" fill="#374151" font-size="8">偽突破多</text>
+<text x="361" y="116" text-anchor="middle" fill="#374151" font-size="8">陷阱行情頻繁</text>
+<text x="361" y="130" text-anchor="middle" fill="#d97706" font-size="9" font-weight="600">縮減操作</text>
+<text x="361" y="147" text-anchor="middle" fill="#92400e" font-size="7">波動：★★</text>
+<rect x="434" y="26" width="136" height="128" fill="#fee2e2" rx="6" stroke="#f87171" stroke-width="1"/>
+<text x="502" y="44" text-anchor="middle" fill="#991b1b" font-size="9.5" font-weight="700">尾盤衝刺</text>
+<text x="502" y="58" text-anchor="middle" fill="#991b1b" font-size="8.5">01:30–04:00</text>
+<text x="502" y="74" text-anchor="middle" fill="#374151" font-size="8">機構回來</text>
+<text x="502" y="88" text-anchor="middle" fill="#374151" font-size="8">方向重新明確</text>
+<text x="502" y="102" text-anchor="middle" fill="#374151" font-size="8">可捕捉尾盤動能</text>
+<text x="502" y="116" text-anchor="middle" fill="#374151" font-size="8">但需注意翻轉</text>
+<text x="502" y="130" text-anchor="middle" fill="#f87171" font-size="9" font-weight="600">選擇性操作</text>
+<text x="502" y="147" text-anchor="middle" fill="#7f1d1d" font-size="7">波動：★★★★</text>
+</svg>`,
+body:`<h3>美股日內交易的時段邏輯</h3>
+<p>美股期貨交易幾乎24小時，但<strong>不是所有時段都適合交易</strong>。機構投資者（大型對沖基金、做市商）主要在RTH（正式盤21:30–04:00台灣時間）活躍，這段時間的走勢最有方向性、最少噪音。</p>
+<h3>黃金時段：開盤後2小時（21:30–23:30）</h3>
+<div class="hl"><b>為什麼開盤後2小時是最佳交易時段？</b><br>
+1. <strong>方向性強</strong>：隔夜期貨走勢 + 盤前預期在此時快速修正，真實方向在30分鐘內確立<br>
+2. <strong>流動性最佳</strong>：每分鐘成交量是午盤的5–10倍，滑價極小<br>
+3. <strong>趨勢延伸</strong>：開盤後確立的方向，通常能延伸1–2小時<br>
+4. <strong>機構主導</strong>：大型機構的大單在此時集中執行，形成有方向的推動力</div>
+<h3>開盤後第一個30分鐘的策略</h3>
+<div class="formula">開盤區間（Opening Range）策略：
+1. 記錄21:30後的第一根30分鐘K線（開盤區間）
+   開盤高點（OR High）= 21:30–22:00的最高點
+   開盤低點（OR Low）= 21:30–22:00的最低點
+
+2. 突破信號：
+   價格突破OR High + 成交量放大 → 做多
+   價格跌破OR Low + 成交量放大 → 做空
+
+3. 停損設置：
+   多單停損設在OR Low下方
+   空單停損設在OR High上方
+
+4. 獲利目標：OR High – OR Low 的1.5–2倍距離</div>
+<h3>日內交易的工具組合</h3>
+<table class="cmp-table">
+<tr><th>工具</th><th>用途</th><th>設定</th></tr>
+<tr><td>K線時框</td><td>判斷趨勢方向</td><td>5分鐘K（主力）+ 1分鐘K（精確進場）</td></tr>
+<tr><td>VWAP</td><td>動態支撐壓力</td><td>預設（每日重置）</td></tr>
+<tr><td>移動均線</td><td>趨勢方向確認</td><td>9 EMA（快）+ 21 EMA（慢）</td></tr>
+<tr><td>成交量</td><td>確認突破真假</td><td>20根K的平均量為基準</td></tr>
+<tr><td>前日高低點</td><td>靜態支撐壓力</td><td>自動標記PDH/PDL</td></tr>
+</table>
+<h3>TOPSTEP帳戶下的時段選擇</h3>
+<div class="eg"><b>推薦策略：只交易開盤2小時</b><br>
+台灣時間21:30–23:30，剛好是晚餐後的時段。<br>
+每天只操作這2小時，達到日獲利目標（如$300）後立即停止，不在午盤和尾盤繼續暴露風險。<br>
+好處：避免午盤噪音導致的虧損，保護每日風險預算，讓TOPSTEP評估更穩定通過。</div>`,
+pts:['最佳交易時段：21:30–23:30（美股開盤後2小時）','開盤區間（OR High/Low）突破+成交量是最可靠的日內信號','工具組合：5分鐘K + VWAP + 9/21 EMA + 成交量','TOPSTEP建議只交易開盤2小時，達標後立即停止']},
+
+/* 10 */
+{num:'4-2',title:'VWAP與開盤缺口策略',sub:'機構交易員最重視的兩個日內技術工具',ch:'第四章：日內交易實戰',rt:'9 分鐘',
+cap:'VWAP動態支撐壓力與缺口填補示意',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">VWAP作為動態支撐壓力 + 缺口填補示意</text>
+<rect x="10" y="26" width="270" height="128" fill="#fff" stroke="#e2e8f0" stroke-width="1" rx="6"/>
+<text x="145" y="42" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">VWAP 支撐壓力示意</text>
+<polyline points="20,110 55,100 85,90 110,95 130,85 155,80 180,75 210,72 240,68 268,65" fill="none" stroke="#374151" stroke-width="1.5"/>
+<polyline points="20,115 55,108 85,100 110,104 130,96 155,91 180,87 210,84 240,81 268,79" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,2"/>
+<text x="270" y="82" fill="#3b82f6" font-size="8">VWAP</text>
+<circle cx="130" cy="95" r="5" fill="#10b981" opacity="0.8"/>
+<text x="130" y="125" text-anchor="middle" fill="#059669" font-size="8">碰VWAP買</text>
+<circle cx="180" cy="80" r="5" fill="#10b981" opacity="0.8"/>
+<text x="180" y="125" text-anchor="middle" fill="#059669" font-size="8">再碰再買</text>
+<text x="145" y="145" text-anchor="middle" fill="#64748b" font-size="8">多頭結構：價格在VWAP上方震盪，碰線做多</text>
+<rect x="300" y="26" width="270" height="128" fill="#fff" stroke="#e2e8f0" stroke-width="1" rx="6"/>
+<text x="435" y="42" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">缺口填補（Gap Fill）</text>
+<line x1="310" y1="90" x2="560" y2="90" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="380" y="65" width="100" height="22" fill="#fee2e2" rx="3"/>
+<text x="430" y="80" text-anchor="middle" fill="#ef4444" font-size="9">↑ 缺口（Gap）</text>
+<polyline points="310,55 350,52 380,65 410,70 430,68 450,65 480,70 490,72 510,75 560,78" fill="none" stroke="#374151" stroke-width="1.5"/>
+<text x="310" y="58" fill="#064e3b" font-size="7">昨日收盤</text>
+<polyline points="380,87 410,85 430,82 460,80 490,75 520,72 550,68" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,2"/>
+<text x="430" y="110" text-anchor="middle" fill="#059669" font-size="8">缺口填補路徑</text>
+<text x="435" y="145" text-anchor="middle" fill="#64748b" font-size="8">開盤跳空後，70%機率回填缺口</text>
+</svg>`,
+body:`<h3>VWAP（成交量加權平均價格）</h3>
+<div class="hl"><b>VWAP = 機構最重要的參考基準線</b><br>
+VWAP = 所有成交的「價格×成交量」加總 ÷ 總成交量<br>
+它代表當天所有買家的平均持有成本。機構在執行大單時，通常以VWAP為基準來評估執行品質。<br>
+VWAP上方 = 多方佔優；VWAP下方 = 空方佔優</div>
+<h3>VWAP的交易應用</h3>
+<div class="formula">VWAP 四種交易情境：
+
+情境一：多頭結構（VWAP上方）
+  價格碰觸VWAP → 做多
+  停損：VWAP下方10點
+  目標：前日高點或開盤高點
+
+情境二：空頭結構（VWAP下方）
+  價格反彈至VWAP → 做空
+  停損：VWAP上方10點
+  目標：前日低點
+
+情境三：突破VWAP
+  價格穿越VWAP + 成交量放大 → 方向確認，順勢追進
+  （VWAP攻守易位）
+
+情境四：VWAP失守
+  多頭時，ES跌破VWAP且收盤在下方 → 偏空，轉換策略</div>
+<h3>開盤缺口（Gap）策略</h3>
+<div class="kp-box">
+<b>什麼是缺口？</b><br>
+今日開盤價 ≠ 昨日收盤價，中間形成一段「缺口」。<br>
+上跳缺口（Gap Up）：今日開盤高於昨日收盤<br>
+下跳缺口（Gap Down）：今日開盤低於昨日收盤<br><br>
+<b>缺口填補機率（歷史統計）：</b><br>
+缺口小於0.5%：填補機率 ~75%（當天）<br>
+缺口0.5%–1%：填補機率 ~55%（當天）<br>
+缺口超過1%：填補機率 ~35%（可能需要幾天）
+</div>
+<div class="formula">缺口填補交易規則（以ES為例）：
+今日Gap Up：ES昨日收4,980，今日開5,010（+30點缺口）
+缺口填補目標：4,980點
+
+做空條件：
+1. 開盤後前15分鐘觀察，不要馬上進場
+2. 開盤後ES上衝5,030（加速），但RSI>75（超買）
+3. 第一根15分鐘K出現下影線或陰線 → 做空
+4. 目標：4,980–4,995（缺口區間）
+5. 停損：今日開盤高點5,010上方10點（5,020）</div>
+<h3>VWAP + Gap的組合使用</h3>
+<div class="eg"><b>最強組合：缺口在VWAP附近</b><br>
+ES昨日收4,980（VWAP也在附近），今日開5,015（+35點缺口）。<br>
+VWAP和昨日收盤都在4,980，形成雙重支撐/目標。<br>
+做空策略：開盤上衝後放空，雙目標都指向4,980，成功率更高。<br>
+停損：5,020。目標：4,980。風險報酬比 = 40/35 ≈ 1:1.5（可接受）</div>`,
+pts:['VWAP是機構最重要的日內參考基準，多頭在上方碰VWAP做多，空頭在下方反彈做空','開盤缺口填補機率：小缺口（<0.5%）約75%，中缺口（0.5-1%）約55%','VWAP+Gap組合：缺口在VWAP附近時，兩個目標重疊，成功率更高','開盤後前15分鐘觀察不進場，等方向確認後再執行']},
+
+/* 11 */
+{num:'4-3',title:'TOPSTEP框架下的資金控管',sub:'每日$300目標怎麼做到？計算、執行、保護',ch:'第四章：日內交易實戰',rt:'10 分鐘',
+cap:'TOPSTEP 100K帳戶風險預算分配',
+svg:`<svg viewBox="0 0 580 155" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="155" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">TOPSTEP 100K帳戶：日風險預算分配</text>
+<rect x="10" y="26" width="270" height="118" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5" rx="8"/>
+<text x="145" y="45" text-anchor="middle" fill="#065f46" font-size="10.5" font-weight="700">合理的一天</text>
+<text x="145" y="63" text-anchor="middle" fill="#374151" font-size="9">日獲利目標：+$300</text>
+<text x="145" y="79" text-anchor="middle" fill="#374151" font-size="9">自我停損上限：-$600（日限$2000的30%）</text>
+<text x="145" y="95" text-anchor="middle" fill="#374151" font-size="9">每筆虧損上限：$150（目標$300的50%）</text>
+<text x="145" y="111" text-anchor="middle" fill="#374151" font-size="9">每天最多5次交易機會</text>
+<text x="145" y="128" text-anchor="middle" fill="#059669" font-size="9" font-weight="700">→ 5次交易，全虧只損失$750，帳戶安全</text>
+<rect x="300" y="26" width="270" height="118" fill="#fee2e2" stroke="#fca5a5" stroke-width="1.5" rx="8"/>
+<text x="435" y="45" text-anchor="middle" fill="#991b1b" font-size="10.5" font-weight="700">危險的一天</text>
+<text x="435" y="63" text-anchor="middle" fill="#374151" font-size="9">不設停損，虧$500還不平倉</text>
+<text x="435" y="79" text-anchor="middle" fill="#374151" font-size="9">加倉攤平：1口→2口→4口</text>
+<text x="435" y="95" text-anchor="middle" fill="#374151" font-size="9">試圖「一次把今天的虧損全賺回來」</text>
+<text x="435" y="111" text-anchor="middle" fill="#374151" font-size="9">結果觸發日限$2,000，強制停止</text>
+<text x="435" y="128" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="700">→ 這是TOPSTEP失敗最常見原因！</text>
+</svg>`,
+body:`<h3>TOPSTEP框架下的倉位計算</h3>
+<div class="formula">100K帳戶倉位計算（ES為例）：
+每日獲利目標：$300
+每筆虧損上限：$150（目標的50%，確保風報比2:1）
+
+ES每點$50，停損10點 = $500（太大！）
+ES每點$50，停損3點 = $150 ✓
+
+因此：
+ES停損設3點 → 目標設6點
+結果：+$300（達到日標）
+
+或者：
+停損8點（ES常見波動），但口數減半
+ES × 0.5口 = MES × 5口（等效）
+MES 5口 × 8點 × $5 = $200（虧損） → 可接受</div>
+<h3>不同停損距離對應的口數</h3>
+<table class="cmp-table">
+<tr><th>停損點數</th><th>合約</th><th>每筆最大虧損</th><th>口數建議</th><th>達標需漲點數</th></tr>
+<tr><td>5點</td><td>ES（$50/點）</td><td>$250</td><td>1口</td><td>漲6點達$300</td></tr>
+<tr><td>10點</td><td>ES</td><td>$500</td><td>減為MES×3口</td><td>漲10點達$300</td></tr>
+<tr><td>15點</td><td>MES（$5/點）</td><td>$75</td><td>MES×5口</td><td>漲12點達$300</td></tr>
+<tr><td>20點</td><td>MES</td><td>$100</td><td>MES×4口</td><td>漲15點達$300</td></tr>
+</table>
+<h3>TOPSTEP追蹤回撤的倉位影響</h3>
+<div class="eg"><b>追蹤回撤如何影響你的倉位選擇</b><br>
+假設100K帳戶，追蹤回撤下限已上移至$102,000（已賺$2,000）。<br>
+帳戶目前$104,000，距離下限$2,000。<br>
+如果今天大跌，損失超過$2,000 → 評估失敗！<br><br>
+這意味著：你的「有效日限」已從$2,000縮小到$2,000（湊巧相同），但若帳戶已漲到$110,000，你距離下限$107,000還有$3,000的空間。<br>
+→ 帳戶越大，才能動用越多的單日風險預算。</div>
+<h3>每週檢討的指標</h3>
+<div class="formula">每週應該追蹤的4個指標：
+1. 每日平均獲利：目標 &gt; $300
+2. 最大單筆虧損：不超過日限的25%（$500）
+3. 勝率：目標 &gt; 50%（45%也可以，只要風報比夠）
+4. 最大連虧天數：超過3天 → 暫停1天，重新評估策略
+
+如果勝率35%、風報比3:1：
+期望值 = 0.35×3 - 0.65×1 = 1.05 - 0.65 = +0.4 → 長期仍是正期望值！</div>`,
+pts:['每日獲利目標$300，自我停損上限$600（官方日限30%），不要用完所有日限','每筆虧損上限是日目標的50%（$150），確保至少2:1風報比','停損越大→口數越少；TOPSTEP不要求固定口數，靈活調整','勝率35%+風報比3:1也能長期獲利，不要迷信高勝率']},
+
+/* 12 */
+{num:'5-1',title:'美股期貨名詞速查',sub:'ES、NQ、RTH、VWAP……全部看這一課',ch:'第五章：工具書速查',rt:'7 分鐘',
+cap:'美股期貨術語分類索引',
+svg:`<svg viewBox="0 0 580 170" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="170" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">美股期貨核心名詞分類</text>
+<rect x="8" y="26" width="178" height="66" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="6"/>
+<text x="97" y="43" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="700">【合約類】</text>
+<text x="97" y="57" text-anchor="middle" fill="#374151" font-size="8.5">ES / NQ / YM / RTY / MES / MNQ</text>
+<text x="97" y="70" text-anchor="middle" fill="#374151" font-size="8.5">Tick / Point / Contract / Rollover</text>
+<rect x="200" y="26" width="178" height="66" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1" rx="6"/>
+<text x="289" y="43" text-anchor="middle" fill="#065f46" font-size="10" font-weight="700">【時段類】</text>
+<text x="289" y="57" text-anchor="middle" fill="#374151" font-size="8.5">RTH / ETH / Globex / Pre-market</text>
+<text x="289" y="70" text-anchor="middle" fill="#374151" font-size="8.5">Power Hour / Opening Range / OR</text>
+<rect x="392" y="26" width="178" height="66" fill="#fff7ed" stroke="#fed7aa" stroke-width="1" rx="6"/>
+<text x="481" y="43" text-anchor="middle" fill="#9a3412" font-size="10" font-weight="700">【TOPSTEP類】</text>
+<text x="481" y="57" text-anchor="middle" fill="#374151" font-size="8.5">Combine / Funded / Daily Loss / Drawdown</text>
+<text x="481" y="70" text-anchor="middle" fill="#374151" font-size="8.5">Trailing DD / Profit Target / Payout</text>
+<rect x="8" y="102" width="178" height="62" fill="#fdf4ff" stroke="#e9d5ff" stroke-width="1" rx="6"/>
+<text x="97" y="119" text-anchor="middle" fill="#6b21a8" font-size="10" font-weight="700">【技術分析類】</text>
+<text x="97" y="133" text-anchor="middle" fill="#374151" font-size="8.5">VWAP / EMA / RSI / MACD / ATR</text>
+<text x="97" y="147" text-anchor="middle" fill="#374151" font-size="8.5">PDH / PDL / Gap / Gap Fill / OR</text>
+<rect x="200" y="102" width="178" height="62" fill="#fff1f2" stroke="#fecdd3" stroke-width="1" rx="6"/>
+<text x="289" y="119" text-anchor="middle" fill="#9f1239" font-size="10" font-weight="700">【風險管理類】</text>
+<text x="289" y="133" text-anchor="middle" fill="#374151" font-size="8.5">Stop Loss / Take Profit / R-multiple</text>
+<text x="289" y="147" text-anchor="middle" fill="#374151" font-size="8.5">Max Drawdown / Risk-Reward Ratio</text>
+<rect x="392" y="102" width="178" height="62" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" rx="6"/>
+<text x="481" y="119" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">【平台工具類】</text>
+<text x="481" y="133" text-anchor="middle" fill="#374151" font-size="8.5">NinjaTrader / Rithmic / TradingView</text>
+<text x="481" y="147" text-anchor="middle" fill="#374151" font-size="8.5">CME / CBOT / NYMEX / DOM</text>
+</svg>`,
+body:`<h3>一、合約相關術語</h3>
+<table class="cmp-table">
+<tr><th>術語</th><th>解釋</th></tr>
+<tr><td>ES</td><td>E-mini S&amp;P 500期貨，每點$50，全球最大流動性期貨合約</td></tr>
+<tr><td>NQ</td><td>E-mini NASDAQ 100期貨，每點$20，科技股敏感度最高</td></tr>
+<tr><td>YM</td><td>E-mini Dow Jones期貨，每點$5，30檔藍籌股</td></tr>
+<tr><td>RTY</td><td>E-mini Russell 2000期貨，小型股指數，每點$50</td></tr>
+<tr><td>MES/MNQ</td><td>Micro合約，ES/NQ的1/10規格，新手練習用</td></tr>
+<tr><td>Tick</td><td>最小價格變動單位。ES為0.25點（=$12.5），NQ為0.25點（=$5）</td></tr>
+<tr><td>Contract / Lot</td><td>合約口數。「做1口ES」= holding 1 ES contract</td></tr>
+<tr><td>Rollover（展倉）</td><td>期貨到期前轉至下一季合約。ES每季（3/6/9/12月）</td></tr>
+</table>
+<h3>二、交易時段術語</h3>
+<table class="cmp-table">
+<tr><th>術語</th><th>台灣時間</th><th>說明</th></tr>
+<tr><td>RTH</td><td>21:30–04:00</td><td>Regular Trading Hours（正式盤），最佳交易時段</td></tr>
+<tr><td>ETH</td><td>04:00–21:30</td><td>Extended Trading Hours（盤外），流動性低</td></tr>
+<tr><td>Globex</td><td>幾乎24小時</td><td>CME的電子交易平台（夜盤/全球交易）</td></tr>
+<tr><td>Power Hour</td><td>01:30–04:00</td><td>尾盤最後1.5小時，走勢通常有方向</td></tr>
+<tr><td>Opening Range（OR）</td><td>21:30–22:00</td><td>開盤第一個30分鐘的高低點，關鍵支撐壓力</td></tr>
+</table>
+<h3>三、TOPSTEP專屬術語</h3>
+<table class="cmp-table">
+<tr><th>術語</th><th>解釋</th></tr>
+<tr><td>Trading Combine</td><td>TOPSTEP的評估帳號，通過後才能取得Funded帳號</td></tr>
+<tr><td>Funded Account</td><td>通過評估後取得的真實資金帳號</td></tr>
+<tr><td>Daily Loss Limit</td><td>每日最大允許虧損。觸發後當天無法再交易</td></tr>
+<tr><td>Trailing Drawdown</td><td>追蹤最大回撤。從歷史最高點往下計算，只往上走不往下走</td></tr>
+<tr><td>Profit Target</td><td>需達成的獲利目標才能通過評估</td></tr>
+<tr><td>Payout / Withdrawal</td><td>從Funded帳號提領獲利到個人帳戶</td></tr>
+</table>
+<h3>四、技術分析術語</h3>
+<table class="cmp-table">
+<tr><th>術語</th><th>解釋</th></tr>
+<tr><td>VWAP</td><td>成交量加權平均價格，機構最重要的日內基準線</td></tr>
+<tr><td>PDH / PDL</td><td>Previous Day High / Low（前日高低點），關鍵靜態支撐壓力</td></tr>
+<tr><td>Gap / Gap Fill</td><td>開盤缺口 / 回填缺口。小缺口75%當天填補</td></tr>
+<tr><td>ATR</td><td>Average True Range（真實波動範圍），用來設定合理停損距離</td></tr>
+<tr><td>R-multiple</td><td>風險倍數。賺了2R表示獲利是初始風險的2倍</td></tr>
+</table>`,
+pts:['ES=E-mini S&P 500，每點$50；NQ=NASDAQ 100，每點$20','RTH=正式盤（21:30–04:00台灣），ETH=盤外（流動性低）','TOPSTEP核心規則：Daily Loss Limit（日限）+ Trailing Drawdown（追蹤回撤）','VWAP=成交量加權均價，PDH/PDL=前日高低點，都是重要日內支撐壓力']},
+
+/* 13 */
+{num:'5-2',title:'常見失敗案例與解決方案',sub:'9成人為什麼失敗？每一個都是真實教訓',ch:'第五章：工具書速查',rt:'9 分鐘',
+cap:'五大常見失敗模式與對應解決策略',
+svg:`<svg viewBox="0 0 580 158" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="158" fill="#f8fafc" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">五大失敗模式：症狀 → 根本原因 → 解方</text>
+<rect x="8" y="26" width="108" height="123" fill="#fee2e2" stroke="#fca5a5" stroke-width="1" rx="6"/>
+<text x="62" y="43" text-anchor="middle" fill="#991b1b" font-size="9" font-weight="700">觸發日限</text>
+<text x="62" y="58" text-anchor="middle" fill="#374151" font-size="7.5">症狀：</text>
+<text x="62" y="70" text-anchor="middle" fill="#374151" font-size="7.5">一天虧光$2,000</text>
+<text x="62" y="83" text-anchor="middle" fill="#374151" font-size="7.5">根因：</text>
+<text x="62" y="95" text-anchor="middle" fill="#374151" font-size="7.5">不設停損攤平</text>
+<text x="62" y="108" text-anchor="middle" fill="#059669" font-size="7.5">解方：</text>
+<text x="62" y="120" text-anchor="middle" fill="#059669" font-size="7.5">日虧50%即停手</text>
+<text x="62" y="140" text-anchor="middle" fill="#991b1b" font-size="8" font-weight="700">最常見！</text>
+<rect x="124" y="26" width="108" height="123" fill="#fff7ed" stroke="#fed7aa" stroke-width="1" rx="6"/>
+<text x="178" y="43" text-anchor="middle" fill="#9a3412" font-size="9" font-weight="700">過度交易</text>
+<text x="178" y="58" text-anchor="middle" fill="#374151" font-size="7.5">症狀：</text>
+<text x="178" y="70" text-anchor="middle" fill="#374151" font-size="7.5">每天30次以上</text>
+<text x="178" y="83" text-anchor="middle" fill="#374151" font-size="7.5">根因：</text>
+<text x="178" y="95" text-anchor="middle" fill="#374151" font-size="7.5">無法等待機會</text>
+<text x="178" y="108" text-anchor="middle" fill="#059669" font-size="7.5">解方：</text>
+<text x="178" y="120" text-anchor="middle" fill="#059669" font-size="7.5">每天最多5次</text>
+<text x="178" y="140" text-anchor="middle" fill="#9a3412" font-size="8" font-weight="700">手癢症</text>
+<rect x="240" y="26" width="108" height="123" fill="#fef9c3" stroke="#fde68a" stroke-width="1" rx="6"/>
+<text x="294" y="43" text-anchor="middle" fill="#854d0e" font-size="9" font-weight="700">目標接近爆倉</text>
+<text x="294" y="58" text-anchor="middle" fill="#374151" font-size="7.5">症狀：</text>
+<text x="294" y="70" text-anchor="middle" fill="#374151" font-size="7.5">差$500加倉賭博</text>
+<text x="294" y="83" text-anchor="middle" fill="#374151" font-size="7.5">根因：</text>
+<text x="294" y="95" text-anchor="middle" fill="#374151" font-size="7.5">心態失衡</text>
+<text x="294" y="108" text-anchor="middle" fill="#059669" font-size="7.5">解方：</text>
+<text x="294" y="120" text-anchor="middle" fill="#059669" font-size="7.5">接近目標縮倉</text>
+<text x="294" y="140" text-anchor="middle" fill="#854d0e" font-size="8" font-weight="700">最可惜！</text>
+<rect x="356" y="26" width="108" height="123" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" rx="6"/>
+<text x="410" y="43" text-anchor="middle" fill="#166534" font-size="9" font-weight="700">不了解追蹤回撤</text>
+<text x="410" y="58" text-anchor="middle" fill="#374151" font-size="7.5">症狀：</text>
+<text x="410" y="70" text-anchor="middle" fill="#374151" font-size="7.5">帳戶漲後大回撤</text>
+<text x="410" y="83" text-anchor="middle" fill="#374151" font-size="7.5">根因：</text>
+<text x="410" y="95" text-anchor="middle" fill="#374151" font-size="7.5">忽略DD在上移</text>
+<text x="410" y="108" text-anchor="middle" fill="#059669" font-size="7.5">解方：</text>
+<text x="410" y="120" text-anchor="middle" fill="#059669" font-size="7.5">每天看DD下限</text>
+<text x="410" y="140" text-anchor="middle" fill="#166534" font-size="8" font-weight="700">必須理解</text>
+<rect x="472" y="26" width="100" height="123" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" rx="6"/>
+<text x="522" y="43" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="700">數據前不平倉</text>
+<text x="522" y="58" text-anchor="middle" fill="#374151" font-size="7.5">症狀：</text>
+<text x="522" y="70" text-anchor="middle" fill="#374151" font-size="7.5">非農/FOMC前</text>
+<text x="522" y="83" text-anchor="middle" fill="#374151" font-size="7.5">大倉持倉</text>
+<text x="522" y="95" text-anchor="middle" fill="#374151" font-size="7.5">根因：</text>
+<text x="522" y="107" text-anchor="middle" fill="#374151" font-size="7.5">低估事件波動</text>
+<text x="522" y="120" text-anchor="middle" fill="#059669" font-size="7.5">解方：</text>
+<text x="522" y="132" text-anchor="middle" fill="#059669" font-size="7.5">數據前15分</text>
+<text x="522" y="144" text-anchor="middle" fill="#059669" font-size="7.5">平倉觀望</text>
+</svg>`,
+body:`<h3>案例一：觸發每日虧損上限（最常見）</h3>
+<div class="warn"><b>場景</b>：早上連虧3筆，虧了$900。心想「還剩$1,100的日限空間」，繼續開大倉想追回來，結果一筆虧$1,200，觸發日限被強制停止。<br><br>
+<b>根本原因</b>：「虧損後加碼」是最危險的行為。每筆虧損後情緒受影響，判斷力下降，繼續交易只會錯上加錯。<br><br>
+<b>解決方案</b>：設定<strong>自我日限 = 官方日限的50%</strong>（100K帳戶 = $1,000）。達到自我日限後，立即關閉平台，做其他事情。</div>
+<h3>案例二：越接近目標越失敗（最可惜）</h3>
+<div class="warn"><b>場景</b>：帳戶已累積$5,600獲利，還差$400就完成100K目標。心急之下，用3口ES（平時用1口）做一筆交易，結果逆勢，一筆虧$1,500，帳戶回到$4,100，需要重新累積。<br><br>
+<b>根本原因</b>：接近目標時的<strong>「貪婪/焦慮」</strong>讓人改變了一直有效的策略。<br><br>
+<b>解決方案</b>：帳戶累積超過目標80%後，口數減半。最後$500，只用最小口數（1口ES或MES），用時間耗出來，不要賭。</div>
+<h3>案例三：不了解追蹤回撤的移動機制</h3>
+<div class="warn"><b>場景</b>：帳戶從$100K漲到$108K（追蹤下限上移至$105K），然後週末後跌回$104K。心想「我還有獲利$4K，很安全」，但帳戶$104K &lt; 追蹤下限$105K，評估失敗！<br><br>
+<b>根本原因</b>：誤解追蹤回撤是從當前帳戶向下計算，實際上是從<strong>歷史最高點</strong>向下計算。<br><br>
+<b>解決方案</b>：每天開市前查看當前追蹤回撤下限數字，把它貼在螢幕上。把「距離下限多遠」當作當天的風險預算。</div>
+<h3>案例四：重大數據前持倉</h3>
+<div class="warn"><b>場景</b>：做了ES多單$100K帳戶2口，沒想到當天是非農發布日（台灣時間20:30）。非農數據遠差於預期，ES暴跌70點，2口虧損 = 70 × $50 × 2 = $7,000，但100K帳戶日限才$2,000，一瞬間觸發強制平倉，評估失敗。<br><br>
+<b>解決方案</b>：每天交易前查看<strong>Investing.com 經濟日曆</strong>，確認當天有無重大數據。有數據的日子，數據發布前15分鐘出清所有部位。</div>
+<h3>一張表：通過 vs 失敗的行為差異</h3>
+<table class="cmp-table">
+<tr><th>行為</th><th>通過者</th><th>失敗者</th></tr>
+<tr><td>達到日目標後</td><td>立即停止交易</td><td>繼續交易「多賺一點」</td></tr>
+<tr><td>連虧3筆後</td><td>停止當天交易</td><td>加大口數想追回來</td></tr>
+<tr><td>接近獲利目標</td><td>縮小口數，穩穩推進</td><td>加倉想快速衝過去</td></tr>
+<tr><td>重大數據日</td><td>數據前全部平倉</td><td>「感覺方向對的」繼續持倉</td></tr>
+<tr><td>對追蹤回撤的態度</td><td>每天查看下限數字</td><td>不了解這個規則</td></tr>
+</table>`,
+pts:['觸發日限是最常見失敗原因——自設50%軟停損（如$1,000），達到立即停止','接近目標時縮倉，最後$500只用最小口數慢慢推，不要賭','追蹤回撤從歷史最高點算起，不是從當前帳戶——每天查看下限數字','重大數據（非農/FOMC/CPI）發布前15分鐘平倉，數據後再進場']}
+];
+
+// ──────────────── JS ENGINE ────────────────
+const DONE = JSON.parse(localStorage.getItem('ufc-done') || '[]');
+
+function buildSidebar(){
+  const el = document.getElementById('chList');
+  let html = '';
+  CHAPTERS.forEach(ch => {
+    html += `<div class="ch-label">${ch.label}</div>`;
+    ch.ids.forEach(i => {
+      const L = LESSONS[i];
+      const isDone = DONE.includes(i);
+      html += `<div class="ls-item${isDone?' done':''}" id="li${i}" onclick="go(${i})">
+        <div class="ls-num">${isDone?'✓':L.num}</div>
+        <span>${L.title}</span>
+        ${isDone?'<span class="ls-check">✓</span>':''}
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+function updateProgress(){
+  const total = LESSONS.length;
+  const done = DONE.length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('pct').textContent = pct+'%';
+  document.getElementById('pfill').style.width = pct+'%';
+}
+
+function go(i){
+  document.querySelectorAll('.ls-item').forEach(e=>e.classList.remove('active'));
+  const liEl = document.getElementById('li'+i);
+  if(liEl){ liEl.classList.add('active'); liEl.scrollIntoView({block:'nearest'}); }
+  const L = LESSONS[i];
+  const isDone = DONE.includes(i);
+  const isLast = i === LESSONS.length - 1;
+  let prev = -1, next = -1;
+  CHAPTERS.forEach(ch => {
+    ch.ids.forEach((id,idx) => {
+      if(id===i){
+        if(idx>0) prev = ch.ids[idx-1];
+        else { const ci = CHAPTERS.indexOf(ch); if(ci>0) prev = CHAPTERS[ci-1].ids.at(-1); }
+        if(idx<ch.ids.length-1) next = ch.ids[idx+1];
+        else { const ci = CHAPTERS.indexOf(ch); if(ci<CHAPTERS.length-1) next = CHAPTERS[ci+1].ids[0]; }
+      }
+    });
+  });
+  document.getElementById('lw').innerHTML = `
+  <div class="lc">
+    <div class="lc-cap">${L.svg}</div>
+    <div class="lc-body">
+      <div class="lc-meta">
+        <span class="lc-ch">${L.ch}</span>
+        <span class="lc-rt">⏱ ${L.rt}</span>
+      </div>
+      <div class="lc-title">${L.num}｜${L.title}</div>
+      <div class="lc-sub">${L.sub}</div>
+      <div class="lc-content">${L.body}</div>
+      <div class="kp-wrap">
+        <h4>本課重點</h4>
+        <div class="kp-list">${L.pts.map(p=>`<div class="kp-item"><div class="kp-dot"></div><span>${p}</span></div>`).join('')}</div>
+      </div>
+    </div>
+    <div class="lc-nav">
+      <button class="nav-btn" onclick="go(${prev})" ${prev<0?'disabled style="opacity:.3"':''}>← 上一課</button>
+      <button class="done-btn${isDone?' marked':''}" onclick="toggleDone(${i})">${isDone?'✓ 已完成':'標記完成'}</button>
+      <button class="nav-btn primary" onclick="go(${next})" ${next<0?'disabled style="opacity:.3"':''}>下一課 →</button>
+    </div>
+  </div>`;
+}
+
+function toggleDone(i){
+  const idx = DONE.indexOf(i);
+  if(idx>=0) DONE.splice(idx,1); else DONE.push(i);
+  localStorage.setItem('ufc-done', JSON.stringify(DONE));
+  updateProgress();
+  buildSidebar();
+  go(i);
+}
+
+function openSB(){ document.getElementById('sb').classList.add('open'); document.getElementById('ov').classList.add('show'); }
+function closeSB(){ document.getElementById('sb').classList.remove('open'); document.getElementById('ov').classList.remove('show'); }
+
+buildSidebar();
+updateProgress();
+go(0);
+</script>
+</body>
+</html>

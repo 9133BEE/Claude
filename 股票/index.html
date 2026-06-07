@@ -179,40 +179,53 @@ a { color: inherit; text-decoration: none; }
   .nav-link-btn { display: none; }
 }
 
-/* ── TABS ────────────────────────────────────────────────────────────── */
+/* ── GROUP NAV (下拉式) ──────────────────────────────────────────────── */
 .tab-nav {
   position: sticky; top: var(--nav-h); z-index: 200;
   background: #fff;
   border-bottom: 1px solid var(--border-default);
-  overflow-x: auto; scrollbar-width: none;
 }
-.tab-nav::-webkit-scrollbar { display: none; }
-.tab-list {
-  display: flex; max-width: 1200px; margin: 0 auto;
-  padding: 0 28px; position: relative; min-width: max-content;
+.gnav {
+  display: flex; gap: 8px; align-items: center;
+  max-width: 1200px; margin: 0 auto;
+  padding: 10px 28px;
 }
-.tab-btn {
-  padding: 0 24px; height: var(--tab-h);
-  font-size: .85rem; font-weight: 500;
-  color: var(--text-muted);
-  display: flex; align-items: center; gap: 8px;
-  transition: color var(--t-fast); white-space: nowrap;
-  position: relative; font-family: var(--font);
+.gnav-group { position: relative; }
+.gnav-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 10px;
+  border: 1.5px solid var(--border-default);
+  background: #fff; font-size: 14px; font-weight: 600;
+  cursor: pointer; color: var(--text-primary);
+  font-family: var(--font); white-space: nowrap;
+  transition: all .15s;
 }
-.tab-btn .tab-icon { font-size: 1rem; }
-.tab-btn.active { color: var(--section-color, var(--accent)); font-weight: 600; }
-.tab-btn:hover:not(.active) { color: var(--text-secondary); }
-.tab-btn-link { text-decoration: none; border-left: 1px solid var(--border-default); margin-left: 4px; padding-left: 20px; }
-.tab-indicator {
-  position: absolute; bottom: 0; height: 2px; border-radius: 2px;
-  background: var(--accent);
-  transition: left .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1);
+.gnav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.gnav-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.gnav-sub { font-size: 10px; color: rgba(255,255,255,.75); font-weight: 400; }
+.gnav-btn:not(.active) .gnav-sub { color: #94a3b8; }
+.gnav-arrow { font-size: 9px; opacity: .6; transition: transform .2s; }
+.gnav-group.open .gnav-arrow { transform: rotate(180deg); }
+.gnav-drop {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0;
+  background: #fff; border: 1.5px solid var(--border-default);
+  border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  z-index: 500; min-width: 138px; overflow: hidden;
 }
-
-/* Mobile tab spacing */
+@keyframes dropIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.gnav-group.open .gnav-drop { display: block; animation: dropIn .15s ease; }
+.gnav-item {
+  display: flex; width: 100%; align-items: center;
+  padding: 10px 16px; font-size: 13.5px;
+  color: var(--text-secondary); border: none; background: none;
+  cursor: pointer; text-align: left; font-family: var(--font);
+  text-decoration: none; transition: background .12s, color .12s; white-space: nowrap;
+}
+.gnav-item:hover { background: var(--surface-2); color: var(--text-primary); }
+.gnav-item.cur { color: var(--accent); font-weight: 700; background: rgba(59,130,246,.06); }
 @media (max-width: 640px) {
-  .tab-btn { padding: 0 16px; font-size: .8rem; }
-  .tab-list { padding: 0 12px; }
+  .gnav { padding: 8px 12px; gap: 6px; }
+  .gnav-btn { padding: 7px 11px; font-size: 13px; }
 }
 
 /* ── FILTER BAR ──────────────────────────────────────────────────────── */
@@ -478,29 +491,46 @@ a { color: inherit; text-decoration: none; }
 
 <!-- TABS -->
 <div class="tab-nav" id="tab-nav">
-  <div class="tab-list" id="tab-list">
-    <button class="tab-btn active" data-id="technical" style="--section-color:var(--technical-c)" onclick="switchTab('technical')">
-      <span class="tab-icon">📈</span> 技術面
-    </button>
-    <button class="tab-btn" data-id="fundamental" style="--section-color:var(--fundamental-c)" onclick="switchTab('fundamental')">
-      <span class="tab-icon">📊</span> 基本面
-    </button>
-    <button class="tab-btn" data-id="chip" style="--section-color:var(--chip-c)" onclick="switchTab('chip')">
-      <span class="tab-icon">🔍</span> 籌碼面
-    </button>
-    <button class="tab-btn" data-id="news" style="--section-color:var(--news-c)" onclick="switchTab('news')">
-      <span class="tab-icon">📰</span> 消息面
-    </button>
-    <button class="tab-btn" data-id="futures" style="--section-color:var(--futures-c)" onclick="switchTab('futures')">
-      <span class="tab-icon">📉</span> 期貨
-    </button>
-    <a href="candlestick-patterns.html" class="tab-btn tab-btn-link" style="--section-color:#7c3aed">
-      <span class="tab-icon">📊</span> K線圖鑑
-    </a>
-    <a href="futures-course.html" class="tab-btn tab-btn-link" style="--section-color:#059669">
-      <span class="tab-icon">📈</span> 期貨課程
-    </a>
-    <div class="tab-indicator" id="tab-indicator"></div>
+  <div class="gnav">
+    <!-- 股票 -->
+    <div class="gnav-group" id="gnav-stocks">
+      <button class="gnav-btn active" onclick="toggleDrop('stocks')">
+        📈 股票 <span class="gnav-sub" id="sub-stocks">全部</span> <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <button class="gnav-item cur" onclick="switchTab('all');closeDrop('stocks')">全部</button>
+        <button class="gnav-item" onclick="switchTab('technical');closeDrop('stocks')">技術</button>
+        <button class="gnav-item" onclick="switchTab('fundamental');closeDrop('stocks')">基本</button>
+        <button class="gnav-item" onclick="switchTab('chip');closeDrop('stocks')">籌碼</button>
+        <button class="gnav-item" onclick="switchTab('news');closeDrop('stocks')">消息</button>
+        <button class="gnav-item" onclick="switchTab('futures');closeDrop('stocks')">期貨</button>
+      </div>
+    </div>
+    <!-- 圖鑑 -->
+    <div class="gnav-group" id="gnav-chart">
+      <button class="gnav-btn" onclick="toggleDrop('chart')">
+        📊 圖鑑 <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <a class="gnav-item" href="candlestick-patterns.html">全部</a>
+        <a class="gnav-item" href="candlestick-patterns.html?cat=single">單K圖鑑</a>
+        <a class="gnav-item" href="candlestick-patterns.html?cat=double">雙K</a>
+        <a class="gnav-item" href="candlestick-patterns.html?cat=triple">三K</a>
+        <a class="gnav-item" href="candlestick-patterns.html?cat=special">特殊</a>
+        <a class="gnav-item" href="candlestick-patterns.html?cat=combo">組合型態</a>
+      </div>
+    </div>
+    <!-- 期貨 -->
+    <div class="gnav-group" id="gnav-futures">
+      <button class="gnav-btn" onclick="toggleDrop('futures-nav')">
+        📉 期貨 <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <a class="gnav-item" href="futures-course.html">台指期課程</a>
+        <a class="gnav-item" href="us-futures-course.html">TOPSTEP課程</a>
+        <a class="gnav-item" href="us-futures-course.html">美股期貨課程</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -968,12 +998,12 @@ const DATA = [
   }
 ];
 
-let currentSection = 'technical';
+let currentSection = 'all';
 let currentDiff = 'all';
 let searchTerm = '';
 let expandedCard = null;
 
-function getSection(id) { return DATA.find(s => s.id === id); }
+// getSection defined below with 'all' support
 
 function renderCard(card, section) {
   const diffClass = `difficulty-${card.diff}`;
@@ -1016,38 +1046,62 @@ function renderCard(card, section) {
 </div>`;
 }
 
+function getSection(id) {
+  if (id === 'all') {
+    return { id:'all', title:'全部', icon:'🗂', accent:'var(--accent)', kpBg:'rgba(59,130,246,.06)', kpBorder:'rgba(59,130,246,.18)',
+      cards: DATA.reduce((acc,s) => acc.concat(s.cards.map(c=>({...c,_sec:s}))), []) };
+  }
+  return DATA.find(s => s.id === id);
+}
+
 function renderSection(sectionId) {
   const section = getSection(sectionId);
   const grid = document.getElementById('cards-grid');
-  grid.innerHTML = section.cards.map(c => renderCard(c, section)).join('');
+  if (sectionId === 'all') {
+    grid.innerHTML = section.cards.map(c => renderCard(c, c._sec || section)).join('');
+  } else {
+    grid.innerHTML = section.cards.map(c => renderCard(c, section)).join('');
+  }
   applyFilters();
   observeCards();
 }
 
 function switchTab(id) {
-  if (currentSection === id) {
-    document.getElementById('tab-nav').scrollIntoView({behavior:'smooth'});
-    return;
-  }
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
   currentSection = id;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
-  updateTabIndicator();
+  const labels = {all:'全部', technical:'技術', fundamental:'基本', chip:'籌碼', news:'消息', futures:'期貨'};
+  const subEl = document.getElementById('sub-stocks');
+  if (subEl) subEl.textContent = labels[id] || '全部';
+  document.querySelectorAll('#gnav-stocks .gnav-item').forEach(b => {
+    b.classList.toggle('cur', b.textContent.trim() === (labels[id] || '全部'));
+  });
   renderSection(id);
-  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth'});
+  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-function updateTabIndicator() {
-  const active = document.querySelector('.tab-btn.active');
-  const indicator = document.getElementById('tab-indicator');
-  const section = getSection(currentSection);
-  if (active) {
-    indicator.style.left = active.offsetLeft + 'px';
-    indicator.style.width = active.offsetWidth + 'px';
-    const colorMap = { technical:'#1d4ed8', fundamental:'#059669', chip:'#d97706', news:'#7c3aed', futures:'#ea580c' };
-    indicator.style.background = colorMap[currentSection] || '#1d4ed8';
-  }
+function toggleDrop(id) {
+  const groups = ['stocks', 'chart', 'futures-nav'];
+  groups.forEach(g => {
+    const el = document.getElementById('gnav-' + (g === 'futures-nav' ? 'futures' : g));
+    if (!el) return;
+    if (g === id) el.classList.toggle('open');
+    else el.classList.remove('open');
+  });
 }
+
+function closeDrop(id) {
+  const el = document.getElementById('gnav-' + (id === 'futures-nav' ? 'futures' : (id || 'stocks')));
+  if (el) el.classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.gnav-group')) {
+    ['stocks','chart','futures'].forEach(g => {
+      const el = document.getElementById('gnav-' + g);
+      if (el) el.classList.remove('open');
+    });
+  }
+});
 
 function filterDifficulty(diff, btn) {
   currentDiff = diff;
@@ -1143,8 +1197,7 @@ document.getElementById('search-input').addEventListener('input', function() {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderSection('technical');
-  requestAnimationFrame(updateTabIndicator);
+  renderSection('all');
 });
 
 window.addEventListener('resize', updateTabIndicator);
