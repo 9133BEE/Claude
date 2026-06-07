@@ -1142,34 +1142,25 @@ pts:['原始保證金=入場門票；維持保證金=持倉底線；風險指標
 /* 15 */
 {num:'5-2',title:'期貨公式速查表',sub:'損益、保證金、停損一次算清楚',ch:'第五章：工具書速查',rt:'8 分鐘',
 cap:'四大類公式：損益 / 保證金 / 稅費 / 停損',
-svg:`<svg viewBox="0 0 580 175" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-<rect width="580" height="175" fill="#f8fafc" rx="8"/>
-<text x="290" y="20" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">期貨公式速查板</text>
-<rect x="10" y="28" width="270" height="66" fill="#172554" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
-<text x="145" y="43" text-anchor="middle" fill="#60a5fa" font-size="9.5" font-weight="700">損益計算（多單）</text>
-<text x="145" y="57" text-anchor="middle" fill="#e2e8f0" font-size="8.5">損益 = (平倉價 - 建倉價) × 點值 × 口數</text>
-<text x="145" y="70" text-anchor="middle" fill="#94a3b8" font-size="8">範例：買20,000 → 賣20,200，大台1口</text>
-<text x="145" y="83" text-anchor="middle" fill="#34d399" font-size="8.5" font-weight="700">獲利 = (20,200-20,000) × 200 × 1 = 40,000元</text>
-<rect x="300" y="28" width="270" height="66" fill="#172554" rx="6" stroke="#8b5cf6" stroke-width="0.8"/>
-<text x="435" y="43" text-anchor="middle" fill="#a78bfa" font-size="9.5" font-weight="700">損益計算（空單）</text>
-<text x="435" y="57" text-anchor="middle" fill="#e2e8f0" font-size="8.5">損益 = (建倉價 - 平倉價) × 點值 × 口數</text>
-<text x="435" y="70" text-anchor="middle" fill="#94a3b8" font-size="8">範例：賣20,000 → 買回19,700，小台2口</text>
-<text x="435" y="83" text-anchor="middle" fill="#34d399" font-size="8.5" font-weight="700">獲利 = (20,000-19,700) × 50 × 2 = 30,000元</text>
-<rect x="10" y="103" width="175" height="65" fill="#1a1a2e" rx="6" stroke="#f59e0b" stroke-width="0.8"/>
-<text x="97" y="118" text-anchor="middle" fill="#f59e0b" font-size="9.5" font-weight="700">風險指標公式</text>
-<text x="97" y="132" text-anchor="middle" fill="#e2e8f0" font-size="8">帳戶權益 ÷ 原始保證金 × 100%</text>
-<text x="97" y="146" text-anchor="middle" fill="#94a3b8" font-size="7.5">警示線：低於25% → 追繳</text>
-<text x="97" y="159" text-anchor="middle" fill="#f87171" font-size="7.5">強平線：收盤仍低於25%</text>
-<rect x="200" y="103" width="175" height="65" fill="#1a1a2e" rx="6" stroke="#f87171" stroke-width="0.8"/>
-<text x="287" y="118" text-anchor="middle" fill="#f87171" font-size="9.5" font-weight="700">停損點數計算</text>
-<text x="287" y="132" text-anchor="middle" fill="#e2e8f0" font-size="8">最大可承受虧損 ÷ (點值 × 口數)</text>
-<text x="287" y="146" text-anchor="middle" fill="#94a3b8" font-size="7.5">範例：虧損上限20,000 / 200 = 100點</text>
-<text x="287" y="159" text-anchor="middle" fill="#f87171" font-size="7.5">大台買20,000 → 停損設在19,900</text>
-<rect x="390" y="103" width="180" height="65" fill="#1a1a2e" rx="6" stroke="#34d399" stroke-width="0.8"/>
-<text x="480" y="118" text-anchor="middle" fill="#34d399" font-size="9.5" font-weight="700">期交稅 / 手續費</text>
-<text x="480" y="132" text-anchor="middle" fill="#e2e8f0" font-size="8">期交稅 = 成交金額 × 0.02%</text>
-<text x="480" y="146" text-anchor="middle" fill="#94a3b8" font-size="7.5">大台@20,000：稅 = 200×20,000×0.02% = 800元</text>
-<text x="480" y="159" text-anchor="middle" fill="#94a3b8" font-size="7.5">手續費：券商各異，約50–150元/口</text>
+svg:`<svg viewBox="0 0 580 118" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="118" fill="#f8fafc" rx="8"/>
+<text x="290" y="20" text-anchor="middle" fill="#374151" font-size="12" font-weight="700">期貨四大類公式 — 下方逐一詳細解說</text>
+<rect x="8" y="30" width="130" height="78" fill="#172554" rx="8" stroke="#3b82f6" stroke-width="1.5"/>
+<text x="73" y="57" text-anchor="middle" font-size="22">📊</text>
+<text x="73" y="77" text-anchor="middle" fill="#60a5fa" font-size="12" font-weight="700">損益計算</text>
+<text x="73" y="96" text-anchor="middle" fill="#e2e8f0" font-size="9">多單 · 空單 · 各規格</text>
+<rect x="148" y="30" width="130" height="78" fill="#1a1a2e" rx="8" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="213" y="57" text-anchor="middle" font-size="22">🛡</text>
+<text x="213" y="77" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="700">保證金計算</text>
+<text x="213" y="96" text-anchor="middle" fill="#e2e8f0" font-size="9">風險指標 · 補繳 · 槓桿</text>
+<rect x="288" y="30" width="130" height="78" fill="#1a1a2e" rx="8" stroke="#f87171" stroke-width="1.5"/>
+<text x="353" y="57" text-anchor="middle" font-size="22">🎯</text>
+<text x="353" y="77" text-anchor="middle" fill="#f87171" font-size="12" font-weight="700">停損計算</text>
+<text x="353" y="96" text-anchor="middle" fill="#e2e8f0" font-size="9">停損點數 · 風險報酬比</text>
+<rect x="428" y="30" width="144" height="78" fill="#1a1a2e" rx="8" stroke="#34d399" stroke-width="1.5"/>
+<text x="500" y="57" text-anchor="middle" font-size="22">💰</text>
+<text x="500" y="77" text-anchor="middle" fill="#34d399" font-size="12" font-weight="700">稅費計算</text>
+<text x="500" y="96" text-anchor="middle" fill="#e2e8f0" font-size="9">期交稅 · 手續費 · 成本</text>
 </svg>`,
 body:`<h3>一、損益計算公式</h3>
 <div class="formula">【多單（看漲）損益公式】
