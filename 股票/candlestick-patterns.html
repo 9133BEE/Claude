@@ -197,10 +197,10 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
     <div>
       <div class="hero-label">Technical Analysis</div>
       <h1 class="hero-title">K線型態<span class="grad">完整圖鑑</span></h1>
-      <p class="hero-subtitle">35 種經典K線型態一站收錄 — 從單根影線到五K延續型態<br>每種型態附帶 SVG 視覺圖示、台股實例與操作技巧</p>
+      <p class="hero-subtitle">45 種K線型態一站收錄 — 從單根影線到組合實戰型態<br>每種型態附帶 SVG 視覺圖示、台股實例與操作技巧</p>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num">35</div><div class="hero-stat-label">型態總數</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">4</div><div class="hero-stat-label">型態分類</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">45</div><div class="hero-stat-label">型態總數</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">5</div><div class="hero-stat-label">型態分類</div></div>
         <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">難度等級</div></div>
       </div>
     </div>
@@ -211,11 +211,12 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 <!-- TABS -->
 <div class="tab-nav" id="tab-nav">
   <div class="tab-list" id="tab-list">
-    <button class="tab-btn active" data-cat="all" onclick="switchCat('all',this)">全部 <span class="tab-count">35</span></button>
+    <button class="tab-btn active" data-cat="all" onclick="switchCat('all',this)">全部 <span class="tab-count">45</span></button>
     <button class="tab-btn" data-cat="single" onclick="switchCat('single',this)">單K型態 <span class="tab-count">11</span></button>
     <button class="tab-btn" data-cat="double" onclick="switchCat('double',this)">雙K型態 <span class="tab-count">8</span></button>
     <button class="tab-btn" data-cat="triple" onclick="switchCat('triple',this)">三K型態 <span class="tab-count">10</span></button>
     <button class="tab-btn" data-cat="special" onclick="switchCat('special',this)">特殊型態 <span class="tab-count">6</span></button>
+    <button class="tab-btn" data-cat="combo" onclick="switchCat('combo',this)">組合實戰 <span class="tab-count">10</span></button>
     <div class="tab-indicator" id="tab-indicator"></div>
   </div>
 </div>
@@ -247,7 +248,7 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-logo"><span>股學</span>筆記</div>
-  <div class="footer-text">K線型態圖鑑 — 35種型態完整收錄</div>
+  <div class="footer-text">K線型態圖鑑 — 45種型態完整收錄</div>
   <div class="footer-disclaimer">© 2025 股學筆記｜本站內容僅供教育參考，不構成任何投資建議。投資有風險，入市需謹慎。</div>
 </footer>
 
@@ -289,6 +290,23 @@ function gapRect(x1, x2, y1, y2, up) {
   const col = up ? 'rgba(5,150,105,.12)' : 'rgba(220,38,38,.12)';
   const stroke = up ? 'rgba(5,150,105,.40)' : 'rgba(220,38,38,.40)';
   return `<rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" fill="${col}" stroke="${stroke}" stroke-width="0.5" stroke-dasharray="3,2"/>`;
+}
+
+// Combo pattern SVG: ctx candles faded, pat candles highlighted
+function comboSvg(ctx, pat, W, extras) {
+  const H = 84;
+  const total = ctx.length + pat.length;
+  const step = W / total;
+  const nc = ctx.length;
+  const hx = Math.max(0, step * nc - 2);
+  const hw = step * pat.length + 4;
+  let inner = `<rect x="${hx}" y="1" width="${hw}" height="${H-2}" fill="rgba(29,78,216,.05)" rx="3"/>`;
+  inner += '<g opacity="0.26">';
+  ctx.forEach((c, i) => { inner += drawC(step * i + step / 2, c); });
+  inner += '</g>';
+  pat.forEach((c, i) => { inner += drawC(step * (nc + i) + step / 2, c); });
+  if (extras) inner += extras;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
 }
 
 // ─── PATTERN DATA ───────────────────────────────────────────────────────
@@ -643,12 +661,176 @@ const PATTERNS = [
      {h:18,bt:22,bb:76,l:78,bull:false}],220)}
 ];
 
+// ─── COMBINATION PATTERNS ──────────────────────────────────────────────
+const COMBOS = [
+  {id:'morning_star_combo',cat:'combo',title:'早晨之星',en:'Morning Star',bullish:true,diff:'進階',
+   tags:['底部反轉','三K組合','跳空缺口'],
+   summary:'下跌趨勢中由大陰線→小實體星線→大陽線組成的三K反轉訊號。第二根星線需與前後兩根跳空，是最具代表性的底部型態。',
+   points:[
+     '第一根大陰線確認跌勢；第二根星線需與第一根跳空（缺口），代表拋壓暫歇；第三根大陽線收盤須超過第一根實體50%以上',
+     '星線越小、缺口越明顯，反轉訊號越強；星線若為十字線則升級為「早晨十字星」，強度更高',
+     '最佳量能配合：第一根大量、第二根縮量、第三根放量的「大-縮-大」三段式型態'
+   ],
+   example:'台積電2022年Q4在320元整理完成後出現完整早晨之星型態，隨後啟動2023年大多頭行情，三個月內上漲逾50%。',
+   tip:'第三根陽線收盤確認後，次日開盤入場做多，停損設星線低點，目標前波高點。整體風報比通常達1:3以上。',
+   indicators:['RSI 30以下底背離確認','KD低檔死叉轉黃金交叉','成交量「大-縮-大」三段配合'],
+   svg: () => comboSvg(
+     [{h:8,bt:12,bb:26,l:28,bull:false},{h:16,bt:20,bb:36,l:38,bull:false},{h:24,bt:28,bb:46,l:48,bull:false}],
+     [{h:28,bt:32,bb:60,l:64,bull:false},{h:64,bt:67,bb:71,l:76,bull:null},{h:26,bt:28,bb:58,l:62,bull:true},{h:14,bt:16,bb:32,l:34,bull:true}],
+     168)},
+
+  {id:'evening_star_combo',cat:'combo',title:'黃昏之星',en:'Evening Star',bullish:false,diff:'進階',
+   tags:['頭部反轉','三K組合','跳空缺口'],
+   summary:'上漲趨勢中由大陽線→小實體星線→大陰線組成的三K反轉訊號，是最可靠的頭部型態之一，見到即考慮減碼。',
+   points:[
+     '第一根大陽線確認漲勢；第二根星線需與第一根跳空，代表買盤力道衰竭；第三根大陰線收盤須跌破第一根實體50%以下',
+     '星線若為十字線則稱「黃昏十字星」，反轉意義更強；第三根陰線實體越大，頭部確認越可靠',
+     '量能：第一根放量、第二根縮量（確認買盤無力）、第三根放量（賣壓湧現）'
+   ],
+   example:'台股2021年7月萬八高點附近，大盤週K出現黃昏之星型態，成為當年頭部的重要訊號，隨後回檔逾千點。',
+   tip:'第三根陰線收盤確認後立即出場，持多單減碼50~70%。若做空可在次日開盤建立空倉，停損設星線最高點。',
+   indicators:['RSI 70以上高檔鈍化','MACD負背離（主圖創高但MACD未創高）','成交量「放-縮-放」三段配合'],
+   svg: () => comboSvg(
+     [{h:50,bt:52,bb:66,l:68,bull:true},{h:38,bt:40,bb:54,l:56,bull:true},{h:26,bt:28,bb:44,l:46,bull:true}],
+     [{h:18,bt:20,bb:46,l:48,bull:true},{h:10,bt:13,bb:17,l:20,bull:null},{h:20,bt:24,bb:54,l:58,bull:false},{h:42,bt:46,bb:64,l:66,bull:false}],
+     168)},
+
+  {id:'bullish_engulfing_combo',cat:'combo',title:'看漲吞噬',en:'Bullish Engulfing',bullish:true,diff:'入門',
+   tags:['底部反轉','雙K組合','主力吸籌'],
+   summary:'下跌趨勢末端，大陽線實體完整包覆前一根陰線實體，代表買方一舉吞噬賣壓，多頭全面取得控制權。',
+   points:[
+     '陽線實體必須完整包覆陰線實體（不含影線），包覆程度越大越有力；若開盤跳空低開後吞噬，訊號最強',
+     '必須出現在明顯的下跌趨勢末端；若在盤整區間中出現，意義相對較低',
+     '成交量是關鍵確認：吞噬陽線的量至少是前日的1.5倍，代表主力積極低接'
+   ],
+   example:'金融股在除息後回檔，常在季線附近出現吞噬型態，為法人低接訊號。台灣50 ETF在2022年底整理完成後即出現此型態。',
+   tip:'吞噬陽線收盤後，隔日開盤入場做多，停損設吞噬陽線低點（或前日陰線低點），目標設前波高點。',
+   indicators:['成交量較前日放大50%以上','RSI 30~40確認非超賣反彈','外資籌碼是否出現大量買超'],
+   svg: () => comboSvg(
+     [{h:12,bt:16,bb:30,l:32,bull:false},{h:20,bt:24,bb:40,l:42,bull:false},{h:28,bt:32,bb:50,l:52,bull:false}],
+     [{h:44,bt:48,bb:60,l:62,bull:false},{h:28,bt:30,bb:68,l:70,bull:true},{h:18,bt:20,bb:40,l:42,bull:true}],
+     144)},
+
+  {id:'bearish_engulfing_combo',cat:'combo',title:'看跌吞噬',en:'Bearish Engulfing',bullish:false,diff:'入門',
+   tags:['頭部反轉','雙K組合','主力出貨'],
+   summary:'上漲趨勢高點，大陰線實體完整包覆前一根陽線實體，代表賣方力道徹底壓制多方，頭部反轉訊號。',
+   points:[
+     '陰線實體必須完整包覆陽線實體；前日為大陽線、今日全部吞噬，代表主力吃貨後轉向積極出貨',
+     '需出現在明確的上升趨勢高點，量同步放大才有意義；盤整中的吞噬意義不大',
+     '與看漲吞噬互為鏡像；陰線收盤跌破前日開盤是最低確認條件，包覆程度越深越有力'
+   ],
+   example:'台積電2021年10月在688元高點出現吞噬型態，配合外資開始賣超，成為中線賣出訊號，隨後回跌至500元以下。',
+   tip:'吞噬陰線收盤確認後，隔日開盤做空或出清多單，停損設吞噬陰線最高點，目標前一波重要支撐位。',
+   indicators:['成交量大幅放大（賣壓重）','RSI 70以上超買區','MACD柱狀體由正轉負'],
+   svg: () => comboSvg(
+     [{h:50,bt:52,bb:66,l:68,bull:true},{h:38,bt:40,bb:54,l:56,bull:true},{h:26,bt:28,bb:42,l:44,bull:true}],
+     [{h:20,bt:22,bb:34,l:36,bull:true},{h:18,bt:22,bb:64,l:66,bull:false},{h:46,bt:50,bb:68,l:70,bull:false}],
+     144)},
+
+  {id:'three_white_soldiers_combo',cat:'combo',title:'三兵連發',en:'Three White Soldiers',bullish:true,diff:'入門',
+   tags:['趨勢延續','三K組合','強勢多頭'],
+   summary:'連續三根實體遞增的大陽線，每根收盤均創新高，代表多方勢如破竹，是最強勢的看漲延續訊號。',
+   points:[
+     '三根陽線每日收盤均高於前日，且每日開盤均在前日實體中段附近；影線越短代表多方主導越完全',
+     '出現在底部突破後的三兵連發，趨勢起始意義最強；若在高位出現需警惕「頓塞型」變種',
+     '三根每日量均需放量，或至少第三根明顯放大，代表持續湧入的買盤'
+   ],
+   example:'電子股財報優異後連續三日漲停或大漲，形成三兵連發，是追多入場的經典型態。半導體族群景氣復甦初期常見此型態。',
+   tip:'出現在突破關鍵壓力後的三兵連發，可在第三根收盤後追進，停損設第二根陽線低點。追強不追弱。',
+   indicators:['成交量三日遞增','均線（MA5、MA10）向上發散','RSI 50~70健康多頭區間'],
+   svg: () => comboSvg(
+     [{h:38,bt:42,bb:58,l:60,bull:false},{h:40,bt:44,bb:60,l:62,bull:true},{h:42,bt:44,bb:60,l:62,bull:false}],
+     [{h:38,bt:40,bb:58,l:60,bull:true},{h:24,bt:26,bb:44,l:46,bull:true},{h:12,bt:14,bb:32,l:34,bull:true},{h:8,bt:10,bb:24,l:26,bull:true}],
+     168)},
+
+  {id:'three_black_crows_combo',cat:'combo',title:'三隻烏鴉',en:'Three Black Crows',bullish:false,diff:'入門',
+   tags:['趨勢延續','三K組合','強勢空頭'],
+   summary:'連續三根實體遞增的大陰線，每根收盤均創新低，代表空方徹底主導，是最強勢的看跌延續訊號。',
+   points:[
+     '三根陰線每日收盤均低於前日，且開盤在前日實體中段附近；影線越短代表空方控制越完全',
+     '出現在高點頭部確認後，或指數跌破關鍵支撐後，代表拋售潮正式啟動',
+     '三根成交量均需放大，代表市場恐慌性拋售或主力積極做空的確認'
+   ],
+   example:'2022年初台股高點附近，電子股跌破年線後出現三隻烏鴉，大盤由萬八重挫至萬三，跌幅逾兩千八百點。',
+   tip:'見三隻烏鴉應立即出清所有多單，不要猜反彈進場。個股出現此型態，停損優先，不與主力對賭。',
+   indicators:['成交量持續放大（恐慌賣壓）','均線空頭排列（短均在長均下方）','RSI持續低於50'],
+   svg: () => comboSvg(
+     [{h:18,bt:20,bb:36,l:38,bull:true},{h:14,bt:16,bb:32,l:34,bull:true},{h:12,bt:14,bb:28,l:30,bull:true}],
+     [{h:16,bt:20,bb:40,l:42,bull:false},{h:28,bt:32,bb:54,l:56,bull:false},{h:42,bt:46,bb:68,l:70,bull:false},{h:54,bt:58,bb:76,l:78,bull:false}],
+     168)},
+
+  {id:'bullish_harami_combo',cat:'combo',title:'看漲孕線',en:'Bullish Harami',bullish:true,diff:'進階',
+   tags:['底部反轉','雙K組合','縮量整理'],
+   summary:'大陰線後出現一根完全在其實體範圍內的小陽線，代表賣壓暫時收斂，多空出現轉機，需等第三根確認。',
+   points:[
+     '子線（小陽線）必須完全在母線（大陰線）的實體範圍內，開收盤均不可超出；子線越小、型態越標準',
+     '孕線本身是「觀望訊號」，需等第三根確認陽線收盤才能判斷是否真正反轉，不可搶進',
+     '量能：母線放量、子線大幅縮量，代表賣壓暫歇，是主力暫停出貨的訊號'
+   ],
+   example:'台股個股在整數關卡附近橫盤整理時，常出現孕線後拉升。法人護盤股（如台積電）在支撐區的孕線可靠性較高。',
+   tip:'見孕線後等第三根確認陽線，收盤站上母線實體上緣時入場做多，停損設母線低點，需有耐心等待確認。',
+   indicators:['子線成交量萎縮至母線30%以下','是否在重要支撐（季線、半年線）附近','KD指標低檔黃金交叉'],
+   svg: () => comboSvg(
+     [{h:12,bt:16,bb:32,l:34,bull:false},{h:20,bt:24,bb:42,l:44,bull:false},{h:30,bt:34,bb:52,l:54,bull:false}],
+     [{h:32,bt:36,bb:64,l:68,bull:false},{h:44,bt:48,bb:56,l:58,bull:true},{h:28,bt:30,bb:48,l:50,bull:true}],
+     144)},
+
+  {id:'dark_cloud_cover_combo',cat:'combo',title:'烏雲蓋頂',en:'Dark Cloud Cover',bullish:false,diff:'進階',
+   tags:['頭部反轉','雙K組合','賣壓反壓'],
+   summary:'大陽線後隔日跳空開高，但遭賣壓大幅壓回，收盤跌破前日陽線實體中點以下，是強力看跌訊號。',
+   points:[
+     '第二根陰線必須開盤高於前日陽線最高點（跳空高開），然後收盤跌破前日陽線實體中點以下',
+     '跌破程度越深越有力；若陰線收盤跌破前日陽線開盤，已升級為「看跌吞噬」，強度更高',
+     '最佳配合：第一根放量、第二根更大量，代表高位出現大量拋售，主力藉高開出貨'
+   ],
+   example:'權值股在法說會後跳空開高，業績不如預期後賣壓湧現，收盤大幅回落，形成烏雲蓋頂的教科書型態。',
+   tip:'見烏雲蓋頂第二日收盤確認後，次日開盤減碼出場，停損設第二根陰線最高點。空倉可在當日收盤後加碼。',
+   indicators:['成交量第二日大幅放大（主力出貨）','RSI高檔70以上出現鈍化','MACD頂背離訊號確認'],
+   svg: () => comboSvg(
+     [{h:50,bt:52,bb:68,l:70,bull:true},{h:36,bt:38,bb:54,l:56,bull:true},{h:22,bt:24,bb:40,l:42,bull:true}],
+     [{h:10,bt:12,bb:44,l:46,bull:true},{h:6,bt:8,bb:36,l:50,bull:false},{h:28,bt:32,bb:58,l:60,bull:false}],
+     144)},
+
+  {id:'piercing_pattern_combo',cat:'combo',title:'穿頭破腳',en:'Piercing Pattern',bullish:true,diff:'進階',
+   tags:['底部反轉','雙K組合','強力支撐'],
+   summary:'大陰線後隔日跳空低開，買方強力回補，收盤穿越前日陰線實體中點以上，為可靠的底部反轉訊號。',
+   points:[
+     '第二根陽線必須開盤低於前日陰線最低點（跳空低開），然後收盤站上前日陰線實體中點以上',
+     '突破程度越高越可靠；若陽線收盤超過前日陰線開盤，已升級為「看漲吞噬」，強度更高',
+     '跳空低開後的強力反彈，代表低位有主力大量承接，籌碼換手完成'
+   ],
+   example:'台股指數在季線或半年線附近跌破後隔日強力反彈站回，形成穿頭破腳，是中線多頭布局的重要機會。',
+   tip:'第二根陽線收盤確認後，次日開盤入場做多，停損設第二根陽線的最低點（跳空低點），目標設前波高點。',
+   indicators:['成交量第二日明顯放大（主力承接）','RSI 30~40超賣反彈確認','外資籌碼出現轉向買超'],
+   svg: () => comboSvg(
+     [{h:14,bt:18,bb:34,l:36,bull:false},{h:22,bt:26,bb:44,l:46,bull:false},{h:32,bt:36,bb:56,l:58,bull:false}],
+     [{h:36,bt:40,bb:64,l:68,bull:false},{h:30,bt:32,bb:72,l:74,bull:true},{h:20,bt:22,bb:40,l:42,bull:true}],
+     144)},
+
+  {id:'bullish_kicker_combo',cat:'combo',title:'旭日東升',en:'Bullish Kicker',bullish:true,diff:'高階',
+   tags:['強力反轉','雙K組合','跳空缺口','主力訊號'],
+   summary:'大陰線後隔日直接跳空開高至第一日開盤價以上，形成罕見的向上缺口，代表多空力道在一夜之間完全逆轉。',
+   points:[
+     '關鍵在缺口位置：第二根陽線的開盤必須等於或高於第一根陰線的「開盤」（非收盤），形成大幅向上缺口',
+     '此型態極為罕見，通常由重大政策利多或業績爆發等催化劑驅動，往往成為不回補的突破型缺口',
+     '成交量必須大幅放大（建議3倍以上）配合正面消息面，才能確認為真正的旭日東升'
+   ],
+   example:'台股2023年AI熱潮帶動科技族群，廣達、緯創等AI伺服器股多次出現旭日東升型態，啟動數十%的波段大漲行情。',
+   tip:'見旭日東升跳空訊號，若量大幅放大，立即追買不等回測。停損設缺口下方（第二根陽線低點），為強度最高的看漲組合型態之一。',
+   indicators:['成交量暴增（至少3倍以上）','消息面有重大正面催化劑（法說會、財報、政策）','外資投信同步大買確認'],
+   svg: () => comboSvg(
+     [{h:20,bt:24,bb:42,l:44,bull:false},{h:28,bt:32,bb:52,l:54,bull:false},{h:36,bt:40,bb:62,l:64,bull:false}],
+     [{h:36,bt:40,bb:66,l:70,bull:false},{h:10,bt:12,bb:32,l:34,bull:true},{h:6,bt:8,bb:22,l:24,bull:true}],
+     144)}
+];
+PATTERNS.push(...COMBOS);
+
 // ─── STATE ─────────────────────────────────────────────────────────────
 let currentCat = 'all', currentDir = 'all', currentDiff = 'all', searchTerm = '';
 let expandedCard = null;
 
 // ─── CATEGORY LABELS ───────────────────────────────────────────────────
-const CAT_LABEL = {single:'單K',double:'雙K',triple:'三K',special:'特殊'};
+const CAT_LABEL = {single:'單K',double:'雙K',triple:'三K',special:'特殊',combo:'組合'};
 
 // ─── DIRECTION BADGE ───────────────────────────────────────────────────
 function dirBadge(bullish) {
