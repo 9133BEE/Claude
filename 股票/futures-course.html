@@ -94,16 +94,18 @@ a{color:inherit;text-decoration:none}
 .btn-undone{background:#fff;color:#059669;border:1px solid #059669}
 
 /* ── MOBILE ── */
+.fab-toc{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;border:none;border-radius:50px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;z-index:200;box-shadow:0 4px 20px rgba(59,130,246,.45);align-items:center;gap:8px;white-space:nowrap;letter-spacing:.02em}
 @media(max-width:768px){
   body{flex-direction:column}
   .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);width:280px}
   .sidebar.open{transform:translateX(0)}
   .overlay.show{display:block}
   .mob-bar{display:flex}
-  .lw{padding:20px 14px 60px}
+  .lw{padding:20px 14px 90px}
   .ls-title{font-size:1.3rem}
   .body-card{padding:18px}
   .diag{padding:14px}
+  .fab-toc{display:flex}
 }
 </style>
 </head>
@@ -1757,5 +1759,6 @@ updateProgress();
 const hash = parseInt(location.hash.replace('#','')||'0');
 go(isNaN(hash)?0:Math.min(hash,LESSONS.length-1));
 </script>
+<button class="fab-toc" onclick="openSB()">☰ 目錄</button>
 </body>
 </html>
