@@ -197,9 +197,9 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
     <div>
       <div class="hero-label">Technical Analysis</div>
       <h1 class="hero-title">K線型態<span class="grad">完整圖鑑</span></h1>
-      <p class="hero-subtitle">45 種K線型態一站收錄 — 從單根影線到組合實戰型態<br>每種型態附帶 SVG 視覺圖示、台股實例與操作技巧</p>
+      <p class="hero-subtitle">50 種K線型態一站收錄 — 從單根影線到組合實戰型態<br>每種型態附帶 SVG 視覺圖示、台股實例與操作技巧</p>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num">45</div><div class="hero-stat-label">型態總數</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">50</div><div class="hero-stat-label">型態總數</div></div>
         <div class="hero-stat"><div class="hero-stat-num">5</div><div class="hero-stat-label">型態分類</div></div>
         <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">難度等級</div></div>
       </div>
@@ -211,8 +211,8 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 <!-- TABS -->
 <div class="tab-nav" id="tab-nav">
   <div class="tab-list" id="tab-list">
-    <button class="tab-btn active" data-cat="all" onclick="switchCat('all',this)">全部 <span class="tab-count">45</span></button>
-    <button class="tab-btn" data-cat="single" onclick="switchCat('single',this)">單K型態 <span class="tab-count">11</span></button>
+    <button class="tab-btn active" data-cat="all" onclick="switchCat('all',this)">全部 <span class="tab-count">50</span></button>
+    <button class="tab-btn" data-cat="single" onclick="switchCat('single',this)">單K型態 <span class="tab-count">16</span></button>
     <button class="tab-btn" data-cat="double" onclick="switchCat('double',this)">雙K型態 <span class="tab-count">8</span></button>
     <button class="tab-btn" data-cat="triple" onclick="switchCat('triple',this)">三K型態 <span class="tab-count">10</span></button>
     <button class="tab-btn" data-cat="special" onclick="switchCat('special',this)">特殊型態 <span class="tab-count">6</span></button>
@@ -248,7 +248,7 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-logo"><span>股學</span>筆記</div>
-  <div class="footer-text">K線型態圖鑑 — 45種型態完整收錄</div>
+  <div class="footer-text">K線型態圖鑑 — 50種型態完整收錄</div>
   <div class="footer-disclaimer">© 2025 股學筆記｜本站內容僅供教育參考，不構成任何投資建議。投資有風險，入市需謹慎。</div>
 </footer>
 
@@ -410,6 +410,51 @@ const PATTERNS = [
    tip:'連續三根以上紡錘線後，第一根突破往往是方向確認，可跟進。',
    indicators:['布林通道帶寬收窄（盤整確認）','成交量是否持續萎縮','ADX是否低於20'],
    svg: () => psvg('spinning_top',[{h:10,bt:30,bb:56,l:76,bull:null}],48)},
+
+  {id:'high_wave',cat:'single',title:'高浪線',en:'High Wave Candle',bullish:null,diff:'高階',
+   tags:['高度不確定','極端波動','中性','單K'],
+   summary:'上下影線均極長、實體極小的K線，代表當日多空激烈廝殺後幾近平局，市場不確定性達到極致。',
+   points:['上下影線均需超過實體長度的3倍，是長腳十字線的「強化版」，代表更劇烈的多空攻防','通常在重大消息或事件衝擊後出現，代表市場參與者無法形成共識，正在重新定價','連續出現高浪線代表趨勢已嚴重衰竭，突破任一方向的力道往往很強'],
+   example:'聯準會意外升降息、地緣衝突、重大財報等事件後，相關標的常出現高浪線，代表資金正在劇烈博弈。',
+   tip:'高浪線出現後觀察成交量：縮量代表觀望，爆量代表主力換手。次日突破高浪線高低點的方向，往往是中期趨勢方向。',
+   indicators:['VIX 波動率指標是否飆升','成交量是否為近期極端高點','是否有重大事件或消息面衝擊'],
+   svg: () => psvg('high_wave',[{h:6,bt:36,bb:50,l:78,bull:null}],48)},
+
+  {id:'upper_limit',cat:'single',title:'漲停板K',en:'Upper Limit Candle',bullish:true,diff:'入門',
+   tags:['強勢多頭','漲停','台股特有','單K'],
+   summary:'台股每日漲幅上限10%，K線呈現大陽線幾乎無上下影線，代表全日買盤壓倒性主導，是最強單日看漲訊號。',
+   points:['台股規定個股每日漲跌幅上限10%（ETF為10%，指數型商品不同），大陽線幾乎沒有上影線代表尾盤仍鎖板','鎖板（無法繼續交易）代表市場買盤極強，明日開盤仍有延續強勢的高機率','連續漲停板出現在業績爆發、重大政策、主力狙擊等情境，是短線最強勢型態'],
+   example:'AI伺服器族群2023年大爆發，廣達、緯創等個股連續多日漲停，形成「天天漲停板K線群」，帶動整體族群大漲。',
+   tip:'漲停板若在盤中被打開（有人大量賣出），代表籌碼賣壓重，需謹慎；若全日鎖板到收盤，明日追進機率高。',
+   indicators:['成交量是否持續放大（代表追買動能）','是否有重大基本面/消息面催化劑','融資餘額是否急速增加（注意獲利了結壓力）'],
+   svg: () => psvg('upper_limit',[{h:14,bt:16,bb:70,l:76,bull:true}],48)},
+
+  {id:'lower_limit',cat:'single',title:'跌停板K',en:'Lower Limit Candle',bullish:false,diff:'入門',
+   tags:['強勢空頭','跌停','台股特有','單K'],
+   summary:'台股每日跌幅下限10%，K線呈現大陰線幾乎無上下影線，代表全日賣盤壓倒性主導，是最強單日看跌訊號。',
+   points:['大陰線幾乎沒有下影線代表尾盤仍鎖死跌停，無人願意低接，明日開盤繼續走低的機率高','無量跌停（成交量極小）代表市場恐慌拋售且無人承接，最具殺傷力；有量跌停代表有人開始低接','重大利空（財報雷、主力出事、系統性風險）觸發跌停，往往是連續跌停的開始'],
+   example:'個股被爆出財報造假、董事長跑路等重大負面消息，常見連續數日跌停板，散戶幾乎無法出場。',
+   tip:'見跌停板K千萬不要接刀，等股價止跌並放量反彈、出現底部確認型態後才考慮介入。無量跌停最危險，寧可空手觀望。',
+   indicators:['融資斷頭量是否急增','是否有重大基本面負面消息','外資投信是否持續大量賣超'],
+   svg: () => psvg('lower_limit',[{h:10,bt:12,bb:72,l:76,bull:false}],48)},
+
+  {id:'bullish_lower_shadow',cat:'single',title:'帶下影長陽K',en:'Bullish Candle with Lower Shadow',bullish:true,diff:'入門',
+   tags:['買盤支撐','下影線','多頭延續','單K'],
+   summary:'長陽實體搭配明顯下影線，代表盤中雖有賣壓拉低，但多方最終完全消化並大幅拉升，看漲但需注意下方支撐。',
+   points:['下影線代表盤中有賣壓（或逢低買進），但最終被多方克服；下影線越長代表下方支撐越強','與錘子線不同：帶下影長陽K有大實體，多方主導性更強，適合趨勢延續環境','出現在上升趨勢中代表回調支撐有效；出現在底部代表買盤已在低位積極介入'],
+   example:'台積電在上升趨勢中回測季線後收一根帶長下影的大陽K，代表季線支撐有效，是加碼做多的機會。',
+   tip:'實體越長、下影線越長越好；若同時伴隨成交量放大（下影部分代表抄底買盤），確認支撐更可靠，可積極做多。',
+   indicators:['成交量是否在下影部分異常放大','是否在重要均線或支撐位附近','KD指標是否在低檔黃金交叉'],
+   svg: () => psvg('bullish_lower_shadow',[{h:10,bt:12,bb:48,l:76,bull:true}],48)},
+
+  {id:'four_price_doji',cat:'single',title:'四價同一線',en:'Four Price Doji',bullish:null,diff:'高階',
+   tags:['極端中性','稀有','停滯','單K'],
+   summary:'開盤、最高、最低、收盤四個價格完全相同，呈現一條水平線，代表市場完全停滯，幾乎沒有波動。',
+   points:['圖表上呈現一條水平橫線，是最極端的中性K線，代表當日價格完全沒有波動（或只有0.01%以內）','在流動性極低的個股或重大停牌後復牌第一日偶爾出現，代表市場缺乏參與者','在主板活躍個股極為罕見；若出現，往往是交易暫停、系統問題或重大事件前夕'],
+   example:'台股偶發性停牌（如重大消息宣布前）復牌後，或流動性極低的中小型股，有時出現四價同一的情況。',
+   tip:'四價同一出現後，次日任何方向的突破往往帶有強烈的方向性；注意後續的開盤方向和成交量，是判斷真實方向的關鍵。',
+   indicators:['前日與隔日K線的方向','是否有重大消息即將宣布','成交量是否幾近於零'],
+   svg: () => psvg('four_price_doji',[{h:42,bt:42,bb:42,l:42,bull:null}],48)},
 
   // ── DOUBLE K ──────────────────────────────────────────────────────────
   {id:'bullish_engulfing',cat:'double',title:'看漲吞噬',en:'Bullish Engulfing',bullish:true,diff:'入門',
