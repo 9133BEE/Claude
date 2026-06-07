@@ -136,7 +136,8 @@ const CHAPTERS = [
   {label:'第二章：保證金制度', ids:[3,4,5]},
   {label:'第三章：下單操作實務', ids:[6,7,8,9]},
   {label:'第四章：進階應用', ids:[10,11,12,13]},
-  {label:'第五章：工具書速查', ids:[14,15,16]}
+  {label:'第五章：工具書速查', ids:[14,15,16]},
+  {label:'第六章：實戰技能', ids:[17,18,19]}
 ];
 
 const LESSONS = [
@@ -1350,7 +1351,294 @@ body:`<h3>策略一：趨勢追蹤（Trend Following）</h3>
 初學者建議從「趨勢追蹤」入門——勝率雖低（約40–45%），但單次獲利遠大於虧損，長期正期望值。
 區間操作看似容易，但一次破位可能吞掉數次獲利。當沖需要大量練習和心理素質，不適合剛入門者。
 <strong>先練「看方向、設停損、嚴格執行」，再談策略複雜度。</strong></div>`,
-pts:['趨勢策略：確認方向後順勢操作，用移動停利讓獲利奔跑','區間操作：在確認支撐壓力範圍內高賣低買，破位立即出場','ETF避險：用期貨空單對沖ETF部位，降低市場下跌風險','當沖新手慎入，先在模擬帳戶練習至少一個月再用真錢']}
+pts:['趨勢策略：確認方向後順勢操作，用移動停利讓獲利奔跑','區間操作：在確認支撐壓力範圍內高賣低買，破位立即出場','ETF避險：用期貨空單對沖ETF部位，降低市場下跌風險','當沖新手慎入，先在模擬帳戶練習至少一個月再用真錢']},
+
+/* 17 */
+{num:'6-1',title:'台指期技術分析必備',sub:'均線、量價、K線型態——期貨交易三大工具',ch:'第六章：實戰技能',rt:'14 分鐘',
+cap:'均線多頭排列 vs 空頭排列判斷',
+svg:`<svg viewBox="0 0 580 175" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="175" fill="#0f172a" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#94a3b8" font-size="10.5" font-weight="600">均線多頭排列 / 空頭排列 + 成交量判讀</text>
+<rect x="8" y="24" width="278" height="146" fill="#0a2540" rx="6" stroke="#1d4ed8" stroke-width="0.8"/>
+<text x="147" y="40" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">多頭排列（做多信號）</text>
+<polyline points="20,130 50,115 75,105 100,88 130,72 160,58 190,46 220,38 260,32" fill="none" stroke="#34d399" stroke-width="2"/>
+<polyline points="20,138 50,128 75,120 100,108 130,95 160,84 190,75 220,68 260,63" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+<polyline points="20,145 50,140 75,135 100,128 130,119 160,112 190,106 220,101 260,97" fill="none" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,2"/>
+<text x="265" y="34" fill="#34d399" font-size="8">MA5</text>
+<text x="265" y="65" fill="#fbbf24" font-size="8">MA20</text>
+<text x="265" y="99" fill="#f87171" font-size="8">MA60</text>
+<text x="147" y="155" text-anchor="middle" fill="#34d399" font-size="8.5">MA5 在最上 → 短期趨勢最強 → 做多</text>
+<rect x="294" y="24" width="278" height="146" fill="#1a0a0a" rx="6" stroke="#ef4444" stroke-width="0.8"/>
+<text x="433" y="40" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">空頭排列（做空信號）</text>
+<polyline points="306,32 336,38 361,48 386,62 416,78 446,92 476,106 506,116 566,130" fill="none" stroke="#f87171" stroke-width="2"/>
+<polyline points="306,40 336,48 361,58 386,72 416,86 446,99 476,110 506,118 566,130" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+<polyline points="306,55 336,60 361,68 386,79 416,90 446,100 476,109 506,116 566,126" fill="none" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4,2"/>
+<text x="570" y="132" fill="#f87171" font-size="8">MA5</text>
+<text x="570" y="140" fill="#fbbf24" font-size="8">MA20</text>
+<text x="570" y="148" fill="#34d399" font-size="8">MA60</text>
+<text x="433" y="155" text-anchor="middle" fill="#f87171" font-size="8.5">MA5 在最下 → 短期趨勢最弱 → 做空</text>
+</svg>`,
+body:`<h3>一、移動均線（MA）——最基礎的趨勢工具</h3>
+<div class="hl"><b>📌 期貨交易最常用的三條均線</b>
+MA5（5日線）：短期趨勢，日內和短線操作的主要參考。
+MA20（月線）：中期趨勢，多空分水嶺，突破或跌破最重要。
+MA60（季線）：長期趨勢，支撐和壓力的重要位置。</div>
+<h3>多頭排列 vs 空頭排列</h3>
+<table class="cmp-table">
+<tr><th>排列狀態</th><th>均線順序</th><th>操作方向</th><th>意義</th></tr>
+<tr><td>多頭排列</td><td>MA5 &gt; MA20 &gt; MA60</td><td>做多（偏多操作）</td><td>短期&gt;中期&gt;長期，上升趨勢確立</td></tr>
+<tr><td>空頭排列</td><td>MA5 &lt; MA20 &lt; MA60</td><td>做空（偏空操作）</td><td>短期&lt;中期&lt;長期，下跌趨勢確立</td></tr>
+<tr><td>糾結中立</td><td>三線纏繞</td><td>觀望</td><td>方向不明，等待突破再操作</td></tr>
+</table>
+<div class="eg"><b>實戰應用範例</b><br>
+台指期大台，目前：MA5=20,200 / MA20=19,800 / MA60=19,500。<br>
+→ 多頭排列！適合做多。<br>
+進場策略：MA20附近（19,800±50點）是相對好的買點，停損設MA60下方（19,450）。<br>
+目標：前高20,500，風險報酬比約 = 700 ÷ 350 = 2:1。</div>
+<h3>二、RSI（相對強弱指標）</h3>
+<div class="kp-box">
+<b>RSI 公式</b>：RSI = 100 - [100 / (1 + 平均上漲幅度 / 平均下跌幅度)]<br>
+<b>常用設定</b>：RSI(14) — 14個周期（日線用14天，分鐘線用14根K）<br>
+<b>判讀標準</b>：<br>
+• RSI &gt; 70：超買區（可能過熱，注意回調）<br>
+• RSI &lt; 30：超賣區（可能跌深，注意反彈）<br>
+• RSI 50 是多空分界：站穩50偏多，跌破50偏空
+</div>
+<div class="formula">RSI 應用於台指期：
+場景：台指期RSI(14) = 75，指數在21,000點
+→ 超買訊號，但趨勢強勁時RSI可長期維持75–85
+→ 不要單純因為「超買」就空，要等RSI從高點回落+K線轉弱
+
+場景：指數下跌，RSI跌至28（超賣）
+→ 若同時出現長下影線K（錘子線），是反彈做多的機會
+→ 停損設在近期低點下方30點</div>
+<h3>三、MACD（移動平均收斂發散）</h3>
+<div class="kp-box">
+<b>MACD 三要素</b>：<br>
+• DIF線（快線）= EMA12 - EMA26<br>
+• MACD線（慢線）= DIF的9日EMA<br>
+• 柱狀體（OSC）= DIF - MACD（正柱=多頭，負柱=空頭）<br><br>
+<b>最重要的訊號</b>：<br>
+• 黃金交叉：DIF向上穿越MACD → 做多訊號<br>
+• 死亡交叉：DIF向下穿越MACD → 做空訊號<br>
+• 柱狀體由負轉正 → 動能由空轉多
+</div>
+<h3>四、成交量判讀</h3>
+<table class="cmp-table">
+<tr><th>量價關係</th><th>K線狀況</th><th>意義</th><th>操作傾向</th></tr>
+<tr><td>量增價漲</td><td>陽線 + 量創新高</td><td>真突破，資金進場</td><td>積極做多</td></tr>
+<tr><td>量縮價漲</td><td>陽線 + 量萎縮</td><td>假突破可能，缺乏動力</td><td>謹慎做多</td></tr>
+<tr><td>量增價跌</td><td>陰線 + 量創新高</td><td>賣壓沉重，下跌確認</td><td>考慮做空</td></tr>
+<tr><td>量縮價跌</td><td>陰線 + 量萎縮</td><td>下跌動力減弱，可能止跌</td><td>觀望，等反彈</td></tr>
+</table>
+<h3>五、支撐與壓力的判斷</h3>
+<ul>
+<li><strong>整數關卡</strong>：20,000 / 21,000 / 22,000點天然是心理支撐壓力</li>
+<li><strong>前高前低</strong>：市場記憶最強，上方前高是壓力，下方前低是支撐</li>
+<li><strong>均線支撐</strong>：MA20在上升趨勢中常作為動態支撐，碰觸MA20是做多機會</li>
+<li><strong>缺口</strong>：開盤跳空缺口通常有回補傾向，是短線操作的參考點</li>
+</ul>
+<div class="formula">台指期支撐壓力計算範例（20分鐘K線）：
+前日高點：20,350點（壓力）
+前日低點：20,100點（支撐）
+今日開盤：20,200點
+
+操作邏輯：
+多單：20,100附近買入，目標20,350，停損20,050
+空單：20,350附近賣出，目標20,100，停損20,400
+勝率目標：60%以上，風險報酬比2:1</div>
+<div class="warn"><b>⚠️ 技術分析的局限性</b>
+技術分析是工具，不是預言。它告訴你「過去的路徑」，不保證未來走向。
+重大基本面事件（央行決策、企業財報、地緣政治）會讓所有技術形態失效。
+建議：先看基本面大方向（多/空環境），再用技術分析找進出點。</div>`,
+pts:['多頭排列：MA5>MA20>MA60，做多；空頭排列：MA5<MA20<MA60，做空','RSI>70超買，RSI<30超賣，RSI 50是多空分界','MACD黃金交叉做多，死亡交叉做空，配合柱狀體判讀動能','量增價漲是真突破；量縮價漲要謹慎；整數關卡是最強的支撐壓力']},
+
+/* 18 */
+{num:'6-2',title:'籌碼分析：大戶動向',sub:'外資、自營商、散戶——誰在主導台指期',ch:'第六章：實戰技能',rt:'11 分鐘',
+cap:'台指期三大法人期貨部位分析框架',
+svg:`<svg viewBox="0 0 580 168" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="168" fill="#0f172a" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#94a3b8" font-size="10.5" font-weight="600">台指期三大法人未平倉口數（籌碼）示意</text>
+<rect x="10" y="25" width="175" height="136" fill="#0a1628" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="97" y="43" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">外資（QFII）</text>
+<text x="97" y="58" text-anchor="middle" fill="#94a3b8" font-size="8.5">台指期最大參與者</text>
+<rect x="22" y="65" width="63" height="84" fill="#1e3a5f" rx="4"/>
+<text x="53" y="83" text-anchor="middle" fill="#60a5fa" font-size="8">多單</text>
+<rect x="22" y="65" width="63" height="46" fill="#3b82f6" rx="4"/>
+<text x="53" y="92" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">+45,000</text>
+<text x="53" y="104" text-anchor="middle" fill="#bfdbfe" font-size="7.5">口 (多)</text>
+<rect x="110" y="65" width="63" height="84" fill="#1a0a0a" rx="4"/>
+<text x="141" y="83" text-anchor="middle" fill="#f87171" font-size="8">空單</text>
+<rect x="110" y="105" width="63" height="44" fill="#ef4444" rx="0 0 4 4"/>
+<text x="141" y="125" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">-30,000</text>
+<text x="141" y="137" text-anchor="middle" fill="#fca5a5" font-size="7.5">口 (空)</text>
+<text x="97" y="155" text-anchor="middle" fill="#34d399" font-size="8.5" font-weight="700">淨部位：+15,000口（淨多）</text>
+<rect x="202" y="25" width="175" height="136" fill="#0a1a0a" rx="6" stroke="#34d399" stroke-width="0.8"/>
+<text x="289" y="43" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700">自營商（Prop）</text>
+<text x="289" y="58" text-anchor="middle" fill="#94a3b8" font-size="8.5">台灣本土券商自營部門</text>
+<rect x="214" y="65" width="63" height="84" fill="#0a1a0a" rx="4"/>
+<text x="245" y="83" text-anchor="middle" fill="#34d399" font-size="8">多單</text>
+<rect x="214" y="85" width="63" height="64" fill="#059669" rx="0 0 4 4"/>
+<text x="245" y="115" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">+25,000</text>
+<rect x="302" y="65" width="63" height="84" fill="#1a0a0a" rx="4"/>
+<text x="333" y="83" text-anchor="middle" fill="#f87171" font-size="8">空單</text>
+<rect x="302" y="65" width="63" height="50" fill="#dc2626" rx="4"/>
+<text x="333" y="95" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">-35,000</text>
+<text x="289" y="155" text-anchor="middle" fill="#f87171" font-size="8.5" font-weight="700">淨部位：-10,000口（淨空）</text>
+<rect x="394" y="25" width="175" height="136" fill="#1a1a0a" rx="6" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="481" y="43" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">投信（Local Fund）</text>
+<text x="481" y="58" text-anchor="middle" fill="#94a3b8" font-size="8.5">台灣本土基金</text>
+<text x="481" y="90" text-anchor="middle" fill="#94a3b8" font-size="9">部位相對小</text>
+<text x="481" y="108" text-anchor="middle" fill="#fbbf24" font-size="15" font-weight="800">-3,000</text>
+<text x="481" y="124" text-anchor="middle" fill="#94a3b8" font-size="8.5">口（淨空）</text>
+<text x="481" y="155" text-anchor="middle" fill="#94a3b8" font-size="8.5">參考性次於外資</text>
+</svg>`,
+body:`<h3>為什麼要看籌碼？</h3>
+<p>台灣期貨市場中，散戶的交易量占最大比例，但散戶整體長期是虧錢的。外資和自營商是市場中最有資訊優勢的參與者。<strong>追蹤法人籌碼動向</strong>，能幫助你判斷大趨勢是否被「大錢」支撐。</p>
+<h3>三大法人的特性</h3>
+<table class="cmp-table">
+<tr><th>法人類型</th><th>特性</th><th>操作風格</th><th>參考價值</th></tr>
+<tr><td>外資（QFII）</td><td>規模最大，資訊最充分</td><td>趨勢型，持倉時間長</td><td>★★★★★ 最重要</td></tr>
+<tr><td>自營商</td><td>對沖選擇權部位為主</td><td>與選擇權連動，偏短線</td><td>★★★ 搭配選擇權看</td></tr>
+<tr><td>投信</td><td>持有個股為主，期貨部位小</td><td>對沖現股風險</td><td>★★ 參考為輔</td></tr>
+</table>
+<div class="hl"><b>📌 籌碼分析最關鍵指標：外資台指期淨未平倉口數</b><br>
+外資淨口數 = 外資多單口數 - 外資空單口數<br>
+正值（淨多）→ 外資看漲，偏多操作<br>
+負值（淨空）→ 外資看跌，偏空操作<br>
+<strong>重點是「趨勢方向」，而不是絕對數字！</strong></div>
+<h3>如何查詢法人籌碼？</h3>
+<ul>
+<li><strong>台灣期貨交易所（TAIFEX）官網</strong>：每日15:30後公布三大法人期貨部位</li>
+<li><strong>看盤軟體</strong>：券商HTS/APP通常有「三大法人期貨部位」專頁</li>
+<li><strong>Goodinfo / CMoney</strong>：提供歷史法人期貨籌碼圖表</li>
+</ul>
+<h3>籌碼分析的實戰應用</h3>
+<div class="eg"><b>場景一：外資大幅增加多單</b><br>
+觀察到：外資台指期淨口數從+5,000口 → +20,000口（連續3天增加多單）。<br>
+意義：外資正在大幅布局多單，看好後市。<br>
+操作參考：技術面若同時多頭排列，可考慮順勢做多。</div>
+<div class="eg"><b>場景二：外資快速翻空</b><br>
+觀察到：外資淨口數從+15,000口 → +5,000口 → -5,000口（連續3天減多增空）。<br>
+意義：外資開始轉向，市場可能進入盤整或反轉。<br>
+操作參考：多單宜縮減，等待方向明朗。</div>
+<h3>選擇權大戶部位（進階）</h3>
+<p>除了期貨籌碼，<strong>選擇權大戶的最大痛點（Max Pain）</strong>也是重要參考：</p>
+<div class="kp-box">
+<b>選擇權最大痛點（Max Pain）</b><br>
+這個價位是讓選擇權賣方（大戶）損失最小的結算點。<br>
+市場有向Max Pain靠攏的傾向——尤其是結算週。<br>
+查詢方式：各大財經網站的「選擇權PUT/CALL比率」和「最大痛點工具」。
+</div>
+<div class="formula">PUT/CALL比率（P/C Ratio）判讀：
+P/C比 &gt; 1.2：市場偏向買保護（看跌），可能已過度悲觀 → 反彈機會
+P/C比 &lt; 0.8：市場樂觀，買Call多 → 可能過熱，注意回調
+P/C比在 0.9–1.1：中性，方向不明</div>
+<h3>台股大盤與外資期貨部位的歷史關聯</h3>
+<ul>
+<li>2020年3月疫情崩盤：外資期貨淨口數 -50,000口創新低，指數跌至8,500</li>
+<li>2021年牛市：外資淨多單維持在 +20,000–+40,000口，指數衝破18,000</li>
+<li>2022年熊市：外資連續翻空，淨口數長期為負，指數跌回12,600</li>
+<li>2024年多頭：外資淨多單飆升至+60,000口以上，配合AI概念股帶動</li>
+</ul>
+<div class="warn"><b>⚠️ 籌碼分析的限制</b>
+1. 法人數據是「昨日收盤後公布」，存在一天的時間差。
+2. 外資也會「對沖」——期貨空單不代表看跌，可能只是在對沖其持有的台股現貨。
+3. 籌碼是輔助工具，不是唯一依據，要與技術面、基本面綜合判斷。</div>`,
+pts:['外資台指期淨口數是最重要的籌碼指標——淨多偏多，淨空偏空','關注的是趨勢方向變化，而非單日絕對數字','TAIFEX官網每日15:30公布三大法人期貨部位','選擇權Max Pain和P/C比率是進階的市場情緒參考工具']},
+
+/* 19 */
+{num:'6-3',title:'資金控管與交易心理',sub:'90%的虧損不是技術問題，是心理問題',ch:'第六章：實戰技能',rt:'12 分鐘',
+cap:'凱利公式與倉位管理示意',
+svg:`<svg viewBox="0 0 580 168" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="168" fill="#0f172a" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#94a3b8" font-size="10.5" font-weight="600">倉位大小 vs 長期存活率（模擬200次交易）</text>
+<rect x="10" y="25" width="265" height="136" fill="#0a1628" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="142" y="43" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">保守倉位（每次虧損上限2%）</text>
+<polyline points="20,135 50,128 80,120 110,115 140,108 170,102 200,97 230,92 260,88" fill="none" stroke="#34d399" stroke-width="2"/>
+<text x="245" y="85" fill="#34d399" font-size="8">帳戶淨值</text>
+<rect x="20" y="130" width="10" height="8" fill="#3b82f6" rx="1"/>
+<text x="35" y="138" fill="#94a3b8" font-size="7.5">起始：100萬</text>
+<text x="142" y="155" text-anchor="middle" fill="#34d399" font-size="8.5">長期仍有獲利機會</text>
+<rect x="305" y="25" width="265" height="136" fill="#1a0505" rx="6" stroke="#ef4444" stroke-width="0.8"/>
+<text x="437" y="43" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">激進倉位（每次虧損上限20%）</text>
+<polyline points="315,50 345,55 375,75 405,115 435,155" fill="none" stroke="#ef4444" stroke-width="2"/>
+<text x="437" y="170" text-anchor="middle" fill="#f87171" font-size="8">帳戶快速歸零</text>
+<line x1="315" y1="155" x2="570" y2="155" stroke="#f87171" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="437" y="144" text-anchor="middle" fill="#94a3b8" font-size="7.5">10次虧損即爆倉</text>
+<text x="437" y="165" text-anchor="middle" fill="#f87171" font-size="8.5">20%虧損→無法回到原點（需賺25%才回本）</text>
+</svg>`,
+body:`<h3>為什麼資金控管比選股更重要？</h3>
+<p>假設你有一個勝率60%、賺/賠比2:1的策略（理論上絕對長期獲利），但如果每次押注帳戶的50%，連續3次虧損就會讓帳戶剩下12.5%，<strong>幾乎無法翻身</strong>。資金控管決定你能否活到趨勢來臨的那一刻。</p>
+<h3>核心原則一：單筆虧損不超過帳戶的2%</h3>
+<div class="formula">2% 法則：
+帳戶100萬元 → 單筆最大虧損 = 20,000元
+帳戶50萬元 → 單筆最大虧損 = 10,000元
+帳戶20萬元 → 單筆最大虧損 = 4,000元
+
+套用到大台（點值200元）：
+最大虧損20,000元 / 200元 = 最多能虧100點
+→ 停損點位就在進場點往反方向100點處
+
+如果停損超過100點，那就用小台（50元/點）：
+最大虧損20,000元 / 50元 = 最多能虧400點</div>
+<h3>核心原則二：最大同時持倉不超過帳戶30%</h3>
+<div class="kp-box">
+帳戶100萬 → 同時動用保證金上限30萬元<br>
+大台保證金18.4萬/口 → 最多同時持1口大台<br>
+小台保證金4.6萬/口 → 最多同時持6口小台<br><br>
+<b>為什麼要留70%現金？</b><br>
+1. 應對追繳：虧損時不至於被強制平倉<br>
+2. 加倉機會：趨勢確認後有籌碼可以加倉<br>
+3. 心理穩定：持倉輕，心態才能冷靜執行停損
+</div>
+<h3>凱利公式——最優倉位計算</h3>
+<div class="formula">凱利公式（Kelly Criterion）：
+最優投注比例 = W - (1-W)/R
+
+W = 勝率（win rate）
+R = 盈虧比（平均獲利 / 平均虧損）
+
+範例：勝率55%，平均獲利300點，平均虧損150點
+R = 300 / 150 = 2
+最優比例 = 0.55 - (0.45/2) = 0.55 - 0.225 = 32.5%
+
+→ 理論上投入帳戶32.5%的資金最佳
+→ 實務上建議用「半凱利」= 16.25%，更保守</div>
+<div class="eg"><b>半凱利實際應用</b><br>
+帳戶100萬 × 16.25% = 162,500元可用保證金<br>
+大台保證金18.4萬 → 剛好可持1口大台<br>
+若勝率低至50%：凱利 = 0.5 - 0.5/2 = 0.25（25%）半凱利12.5% → 仍可以持1口大台</div>
+<h3>交易心理：五大常見錯誤</h3>
+<table class="cmp-table">
+<tr><th>心理陷阱</th><th>表現</th><th>破解方法</th></tr>
+<tr><td>損失規避</td><td>虧損單不停損，等待解套</td><td>事前設好停損，執行時不思考</td></tr>
+<tr><td>過度自信</td><td>連勝後加大倉位</td><td>凱利公式規範每次倉位</td></tr>
+<tr><td>追漲殺跌</td><td>看到漲才買，看到跌才賣</td><td>設好進場條件，不看情緒下單</td></tr>
+<tr><td>報復性交易</td><td>虧損後急著加倉扳回</td><td>達到每日虧損上限立即停止</td></tr>
+<tr><td>確認偏誤</td><td>只看支持自己觀點的資訊</td><td>主動找反向論據再做決定</td></tr>
+</table>
+<h3>建立「交易計畫」的5個要素</h3>
+<div class="kp-box">
+每次交易前必須回答這五個問題：<br>
+1. <b>進場理由</b>：為什麼在這個點位進場？（技術面+籌碼面支撐）<br>
+2. <b>停損點</b>：在哪裡停損？最多虧多少錢？<br>
+3. <b>目標點</b>：目標在哪裡？風險報酬比是多少？<br>
+4. <b>部位大小</b>：根據停損計算要做幾口？<br>
+5. <b>出場條件</b>：除了停損/停利，什麼情況下會提前出場？
+</div>
+<h3>每日交易紀律</h3>
+<div class="formula">建議每日規則（防止爆倉的系統性方法）：
+每日虧損上限 = 帳戶的 5%（100萬帳戶 = 5萬/天）
+每日勝利目標 = 帳戶的 3%（100萬帳戶 = 3萬/天）
+連虧3天 → 停止交易2天，重新檢視策略
+連勝5天 → 可考慮小幅提升倉位（不超過50%增加）</div>
+<div class="warn"><b>⚠️ 交易是機率遊戲</b>
+即使有60%勝率，連輸5次的概率 = 0.4^5 = 1.02% — 並不罕見。
+如果每次投入50%資金，連輸5次後帳戶剩下3.1%，幾乎爆倉。
+如果每次投入2%，連輸5次後帳戶剩下90%，還能繼續交易。
+<strong>存活才能等到趨勢。倉位控制的核心目的是讓你撐過不利期。</strong></div>`,
+pts:['2%法則：單筆最大虧損不超過帳戶2%，保持長期生存','凱利公式計算最優倉位，實務用半凱利更保守','最常見5個心理陷阱：損失規避、過度自信、追漲殺跌、報復交易、確認偏誤','每次交易前寫下交易計畫（進場理由/停損/目標/倉位/出場條件）']}
 ];
 
 // ──────────────── JS ENGINE ────────────────
