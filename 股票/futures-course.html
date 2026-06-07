@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>期貨系統課程 — 股學筆記</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:#f0f4f8;color:#1a202c;display:flex;min-height:100vh;font-size:16px;line-height:1.7}
+a{color:inherit;text-decoration:none}
+
+/* ── SIDEBAR ── */
+.sidebar{width:272px;flex-shrink:0;background:#0f172a;display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;z-index:100;transition:transform .3s}
+.sb-head{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-back{display:flex;align-items:center;gap:5px;color:#64748b;font-size:.78rem;margin-bottom:12px;cursor:pointer}
+.sb-back:hover{color:#94a3b8}
+.sb-title{color:#f1f5f9;font-size:.95rem;font-weight:700;line-height:1.4}
+.sb-meta{color:#475569;font-size:.74rem;margin-top:5px}
+.prog-wrap{margin-top:12px;background:#1e293b;border-radius:4px;height:5px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#06b6d4);border-radius:4px;transition:width .4s ease}
+.prog-text{color:#475569;font-size:.7rem;margin-top:6px}
+.ch-list{flex:1;overflow-y:auto;padding:10px 0 20px}
+.ch-label{padding:14px 20px 6px;color:#334155;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ls-item{display:flex;align-items:center;gap:9px;padding:8px 20px;cursor:pointer;color:#64748b;font-size:.82rem;border-left:3px solid transparent;transition:all .15s;line-height:1.4}
+.ls-item:hover{background:rgba(255,255,255,.04);color:#cbd5e1}
+.ls-item.active{color:#93c5fd;background:rgba(59,130,246,.1);border-left-color:#3b82f6}
+.ls-item.done{color:#34d399}
+.ls-num{width:22px;height:22px;border-radius:50%;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;color:#475569}
+.ls-item.active .ls-num{background:#3b82f6;color:#fff}
+.ls-item.done .ls-num{background:#059669;color:#fff}
+.ls-check{margin-left:auto;font-size:.8rem;flex-shrink:0}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;min-height:100vh}
+.mob-bar{display:none;align-items:center;justify-content:space-between;padding:12px 16px;background:#0f172a;color:#fff;position:sticky;top:0;z-index:50}
+.mob-title{font-size:.88rem;font-weight:700}
+.mob-btn{background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.8rem}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90}
+
+.lw{max-width:760px;margin:0 auto;padding:28px 24px 80px}
+.breadcrumb{display:flex;align-items:center;gap:6px;color:#94a3b8;font-size:.76rem;margin-bottom:18px}
+.breadcrumb span{color:#3b82f6;cursor:pointer}
+.breadcrumb span:hover{text-decoration:underline}
+.ch-badge{display:inline-block;background:#eff6ff;color:#3b82f6;padding:3px 10px;border-radius:20px;font-size:.74rem;font-weight:600;margin-bottom:10px}
+.ls-title{font-size:1.65rem;font-weight:800;color:#0f172a;line-height:1.3;margin-bottom:6px}
+.ls-sub{color:#64748b;font-size:.95rem}
+.ls-meta-row{display:flex;align-items:center;gap:14px;margin-top:10px;color:#94a3b8;font-size:.78rem}
+
+/* diagram */
+.diag{background:#fff;border-radius:12px;padding:20px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow-x:auto;text-align:center}
+.diag svg{max-width:100%;display:block;margin:0 auto}
+.diag-cap{color:#94a3b8;font-size:.74rem;margin-top:10px;text-align:center}
+
+/* lesson body */
+.body-card{background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.body-card h3{font-size:1rem;font-weight:700;color:#0f172a;margin:20px 0 8px;padding-left:10px;border-left:3px solid #3b82f6}
+.body-card h3:first-child{margin-top:0}
+.body-card p{color:#374151;line-height:1.85;margin-bottom:10px;font-size:.93rem}
+.body-card ul,.body-card ol{padding-left:18px;color:#374151;font-size:.93rem}
+.body-card li{margin-bottom:5px;line-height:1.75}
+.hl{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 15px;margin:12px 0;color:#1d4ed8;font-size:.88rem}
+.hl b{display:block;margin-bottom:3px}
+.eg{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 15px;margin:12px 0;color:#166534;font-size:.88rem}
+.eg b{display:block;margin-bottom:3px}
+.warn{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 15px;margin:12px 0;color:#92400e;font-size:.88rem}
+.warn b{display:block;margin-bottom:3px}
+.formula{background:#0f172a;border-radius:8px;padding:14px 18px;margin:12px 0;color:#e2e8f0;font-family:monospace;font-size:.85rem;line-height:1.9;overflow-x:auto;white-space:pre}
+.cmp-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.85rem}
+.cmp-table th{background:#0f172a;color:#f1f5f9;padding:9px 12px;text-align:left;font-weight:600}
+.cmp-table td{padding:9px 12px;border-bottom:1px solid #e2e8f0;color:#374151;vertical-align:top}
+.cmp-table tr:nth-child(even) td{background:#f8fafc}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.74rem;font-weight:600;margin:2px}
+.tag-b{background:#eff6ff;color:#1d4ed8}
+.tag-g{background:#f0fdf4;color:#166534}
+.tag-r{background:#fff1f2;color:#9f1239}
+
+/* key points */
+.kp-box{background:#0f172a;border-radius:12px;padding:20px 24px;margin-bottom:14px}
+.kp-box h4{color:#60a5fa;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.kp-box ul{list-style:none;padding:0}
+.kp-box li{color:#e2e8f0;font-size:.88rem;padding:5px 0 5px 22px;position:relative;line-height:1.6}
+.kp-box li::before{content:'✓';color:#34d399;position:absolute;left:0;font-weight:700}
+
+/* footer nav */
+.ls-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:8px;font-size:.86rem;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.btn-primary{background:#3b82f6;color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-ghost{background:#fff;color:#374151;border:1px solid #e2e8f0}
+.btn-ghost:hover{background:#f8fafc}
+.btn-done{background:#059669;color:#fff}
+.btn-done:hover{background:#047857}
+.btn-dim{opacity:.35;pointer-events:none}
+.btn-undone{background:#fff;color:#059669;border:1px solid #059669}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  body{flex-direction:column}
+  .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);width:280px}
+  .sidebar.open{transform:translateX(0)}
+  .overlay.show{display:block}
+  .mob-bar{display:flex}
+  .lw{padding:20px 14px 60px}
+  .ls-title{font-size:1.3rem}
+  .body-card{padding:18px}
+  .diag{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-back" onclick="location.href='index.html'">← 返回股學筆記</div>
+    <div class="sb-title">📈 期貨系統完整課程</div>
+    <div class="sb-meta">4 章節 · 14 堂課 · 約 3 小時</div>
+    <div class="prog-wrap"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
+    <div class="prog-text" id="pText">0 / 14 堂課完成</div>
+  </div>
+  <div class="ch-list" id="chList"></div>
+</nav>
+
+<main class="main">
+  <div class="mob-bar">
+    <span class="mob-title">📈 期貨系統課程</span>
+    <button class="mob-btn" onclick="openSB()">☰ 目錄</button>
+  </div>
+  <div class="lw" id="lw"></div>
+</main>
+
+<script>
+const CHAPTERS = [
+  {label:'第一章：認識期貨', ids:[0,1,2]},
+  {label:'第二章：保證金制度', ids:[3,4,5]},
+  {label:'第三章：下單操作實務', ids:[6,7,8,9]},
+  {label:'第四章：進階應用', ids:[10,11,12,13]}
+];
+
+const LESSONS = [
+/* 0 */
+{num:'1-1',title:'什麼是期貨合約？',sub:'用花店比喻，秒懂期貨的本質',ch:'第一章：認識期貨',rt:'8 分鐘',
+cap:'期貨合約：現在約定，未來交割',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<rect x="20" y="20" width="160" height="120" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" rx="10"/>
+<text x="100" y="47" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="700">今天（簽約日）</text>
+<line x1="40" y1="58" x2="160" y2="58" stroke="#bfdbfe" stroke-width="1"/>
+<text x="100" y="76" text-anchor="middle" fill="#374151" font-size="11">📦 約定品項</text>
+<text x="100" y="96" text-anchor="middle" fill="#374151" font-size="11">💰 約定價格</text>
+<text x="100" y="116" text-anchor="middle" fill="#374151" font-size="11">📅 約定交期</text>
+<text x="100" y="132" text-anchor="middle" fill="#3b82f6" font-size="10" font-weight="600">繳交保證金</text>
+<line x1="185" y1="80" x2="370" y2="80" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>
+<polygon points="370,74 384,80 370,86" fill="#94a3b8"/>
+<text x="280" y="68" text-anchor="middle" fill="#64748b" font-size="10">合約保障</text>
+<text x="280" y="96" text-anchor="middle" fill="#64748b" font-size="10">價格鎖定</text>
+<rect x="390" y="20" width="170" height="120" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="10"/>
+<text x="475" y="47" text-anchor="middle" fill="#166534" font-size="13" font-weight="700">未來（交割日）</text>
+<line x1="410" y1="58" x2="545" y2="58" stroke="#bbf7d0" stroke-width="1"/>
+<text x="475" y="76" text-anchor="middle" fill="#374151" font-size="11">按合約執行交割</text>
+<text x="475" y="96" text-anchor="middle" fill="#374151" font-size="11">不受市價波動</text>
+<text x="475" y="116" text-anchor="middle" fill="#059669" font-size="11" font-weight="600">✓ 風險已對沖</text>
+<text x="475" y="132" text-anchor="middle" fill="#059669" font-size="10">買賣雙方皆受保護</text>
+</svg>`,
+body:`<h3>花店老闆的煩惱</h3>
+<p>情人節前一天，玫瑰花價格可能暴漲3倍。花店老闆不想冒這個風險，於是在1月就找花農談好：「2月14日我要買1,000束玫瑰，每束固定50元。」花農也答應了——這就是<strong>期貨合約的雛形</strong>。</p>
+<div class="hl"><b>📌 期貨的核心定義</b>期貨（Futures）是一種<strong>標準化合約</strong>，買賣雙方同意在未來特定日期，以<strong>現在約定的價格</strong>買入或賣出特定數量的標的物。</div>
+<h3>期貨為什麼存在？</h3>
+<p>期貨最初的目的是<strong>對沖（Hedge）價格風險</strong>。農夫擔心豐收時糧價下跌，食品公司擔心缺糧時價格飆漲，雙方透過期貨合約事先鎖定價格，各自規避不確定性。</p>
+<p>後來，投機者（Speculator）加入市場，他們不需要實際商品，只是預測價格方向來賺取價差——這讓期貨市場的流動性大幅提升，也讓更多人能以較低成本參與。</p>
+<h3>台灣的期貨主要是什麼？</h3>
+<p>台灣期貨市場以<strong>金融期貨</strong>為主，不是農產品。最主流的是<strong>台指期（台股加權指數期貨）</strong>，追蹤台灣加權股價指數的漲跌，是台灣交易量最大的衍生性商品。</p>
+<div class="eg"><b>✅ 生活比喻總結</b>期貨就像「預購」：你現在預訂，鎖定價格，未來到期才取貨（或結算差價）。和一般預購不同的是，期貨合約本身可以在到期前隨時<strong>轉讓買賣</strong>。</div>
+<h3>期貨合約的三個要素</h3>
+<ul>
+<li><strong>標的物</strong>：合約追蹤的對象（台灣加權指數、台積電股票、原油等）</li>
+<li><strong>到期日</strong>：合約履行的日期，台指期為每月第三個週三</li>
+<li><strong>約定價格</strong>：簽約時雙方同意的交割價格（即今日的期貨報價）</li>
+</ul>`,
+pts:['期貨是「現在約定價格、未來交割」的標準化合約','最初目的是對沖價格風險，後來演變成投機交易工具','台灣最主流的是台指期（追蹤加權指數）','期貨合約可在到期前隨時在市場上買賣轉讓']},
+
+/* 1 */
+{num:'1-2',title:'期貨 vs 現貨：5大關鍵差異',sub:'搞懂這些差異，才算真正入門期貨',ch:'第一章：認識期貨',rt:'10 分鐘',
+cap:'現貨與期貨的核心差異對照',
+svg:`<svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="180" fill="#f8fafc" rx="8"/>
+<rect x="10" y="10" width="270" height="160" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5" rx="8"/>
+<rect x="300" y="10" width="270" height="160" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" rx="8"/>
+<text x="145" y="36" text-anchor="middle" fill="#c2410c" font-size="14" font-weight="700">現貨（股票/ETF）</text>
+<text x="435" y="36" text-anchor="middle" fill="#1d4ed8" font-size="14" font-weight="700">期貨（台指期）</text>
+<line x1="20" y1="46" x2="270" y2="46" stroke="#fed7aa" stroke-width="1"/>
+<line x1="310" y1="46" x2="560" y2="46" stroke="#bfdbfe" stroke-width="1"/>
+<text x="145" y="66" text-anchor="middle" fill="#374151" font-size="11">全額付款買入</text>
+<text x="435" y="66" text-anchor="middle" fill="#374151" font-size="11">保證金（約5–15%）</text>
+<text x="145" y="88" text-anchor="middle" fill="#374151" font-size="11">只能做多（漲才賺）</text>
+<text x="435" y="88" text-anchor="middle" fill="#374151" font-size="11">多空雙向（漲跌都能賺）</text>
+<text x="145" y="110" text-anchor="middle" fill="#374151" font-size="11">無到期日</text>
+<text x="435" y="110" text-anchor="middle" fill="#374151" font-size="11">每月第三週三到期</text>
+<text x="145" y="132" text-anchor="middle" fill="#374151" font-size="11">浮盈浮虧不影響現金</text>
+<text x="435" y="132" text-anchor="middle" fill="#374151" font-size="11">每日結算（逐日盯市）</text>
+<text x="145" y="154" text-anchor="middle" fill="#c2410c" font-size="10" font-weight="600">槓桿：1倍</text>
+<text x="435" y="154" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="600">槓桿：15–20倍</text>
+<line x1="285" y1="10" x2="285" y2="170" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4,3"/>
+</svg>`,
+body:`<h3>差異①：資金使用方式</h3>
+<p>買股票要付全額——買一張台積電（1,000股）1,000元，要花100萬元。<br>買一口台指期只需繳交<strong>保證金</strong>（約5–15%的合約價值），其餘資金可留在帳戶或做其他投資。</p>
+<div class="hl"><b>📌 槓桿效果</b>期貨保證金約為合約價值的5–15%，相當於<strong>15–20倍的槓桿</strong>。同樣的資金，期貨能控制更大規模的部位——獲利放大，虧損同樣放大。</div>
+<h3>差異②：交易方向</h3>
+<table class="cmp-table">
+<tr><th>操作</th><th>現貨（股票）</th><th>期貨</th></tr>
+<tr><td>看漲</td><td>✅ 買股票</td><td>✅ 買多單（做多）</td></tr>
+<tr><td>看跌</td><td>⚠️ 融券放空（限制多）</td><td>✅ 賣空單（做空）無限制</td></tr>
+<tr><td>平盤以下放空</td><td>❌ 不得放空</td><td>✅ 可以</td></tr>
+</table>
+<h3>差異③：有沒有到期日</h3>
+<p>股票沒有到期日，可以持有10年、20年。期貨合約<strong>有到期日</strong>（台指期每月第三個週三），到期前必須平倉或換倉，無法無限期持有。</p>
+<h3>差異④：損益結算方式</h3>
+<p>持有股票時，帳面損益不影響你的現金——漲了看帳面開心，跌了還是有原始現金。<br>期貨則是<strong>每日結算（逐日盯市）</strong>：當日收盤後，獲利直接入帳、虧損直接從保證金扣除，這是最大的心理衝擊。</p>
+<h3>差異⑤：稅務</h3>
+<div class="formula">現貨（股票）：
+  交易稅 0.3%（賣出時）
+  股利需計入所得稅
+  資本利得目前免稅
+
+期貨：
+  交易稅 0.004%（來回，極低）
+  期貨交易所得目前課徵期交稅（較低）
+  無配息，不涉及股利稅</div>
+<div class="warn"><b>⚠️ 期貨適合誰？</b>期貨不適合「長期存股」的投資人。它適合：有時間盯盤、能承受高波動、執行嚴格停損紀律的<strong>主動交易者</strong>。</div>`,
+pts:['期貨保證金僅需合約價值5–15%，槓桿15–20倍','期貨可雙向交易，看跌直接做空，無融券限制','期貨有到期日，需定期換倉延續部位','期貨每日結算，損益直接影響帳戶現金']},
+
+/* 2 */
+{num:'1-3',title:'台灣期貨市場全覽',sub:'搞清楚大台、小台、微台的差異',ch:'第一章：認識期貨',rt:'7 分鐘',
+cap:'台指期三種合約規格比較（2024年資料）',
+svg:`<svg viewBox="0 0 580 170" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="170" fill="#f8fafc" rx="8"/>
+<rect x="20" y="20" width="160" height="130" fill="#0f172a" rx="10"/>
+<text x="100" y="48" text-anchor="middle" fill="#60a5fa" font-size="13" font-weight="700">大台（TX）</text>
+<text x="100" y="68" text-anchor="middle" fill="#94a3b8" font-size="10">每點 200 元</text>
+<text x="100" y="86" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">NT$184,000</text>
+<text x="100" y="100" text-anchor="middle" fill="#94a3b8" font-size="9">原始保證金</text>
+<text x="100" y="118" text-anchor="middle" fill="#34d399" font-size="10">✦ 主力合約</text>
+<text x="100" y="136" text-anchor="middle" fill="#94a3b8" font-size="9">流動性最佳</text>
+<rect x="210" y="40" width="160" height="110" fill="#1e3a5f" rx="10"/>
+<text x="290" y="66" text-anchor="middle" fill="#93c5fd" font-size="13" font-weight="700">小台（MTX）</text>
+<text x="290" y="86" text-anchor="middle" fill="#94a3b8" font-size="10">每點 50 元</text>
+<text x="290" y="104" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="700">NT$46,000</text>
+<text x="290" y="118" text-anchor="middle" fill="#94a3b8" font-size="9">原始保證金</text>
+<text x="290" y="136" text-anchor="middle" fill="#fbbf24" font-size="9">大台 1/4</text>
+<rect x="400" y="60" width="160" height="90" fill="#1e293b" rx="10"/>
+<text x="480" y="84" text-anchor="middle" fill="#7dd3fc" font-size="13" font-weight="700">微台（TMF）</text>
+<text x="480" y="102" text-anchor="middle" fill="#94a3b8" font-size="10">每點 10 元</text>
+<text x="480" y="118" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="700">NT$9,200</text>
+<text x="480" y="132" text-anchor="middle" fill="#94a3b8" font-size="9">新手首選</text>
+</svg>`,
+body:`<h3>台灣三大台指期合約</h3>
+<table class="cmp-table">
+<tr><th>商品</th><th>代碼</th><th>每點價值</th><th>原始保證金</th><th>維持保證金</th><th>適合對象</th></tr>
+<tr><td><strong>大台</strong></td><td>TX</td><td>200元</td><td>184,000元</td><td>142,000元</td><td>熟練交易者</td></tr>
+<tr><td><strong>小台</strong></td><td>MTX</td><td>50元</td><td>46,000元</td><td>35,500元</td><td>入門~中級</td></tr>
+<tr><td><strong>微台</strong></td><td>TMF</td><td>10元</td><td>9,200元</td><td>7,100元</td><td>新手練習</td></tr>
+</table>
+<div class="hl"><b>📌 新手建議從微台開始</b>微台保證金僅需約9,200元，指數每漲跌1點，損益只有10元。即使指數波動100點，損益也只有1,000元，風險可控，是最好的實戰練習場。</div>
+<h3>結算日與交割方式</h3>
+<p>台指期採<strong>現金交割</strong>（不是實際交股票），每月到期時，依<strong>結算價</strong>計算損益後直接以現金結清。</p>
+<div class="formula">結算日：每月第三個週三
+結算價：當日台灣加權指數開盤後15分鐘的算術平均值
+交割：現金差額結算（不需要實際買賣股票）
+
+例：合約買入價 18,000點，結算價 18,500點
+大台獲利 = 500點 × 200元 = 100,000元</div>
+<h3>其他台灣期貨商品</h3>
+<ul>
+<li><strong>電子期（TE）</strong>：每點4,000元，追蹤電子類股指數</li>
+<li><strong>金融期（TF）</strong>：每點1,000元，追蹤金融保險類股指數</li>
+<li><strong>個股期貨</strong>：以單一上市股票為標的（台積電、聯發科等500多檔）</li>
+<li><strong>商品期貨</strong>：黃金期（每口1公斤）、布蘭特原油期貨</li>
+</ul>
+<div class="eg"><b>✅ 實務建議</b>初學者請先專注台指期（微台或小台），熟悉操作機制後，再考慮個股期貨或其他商品。每種商品的波動特性不同，不要同時操作太多種類。</div>`,
+pts:['大台每點200元、小台50元、微台10元，規格差20倍','微台保證金僅9,200元，最適合新手練習','台指期每月第三週三結算，採現金差額交割','台灣還有電子期、金融期、個股期貨等商品']},
+
+/* 3 */
+{num:'2-1',title:'保證金制度詳解',sub:'台灣股票沒有這個制度，必須搞懂',ch:'第二章：保證金制度',rt:'10 分鐘',
+cap:'保證金帳戶水位示意圖',
+svg:`<svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="180" fill="#f8fafc" rx="8"/>
+<rect x="60" y="15" width="100" height="150" fill="none" stroke="#cbd5e1" stroke-width="2" rx="6"/>
+<rect x="62" y="17" width="96" height="146" fill="#e2e8f0" rx="4"/>
+<rect x="62" y="71" width="96" height="92" fill="#3b82f6" rx="0 0 4 4"/>
+<line x1="62" y1="71" x2="158" y2="71" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="4,2"/>
+<text x="110" y="60" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">184,000</text>
+<text x="110" y="72" text-anchor="middle" fill="#1d4ed8" font-size="9">原始保證金</text>
+<rect x="62" y="104" width="96" height="59" fill="#f59e0b" rx="0"/>
+<line x1="62" y1="104" x2="158" y2="104" stroke="#d97706" stroke-width="2" stroke-dasharray="4,2"/>
+<text x="110" y="118" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">142,000</text>
+<text x="110" y="130" text-anchor="middle" fill="#fff" font-size="9">維持保證金</text>
+<rect x="62" y="137" width="96" height="26" fill="#ef4444" rx="0 0 4 4"/>
+<line x1="62" y1="137" x2="158" y2="137" stroke="#dc2626" stroke-width="1.5"/>
+<text x="110" y="155" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">追繳線</text>
+<text x="190" y="75" fill="#3b82f6" font-size="11" font-weight="600">← 原始保證金 184,000</text>
+<text x="190" y="92" fill="#64748b" font-size="9">帳戶資金正常水位</text>
+<text x="190" y="115" fill="#d97706" font-size="11" font-weight="600">← 維持保證金 142,000</text>
+<text x="190" y="132" fill="#64748b" font-size="9">低於此線 → 收到追繳通知</text>
+<text x="190" y="150" fill="#ef4444" font-size="11" font-weight="600">← 危險水位</text>
+<text x="190" y="162" fill="#64748b" font-size="9">風險指標 &lt;25% → 強制平倉</text>
+<text x="360" y="40" fill="#374151" font-size="12" font-weight="700">大台（TX）保證金</text>
+<text x="360" y="58" fill="#64748b" font-size="10">合約價值 ≈ 3,700,000 元</text>
+<text x="360" y="75" fill="#64748b" font-size="10">原始保證金 184,000 元</text>
+<text x="360" y="92" fill="#64748b" font-size="10">維持保證金 142,000 元</text>
+<text x="360" y="110" fill="#3b82f6" font-size="10" font-weight="600">槓桿倍數 ≈ 20倍</text>
+</svg>`,
+body:`<h3>什麼是保證金？</h3>
+<p>期貨交易不需要付清合約全額，只需繳交一筆<strong>保證金</strong>作為「誠信保證」。這筆錢存在你的期貨帳戶，用來承擔交易過程中的虧損。</p>
+<p>台指期大台一口合約價值約370萬元，但只需繳交約18.4萬元的保證金，這就是<strong>槓桿</strong>的由來。</p>
+<h3>兩種保證金的差異</h3>
+<table class="cmp-table">
+<tr><th>種類</th><th>說明</th><th>大台金額</th></tr>
+<tr><td><strong>原始保證金</strong>（Initial Margin）</td><td>開倉時需繳交的金額，也是帳戶應維持的正常水位</td><td>184,000元</td></tr>
+<tr><td><strong>維持保證金</strong>（Maintenance Margin）</td><td>帳戶資金的下限，低於此線就會收到追繳通知</td><td>142,000元</td></tr>
+</table>
+<h3>帳戶權益如何計算？</h3>
+<div class="formula">帳戶權益 = 原始保證金 + 浮動損益（未實現）
+
+例：大台買入18,000點，現價下跌至17,800點
+浮動損失 = 200點 × 200元 = 40,000元
+帳戶權益 = 184,000 - 40,000 = 144,000元
+→ 仍高於維持保證金(142,000)，安全</div>
+<h3>風險指標（Risk Indicator）</h3>
+<div class="formula">風險指標 = (帳戶權益 ÷ 維持保證金) × 100%
+
+風險指標 > 100%：正常
+風險指標 &lt; 100%：收到追繳通知（需補款至原始保證金）
+風險指標 &lt;  25%：強制平倉（交易所自動幫你砍倉）</div>
+<div class="warn"><b>⚠️ 重要：補款到原始保證金，不是維持保證金</b>收到追繳通知後，必須補款讓帳戶回到<strong>原始保證金</strong>水位，而非只補到維持保證金。許多新手誤解這一點，補款不足後仍被強制平倉。</div>
+<h3>保證金的實務建議</h3>
+<ul>
+<li>帳戶建議保持<strong>2–3倍保證金</strong>的緩衝，避免小波動就觸發追繳</li>
+<li>做大台建議帳戶至少有40–50萬元，才有足夠緩衝空間</li>
+<li>做微台帳戶至少2–3萬元起步</li>
+</ul>`,
+pts:['保證金是合約價值的5–15%，產生槓桿效應','原始保證金＞維持保證金，低於維持線就追繳','帳戶權益＝保證金＋浮動損益（每日即時更新）','風險指標低於25%，交易所強制平倉']},
+
+/* 4 */
+{num:'2-2',title:'逐日盯市：每日結算機制',sub:'最讓新手驚嚇的期貨特性',ch:'第二章：保證金制度',rt:'8 分鐘',
+cap:'五個交易日的逐日盯市示意',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<text x="290" y="24" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">持有大台多單1口（買入18,000點）</text>
+<g transform="translate(20,35)">
+<rect width="100" height="105" fill="#fff" stroke="#e2e8f0" stroke-width="1" rx="6"/>
+<text x="50" y="22" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">Day 1</text>
+<text x="50" y="40" text-anchor="middle" fill="#374151" font-size="10">18,200點</text>
+<line x1="10" y1="50" x2="90" y2="50" stroke="#e2e8f0" stroke-width="1"/>
+<text x="50" y="68" text-anchor="middle" fill="#059669" font-size="10" font-weight="700">+200點</text>
+<text x="50" y="84" text-anchor="middle" fill="#059669" font-size="12" font-weight="700">+40,000</text>
+<text x="50" y="98" text-anchor="middle" fill="#94a3b8" font-size="9">入帳 ✓</text>
+</g>
+<g transform="translate(130,35)">
+<rect width="100" height="105" fill="#fff" stroke="#e2e8f0" stroke-width="1" rx="6"/>
+<text x="50" y="22" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">Day 2</text>
+<text x="50" y="40" text-anchor="middle" fill="#374151" font-size="10">18,050點</text>
+<line x1="10" y1="50" x2="90" y2="50" stroke="#e2e8f0" stroke-width="1"/>
+<text x="50" y="68" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">-150點</text>
+<text x="50" y="84" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="700">-30,000</text>
+<text x="50" y="98" text-anchor="middle" fill="#94a3b8" font-size="9">扣款 ✗</text>
+</g>
+<g transform="translate(240,35)">
+<rect width="100" height="105" fill="#fff" stroke="#e2e8f0" stroke-width="1" rx="6"/>
+<text x="50" y="22" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">Day 3</text>
+<text x="50" y="40" text-anchor="middle" fill="#374151" font-size="10">18,300點</text>
+<line x1="10" y1="50" x2="90" y2="50" stroke="#e2e8f0" stroke-width="1"/>
+<text x="50" y="68" text-anchor="middle" fill="#059669" font-size="10" font-weight="700">+250點</text>
+<text x="50" y="84" text-anchor="middle" fill="#059669" font-size="12" font-weight="700">+50,000</text>
+<text x="50" y="98" text-anchor="middle" fill="#94a3b8" font-size="9">入帳 ✓</text>
+</g>
+<g transform="translate(350,35)">
+<rect width="100" height="105" fill="#fff" stroke="#e2e8f0" stroke-width="1" rx="6"/>
+<text x="50" y="22" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">Day 4</text>
+<text x="50" y="40" text-anchor="middle" fill="#374151" font-size="10">18,100點</text>
+<line x1="10" y1="50" x2="90" y2="50" stroke="#e2e8f0" stroke-width="1"/>
+<text x="50" y="68" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="700">-200點</text>
+<text x="50" y="84" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="700">-40,000</text>
+<text x="50" y="98" text-anchor="middle" fill="#94a3b8" font-size="9">扣款 ✗</text>
+</g>
+<g transform="translate(460,35)">
+<rect width="100" height="105" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="6"/>
+<text x="50" y="22" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">Day 5（平倉）</text>
+<text x="50" y="40" text-anchor="middle" fill="#374151" font-size="10">18,400點</text>
+<line x1="10" y1="50" x2="90" y2="50" stroke="#bbf7d0" stroke-width="1"/>
+<text x="50" y="68" text-anchor="middle" fill="#059669" font-size="10" font-weight="700">+300點</text>
+<text x="50" y="84" text-anchor="middle" fill="#059669" font-size="12" font-weight="700">+60,000</text>
+<text x="50" y="98" text-anchor="middle" fill="#059669" font-size="9" font-weight="700">已平倉</text>
+</g>
+<text x="290" y="153" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">5日總損益：(+40,000) + (-30,000) + (+50,000) + (-40,000) + (+60,000) = +80,000元</text>
+</svg>`,
+body:`<h3>什麼是逐日盯市？</h3>
+<p>「逐日盯市」（Mark-to-Market）是期貨最與眾不同的機制：每個交易日收盤後，交易所依<strong>當日結算價</strong>重新計算你的部位損益，並立即從帳戶入帳或扣款。</p>
+<div class="hl"><b>📌 和股票最大的不同</b>持有股票：虧損20萬，帳戶現金<strong>不減少</strong>，只是帳面浮虧。<br>持有期貨：虧損20萬，帳戶現金<strong>立即減少</strong>20萬，這是真實的現金流動。</div>
+<h3>每日損益怎麼算？</h3>
+<div class="formula">當日損益（多單）= (今日結算價 - 昨日結算價) × 每點價值 × 口數
+
+例：持有大台多單1口
+昨日結算價：18,000點
+今日結算價：18,200點
+今日損益 = (18,200 - 18,000) × 200元 × 1口 = +40,000元
+→ 今晚自動入帳40,000元
+
+若今日結算價：17,850點
+今日損益 = (17,850 - 18,000) × 200元 × 1口 = -30,000元
+→ 今晚自動扣款30,000元</div>
+<h3>為什麼要逐日盯市？</h3>
+<p>逐日盯市確保<strong>交易所的風險最小化</strong>——如果期貨像股票一樣等到最後才結算，帳戶虧損可能遠超保證金，造成違約風險。每日結算把風險限制在「一天的波動範圍內」。</p>
+<h3>實務上的心理衝擊</h3>
+<p>新手最大的心理衝擊是：晚上看到帳戶扣了好幾萬，即使隔天反彈回來，那幾萬也已經「真實消失再真實回來」，心理壓力遠大於股票的帳面浮虧。</p>
+<div class="eg"><b>✅ 調適方法</b>做期貨要看「累積損益」，不要每天看帳戶餘額起伏。每個交易日的扣款或入帳，在你還未平倉前都只是「階段性結算」，平倉後才是最終損益。</div>`,
+pts:['逐日盯市：每日收盤後依結算價計算損益並即時入帳/扣款','獲利直接入帳可取用；虧損直接從保證金扣除','和股票最大差異：期貨的浮盈浮虧每天都是真實現金流動','逐日盯市讓交易所限制單日違約風險']},
+
+/* 5 */
+{num:'2-3',title:'追繳保證金完整指南',sub:'收到Margin Call要怎麼辦？',ch:'第二章：保證金制度',rt:'9 分鐘',
+cap:'追繳保證金處理流程圖',
+svg:`<svg viewBox="0 0 580 170" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="170" fill="#f8fafc" rx="8"/>
+<rect x="200" y="10" width="180" height="36" fill="#3b82f6" rx="6"/>
+<text x="290" y="33" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">帳戶虧損</text>
+<line x1="290" y1="46" x2="290" y2="60" stroke="#94a3b8" stroke-width="1.5"/>
+<polygon points="284,60 296,60 290,68" fill="#94a3b8"/>
+<rect x="200" y="68" width="180" height="36" fill="#f59e0b" rx="6"/>
+<text x="290" y="81" text-anchor="middle" fill="#fff" font-size="11">帳戶權益 &lt; 維持保證金</text>
+<text x="290" y="97" text-anchor="middle" fill="#fff" font-size="10">（142,000元以下）</text>
+<line x1="290" y1="104" x2="290" y2="116" stroke="#94a3b8" stroke-width="1.5"/>
+<polygon points="284,116 296,116 290,124" fill="#94a3b8"/>
+<rect x="200" y="124" width="180" height="36" fill="#ef4444" rx="6"/>
+<text x="290" y="147" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">收到追繳通知</text>
+<line x1="380" y1="142" x2="440" y2="110" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,2"/>
+<rect x="440" y="88" width="130" height="46" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="6"/>
+<text x="505" y="107" text-anchor="middle" fill="#166534" font-size="11" font-weight="700">補款</text>
+<text x="505" y="123" text-anchor="middle" fill="#166534" font-size="10">至原始保證金</text>
+<text x="505" y="136" text-anchor="middle" fill="#64748b" font-size="9">隔日中午前</text>
+<line x1="380" y1="142" x2="440" y2="155" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,2"/>
+<rect x="440" y="140" width="130" height="28" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5" rx="6"/>
+<text x="505" y="158" text-anchor="middle" fill="#9f1239" font-size="11" font-weight="700">強制平倉</text>
+<text x="390" y="108" fill="#64748b" font-size="9">選擇①</text>
+<text x="390" y="155" fill="#64748b" font-size="9">選擇②</text>
+</svg>`,
+body:`<h3>什麼情況下會被追繳？</h3>
+<p>當你的帳戶因虧損導致<strong>帳戶權益低於維持保證金</strong>時，期貨商會自動發出追繳通知（Margin Call）。這通常透過簡訊或APP推播通知你。</p>
+<div class="formula">大台（TX）追繳觸發條件：
+帳戶權益 &lt; 142,000元（維持保證金）
+
+例：帳戶原有184,000元，期間虧損50,000元
+帳戶剩餘：184,000 - 50,000 = 134,000元
+134,000 &lt; 142,000 → 觸發追繳！</div>
+<h3>收到追繳通知怎麼辦？</h3>
+<p>有兩個選擇：</p>
+<div class="eg"><b>選擇①：補款（推薦）</b>
+在<strong>隔日中午12:00前</strong>，將帳戶補款到原始保證金水位（不是補到維持保證金，而是原始保證金！）。
+補款金額 = 原始保證金 - 目前帳戶權益
+例：需補款至184,000元，目前帳戶134,000元 → 補款50,000元</div>
+<div class="warn"><b>選擇②：接受強制平倉</b>
+若不補款，期貨商有權在<strong>任何時間</strong>強制幫你平倉（砍倉）。強制平倉通常在市價成交，可能在不利價格執行，損失可能比你預期更大。</div>
+<h3>最嚴重的情況：強制平倉</h3>
+<p>當<strong>風險指標低於25%</strong>時，不需要等你決定，交易所會<strong>立即強制平倉</strong>，不給你任何緩衝時間。</p>
+<div class="formula">強制平倉觸發：風險指標 &lt; 25%
+風險指標 = 帳戶權益 ÷ 維持保證金 × 100%
+= 帳戶權益 ÷ 142,000 × 100%
+
+強制平倉觸發時：帳戶 &lt; 142,000 × 25% = 35,500元</div>
+<h3>如何避免追繳？</h3>
+<ul>
+<li><strong>帳戶留足夠緩衝</strong>：至少保留2倍以上保證金（做大台建議帳戶40萬以上）</li>
+<li><strong>設定停損</strong>：在特定虧損點主動出場，不要讓虧損無限擴大</li>
+<li><strong>輕倉操作</strong>：資金100萬不要做5口，做1-2口即可</li>
+</ul>
+<div class="warn"><b>⚠️ 新手最常見的錯誤</b>拿10萬元開期貨帳戶，馬上做大台多單。大台保證金就要18.4萬，你帳戶只有10萬根本不夠原始保證金，更遑論緩衝空間。務必量力而為！</div>`,
+pts:['帳戶權益低於維持保證金→觸發追繳（Margin Call）','收到追繳需補款至原始保證金（不是維持保證金）','補款期限：隔日中午12:00前，否則期貨商強制平倉','風險指標低於25%，交易所立即強制平倉不等你']},
+
+/* 6 */
+{num:'3-1',title:'損益計算實戰演練',sub:'學會這個公式，才算懂期貨',ch:'第三章：下單操作實務',rt:'8 分鐘',
+cap:'大台、小台、微台損益計算比較',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<text x="290" y="24" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">指數上漲100點的損益（持有多單1口）</text>
+<rect x="20" y="35" width="165" height="110" fill="#0f172a" rx="8"/>
+<text x="102" y="58" text-anchor="middle" fill="#60a5fa" font-size="13" font-weight="700">大台（TX）</text>
+<text x="102" y="78" text-anchor="middle" fill="#94a3b8" font-size="10">100點 × 200元 × 1口</text>
+<text x="102" y="108" text-anchor="middle" fill="#34d399" font-size="22" font-weight="800">+20,000</text>
+<text x="102" y="126" text-anchor="middle" fill="#94a3b8" font-size="9">元</text>
+<text x="102" y="142" text-anchor="middle" fill="#94a3b8" font-size="9">報酬率 ≈ 10.9%</text>
+<rect x="207" y="35" width="165" height="110" fill="#1e293b" rx="8"/>
+<text x="289" y="58" text-anchor="middle" fill="#93c5fd" font-size="13" font-weight="700">小台（MTX）</text>
+<text x="289" y="78" text-anchor="middle" fill="#94a3b8" font-size="10">100點 × 50元 × 1口</text>
+<text x="289" y="108" text-anchor="middle" fill="#34d399" font-size="22" font-weight="800">+5,000</text>
+<text x="289" y="126" text-anchor="middle" fill="#94a3b8" font-size="9">元</text>
+<text x="289" y="142" text-anchor="middle" fill="#94a3b8" font-size="9">報酬率 ≈ 10.9%</text>
+<rect x="394" y="35" width="165" height="110" fill="#0f3460" rx="8"/>
+<text x="476" y="58" text-anchor="middle" fill="#7dd3fc" font-size="13" font-weight="700">微台（TMF）</text>
+<text x="476" y="78" text-anchor="middle" fill="#94a3b8" font-size="10">100點 × 10元 × 1口</text>
+<text x="476" y="108" text-anchor="middle" fill="#34d399" font-size="22" font-weight="800">+1,000</text>
+<text x="476" y="126" text-anchor="middle" fill="#94a3b8" font-size="9">元</text>
+<text x="476" y="142" text-anchor="middle" fill="#94a3b8" font-size="9">報酬率 ≈ 10.9%</text>
+</svg>`,
+body:`<h3>基本損益公式</h3>
+<div class="formula">損益 = (平倉價 - 買入價) × 每點價值 × 口數
+
+多單（看漲）：
+  損益 = (賣出價 - 買入價) × 點值 × 口數
+  → 賣出 > 買入 = 獲利；賣出 &lt; 買入 = 虧損
+
+空單（看跌）：
+  損益 = (賣出價 - 買入價) × 點值 × 口數
+  → 賣出 > 買入 = 虧損；賣出 &lt; 買入 = 獲利</div>
+<h3>實戰範例①：大台多單獲利</h3>
+<div class="formula">操作：大台（TX）多單1口
+買入：18,000點 / 賣出：18,500點
+損益 = (18,500 - 18,000) × 200元 × 1口
+     = 500點 × 200元
+     = +100,000元
+
+報酬率 = 100,000 ÷ 184,000（保證金）× 100% ≈ 54.3%
+（指數僅漲2.8%，期貨報酬54.3%！）</div>
+<h3>實戰範例②：大台多單虧損</h3>
+<div class="formula">操作：大台（TX）多單1口
+買入：18,000點 / 賣出：17,700點（停損出場）
+損益 = (17,700 - 18,000) × 200元 × 1口
+     = -300點 × 200元
+     = -60,000元
+
+虧損60,000元 ÷ 保證金184,000元 = -32.6%</div>
+<h3>實戰範例③：空單獲利（看跌做空）</h3>
+<div class="formula">操作：大台（TX）空單1口
+賣出：19,000點 / 買回：18,500點（獲利平倉）
+損益 = (19,000 - 18,500) × 200元 × 1口
+     = 500點 × 200元
+     = +100,000元
+（指數跌了2.6%，做空者賺了10萬元）</div>
+<h3>加計手續費後的真實損益</h3>
+<div class="formula">真實損益 = 理論損益 - 手續費 × 2（來回）
+手續費（優惠價）：約100元/口/邊
+來回手續費：200元
+
+例：大台多單獲利100,000元
+真實損益 = 100,000 - 200 = 99,800元（影響極小）
+
+但若操作頻繁（每天來回5口），
+月手續費 = 200元 × 5口 × 20天 = 20,000元/月
+→ 手續費侵蝕不可忽視！</div>`,
+pts:['損益 = (平倉價-買入價) × 每點價值 × 口數','大台每點200元，指數漲1%≈3,700,000×1%÷200=185點，即37,000元','槓桿讓期貨報酬率遠高於指數漲跌幅','頻繁交易要注意手續費累積侵蝕損益']},
+
+/* 7 */
+{num:'3-2',title:'四種委託下單類型',sub:'用對下單方式，減少不必要的滑價',ch:'第三章：下單操作實務',rt:'7 分鐘',
+cap:'四種委託類型使用場景對比',
+svg:`<svg viewBox="0 0 580 165" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="165" fill="#f8fafc" rx="8"/>
+<rect x="10" y="15" width="130" height="135" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" rx="8"/>
+<text x="75" y="38" text-anchor="middle" fill="#1d4ed8" font-size="12" font-weight="700">限價單</text>
+<text x="75" y="55" text-anchor="middle" fill="#1d4ed8" font-size="9">Limit Order</text>
+<line x1="20" y1="62" x2="130" y2="62" stroke="#bfdbfe" stroke-width="1"/>
+<text x="75" y="79" text-anchor="middle" fill="#374151" font-size="9">指定價格成交</text>
+<text x="75" y="95" text-anchor="middle" fill="#059669" font-size="9">✓ 不會成交在更差價格</text>
+<text x="75" y="111" text-anchor="middle" fill="#ef4444" font-size="9">✗ 可能無法成交</text>
+<text x="75" y="133" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="600">日盤推薦</text>
+<rect x="153" y="15" width="130" height="135" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5" rx="8"/>
+<text x="218" y="38" text-anchor="middle" fill="#c2410c" font-size="12" font-weight="700">市價單</text>
+<text x="218" y="55" text-anchor="middle" fill="#c2410c" font-size="9">Market Order</text>
+<line x1="163" y1="62" x2="273" y2="62" stroke="#fed7aa" stroke-width="1"/>
+<text x="218" y="79" text-anchor="middle" fill="#374151" font-size="9">立即以最佳市價成交</text>
+<text x="218" y="95" text-anchor="middle" fill="#059669" font-size="9">✓ 保證成交</text>
+<text x="218" y="111" text-anchor="middle" fill="#ef4444" font-size="9">✗ 滑價風險</text>
+<text x="218" y="133" text-anchor="middle" fill="#c2410c" font-size="9" font-weight="600">急需進出時用</text>
+<rect x="296" y="15" width="130" height="135" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5" rx="8"/>
+<text x="361" y="38" text-anchor="middle" fill="#9f1239" font-size="12" font-weight="700">停損單</text>
+<text x="361" y="55" text-anchor="middle" fill="#9f1239" font-size="9">Stop Order</text>
+<line x1="306" y1="62" x2="416" y2="62" stroke="#fecdd3" stroke-width="1"/>
+<text x="361" y="79" text-anchor="middle" fill="#374151" font-size="9">觸價後送出市價單</text>
+<text x="361" y="95" text-anchor="middle" fill="#059669" font-size="9">✓ 自動限制虧損</text>
+<text x="361" y="111" text-anchor="middle" fill="#ef4444" font-size="9">✗ 觸價不保證此價成交</text>
+<text x="361" y="133" text-anchor="middle" fill="#9f1239" font-size="9" font-weight="600">持倉必備工具</text>
+<rect x="439" y="15" width="130" height="135" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="8"/>
+<text x="504" y="38" text-anchor="middle" fill="#166534" font-size="12" font-weight="700">IOC單</text>
+<text x="504" y="55" text-anchor="middle" fill="#166534" font-size="9">Immediate or Cancel</text>
+<line x1="449" y1="62" x2="559" y2="62" stroke="#bbf7d0" stroke-width="1"/>
+<text x="504" y="79" text-anchor="middle" fill="#374151" font-size="9">立即成交部分，餘取消</text>
+<text x="504" y="95" text-anchor="middle" fill="#059669" font-size="9">✓ 不掛單等待</text>
+<text x="504" y="111" text-anchor="middle" fill="#ef4444" font-size="9">✗ 部分成交風險</text>
+<text x="504" y="133" text-anchor="middle" fill="#166534" font-size="9" font-weight="600">大量委託時用</text>
+</svg>`,
+body:`<h3>限價單（Limit Order）</h3>
+<p>你指定一個<strong>特定價格</strong>，只在這個價格或更好的價格才成交。買單填的是你願意買入的<strong>最高價</strong>，賣單填的是你願意賣出的<strong>最低價</strong>。</p>
+<div class="eg"><b>使用場景</b>想買台指期，目前報價18,200點，你認為18,100點才划算 → 掛限價買單@18,100，等待市場跌到18,100才成交。缺點：如果市場直接漲上去，你永遠沒買到。</div>
+<h3>市價單（Market Order）</h3>
+<p>不指定價格，<strong>立即以當前最佳可得價格成交</strong>。保證成交，但成交價格可能比你看到的報價差幾點（這叫滑價）。</p>
+<div class="warn"><b>⚠️ 夜盤或流動性低時慎用市價單</b>夜盤成交量稀少，一張市價單可能在比預期差10–20點的地方成交，無謂損失成本。優先使用限價單。</div>
+<h3>停損單（Stop Order）</h3>
+<p>這是<strong>風險管理最重要的工具</strong>。你設定一個觸發價格，當市場價格到達或超過這個觸發點，系統自動送出市價單執行。</p>
+<div class="formula">停損單設定範例：
+買入大台多單 @ 18,000點
+停損設定 @ 17,800點（虧損200點即停損）
+
+當指數跌至17,800點：
+→ 系統自動送出市價平倉單
+→ 最大虧損鎖定 ≈ 200點 × 200元 = 40,000元
+
+注意：停損單觸發後以市價成交
+實際成交可能是17,795點（略有滑價）</div>
+<h3>委託有效期：ROD / IOC / FOK</h3>
+<table class="cmp-table">
+<tr><th>代號</th><th>全名</th><th>說明</th></tr>
+<tr><td><strong>ROD</strong></td><td>Rest of Day</td><td>當日有效，未成交當日收盤自動取消</td></tr>
+<tr><td><strong>IOC</strong></td><td>Immediate or Cancel</td><td>立即成交部分，未成交部分立即取消</td></tr>
+<tr><td><strong>FOK</strong></td><td>Fill or Kill</td><td>立即全部成交，否則全部取消</td></tr>
+</table>`,
+pts:['限價單：指定價格成交，不滑價但可能未成交','市價單：保證成交，但可能滑價，流動性低時慎用','停損單：觸發後自動平倉，持倉必備的風控工具','ROD=當日有效、IOC=立即成交餘取消、FOK=全成交或全取消']},
+
+/* 8 */
+{num:'3-3',title:'做多做空雙向操作',sub:'漲跌都能賺錢，這才是期貨的核心優勢',ch:'第三章：下單操作實務',rt:'8 分鐘',
+cap:'做多與做空的損益對比圖',
+svg:`<svg viewBox="0 0 580 165" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="165" fill="#f8fafc" rx="8"/>
+<rect x="15" y="15" width="255" height="135" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="10"/>
+<text x="142" y="40" text-anchor="middle" fill="#166534" font-size="14" font-weight="800">做多（Multi-Long）</text>
+<text x="142" y="58" text-anchor="middle" fill="#374151" font-size="10">看好市場會漲 → 先買進，等漲再賣出</text>
+<polygon points="85,75 100,120 130,75 160,120 190,75 220,120 235,75" fill="none" stroke="#10b981" stroke-width="2.5"/>
+<line x1="40" y1="120" x2="260" y2="120" stroke="#e2e8f0" stroke-width="1"/>
+<text x="142" y="138" text-anchor="middle" fill="#059669" font-size="11" font-weight="700">↑ 指數漲 → 賺錢 ↑</text>
+<text x="142" y="150" text-anchor="middle" fill="#ef4444" font-size="10">↓ 指數跌 → 虧錢 ↓</text>
+<rect x="310" y="15" width="255" height="135" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5" rx="10"/>
+<text x="437" y="40" text-anchor="middle" fill="#9f1239" font-size="14" font-weight="800">做空（Short-Sell）</text>
+<text x="437" y="58" text-anchor="middle" fill="#374151" font-size="10">預期市場會跌 → 先賣出，等跌再買回</text>
+<polygon points="380,75 395,120 425,75 455,120 485,75 515,120 530,75" fill="none" stroke="#ef4444" stroke-width="2.5" transform="scale(1,-1) translate(0,-195)"/>
+<line x1="335" y1="120" x2="555" y2="120" stroke="#e2e8f0" stroke-width="1"/>
+<text x="437" y="138" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">↓ 指數跌 → 賺錢 ↓</text>
+<text x="437" y="150" text-anchor="middle" fill="#059669" font-size="10">↑ 指數漲 → 虧錢 ↑</text>
+</svg>`,
+body:`<h3>做多（Buy / Long）：看漲操作</h3>
+<p>做多就是<strong>先買進、後賣出</strong>，預期價格會上漲後賣出獲利。這和買股票的邏輯一樣，只是期貨只需繳保證金，不需全額付款。</p>
+<div class="formula">做多操作步驟：
+1. 看好台股後市 → 買進大台多單1口 @ 18,000點
+2. 指數漲至18,500點 → 賣出平倉
+3. 獲利 = (18,500 - 18,000) × 200 = +100,000元
+
+若指數跌至17,700點→ 停損賣出
+虧損 = (17,700 - 18,000) × 200 = -60,000元</div>
+<h3>做空（Sell / Short）：看跌操作</h3>
+<p>做空是<strong>先賣出（融空）、後買回</strong>，預期價格會下跌後買回獲利。這在期貨市場完全正常，沒有融券限制、沒有平盤以下不得放空的規定。</p>
+<div class="formula">做空操作步驟：
+1. 預期台股回調 → 賣出大台空單1口 @ 19,000點
+2. 指數跌至18,500點 → 買回平倉
+3. 獲利 = (19,000 - 18,500) × 200 = +100,000元
+
+若指數漲至19,300點 → 停損買回
+虧損 = (19,000 - 19,300) × 200 = -60,000元</div>
+<h3>做多 vs 做空 的風險不對稱</h3>
+<div class="warn"><b>⚠️ 做空的理論損失無上限！</b>
+做多最大虧損：買入價 × 合約價值（指數歸零才全虧）
+做空理論最大虧損：無限大（指數可以無限上漲）
+
+實務上，透過停損單限制虧損，兩者都是可控的。但做空心理壓力更大，因為「漲」比「跌」更難預測時間點。</div>
+<h3>什麼時候做多？什麼時候做空？</h3>
+<table class="cmp-table">
+<tr><th>做多（買進）</th><th>做空（賣出）</th></tr>
+<tr><td>大盤處於多頭趨勢</td><td>大盤處於空頭趨勢</td></tr>
+<tr><td>KD黃金交叉、MACD翻多</td><td>KD死亡交叉、MACD翻空</td></tr>
+<tr><td>美股大漲，夜盤台指期上揚</td><td>美股重挫，夜盤台指期下跌</td></tr>
+<tr><td>重要支撐位反彈</td><td>重要壓力位反壓</td></tr>
+</table>
+<div class="eg"><b>✅ 新手建議</b>先只做多單，熟悉操作後再嘗試做空。做空的時機判斷更難，且空頭行情通常急速且短暫，需要更快的反應速度。</div>`,
+pts:['做多：先買進後賣出，看漲獲利','做空：先賣出後買回，看跌獲利，期貨無放空限制','做多最大虧損有限；做空理論虧損無上限，需嚴格停損','新手建議先從做多入手，熟悉後再學做空']},
+
+/* 9 */
+{num:'3-4',title:'換倉操作與結算日',sub:'不懂換倉，持倉到期就被結算了',ch:'第三章：下單操作實務',rt:'8 分鐘',
+cap:'台指期換倉時間軸示意',
+svg:`<svg viewBox="0 0 580 155" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="155" fill="#f8fafc" rx="8"/>
+<line x1="40" y1="60" x2="540" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+<polygon points="540,55 555,60 540,65" fill="#cbd5e1"/>
+<circle cx="100" cy="60" r="7" fill="#3b82f6"/>
+<text x="100" y="48" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">月初</text>
+<text x="100" y="80" text-anchor="middle" fill="#3b82f6" font-size="9">近月流動性最佳</text>
+<circle cx="290" cy="60" r="9" fill="#f59e0b"/>
+<text x="290" y="45" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">換倉區間</text>
+<text x="290" y="38" text-anchor="middle" fill="#64748b" font-size="9">結算日前3–5天</text>
+<text x="290" y="80" text-anchor="middle" fill="#d97706" font-size="9">建議此時換倉</text>
+<text x="290" y="93" text-anchor="middle" fill="#64748b" font-size="8">近月成交量下滑</text>
+<circle cx="430" cy="60" r="10" fill="#ef4444"/>
+<text x="430" y="48" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="700">結算日</text>
+<text x="430" y="38" text-anchor="middle" fill="#64748b" font-size="9">每月第三週三</text>
+<text x="430" y="80" text-anchor="middle" fill="#ef4444" font-size="9">近月合約到期</text>
+<text x="430" y="93" text-anchor="middle" fill="#64748b" font-size="8">按結算價強制結清</text>
+<rect x="40" y="110" width="160" height="30" fill="#eff6ff" stroke="#bfdbfe" rx="6"/>
+<text x="120" y="129" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="600">①平近月 @ 18,650</text>
+<rect x="220" y="110" width="160" height="30" fill="#f0fdf4" stroke="#bbf7d0" rx="6"/>
+<text x="300" y="129" text-anchor="middle" fill="#166534" font-size="10" font-weight="600">②買次月 @ 18,680</text>
+<rect x="400" y="110" width="160" height="30" fill="#fffbeb" stroke="#fde68a" rx="6"/>
+<text x="480" y="129" text-anchor="middle" fill="#92400e" font-size="10" font-weight="600">換倉成本 30點 ＝ 6,000元</text>
+</svg>`,
+body:`<h3>什麼是換倉（Roll Over）？</h3>
+<p>台指期每月到期（每月第三週三），如果你想繼續持有部位，必須在到期前進行「換倉」：<strong>同時平掉近月合約，買入次月合約</strong>，讓部位延續。</p>
+<h3>結算日時間表</h3>
+<table class="cmp-table">
+<tr><th>月份</th><th>結算日</th><th>說明</th></tr>
+<tr><td>每個月</td><td>第三個週三</td><td>近月合約到期，依結算價強制結清</td></tr>
+<tr><td>結算時間</td><td>08:45 開盤後</td><td>取開盤後15分鐘成交均價為結算價</td></tr>
+</table>
+<h3>換倉操作步驟</h3>
+<div class="formula">持有近月大台多單1口（建倉價18,000點）
+換倉前報價：近月18,650 / 次月18,680
+
+換倉操作：
+步驟①：賣出近月平倉 → 成交@18,650（實現獲利150點=30,000元）
+步驟②：買入次月建倉 → 成交@18,680（新部位成本18,680點）
+
+換倉成本 = 30點 × 200元 = 6,000元
+（次月比近月貴30點 = 正價差，這是持有成本）</div>
+<h3>換倉成本是怎麼來的？</h3>
+<p>台指期通常處於<strong>正價差</strong>狀態（次月 &gt; 近月），代表市場對未來有正面預期，也反映資金的時間成本。</p>
+<div class="formula">正價差（Contango）：次月 > 近月（常態）
+換倉成本 ≈ 30–80點/月（依市場情況而定）
+
+全年換倉12次成本（大台）：
+最小 = 30點 × 200元 × 12 = 72,000元/年
+最大 = 80點 × 200元 × 12 = 192,000元/年
+→ 長期持有期貨的隱性成本相當可觀</div>
+<h3>換倉的最佳時機</h3>
+<ul>
+<li><strong>結算日前3–5個交易日</strong>執行（通常是第三週一前後）</li>
+<li>觀察近月成交量明顯低於次月時 → 換倉信號</li>
+<li>不要等到結算日當天才換！流動性差，買賣價差擴大，成本更高</li>
+</ul>
+<div class="warn"><b>⚠️ 長期持有期貨代價驚人</b>以大台為例，每年換倉成本7.2–19.2萬元。相比之下，持有0050一年的手續費不超過3,000元，且每年領取股息。長期持有者應優先考慮ETF而非期貨。</div>`,
+pts:['換倉=平近月+買次月，每月第三週三前須完成','結算日：每月第三個週三，08:45後開盤15分鐘均價為結算價','換倉通常有30–80點的正價差成本（次月比近月貴）','換倉時機：結算日前3–5天，成交量下滑即為信號']},
+
+/* 10 */
+{num:'4-1',title:'期貨夜盤交易策略',sub:'美股動態即時連動，把握夜盤機會',ch:'第四章：進階應用',rt:'9 分鐘',
+cap:'台指期日盤與夜盤時間軸（台灣時間）',
+svg:`<svg viewBox="0 0 580 155" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="155" fill="#0f172a" rx="8"/>
+<text x="290" y="24" text-anchor="middle" fill="#94a3b8" font-size="11">台灣時間 24小時交易時段</text>
+<line x1="30" y1="45" x2="550" y2="45" stroke="#1e293b" stroke-width="18" rx="9"/>
+<rect x="30" y="36" width="185" height="18" fill="#3b82f6" rx="3"/>
+<text x="122" y="48" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">日盤 08:45–13:45</text>
+<rect x="250" y="36" width="295" height="18" fill="#7c3aed" rx="3"/>
+<text x="397" y="48" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">夜盤 15:00–翌日05:00</text>
+<line x1="30" y1="68" x2="550" y2="68" stroke="#1e293b" stroke-width="1"/>
+<circle cx="30" cy="68" r="3" fill="#94a3b8"/>
+<text x="30" y="83" text-anchor="middle" fill="#64748b" font-size="8">00:00</text>
+<circle cx="112" cy="68" r="4" fill="#3b82f6"/>
+<text x="112" y="83" text-anchor="middle" fill="#60a5fa" font-size="8">08:45</text>
+<text x="112" y="93" text-anchor="middle" fill="#60a5fa" font-size="8">開盤</text>
+<circle cx="196" cy="68" r="4" fill="#3b82f6"/>
+<text x="196" y="83" text-anchor="middle" fill="#60a5fa" font-size="8">13:45</text>
+<text x="196" y="93" text-anchor="middle" fill="#60a5fa" font-size="8">收盤</text>
+<circle cx="250" cy="68" r="4" fill="#7c3aed"/>
+<text x="250" y="83" text-anchor="middle" fill="#a78bfa" font-size="8">15:00</text>
+<text x="250" y="93" text-anchor="middle" fill="#a78bfa" font-size="8">夜盤開</text>
+<circle cx="404" cy="68" r="6" fill="#f59e0b"/>
+<text x="404" y="83" text-anchor="middle" fill="#fbbf24" font-size="8">22:30</text>
+<text x="404" y="93" text-anchor="middle" fill="#fbbf24" font-size="8">美股開盤</text>
+<text x="404" y="103" text-anchor="middle" fill="#fbbf24" font-size="8">最活躍時段</text>
+<circle cx="464" cy="68" r="5" fill="#ef4444"/>
+<text x="464" y="83" text-anchor="middle" fill="#f87171" font-size="8">03:00</text>
+<text x="464" y="93" text-anchor="middle" fill="#f87171" font-size="8">Fed時間</text>
+<circle cx="550" cy="68" r="4" fill="#7c3aed"/>
+<text x="550" y="83" text-anchor="middle" fill="#a78bfa" font-size="8">05:00</text>
+<text x="550" y="93" text-anchor="middle" fill="#a78bfa" font-size="8">夜盤收</text>
+<text x="290" y="125" text-anchor="middle" fill="#34d399" font-size="10" font-weight="600">重要時間點：CPI/PPI 22:30 · 非農(每月第一週五)22:30 · Fed決策 03:00–04:00</text>
+<text x="290" y="142" text-anchor="middle" fill="#64748b" font-size="9">夜盤成交量約為日盤5–15%，流動性低，建議使用限價單</text>
+</svg>`,
+body:`<h3>夜盤是什麼？</h3>
+<p>台指期夜盤從<strong>下午15:00開始到隔天05:00</strong>，讓投資人可以在美股交易時段即時對應國際市場動態。台灣是少數提供如此長時間夜盤交易的市場之一。</p>
+<h3>夜盤最重要的時間點</h3>
+<table class="cmp-table">
+<tr><th>台灣時間</th><th>事件</th><th>影響</th></tr>
+<tr><td>22:30</td><td>美股開盤</td><td>台指期夜盤立即連動，最活躍時段</td></tr>
+<tr><td>22:30（月)</td><td>CPI/PPI發布</td><td>通膨數據，影響Fed立場→大波動</td></tr>
+<tr><td>22:30（每月首五）</td><td>非農就業報告</td><td>全球最重要就業數據，必看</td></tr>
+<tr><td>03:00–04:00</td><td>Fed利率決策</td><td>全年最重要的幾次，可能造成±2%</td></tr>
+</table>
+<h3>夜盤的特性與限制</h3>
+<div class="warn"><b>⚠️ 夜盤流動性遠低於日盤</b>夜盤成交量約為日盤的5–15%，買賣價差可能擴大至3–5點（日盤通常1點），大量委託容易造成滑價。建議：①使用限價單，②每次操作口數比日盤少一半。</div>
+<h3>夜盤對沖現股持倉</h3>
+<p>持有台股現股的投資人，可在夜盤<strong>賣出台指期空單</strong>對沖隔日開盤風險。</p>
+<div class="formula">對沖範例：
+持有台積電現股50張（5萬股），市值約5,000萬元
+
+夜間費半指數重挫5%，預估台積電跌幅4%
+潛在損失 ≈ 5,000萬 × 4% = 200萬元
+
+對沖操作：夜盤賣出大台空單10口
+若台指期跌1,000點：獲利 = 1,000×200×10 = 200萬
+→ 現股損失被期貨獲利對沖</div>
+<h3>夜盤操作原則</h3>
+<ul>
+<li><strong>重大數據前15分鐘出場</strong>：數據方向確認後再進場，不要在數據公布前持有大部位</li>
+<li><strong>美股開盤前30分鐘最活躍</strong>：22:00–22:30行情常有方向性突破</li>
+<li><strong>凌晨02:00後少操作</strong>：流動性極低，非必要不在此時間持大倉</li>
+</ul>`,
+pts:['夜盤時段：15:00–翌日05:00，共14小時','美股22:30開盤是夜盤最活躍、波動最大的時段','重大數據（CPI、非農、Fed）前後是高風險時刻，先出場觀望','夜盤流動性低，用限價單，口數比日盤輕']},
+
+/* 11 */
+{num:'4-2',title:'個股期貨入門',sub:'比融券更靈活的放空工具',ch:'第四章：進階應用',rt:'9 分鐘',
+cap:'個股期貨 vs 直接持股的資金效率比較',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<text x="290" y="22" text-anchor="middle" fill="#374151" font-size="11" font-weight="600">同樣持有台積電2,000股（約200萬市值），資金比較</text>
+<rect x="50" y="35" width="200" height="110" fill="#0f172a" rx="8"/>
+<text x="150" y="56" text-anchor="middle" fill="#94a3b8" font-size="11">直接買股票</text>
+<text x="150" y="80" text-anchor="middle" fill="#f1f5f9" font-size="18" font-weight="800">2,000,000</text>
+<text x="150" y="96" text-anchor="middle" fill="#94a3b8" font-size="10">元（全額）</text>
+<text x="150" y="118" text-anchor="middle" fill="#64748b" font-size="9">投入全部資金</text>
+<text x="150" y="135" text-anchor="middle" fill="#fbbf24" font-size="9">槓桿：1倍</text>
+<rect x="330" y="35" width="200" height="110" fill="#1d4ed8" rx="8"/>
+<text x="430" y="56" text-anchor="middle" fill="#bfdbfe" font-size="11">台積電期貨（1口）</text>
+<text x="430" y="80" text-anchor="middle" fill="#fff" font-size="18" font-weight="800">270,000</text>
+<text x="430" y="96" text-anchor="middle" fill="#bfdbfe" font-size="10">元（保證金）</text>
+<text x="430" y="118" text-anchor="middle" fill="#34d399" font-size="9">剩餘資金可再投資</text>
+<text x="430" y="135" text-anchor="middle" fill="#fbbf24" font-size="9">槓桿：約7倍</text>
+<text x="290" y="150" text-anchor="middle" fill="#64748b" font-size="9">※個股期貨1口=2,000股，台積電股價以1,000元計算</text>
+</svg>`,
+body:`<h3>台灣個股期貨基本介紹</h3>
+<p>台灣目前有<strong>超過500檔個股期貨</strong>，標的涵蓋台積電、聯發科、鴻海、台達電等主要上市公司。標準合約規模通常為<strong>2,000股/口</strong>。</p>
+<h3>個股期貨 vs 直接買股票</h3>
+<table class="cmp-table">
+<tr><th>比較項目</th><th>直接買股票</th><th>個股期貨</th></tr>
+<tr><td>所需資金（台積電2,000股）</td><td>約200萬元</td><td>約27萬元保證金</td></tr>
+<tr><td>享有股息</td><td>✅ 除息配股</td><td>❌ 不享股息</td></tr>
+<tr><td>做空限制</td><td>平盤以下不得放空</td><td>✅ 無限制，隨時可空</td></tr>
+<tr><td>融券問題</td><td>券源不足可能強制回補</td><td>✅ 不會強制回補</td></tr>
+<tr><td>到期日</td><td>無</td><td>每月第三週三</td></tr>
+</table>
+<h3>個股期貨的最大優勢：靈活放空</h3>
+<p>台灣股票融券放空有兩大限制：①<strong>平盤以下不得放空</strong>（防守性規定），②<strong>券源不足</strong>（熱門股常常借不到券）。個股期貨完全沒有這些限制，任何時間、任何價位都能做空。</p>
+<div class="eg"><b>✅ 實戰：用個股期貨避險</b>持有台積電現股100張（10萬股）的投資人，若擔心短期回調：
+賣出台積電期貨50口（50×2,000=10萬股）完全對沖
+現股下跌損失 ≈ 空單期貨獲利（delta中性）
+回調結束後，買回期貨空單，繼續持有現股</div>
+<h3>個股期貨的注意事項</h3>
+<div class="warn"><b>⚠️ 除息注意</b>個股除息時，期貨合約價格<strong>同步向下調整</strong>（等於除息金額），持有多單不會因除息而損失，但也不會「領到股息」。</div>
+<div class="formula">損益計算範例（台積電期貨）：
+台積電股價從900元漲至950元
+1口損益 = (950 - 900) × 2,000股 = +100,000元
+
+保證金約27萬元
+報酬率 = 100,000 ÷ 270,000 ≈ 37%
+（台積電股票報酬率 = 100,000÷1,800,000 ≈ 5.6%）</div>`,
+pts:['個股期貨1口=2,000股，保證金約市值13–15%','最大優勢：無融券限制，平盤以下也能做空','除息時合約價自動下調，持多單不領股息','可做法人級的delta對沖：現股+空期貨中和風險']},
+
+/* 12 */
+{num:'4-3',title:'停損策略與資金控管',sub:'這一課，決定你能在市場存活多久',ch:'第四章：進階應用',rt:'10 分鐘',
+cap:'期貨資金控管金字塔',
+svg:`<svg viewBox="0 0 580 165" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="165" fill="#f8fafc" rx="8"/>
+<polygon points="290,15 100,145 480,145" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+<polygon points="290,15 190,75 390,75" fill="#ef4444" opacity=".9"/>
+<text x="290" y="52" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">高槓桿衝擊部位</text>
+<text x="290" y="65" text-anchor="middle" fill="#fecdd3" font-size="9">≤10% 資金</text>
+<polygon points="190,77 390,77 450,145 130,145" fill="#f59e0b" opacity=".9"/>
+<text x="290" y="103" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">主力操作部位</text>
+<text x="290" y="117" text-anchor="middle" fill="#fef3c7" font-size="9">≤30% 資金，嚴格停損</text>
+<polygon points="130,147 450,147 480,145 100,145" fill="#10b981" opacity=".85"/>
+<text x="290" y="138" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">核心安全倉位（ETF、現金）</text>
+<text x="290" y="150" text-anchor="middle" fill="#d1fae5" font-size="9">≥60% 資金</text>
+<text x="60" y="155" fill="#64748b" font-size="9">↑ 高風險</text>
+<text x="460" y="155" fill="#64748b" font-size="9">低風險 ↑</text>
+</svg>`,
+body:`<h3>為什麼停損是期貨的生命線？</h3>
+<p>股票虧損50%，還需要漲100%才能回本；期貨加了15–20倍槓桿，一個大波動就能讓保證金歸零，甚至產生超額虧損。<strong>停損不是示弱，是延長存活時間的唯一方法</strong>。</p>
+<div class="hl"><b>📌 期貨交易的核心悖論</b>賺錢的唯一方式，是不讓自己出局。出局的最快方式，是不設停損。</div>
+<h3>停損點怎麼設定？</h3>
+<p>停損不是隨便設一個數字，而是根據<strong>市場結構</strong>和<strong>資金承受能力</strong>來決定：</p>
+<div class="formula">方法①：技術面停損
+設在關鍵支撐/壓力位下方（多單）或上方（空單）
+例：台指期多單，支撐在18,200點 → 停損設在18,100（支撐下100點）
+
+方法②：固定金額停損（適合新手）
+每筆交易最大虧損 ≤ 帳戶的2%
+帳戶50萬 → 每筆最大虧損10,000元
+大台1口10,000÷200 = 50點停損
+（一旦虧損50點就出場）
+
+方法③：固定百分比停損
+設定虧損達保證金15–20%就出場
+大台保證金18.4萬 → 虧損2.76萬就出場 ≈ 138點</div>
+<h3>資金控管：2% 原則</h3>
+<p>職業交易員普遍遵守的原則：<strong>任何單筆交易，風險不超過帳戶總資金的2%</strong>。</p>
+<div class="formula">帳戶資金100萬元
+每筆最大風險 = 100萬 × 2% = 20,000元
+
+若停損設在100點（大台1口=20,000元）→ 可做1口
+若停損設在50點（大台1口=10,000元）→ 可做2口
+若停損設在200點（大台1口=40,000元）→ 不能做大台
+（保護：即使連續輸10次，帳戶僅虧20%，還能繼續交易）</div>
+<h3>最重要的一條規則</h3>
+<div class="warn"><b>⚠️ 停損絕對不能移動</b>設好停損後，不管你多麼「相信」市場會反轉，都不要把停損點往更不利的方向移動。這是期貨交易中最致命的心理陷阱，已經讓無數交易人傾家蕩產。</div>
+<ul>
+<li>停損觸發 → 立即出場 → 重新評估行情</li>
+<li>不要「攤平」（加碼虧損部位）</li>
+<li>不要「凹單」（撐著不認輸）</li>
+<li>連續虧損3次後，暫停交易1天，重新評估策略</li>
+</ul>`,
+pts:['停損是延長市場存活時間的唯一方法，不設停損必然爆倉','停損點設在技術面關鍵位置，不能隨意移動','2%原則：單筆風險不超過帳戶總資金的2%','連虧3次暫停交易，避免情緒化決策']},
+
+/* 13 */
+{num:'4-4',title:'期貨與ETF搭配策略',sub:'聰明投資人的「核心＋衛星」配置',ch:'第四章：進階應用',rt:'9 分鐘',
+cap:'期貨 vs ETF 成本與適用場景比較',
+svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="160" fill="#f8fafc" rx="8"/>
+<circle cx="155" cy="80" r="65" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+<text x="155" y="58" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="700">ETF（0050）</text>
+<text x="155" y="76" text-anchor="middle" fill="#374151" font-size="10">長期持有</text>
+<text x="155" y="91" text-anchor="middle" fill="#374151" font-size="10">領股息</text>
+<text x="155" y="106" text-anchor="middle" fill="#374151" font-size="10">低換倉成本</text>
+<text x="155" y="121" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="600">核心倉 60–80%</text>
+<circle cx="425" cy="80" r="65" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2"/>
+<text x="425" y="58" text-anchor="middle" fill="#166534" font-size="11" font-weight="700">期貨（台指期）</text>
+<text x="425" y="76" text-anchor="middle" fill="#374151" font-size="10">戰術加碼</text>
+<text x="425" y="91" text-anchor="middle" fill="#374151" font-size="10">彈性做空</text>
+<text x="425" y="106" text-anchor="middle" fill="#374151" font-size="10">資金效率高</text>
+<text x="425" y="121" text-anchor="middle" fill="#166534" font-size="10" font-weight="600">衛星倉 10–20%</text>
+<text x="290" y="80" text-anchor="middle" fill="#94a3b8" font-size="16">+</text>
+<text x="290" y="150" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">= 核心＋衛星策略：兼顧長期複利與短線靈活性</text>
+</svg>`,
+body:`<h3>期貨 vs ETF：成本與適用場景</h3>
+<table class="cmp-table">
+<tr><th>比較項目</th><th>期貨（台指期大台）</th><th>ETF（0050）</th></tr>
+<tr><td>持有成本（100萬元部位3個月）</td><td>換倉18,000+手續費≈19,200元</td><td>買賣一次≈1,430元</td></tr>
+<tr><td>股息收益</td><td>❌ 無</td><td>✅ 年殖利率約5–7%</td></tr>
+<tr><td>槓桿</td><td>15–20倍</td><td>1倍（無槓桿）</td></tr>
+<tr><td>放空能力</td><td>✅ 可隨時做空</td><td>❌ 無（除槓反型ETF）</td></tr>
+<tr><td>最適合持有期</td><td>數日到數月</td><td>數年到數十年</td></tr>
+<tr><td>稅務</td><td>期交稅0.004%，低</td><td>資本利得免稅，股息所得稅</td></tr>
+</table>
+<h3>核心＋衛星策略</h3>
+<p>這是機構和高端私人投資人常用的配置框架：</p>
+<div class="formula">核心倉（Core）：60–80% 資金
+  → ETF（0050、006208）長期持有、定期定額
+  → 目標：捕捉台股長期成長 + 領股息複利
+  → 特點：低成本、不需盯盤
+
+衛星倉（Satellite）：10–20% 資金
+  → 期貨（微台、小台）戰術性加碼或對沖
+  → 目標：趨勢行情放大報酬、下跌行情對沖損失
+  → 特點：靈活、高效、需積極管理</div>
+<h3>實戰應用：行情好時加碼，行情壞時對沖</h3>
+<div class="eg"><b>✅ 多頭行情（加碼）</b>
+ETF持有100萬元，台股上漲趨勢明確
+→ 再用10萬保證金買小台2口（相當於加碼約50萬市值的台股暴露）
+→ 行情續漲：ETF+小台雙重獲利
+→ 行情反轉：停損期貨，ETF繼續持有</div>
+<div class="eg"><b>✅ 空頭行情（對沖）</b>
+ETF持有100萬元，預期台股短期回調
+→ 賣出小台2口（相當於對沖50萬元暴露）
+→ 市場下跌：ETF跌損 ≈ 期貨空單獲利
+→ 回調結束：平掉空單，繼續讓ETF持有</div>
+<h3>長期績效比較</h3>
+<div class="formula">2009–2023年（15年）台股含息年化報酬約12%
+
+場景A：全部買0050（100萬元）
+  15年後：100萬 × (1.12)^15 ≈ 547萬元
+
+場景B：核心+衛星（ETF 80萬 + 期貨保證金20萬）
+  ETF部分：80萬 × 1.12^15 ≈ 437萬元
+  期貨衛星（假設年化20%）：20萬 × 1.20^15 ≈ 309萬元
+  合計：約746萬元（但期貨部分風險高，並非保證）</div>`,
+pts:['ETF適合長期持有、低成本複利；期貨適合短中線戰術操作','核心+衛星：ETF佔60–80%，期貨衛星倉10–20%','多頭行情用期貨加碼放大報酬；看跌時用期貨空單對沖ETF','長期來看ETF複利回報穩健，期貨是工具不是主角']}
+];
+
+// ──────────────── JS ENGINE ────────────────
+const DONE = JSON.parse(localStorage.getItem('fc-done') || '[]');
+
+function buildSidebar(){
+  const el = document.getElementById('chList');
+  let html = '';
+  CHAPTERS.forEach(ch => {
+    html += `<div class="ch-label">${ch.label}</div>`;
+    ch.ids.forEach(i => {
+      const L = LESSONS[i];
+      const isDone = DONE.includes(i);
+      html += `<div class="ls-item${isDone?' done':''}" id="li${i}" onclick="go(${i})">
+        <div class="ls-num">${isDone?'✓':L.num}</div>
+        <span>${L.title}</span>
+        ${isDone?'<span class="ls-check">✓</span>':''}
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+function updateProgress(){
+  const total = LESSONS.length;
+  const done = DONE.length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('pFill').style.width = pct + '%';
+  document.getElementById('pText').textContent = `${done} / ${total} 堂課完成`;
+}
+
+let CUR = 0;
+
+function go(i){
+  CUR = i;
+  const L = LESSONS[i];
+  // highlight sidebar
+  document.querySelectorAll('.ls-item').forEach(el => el.classList.remove('active'));
+  const liEl = document.getElementById('li'+i);
+  if(liEl){ liEl.classList.add('active'); liEl.scrollIntoView({block:'nearest'}); }
+
+  const chLabel = CHAPTERS.find(c=>c.ids.includes(i))?.label || '';
+  const isDone = DONE.includes(i);
+  const isFirst = i === 0;
+  const isLast = i === LESSONS.length - 1;
+
+  // Find prev/next
+  let prev = -1, next = -1;
+  CHAPTERS.forEach(ch => {
+    ch.ids.forEach((id,idx) => {
+      if(id===i){
+        if(idx>0) prev = ch.ids[idx-1];
+        else { const ci = CHAPTERS.indexOf(ch); if(ci>0) prev = CHAPTERS[ci-1].ids.at(-1); }
+        if(idx<ch.ids.length-1) next = ch.ids[idx+1];
+        else { const ci = CHAPTERS.indexOf(ch); if(ci<CHAPTERS.length-1) next = CHAPTERS[ci+1].ids[0]; }
+      }
+    });
+  });
+
+  document.getElementById('lw').innerHTML = `
+    <div class="breadcrumb">
+      <span onclick="location.href='index.html'">股學筆記</span>
+      <span style="color:#cbd5e1">›</span>
+      <span>${chLabel}</span>
+      <span style="color:#cbd5e1">›</span>
+      <span style="color:#374151">${L.title}</span>
+    </div>
+    <div class="lesson-header">
+      <div class="ch-badge">${L.ch} · 第 ${L.num} 課</div>
+      <div class="ls-title">${L.title}</div>
+      <div class="ls-sub">${L.sub}</div>
+      <div class="ls-meta-row">
+        <span>📖 閱讀時間：${L.rt}</span>
+        ${isDone?'<span style="color:#059669;font-weight:600">✓ 已完成</span>':''}
+      </div>
+    </div>
+    <div class="diag">
+      ${L.svg}
+      <div class="diag-cap">${L.cap}</div>
+    </div>
+    <div class="body-card">${L.body}</div>
+    <div class="kp-box">
+      <h4>📌 本課重點整理</h4>
+      <ul>${L.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
+    </div>
+    <div class="ls-footer">
+      <button class="btn btn-ghost${prev<0?' btn-dim':''}" onclick="go(${prev})">← 上一課</button>
+      <button class="btn ${isDone?'btn-undone':'btn-done'}" onclick="toggleDone(${i})">
+        ${isDone?'取消完成':'✓ 標記完成'}
+      </button>
+      <button class="btn btn-primary${next<0?' btn-dim':''}" onclick="go(${next})">下一課 →</button>
+    </div>
+  `;
+  window.scrollTo(0,0);
+  document.getElementById('lw').scrollIntoView({behavior:'smooth'});
+  closeSB();
+}
+
+function toggleDone(i){
+  const idx = DONE.indexOf(i);
+  if(idx>=0) DONE.splice(idx,1); else DONE.push(i);
+  localStorage.setItem('fc-done', JSON.stringify(DONE));
+  buildSidebar();
+  updateProgress();
+  go(i);
+}
+
+function openSB(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeSB(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+function toggleSidebar(){ document.getElementById('sidebar').classList.contains('open')?closeSB():openSB(); }
+
+// Init
+buildSidebar();
+updateProgress();
+// load from URL hash or start at 0
+const hash = parseInt(location.hash.replace('#','')||'0');
+go(isNaN(hash)?0:Math.min(hash,LESSONS.length-1));
+</script>
+</body>
+</html>
