@@ -135,7 +135,8 @@ const CHAPTERS = [
   {label:'第一章：認識期貨', ids:[0,1,2]},
   {label:'第二章：保證金制度', ids:[3,4,5]},
   {label:'第三章：下單操作實務', ids:[6,7,8,9]},
-  {label:'第四章：進階應用', ids:[10,11,12,13]}
+  {label:'第四章：進階應用', ids:[10,11,12,13]},
+  {label:'第五章：工具書速查', ids:[14,15,16]}
 ];
 
 const LESSONS = [
@@ -1003,7 +1004,353 @@ ETF持有100萬元，預期台股短期回調
   ETF部分：80萬 × 1.12^15 ≈ 437萬元
   期貨衛星（假設年化20%）：20萬 × 1.20^15 ≈ 309萬元
   合計：約746萬元（但期貨部分風險高，並非保證）</div>`,
-pts:['ETF適合長期持有、低成本複利；期貨適合短中線戰術操作','核心+衛星：ETF佔60–80%，期貨衛星倉10–20%','多頭行情用期貨加碼放大報酬；看跌時用期貨空單對沖ETF','長期來看ETF複利回報穩健，期貨是工具不是主角']}
+pts:['ETF適合長期持有、低成本複利；期貨適合短中線戰術操作','核心+衛星：ETF佔60–80%，期貨衛星倉10–20%','多頭行情用期貨加碼放大報酬；看跌時用期貨空單對沖ETF','長期來看ETF複利回報穩健，期貨是工具不是主角']},
+
+/* 14 */
+{num:'5-1',title:'期貨名詞大全',sub:'從保證金到換倉，一次搞懂所有術語',ch:'第五章：工具書速查',rt:'10 分鐘',
+cap:'期貨名詞分六大類，建立完整詞彙地圖',
+svg:`<svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="180" fill="#0f172a" rx="8"/>
+<text x="290" y="20" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">期貨核心名詞分類索引</text>
+<rect x="10" y="28" width="178" height="68" fill="#1e293b" rx="6"/>
+<text x="99" y="45" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">【保證金類】</text>
+<text x="99" y="60" text-anchor="middle" fill="#94a3b8" font-size="8.5">原始保證金 / 維持保證金</text>
+<text x="99" y="73" text-anchor="middle" fill="#94a3b8" font-size="8.5">風險指標 / 追繳令 / 強制平倉</text>
+<text x="99" y="86" text-anchor="middle" fill="#94a3b8" font-size="8.5">帳戶權益 / 逐日盯市</text>
+<rect x="201" y="28" width="178" height="68" fill="#1e293b" rx="6"/>
+<text x="290" y="45" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700">【交易操作類】</text>
+<text x="290" y="60" text-anchor="middle" fill="#94a3b8" font-size="8.5">多單 / 空單 / 建倉 / 平倉</text>
+<text x="290" y="73" text-anchor="middle" fill="#94a3b8" font-size="8.5">當沖 / 留倉 / 沖銷 / 換倉</text>
+<text x="290" y="86" text-anchor="middle" fill="#94a3b8" font-size="8.5">近月 / 次月 / 結算</text>
+<rect x="392" y="28" width="178" height="68" fill="#1e293b" rx="6"/>
+<text x="481" y="45" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">【市場結構類】</text>
+<text x="481" y="60" text-anchor="middle" fill="#94a3b8" font-size="8.5">正價差 / 逆價差 / 基差</text>
+<text x="481" y="73" text-anchor="middle" fill="#94a3b8" font-size="8.5">點值 / 槓桿倍數 / 到期日</text>
+<text x="481" y="86" text-anchor="middle" fill="#94a3b8" font-size="8.5">現金交割 / 實物交割</text>
+<rect x="10" y="106" width="178" height="68" fill="#1e293b" rx="6"/>
+<text x="99" y="123" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">【委託訂單類】</text>
+<text x="99" y="138" text-anchor="middle" fill="#94a3b8" font-size="8.5">限價單 / 市價單 / 停損單</text>
+<text x="99" y="151" text-anchor="middle" fill="#94a3b8" font-size="8.5">停利單 / 觸價單 / 追蹤停損</text>
+<text x="99" y="164" text-anchor="middle" fill="#94a3b8" font-size="8.5">IOC / FOK / ROD</text>
+<rect x="201" y="106" width="178" height="68" fill="#1e293b" rx="6"/>
+<text x="290" y="123" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700">【損益計算類】</text>
+<text x="290" y="138" text-anchor="middle" fill="#94a3b8" font-size="8.5">浮動損益 / 已實現損益</text>
+<text x="290" y="151" text-anchor="middle" fill="#94a3b8" font-size="8.5">報酬率 / 最大虧損 / 回撤</text>
+<text x="290" y="164" text-anchor="middle" fill="#94a3b8" font-size="8.5">手續費 / 期交稅 / 滑價</text>
+<rect x="392" y="106" width="178" height="68" fill="#1e293b" rx="6"/>
+<text x="481" y="123" text-anchor="middle" fill="#38bdf8" font-size="10" font-weight="700">【商品規格類】</text>
+<text x="481" y="138" text-anchor="middle" fill="#94a3b8" font-size="8.5">大台TX / 小台MTX / 微台TMF</text>
+<text x="481" y="151" text-anchor="middle" fill="#94a3b8" font-size="8.5">個股期貨 / 商品期貨</text>
+<text x="481" y="164" text-anchor="middle" fill="#94a3b8" font-size="8.5">夜盤 / 電子盤 / TAIFEX</text>
+</svg>`,
+body:`<h3>第一類：保證金相關術語</h3>
+<div class="kp-box">
+<b>原始保證金（Initial Margin）</b><br>
+開倉時必須繳交的最低金額。台指期大台約184,000元，小台46,000元，微台9,200元。這是「入場門票」，不是全部成本。
+</div>
+<div class="kp-box">
+<b>維持保證金（Maintenance Margin）</b><br>
+持有倉位時帳戶必須維持的最低金額，約為原始保證金的75–80%。大台約為139,000元。低於此值會收到追繳通知。
+</div>
+<div class="kp-box">
+<b>風險指標（Risk Indicator）</b><br>
+公式：帳戶權益 ÷ 所有合約原始保證金總額 × 100%。
+低於25%→警示；低於25%持續→強制平倉。建議維持在100%以上。
+</div>
+<div class="kp-box">
+<b>追繳保證金（Margin Call）</b><br>
+當帳戶風險指標過低，期貨商發出補錢通知。必須在交易日下午2:00前補足至原始保證金，否則期貨商有權強制平倉。
+</div>
+<div class="kp-box">
+<b>逐日盯市（Mark-to-Market）</b><br>
+每日收盤後，期貨商會根據當日結算價重新計算你的損益，直接加減到帳戶餘額。盈利當天入帳，虧損當天扣款。
+</div>
+<h3>第二類：交易操作術語</h3>
+<div class="kp-box">
+<b>多單（Long）/ 空單（Short）</b><br>
+多單：預期漲，先買後賣。空單：預期跌，先賣後買。期貨特別之處是可以「先賣再買」——即空單建立不需要借券。
+</div>
+<div class="kp-box">
+<b>建倉（Open）/ 平倉（Close）</b><br>
+建倉：開啟新的期貨部位（買入或賣出）。平倉：反向操作關閉部位（賣出多單 或 買回空單），實現損益。
+</div>
+<div class="kp-box">
+<b>沖銷 / 當沖（Day Trade）/ 留倉（Overnight）</b><br>
+當沖：同一天建倉並平倉，不過夜，無隔夜風險。留倉：持有部位過夜，承擔隔夜缺口風險但可捕捉更大波段。
+</div>
+<div class="kp-box">
+<b>換倉（Roll Over）</b><br>
+近月合約接近到期日前，將部位從近月移到次月的操作。通常在結算前一週進行。需注意換倉成本（正逆價差）。
+</div>
+<div class="kp-box">
+<b>近月 / 次月 / 結算</b><br>
+近月：最快到期的合約（流動性最好）。次月：下一個月份的合約。結算：每月第三個星期三上午，以開盤集合競價決定「結算價」，所有當月合約強制以此價格平倉。
+</div>
+<h3>第三類：市場結構術語</h3>
+<div class="kp-box">
+<b>正價差（Contango）/ 逆價差（Backwardation）</b><br>
+正價差：期貨價格 > 現貨價格（正常狀態，代表市場對未來偏樂觀，期貨含持有成本）。
+逆價差：期貨價格 &lt; 現貨價格（通常代表市場恐慌或預期未來下跌，短期看空訊號）。
+</div>
+<div class="kp-box">
+<b>基差（Basis）</b><br>
+基差 = 現貨價格 − 期貨價格。正基差代表現貨貴（逆價差），負基差代表期貨貴（正價差）。換倉時需注意基差，避免付出不必要的成本。
+</div>
+<div class="kp-box">
+<b>點值（Tick Value）</b><br>
+每一個指數點代表的金額。大台：200元/點；小台：50元/點；微台：10元/點。台指期漲10點，大台獲利2,000元。
+</div>
+<h3>第四類：委託訂單術語</h3>
+<table class="cmp-table">
+<tr><th>訂單類型</th><th>說明</th><th>適用場景</th></tr>
+<tr><td>限價單（Limit）</td><td>指定價格成交，保護成本</td><td>流動性好、波動穩定時</td></tr>
+<tr><td>市價單（Market）</td><td>以市場最佳價格立即成交</td><td>緊急進出、重要消息時</td></tr>
+<tr><td>停損單（Stop Loss）</td><td>觸達指定價位後觸發市價單</td><td>保護既有部位的核心工具</td></tr>
+<tr><td>停利單（Take Profit）</td><td>達到獲利目標後自動平倉</td><td>鎖定利潤、避免回吐</td></tr>
+<tr><td>IOC</td><td>立即成交，未成交部分取消</td><td>想快速部分成交</td></tr>
+<tr><td>FOK</td><td>全部成交或全部取消</td><td>必須全量成交的策略</td></tr>
+<tr><td>ROD</td><td>當日有效，收盤自動取消</td><td>日內委託掛單</td></tr>
+</table>
+<h3>第五類：損益計算術語</h3>
+<div class="kp-box">
+<b>浮動損益（Unrealized P&amp;L）</b><br>
+尚未平倉的部位，按當前市價計算的帳面損益。每秒都在變動，只有平倉後才變成「已實現損益」。
+</div>
+<div class="kp-box">
+<b>最大回撤（Max Drawdown）</b><br>
+從高點到低谷的最大跌幅。評估交易策略風險的重要指標。例如帳戶從50萬跌到35萬，回撤為30%。
+</div>
+<div class="kp-box">
+<b>期交稅</b><br>
+台灣期貨每口每次交易課徵千分之0.2（0.02%）的期交稅。以大台一口賣在20,000點：稅 = 20,000 × 200 × 0.0002 = 800元。
+</div>
+<h3>第六類：商品規格術語</h3>
+<table class="cmp-table">
+<tr><th>商品</th><th>代號</th><th>點值</th><th>原始保證金</th><th>交易時段</th></tr>
+<tr><td>台指期（大台）</td><td>TX</td><td>200元/點</td><td>~184,000元</td><td>日盤+夜盤</td></tr>
+<tr><td>小台指（小台）</td><td>MTX</td><td>50元/點</td><td>~46,000元</td><td>日盤+夜盤</td></tr>
+<tr><td>微型台指（微台）</td><td>TMF</td><td>10元/點</td><td>~9,200元</td><td>日盤+夜盤</td></tr>
+<tr><td>電子期貨</td><td>TE</td><td>4,000元/點</td><td>~90,000元</td><td>日盤</td></tr>
+<tr><td>金融期貨</td><td>TF</td><td>1,000元/點</td><td>~45,000元</td><td>日盤</td></tr>
+</table>`,
+pts:['原始保證金=入場門票；維持保證金=持倉底線；風險指標要維持100%以上','多單先買後賣；空單先賣後買——期貨可以不持有標的直接做空','結算在每月第三個星期三，近月流動性最好','停損單是必備工具，設好後不要輕易移動']},
+
+/* 15 */
+{num:'5-2',title:'期貨公式速查表',sub:'損益、保證金、停損一次算清楚',ch:'第五章：工具書速查',rt:'8 分鐘',
+cap:'四大類公式：損益 / 保證金 / 稅費 / 停損',
+svg:`<svg viewBox="0 0 580 175" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="175" fill="#0f172a" rx="8"/>
+<text x="290" y="20" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">期貨公式速查板</text>
+<rect x="10" y="28" width="270" height="66" fill="#172554" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="145" y="43" text-anchor="middle" fill="#60a5fa" font-size="9.5" font-weight="700">損益計算（多單）</text>
+<text x="145" y="57" text-anchor="middle" fill="#e2e8f0" font-size="8.5">損益 = (平倉價 - 建倉價) × 點值 × 口數</text>
+<text x="145" y="70" text-anchor="middle" fill="#94a3b8" font-size="8">範例：買20,000 → 賣20,200，大台1口</text>
+<text x="145" y="83" text-anchor="middle" fill="#34d399" font-size="8.5" font-weight="700">獲利 = (20,200-20,000) × 200 × 1 = 40,000元</text>
+<rect x="300" y="28" width="270" height="66" fill="#172554" rx="6" stroke="#8b5cf6" stroke-width="0.8"/>
+<text x="435" y="43" text-anchor="middle" fill="#a78bfa" font-size="9.5" font-weight="700">損益計算（空單）</text>
+<text x="435" y="57" text-anchor="middle" fill="#e2e8f0" font-size="8.5">損益 = (建倉價 - 平倉價) × 點值 × 口數</text>
+<text x="435" y="70" text-anchor="middle" fill="#94a3b8" font-size="8">範例：賣20,000 → 買回19,700，小台2口</text>
+<text x="435" y="83" text-anchor="middle" fill="#34d399" font-size="8.5" font-weight="700">獲利 = (20,000-19,700) × 50 × 2 = 30,000元</text>
+<rect x="10" y="103" width="175" height="65" fill="#1a1a2e" rx="6" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="97" y="118" text-anchor="middle" fill="#f59e0b" font-size="9.5" font-weight="700">風險指標公式</text>
+<text x="97" y="132" text-anchor="middle" fill="#e2e8f0" font-size="8">帳戶權益 ÷ 原始保證金 × 100%</text>
+<text x="97" y="146" text-anchor="middle" fill="#94a3b8" font-size="7.5">警示線：低於25% → 追繳</text>
+<text x="97" y="159" text-anchor="middle" fill="#f87171" font-size="7.5">強平線：收盤仍低於25%</text>
+<rect x="200" y="103" width="175" height="65" fill="#1a1a2e" rx="6" stroke="#f87171" stroke-width="0.8"/>
+<text x="287" y="118" text-anchor="middle" fill="#f87171" font-size="9.5" font-weight="700">停損點數計算</text>
+<text x="287" y="132" text-anchor="middle" fill="#e2e8f0" font-size="8">最大可承受虧損 ÷ (點值 × 口數)</text>
+<text x="287" y="146" text-anchor="middle" fill="#94a3b8" font-size="7.5">範例：虧損上限20,000 / 200 = 100點</text>
+<text x="287" y="159" text-anchor="middle" fill="#f87171" font-size="7.5">大台買20,000 → 停損設在19,900</text>
+<rect x="390" y="103" width="180" height="65" fill="#1a1a2e" rx="6" stroke="#34d399" stroke-width="0.8"/>
+<text x="480" y="118" text-anchor="middle" fill="#34d399" font-size="9.5" font-weight="700">期交稅 / 手續費</text>
+<text x="480" y="132" text-anchor="middle" fill="#e2e8f0" font-size="8">期交稅 = 成交金額 × 0.02%</text>
+<text x="480" y="146" text-anchor="middle" fill="#94a3b8" font-size="7.5">大台@20,000：稅 = 200×20,000×0.02% = 800元</text>
+<text x="480" y="159" text-anchor="middle" fill="#94a3b8" font-size="7.5">手續費：券商各異，約50–150元/口</text>
+</svg>`,
+body:`<h3>一、損益計算公式</h3>
+<div class="formula">【多單（看漲）損益公式】
+損益 = (平倉價 - 建倉價) × 點值 × 口數
+
+範例 1：大台（200元/點）做多
+  建倉：指數20,000點；平倉：指數20,500點；1口
+  損益 = (20,500 - 20,000) × 200 × 1 = +100,000元（獲利）
+
+範例 2：小台（50元/點）做多
+  建倉：指數20,000點；平倉：指數19,800點；2口
+  損益 = (19,800 - 20,000) × 50 × 2 = -20,000元（虧損）</div>
+<div class="formula">【空單（看跌）損益公式】
+損益 = (建倉價 - 平倉價) × 點值 × 口數
+
+範例：大台做空
+  建倉：指數21,000點；平倉：指數20,600點；1口
+  損益 = (21,000 - 20,600) × 200 × 1 = +80,000元（獲利）
+
+注意：空單賺的是「跌幅」，若指數漲回21,500則虧損10萬元</div>
+<div class="formula">【微台（10元/點）做多範例 — 新手練習用】
+  建倉：20,000點；平倉：20,300點；1口
+  損益 = (20,300 - 20,000) × 10 × 1 = +3,000元</div>
+<h3>二、保證金相關公式</h3>
+<div class="formula">【帳戶風險指標（最重要！）】
+風險指標 = 帳戶權益 ÷ 所有未平倉合約原始保證金之和 × 100%
+
+帳戶權益 = 原始存入資金 + 浮動損益（每日更新）
+
+範例：帳戶存200,000元，持有大台1口（保證金184,000元）
+  今日浮動虧損 -30,000元
+  帳戶權益 = 200,000 - 30,000 = 170,000元
+  風險指標 = 170,000 / 184,000 = 92% ← 安全
+
+  若虧損 -155,000元：權益 = 45,000 / 184,000 = 24.4% ← 追繳！</div>
+<div class="formula">【補繳保證金計算】
+需補金額 = 原始保證金 - 現有帳戶權益
+
+範例：帳戶權益剩40,000元，原始保證金184,000元
+  需補繳 = 184,000 - 40,000 = 144,000元（下午2點前）</div>
+<div class="formula">【槓桿倍數計算】
+槓桿倍數 = 合約總市值 ÷ 所需保證金
+
+台指期大台@20,000點：合約市值 = 20,000 × 200 = 4,000,000元
+槓桿倍數 = 4,000,000 / 184,000 ≈ 21.7倍
+
+台指期小台@20,000點：合約市值 = 20,000 × 50 = 1,000,000元
+槓桿倍數 = 1,000,000 / 46,000 ≈ 21.7倍（相同槓桿，不同規模）</div>
+<h3>三、停損計算公式</h3>
+<div class="formula">【停損點數計算】
+可承受虧損點數 = 單筆最大虧損金額 ÷ (點值 × 口數)
+
+範例：計畫每筆最多虧損20,000元，做大台1口
+  停損點數 = 20,000 / (200 × 1) = 100點
+  買在20,000點 → 停損設在19,900點
+
+範例：計畫每筆最多虧損10,000元，做小台2口
+  停損點數 = 10,000 / (50 × 2) = 100點
+  買在20,000點 → 停損設在19,900點</div>
+<div class="formula">【風險報酬比計算】
+風險報酬比 = 預期獲利 ÷ 最大虧損
+
+目標：買大台@20,000，停損-100點，目標+300點
+  風險報酬比 = 300 ÷ 100 = 3:1（每虧1元，預期賺3元）
+  建議：風險報酬比至少維持 2:1 以上才值得進場</div>
+<h3>四、稅費成本計算</h3>
+<div class="formula">【期交稅計算（每次交易雙邊都課）】
+期交稅 = 成交金額 × 0.02%
+成交金額 = 成交點數 × 點值
+
+大台@20,000點：
+  稅 = 20,000 × 200 × 0.02% = 800元（建倉）+ 800元（平倉）= 1,600元
+
+小台@20,000點：
+  稅 = 20,000 × 50 × 0.02% = 200元/次，來回 400元</div>
+<div class="formula">【損益平衡點計算（含手續費）】
+損益平衡點 = 建倉價 + (手續費 + 期交稅) ÷ (點值 × 口數)
+
+範例：大台1口，手續費150元，期交稅800元
+  成本 = (150 + 800) / 200 = 4.75點
+  買@20,000 → 損益平衡在20,004.75點（約漲5點才開始賺）</div>
+<h3>五、換倉成本計算</h3>
+<div class="formula">【換倉成本公式】
+換倉成本 = 次月合約價格 - 近月合約價格
+
+若近月@20,000，次月@20,050：
+  正價差 = 50點 → 換倉成本 = 50 × 200 = 10,000元（多單換倉需付出）
+
+若近月@20,000，次月@19,960：
+  逆價差 = -40點 → 換倉獲利 = 40 × 200 = 8,000元（空頭環境換倉有利）</div>
+<div class="warn"><b>⚠️ 公式使用提醒</b>
+以上公式未考慮：滑價（市價單成交差異）、隔夜利率成本、選擇權時間價值。
+實際交易損益可能與理論計算有出入，建議每筆交易後核對交割單。</div>`,
+pts:['多單損益=(平倉-建倉)×點值×口數；空單損益=(建倉-平倉)×點值×口數','風險指標=帳戶權益÷原始保證金，必須維持25%以上','停損點數=單筆最大虧損÷(點值×口數)，先計算再下單','期交稅=成交金額×0.02%，大台來回約1,600元']},
+
+/* 16 */
+{num:'5-3',title:'常見期貨交易策略',sub:'趨勢追蹤、區間操作、避險三大方向',ch:'第五章：工具書速查',rt:'12 分鐘',
+cap:'三類策略：趨勢跟蹤 / 區間震盪 / 避險對沖',
+svg:`<svg viewBox="0 0 580 172" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="172" fill="#0f172a" rx="8"/>
+<text x="290" y="18" text-anchor="middle" fill="#94a3b8" font-size="10.5" font-weight="600">三種主流策略示意</text>
+<rect x="8" y="25" width="177" height="140" fill="#172554" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="96" y="42" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="700">趨勢追蹤策略</text>
+<polyline points="20,140 50,130 70,120 90,105 115,90 140,70 160,55 175,42" fill="none" stroke="#34d399" stroke-width="2"/>
+<circle cx="20" cy="140" r="4" fill="#34d399"/>
+<text x="28" y="155" fill="#34d399" font-size="7.5">建倉</text>
+<circle cx="175" cy="42" r="4" fill="#f59e0b"/>
+<text x="163" y="37" fill="#f59e0b" font-size="7.5">平倉</text>
+<text x="96" y="160" text-anchor="middle" fill="#94a3b8" font-size="7.5">順勢而為，讓利潤奔跑</text>
+<rect x="201" y="25" width="177" height="140" fill="#1a1a2e" rx="6" stroke="#f59e0b" stroke-width="0.8"/>
+<text x="289" y="42" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">區間震盪策略</text>
+<line x1="213" y1="75" x2="368" y2="75" stroke="#60a5fa" stroke-width="1" stroke-dasharray="4,3"/>
+<line x1="213" y1="125" x2="368" y2="125" stroke="#f87171" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="373" y="78" fill="#60a5fa" font-size="7.5">壓力</text>
+<text x="373" y="128" fill="#f87171" font-size="7.5">支撐</text>
+<polyline points="215,75 230,120 250,78 270,122 290,80 310,118 330,76 350,121 366,79" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+<circle cx="215" cy="75" r="3" fill="#34d399"/>
+<circle cx="230" cy="120" r="3" fill="#34d399"/>
+<circle cx="250" cy="78" r="3" fill="#34d399"/>
+<text x="289" y="160" text-anchor="middle" fill="#94a3b8" font-size="7.5">高賣低買，反覆操作</text>
+<rect x="394" y="25" width="177" height="140" fill="#1a1a2e" rx="6" stroke="#f87171" stroke-width="0.8"/>
+<text x="482" y="42" text-anchor="middle" fill="#f87171" font-size="10" font-weight="700">ETF避險策略</text>
+<polyline points="406,60 430,70 455,85 480,100 505,115 530,130 560,142" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
+<text x="420" y="55" fill="#60a5fa" font-size="7">ETF部位</text>
+<polyline points="406,130 430,120 455,105 480,90 505,75 530,60 560,48" fill="none" stroke="#f87171" stroke-width="1.5" stroke-dasharray="3,2"/>
+<text x="530" y="45" fill="#f87171" font-size="7">期貨空單</text>
+<line x1="406" y1="90" x2="560" y2="90" stroke="#64748b" stroke-width="0.8" stroke-dasharray="4,3"/>
+<text x="482" y="160" text-anchor="middle" fill="#94a3b8" font-size="7.5">空單對沖，降低組合波動</text>
+</svg>`,
+body:`<h3>策略一：趨勢追蹤（Trend Following）</h3>
+<div class="hl"><b>核心思想：</b>不預測頂底，只跟隨已確立的趨勢方向。讓獲利奔跑，嚴格截斷虧損。</div>
+<h3>操作要點</h3>
+<ul>
+<li><strong>確認趨勢</strong>：20MA 和 60MA 都向上且多頭排列，才做多；都向下才做空。不在盤整區交易。</li>
+<li><strong>進場時機</strong>：突破前高（或前低）+ 成交量放大，是最典型的進場訊號。</li>
+<li><strong>停損設置</strong>：設在前一個重要低點下方（多單）或前一個重要高點上方（空單），不受情緒影響。</li>
+<li><strong>出場方式</strong>：移動停利（Trailing Stop）——隨著獲利擴大，停損逐步上移，讓利潤最大化。</li>
+</ul>
+<div class="eg"><b>台指期趨勢交易範例</b><br>
+台指從18,000上漲突破19,000關卡，成交量創新高。MA20/MA60均向上排列。<br>
+進場：19,050點做多，1口大台。<br>
+初始停損：18,700點（-350點，虧損上限70,000元）。<br>
+台指繼續漲至20,000點。停損上移至19,600（保護利潤）。<br>
+最終在19,600觸停損平倉：獲利 = (19,600-19,050)×200 = 110,000元。</div>
+<h3>策略二：區間震盪操作（Mean Reversion）</h3>
+<div class="hl"><b>核心思想：</b>在確認的區間內，高賣低買。適合橫盤盤整的市場環境。</div>
+<h3>操作要點</h3>
+<ul>
+<li><strong>確認區間</strong>：至少3次觸碰支撐和壓力才算確認，單次碰壁不算。</li>
+<li><strong>進場位置</strong>：多單在支撐區買入（加上K線確認訊號如吞噬、槌子線）；空單在壓力區賣出。</li>
+<li><strong>停損設置</strong>：突破支撐/壓力20–30點停損（避免假突破吃掉停損後回來）。</li>
+<li><strong>注意破位</strong>：一旦區間被突破且收盤確認，應立即出場，不要繼續等反轉。</li>
+</ul>
+<div class="formula">區間操作判斷標準：
+支撐區 = 近30日最低點 ± 50點緩衝帶
+壓力區 = 近30日最高點 ± 50點緩衝帶
+勝率目標 > 55%，風險報酬比 1:1.5 以上</div>
+<h3>策略三：ETF避險（Hedging）</h3>
+<div class="hl"><b>核心思想：</b>持有ETF（0050等）的同時，用期貨空單對沖系統性風險，降低組合波動度。</div>
+<h3>操作要點</h3>
+<ul>
+<li><strong>避險比例計算</strong>：若持有0050市值200萬元（Beta≈1），需要空台指期合約市值約200萬元。<br>
+  所需空單口數 = 200萬 ÷ (指數點數 × 點值) = 200萬 ÷ (20,000 × 200) = 0.5口 → 做空小台2口</li>
+<li><strong>何時啟動避險</strong>：技術面轉弱（跌破月線）、或有明確利空事件（聯準會決議、地緣衝突）時。</li>
+<li><strong>何時解除避險</strong>：恐慌消退、指數回穩上方月線後，買回空單平倉。</li>
+</ul>
+<div class="eg"><b>避險實戰範例</b><br>
+持有0050共200萬元，台指在20,000點，擔心短期回調。<br>
+做空小台2口（合約市值 = 2 × 20,000 × 50 = 200萬）。<br>
+隔週台指跌500點（-2.5%）：<br>
+  ETF損失：200萬 × 2.5% = -50,000元<br>
+  空單獲利：500 × 50 × 2 = +50,000元<br>
+  淨損益：0元（完美對沖）</div>
+<h3>策略四：當沖（Day Trading）基本框架</h3>
+<ul>
+<li><strong>開盤前</strong>：確認美股夜盤方向、期貨夜盤走勢、重大新聞事件。</li>
+<li><strong>開盤策略</strong>：高開（+0.5%以上）通常先漲再跌（賣壓），低開（-0.5%以下）常先跌再漲（買盤）。</li>
+<li><strong>核心工具</strong>：5分鐘/15分鐘K線 + VWAP + RSI(14)。</li>
+<li><strong>停損紀律</strong>：當沖必須設置每日最大虧損上限，達到即停止交易，不追單。</li>
+</ul>
+<div class="warn"><b>⚠️ 策略選擇的重要原則</b>
+初學者建議從「趨勢追蹤」入門——勝率雖低（約40–45%），但單次獲利遠大於虧損，長期正期望值。
+區間操作看似容易，但一次破位可能吞掉數次獲利。當沖需要大量練習和心理素質，不適合剛入門者。
+<strong>先練「看方向、設停損、嚴格執行」，再談策略複雜度。</strong></div>`,
+pts:['趨勢策略：確認方向後順勢操作，用移動停利讓獲利奔跑','區間操作：在確認支撐壓力範圍內高賣低買，破位立即出場','ETF避險：用期貨空單對沖ETF部位，降低市場下跌風險','當沖新手慎入，先在模擬帳戶練習至少一個月再用真錢']}
 ];
 
 // ──────────────── JS ENGINE ────────────────
