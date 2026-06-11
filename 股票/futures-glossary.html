@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>期貨術語字典 — 股學筆記</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:#161b22;color:#e6edf3;min-height:100vh;font-size:15px}
+a{color:inherit;text-decoration:none}
+.topbar{background:#0d1117;border-bottom:1px solid #21262d;padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.tb-back{color:#484f58;font-size:.8rem;cursor:pointer;transition:color .15s}
+.tb-back:hover{color:#8b949e}
+.tb-title{font-size:1rem;font-weight:700;color:#e6edf3;flex:1}
+.tb-sub{font-size:.78rem;color:#484f58}
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);padding:36px 24px 28px;border-bottom:1px solid #21262d;text-align:center}
+.hero h1{font-size:1.7rem;font-weight:800;color:#e6edf3;margin-bottom:8px}
+.hero p{color:#8b949e;font-size:.9rem;margin-bottom:20px}
+.search-wrap{max-width:520px;margin:0 auto;position:relative}
+.search-wrap input{width:100%;padding:13px 16px 13px 44px;background:#21262d;border:1px solid #30363d;border-radius:10px;color:#e6edf3;font-size:.95rem;outline:none;transition:border .15s;font-family:inherit}
+.search-wrap input:focus{border-color:#3fb950}
+.search-wrap input::placeholder{color:#484f58}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#484f58;font-size:1rem;pointer-events:none}
+.count{color:#484f58;font-size:.8rem;margin-top:8px}
+.cats{display:flex;gap:8px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid #21262d;justify-content:center}
+.cat-btn{padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid #30363d;background:transparent;color:#8b949e;transition:all .15s}
+.cat-btn:hover{border-color:#3fb950;color:#3fb950}
+.cat-btn.active{background:#238636;border-color:#238636;color:#fff}
+.cat-btn[data-cat="margin"].active{background:#7c3aed;border-color:#7c3aed}
+.cat-btn[data-cat="trading"].active{background:#0e7490;border-color:#0e7490}
+.cat-btn[data-cat="risk"].active{background:#b91c1c;border-color:#b91c1c}
+.cat-btn[data-cat="us"].active{background:#1d4ed8;border-color:#1d4ed8}
+.glossary{max-width:1100px;margin:0 auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.term-card{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:18px 20px;transition:border-color .15s}
+.term-card:hover{border-color:#484f58}
+.tc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px}
+.tc-name{font-size:1.05rem;font-weight:800;color:#e6edf3;line-height:1.3}
+.tc-en{font-size:.73rem;color:#484f58;margin-top:2px}
+.tc-badge{flex-shrink:0;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:2px}
+.badge-contract{background:rgba(35,134,54,.15);color:#4ade80;border:1px solid rgba(35,134,54,.3)}
+.badge-margin{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.badge-trading{background:rgba(14,116,144,.15);color:#22d3ee;border:1px solid rgba(14,116,144,.3)}
+.badge-risk{background:rgba(185,28,28,.15);color:#fca5a5;border:1px solid rgba(185,28,28,.3)}
+.badge-us{background:rgba(29,78,216,.15);color:#93c5fd;border:1px solid rgba(29,78,216,.3)}
+.tc-short{font-size:.85rem;color:#8b949e;line-height:1.6;margin-bottom:8px}
+.tc-detail{font-size:.83rem;color:#c9d1d9;line-height:1.7;border-top:1px solid #21262d;padding-top:8px}
+.tc-detail b,.tc-detail strong{color:#e6edf3}
+.tc-formula{background:#0d1117;border-radius:6px;padding:8px 12px;margin:8px 0;font-family:monospace;font-size:.78rem;color:#7dd3fc;border-left:3px solid #3fb950}
+.tc-eg{background:rgba(35,134,54,.08);border-left:2px solid #238636;padding:6px 10px;margin:6px 0;font-size:.8rem;color:#7ee787;border-radius:0 4px 4px 0}
+.tc-warn{background:rgba(210,153,34,.08);border-left:2px solid #d29922;padding:6px 10px;margin:6px 0;font-size:.8rem;color:#e3b341;border-radius:0 4px 4px 0}
+.sec-label{grid-column:1/-1;padding:8px 4px 4px;color:#484f58;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #21262d;margin-bottom:2px}
+.empty{grid-column:1/-1;text-align:center;padding:60px;color:#484f58;font-size:.9rem}
+@media(max-width:600px){
+  .glossary{padding:14px;grid-template-columns:1fr}
+  .hero{padding:24px 16px 18px}
+  .hero h1{font-size:1.4rem}
+  .cats{padding:12px 14px}
+  .topbar{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="tb-back" onclick="location.href='index.html'">← 股學筆記</span>
+  <span class="tb-title">期貨術語字典</span>
+  <span class="tb-sub">共 <span id="total">0</span> 個詞條</span>
+</div>
+
+<div class="hero">
+  <h1>📖 期貨術語字典</h1>
+  <p>台指期 · 保證金 · 交易術語 · 美股期貨 — 完整解說不漏掉</p>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="q" placeholder="搜尋術語、英文、定義..." oninput="filter()">
+  </div>
+  <div class="count">顯示 <span id="showing">0</span> 個詞條</div>
+</div>
+
+<div class="cats" id="cats">
+  <button class="cat-btn active" data-cat="all" onclick="setCat('all',this)">全部</button>
+  <button class="cat-btn" data-cat="contract" onclick="setCat('contract',this)">📄 合約基礎</button>
+  <button class="cat-btn" data-cat="margin" onclick="setCat('margin',this)">💰 保證金制度</button>
+  <button class="cat-btn" data-cat="trading" onclick="setCat('trading',this)">⚡ 交易術語</button>
+  <button class="cat-btn" data-cat="risk" onclick="setCat('risk',this)">🛡 風險管理</button>
+  <button class="cat-btn" data-cat="us" onclick="setCat('us',this)">🇺🇸 美股期貨</button>
+</div>
+
+<div class="glossary" id="glossary"></div>
+
+<script>
+const TERMS = [
+// ── 合約基礎 ──────────────────────────────────────────────────────────────
+{term:'期貨合約',en:'Futures Contract',cat:'contract',
+short:'雙方約定在未來特定日期，以今日議定的價格交割特定標的物的標準化合約。',
+detail:'<b>標準化</b>：合約規格由交易所制定，不能任意更改（口數、到期日、結算方式）。<b>雙向操作</b>：可以先買後賣（做多），也可先賣後買（做空）。<b>台灣主流</b>：台灣期貨交易所（TAIFEX）的台指期（TX/MTX/TMF）。',
+eg:'買進1口大台（TX）= 同意以今天的指數點位，在到期日結算差價。'},
+
+{term:'現貨',en:'Spot / Cash Market',cat:'contract',
+short:'指直接在市場上立即買賣實際資產（股票、商品）的市場，相對於期貨的「未來交割」。',
+detail:'台股加權指數本身就是現貨指數。期貨合約追蹤的是這個指數的未來價格預期。現貨市場和期貨市場同向波動，但期貨可能因<b>升貼水</b>出現差距。'},
+
+{term:'基差',en:'Basis',cat:'contract',
+short:'期貨價格與現貨價格的差額，通常期貨比現貨高（正向基差/升水），到期時兩者收斂。',
+detail:'<b>升水（Contango）</b>：期貨 > 現貨，代表市場對未來看多，或持有成本反映。台指期通常在多頭市場升水30~80點。<b>貼水（Backwardation）</b>：期貨 < 現貨，代表市場預期未來走弱或恐慌情緒。<b>到期當天</b>：基差自動歸零，期現貨收斂。',
+formula:'基差 = 期貨價格 − 現貨價格'},
+
+{term:'台指期（TX）',en:'Taiwan Stock Index Futures',cat:'contract',
+short:'追蹤台灣加權股價指數的期貨合約，台灣交易量最大的衍生性商品。',
+detail:'<b>每點價值</b>：200元/點。<b>最小跳動</b>：1點（200元）。<b>保證金</b>：約184,000元（原始保證金，依市況調整）。<b>到期日</b>：每月第三個週三。<b>交易時間</b>：日盤8:45~13:45，夜盤15:00~次日5:00。',
+formula:'損益 = 口數 × 點數差 × 200元',
+eg:'1口大台，以21,000點買進、21,100點賣出 → 獲利 100×200 = 20,000元'},
+
+{term:'小台（MTX）',en:'Mini Taiwan Futures',cat:'contract',
+short:'台指期的小型版本，每點50元，保證金約1/4，適合資金較小的交易者。',
+detail:'<b>每點價值</b>：50元/點。<b>保證金</b>：約46,000元。<b>最大特色</b>：可以更精細地控制部位，適合初學者練習和小資金操作。4口小台≈1口大台，但手續費也是4倍。',
+formula:'損益 = 口數 × 點數差 × 50元'},
+
+{term:'微台（TMF）',en:'Micro Taiwan Futures',cat:'contract',
+short:'台指期最小規格，每點10元，保證金約9,000元，專為入門者設計。',
+detail:'<b>每點價值</b>：10元/點。<b>保證金</b>：約9,000元（依市況調整）。<b>適合</b>：剛開始學台指期的新手，用最少本金體驗期貨交易，虧損有限但也能學到完整的交易流程。',
+formula:'損益 = 口數 × 點數差 × 10元',
+eg:'1口微台，指數漲100點 → 獲利 100×10 = 1,000元'},
+
+{term:'到期日',en:'Expiration Date',cat:'contract',
+short:'台指期合約的最終交割日，台灣為每月第三個週三，到期當天強制以結算價結算。',
+detail:'<b>近月合約</b>：最接近到期的合約，流動性最好、交易量最大。<b>遠月合約</b>：下月、下季合約，流動性較差。<b>到期前換月</b>：為了持續持有部位，需在到期前把近月合約平倉，重新買進下月合約。'},
+
+{term:'結算',en:'Settlement',cat:'contract',
+short:'期貨到期時，以「最後結算價」計算損益並自動平倉的機制，台指期為現金結算（非實物交割）。',
+detail:'<b>最後結算價</b>：到期日當天，以開盤後前15分鐘（或特定規則）計算出的指數均值，作為最終結算基準。<b>現金結算</b>：直接計算差價轉帳，不涉及實際股票交割。<b>注意</b>：到期日有時出現異常波動（結算操控），需特別謹慎。'},
+
+{term:'口',en:'Contract (lot)',cat:'contract',
+short:'期貨的交易單位，買1口就是買1張標準合約，損益依合約規格計算。',
+detail:'台灣期貨以「口」為單位，美國期貨以「contract」為單位。<b>不能買0.5口</b>：期貨合約不能細分，部位控制只能以整口數調整。'},
+
+{term:'未平倉量',en:'Open Interest',cat:'contract',
+short:'目前市場上所有未結算（尚未平倉）的期貨合約總數，代表市場的「賭注」大小。',
+detail:'<b>未平倉量增加</b>：市場新資金進入，行情可能持續。<b>未平倉量減少</b>：有人平倉（獲利了結或停損），行情可能趨緩。<b>注意</b>：未平倉量是「買方＋賣方都算1口」，每一口多單對應一口空單。',
+warn:'未平倉量大的合約流動性好，拉大倉位時選流動性高的近月合約。'},
+
+// ── 保證金制度 ─────────────────────────────────────────────────────────────
+{term:'原始保證金',en:'Initial Margin',cat:'margin',
+short:'開倉時帳戶內必須存入的最低金額，由期貨交易所根據合約波動性設定。',
+detail:'台指期（大台）目前約184,000元，小台約46,000元，微台約9,000元（會因市場波動調整）。保證金不是「買股票的成本」，而是「履約保證」——行情對你有利時可以超過原始保證金的虧損，期貨公司會每天結算。',
+warn:'期貨公司每天將當日損益直接計入帳戶（每日結算），帳戶資金實時反映損益，不像股票要賣出才知道。'},
+
+{term:'維持保證金',en:'Maintenance Margin',cat:'margin',
+short:'帳戶最低必須維持的保證金水位（約原始的75%），低於此水位會收到追繳通知。',
+detail:'台指期維持保證金約為原始保證金的75%~80%。<b>帳戶淨值低於維持保證金</b> → 期貨公司發出「追繳令」，你需要在指定時間內（通常是下個交易日早上）補足到原始保證金水位。',
+formula:'大台維持保證金 ≈ 142,000元（原始184,000×77%）',
+eg:'持1口大台，帳戶虧損到剩13萬 → 低於維持保證金 → 追繳到18.4萬'},
+
+{term:'追繳令（Margin Call）',en:'Margin Call',cat:'margin',
+short:'帳戶淨值低於維持保證金時，期貨公司要求在期限內補足的通知。',
+detail:'收到追繳令後若不補繳，期貨公司有權在次日開盤時強制平倉（斷頭）。補繳金額必須補足到<b>原始保證金</b>水位（不只是補到維持保證金）。<b>計算方式</b>：追繳金額 = 原始保證金 − 目前帳戶淨值。',
+warn:'追繳令通常在行情對你不利時出現，此時補錢等於在最糟的時機加碼——要非常謹慎考慮是否繼續持有。'},
+
+{term:'斷頭',en:'Forced Liquidation / Stop Out',cat:'margin',
+short:'帳戶資金不足維持保證金，期貨公司強制平倉，不管你同不同意。',
+detail:'斷頭常發生在行情劇烈波動時（如跳空下跌），虧損速度超過補繳速度。<b>斷頭後仍可能欠期貨公司錢</b>（行情跳空超過帳戶本金時）。<b>防止斷頭</b>：帳戶保留充足緩衝（建議帳戶資金 ≥ 原始保證金×2），並嚴格設停損。',
+warn:'不設停損而被動等待追繳或斷頭，是散戶爆倉的最主要原因。'},
+
+{term:'槓桿倍數',en:'Leverage Ratio',cat:'margin',
+short:'用保證金控制合約的倍數，台指期大台槓桿約10~15倍，波動風險等比放大。',
+detail:'<b>計算方式</b>：合約市值 ÷ 保證金。大台指數21,000點時，合約市值 = 21,000×200 = 420萬，保證金18.4萬，槓桿 ≈ 22.8倍。這代表指數漲1%，你的保證金帳戶漲22.8%；跌1%也同樣虧22.8%。',
+formula:'槓桿倍數 = 合約市值 ÷ 保證金\n合約市值 = 指數點位 × 每點價值',
+warn:'槓桿是雙刃劍，一次逆向行情可以吃掉大部分保證金。永遠設好停損。'},
+
+{term:'每日結算',en:'Daily Mark-to-Market Settlement',cat:'margin',
+short:'期貨每天收盤後，依當日收盤價計算損益並立即轉入/從保證金帳戶扣除。',
+detail:'和股票不同：股票要賣出才實現損益，期貨每天直接結算到帳。<b>影響</b>：今天虧損10,000元，明天開盤前帳戶就少了10,000元的可用資金。這讓帳戶現金必須保持充裕緩衝。'},
+
+// ── 交易術語 ──────────────────────────────────────────────────────────────
+{term:'做多',en:'Long / Buy to Open',cat:'trading',
+short:'預期價格上漲，先買入期貨合約（買進開倉），漲了再平倉賣出獲利。',
+detail:'期貨做多和買股票類似，但是槓桿交易。<b>開多倉</b>：買進期貨合約。<b>平多倉</b>：賣出期貨合約（反手）。做多的最大損失理論上是合約歸零（但指數不會到零）。',
+formula:'多單獲利 = (賣出價格 − 買入價格) × 點值 × 口數'},
+
+{term:'做空',en:'Short / Sell to Open',cat:'trading',
+short:'預期價格下跌，先賣出期貨合約（賣出開倉），跌了再平倉買回獲利。',
+detail:'期貨做空不需要借券，直接在交易軟體選「賣出」即可開空單，這是期貨比股票靈活的重要優勢。<b>開空倉</b>：賣出期貨合約。<b>平空倉</b>：買回期貨合約。',
+formula:'空單獲利 = (賣出價格 − 買入價格) × 點值 × 口數',
+eg:'台指期20,500點空1口大台，跌至20,400點平倉 → 獲利100×200=20,000元'},
+
+{term:'平倉',en:'Close Position / Square Off',cat:'trading',
+short:'結束手中持有的期貨部位，做多就賣出、做空就買入，損益在此確定。',
+detail:'<b>自行平倉</b>：主動在想要的價格平倉。<b>停損平倉</b>：觸及停損價格自動平倉。<b>被動平倉（斷頭）</b>：保證金不足被期貨公司強制平倉。<b>到期自動結算</b>：到期日不平倉則自動以結算價結算。'},
+
+{term:'留倉',en:'Overnight Position / Carry',cat:'trading',
+short:'收盤時沒有平倉，將部位持留到下個交易日，承擔隔夜風險（跳空）。',
+detail:'台指期夜盤（15:00~05:00）可以交易，留倉到夜盤或隔日開盤都可能面臨跳空風險。<b>建議</b>：初學者不宜頻繁留倉，隔夜發生重大消息（美股大跌、地緣政治）會讓你措手不及。',
+warn:'留倉時如果設停損，確認停損單是「觸及成交」而非「限價停損」，跳空時限價單可能完全無法成交。'},
+
+{term:'換月',en:'Contract Rollover',cat:'trading',
+short:'近月合約即將到期時，將持倉轉移至下月合約，以繼續持有相同方向的部位。',
+detail:'換月通常在到期日前2~3天進行（此時近月合約量縮、下月合約量增）。<b>換月成本</b>：近月和下月合約之間的價差（基差），換月時可能付出幾十到上百點的成本或獲益。'},
+
+{term:'翻倉',en:'Position Reversal',cat:'trading',
+short:'從多倉直接轉為空倉（或反之），等於同時平倉和開新倉，通常在判斷趨勢反轉時使用。',
+detail:'例：持有1口多單，判斷轉空後「賣出2口」——第一口平多、第二口開空。這比分兩次操作（先平倉再開倉）更節省手續費，也更快速執行。'},
+
+{term:'未平倉量增減',en:'Open Interest Change',cat:'trading',
+short:'未平倉量（OI）增加代表有新資金進場，OI減少代表有人平倉離場，是行情動能的佐證。',
+detail:'<b>價漲+OI增</b>：多頭資金積極進場，行情偏多且強勁。<b>價漲+OI減</b>：空單回補推升股價，漲勢可能不持久。<b>價跌+OI增</b>：空頭資金進場，行情偏空。<b>價跌+OI減</b>：多單認賠出場，跌勢可能接近尾聲。'},
+
+{term:'跳空',en:'Price Gap',cat:'trading',
+short:'開盤價相對前一日收盤價出現大幅差距，期貨在夜盤後或重大消息後常見。',
+detail:'<b>上跳空</b>：開盤遠高於前收盤（如利多消息）。<b>下跳空</b>：開盤遠低於前收盤（如利空消息）。<b>跳空風險</b>：停損單在跳空點位之外時，會以實際開盤價成交，虧損可能遠超原本設定的停損金額。',
+warn:'這是留倉最大的風險，設停損不能100%保護你，因為跳空會讓停損滑價嚴重。'},
+
+{term:'滑價',en:'Slippage',cat:'trading',
+short:'實際成交價格與預期（或設定）價格之間的差距，在市場快速移動時特別明顯。',
+detail:'<b>原因</b>：掛市價單時行情迅速移動，或停損單跳過設定價格成交。<b>減少滑價方法</b>：使用「限價單」但可能無法成交；大台比小台流動性好，滑價較少；避免在重大數據公布時下市價單。'},
+
+// ── 風險管理 ───────────────────────────────────────────────────────────────
+{term:'停損',en:'Stop Loss',cat:'risk',
+short:'預先設定一個可接受的最大虧損點位，一旦行情到達就立即平倉，控制單筆損失。',
+detail:'<b>固定金額停損</b>：每口虧損超過X元就出場（如每口虧3,000元=15點停損）。<b>技術面停損</b>：跌破支撐位/均線就出場，更符合市場邏輯。<b>時間停損</b>：進場後N分鐘/小時沒有如預期走，直接出場。停損是交易最重要的紀律，設了就要確實執行。',
+warn:'「這次再等一下」是爆倉的開始。停損不執行，紀律就崩潰。'},
+
+{term:'停利',en:'Take Profit / Target',cat:'risk',
+short:'預先設定獲利目標，到達後鎖定利潤離場，避免行情反轉吃掉獲利。',
+detail:'<b>固定目標停利</b>：設定進場後+30點停利（300元/口小台）。<b>移動停利（Trailing Stop）</b>：隨著行情有利移動，停利點跟著移動，讓利潤最大化同時保護已有獲利。<b>技術面停利</b>：在壓力位或上影線出現時離場。'},
+
+{term:'風險報酬比',en:'Risk/Reward Ratio',cat:'risk',
+short:'每次交易的預期獲利與預期虧損的比例，好的交易至少要1:2。',
+detail:'<b>計算方式</b>：(目標點−進場點) ÷ (進場點−停損點)。<b>1:2</b>代表虧損1元能賺2元，即使只有50%勝率也能長期獲利。<b>專業建議</b>：至少要1:1.5，低於1:1的交易通常不值得進場。',
+formula:'風報比 = 預期獲利 ÷ 預期虧損\n例：目標+50點，停損-25點 → 風報比 = 2:1'},
+
+{term:'2%法則',en:'2% Rule',cat:'risk',
+short:'每次交易的最大損失不超過總帳戶資金的2%，確保即使連輸多次也不會爆倉。',
+detail:'<b>帳戶100萬 × 2% = 2萬元</b>，這是你每口大台最多可以承受的虧損。換算：2萬÷200元/點 = 100點停損空間。如果你的策略需要超過100點停損才合理，就需要縮小口數。<b>實務</b>：大多數職業交易者用更保守的0.5%~1%。',
+formula:'最大單筆虧損金額 = 帳戶總資金 × 2%\n停損點數 = 最大虧損 ÷ 每點價值'},
+
+{term:'凱利公式',en:'Kelly Criterion',cat:'risk',
+short:'根據你的歷史勝率和賠率，計算最佳的每次下注比例，長期最大化資金成長。',
+detail:'需要知道：勝率（W%）和平均獲利/虧損比（R）。<b>半凱利</b>：實務上用計算出比例的一半，更保守更安全。如果凱利公式算出20%，就用10%的帳戶資金下注。',
+formula:'凱利比例 = W − (1−W) ÷ R\nW = 勝率，R = 平均獲利÷平均虧損',
+eg:'勝率55%，平均獲利/虧損比=1.5 → 凱利 = 0.55 − 0.45÷1.5 = 0.25 → 用帳戶25%（半凱利12.5%）'},
+
+{term:'每日虧損上限',en:'Daily Stop Loss Limit',cat:'risk',
+short:'設定單日最大可虧損金額，到達後立即停止交易、不管行情如何。',
+detail:'建議設在帳戶的3%~5%。<b>為什麼重要</b>：情緒化交易最常在「虧損後想扳回」時出現，設定日停損能強制你暫停，避免當天連環虧損。<b>連續觸發</b>：如果3天都觸發日停損，應停止交易至少2天，重新審視策略是否失效。'},
+
+{term:'部位控制',en:'Position Sizing',cat:'risk',
+short:'根據帳戶規模和停損距離計算下多少口期貨，使虧損維持在可接受範圍內的方法。',
+detail:'<b>步驟</b>：1) 決定停損點位（技術面）；2) 計算1口的停損金額；3) 用最大虧損金額 ÷ 單口停損 = 可下口數。',
+formula:'可下口數 = 最大單筆虧損 ÷ (停損點數 × 每點價值)',
+eg:'帳戶50萬，最大虧損1% = 5,000元，停損40點 → 5,000÷(40×200) = 0.625口 → 只能下1口（向下取整）'},
+
+// ── 美股期貨 ───────────────────────────────────────────────────────────────
+{term:'E-mini S&P 500 (ES)',en:'E-mini S&P 500 Futures',cat:'us',
+short:'追蹤標普500指數的期貨合約，美國最主流、流動性最高的股指期貨。',
+detail:'<b>每點價值</b>：$50。<b>最小跳動</b>：0.25點（$12.5）。<b>保證金</b>：約$12,400（平均數，依券商及市況不同）。<b>交易時間</b>：近24小時（週日17:00至週五16:00，CST）。<b>代碼</b>：ES（CME交易所）。',
+formula:'損益 = 點數差 × $50 × 口數',
+eg:'ES 5000點買進，5050點賣出 → 獲利50×$50=$2,500'},
+
+{term:'Micro E-mini S&P 500 (MES)',en:'Micro E-mini S&P 500',cat:'us',
+short:'ES的1/10規模版本，每點$5，適合小資金或練習用。',
+detail:'<b>每點價值</b>：$5。<b>保證金</b>：約$1,200。<b>特色</b>：和ES完全相同的機制，只是規模縮小10倍，非常適合新手練習美股期貨、學習在真實市場環境下操作。',
+formula:'損益 = 點數差 × $5 × 口數'},
+
+{term:'E-mini Nasdaq (NQ)',en:'E-mini Nasdaq-100 Futures',cat:'us',
+short:'追蹤那斯達克100指數（科技股為主），波動較ES大，機會與風險都更高。',
+detail:'<b>每點價值</b>：$20。<b>最小跳動</b>：0.25點（$5）。<b>保證金</b>：約$16,000。<b>特色</b>：包含AAPL、MSFT、NVDA等科技巨頭，波動比ES大30~50%，適合喜歡強烈波動的交易者。',
+formula:'損益 = 點數差 × $20 × 口數'},
+
+{term:'Micro E-mini Nasdaq (MNQ)',en:'Micro E-mini Nasdaq-100',cat:'us',
+short:'NQ的1/10版本，每點$2，保證金約$1,600，新手進入美股期貨的最佳起點。',
+detail:'<b>每點價值</b>：$2。<b>保證金</b>：約$1,600。台灣TOPSTEP交易者常先從MNQ開始練習，再升級到NQ。',
+formula:'損益 = 點數差 × $2 × 口數',
+eg:'MNQ 18,000點買進，18,100點賣出 → 獲利100×$2=$200'},
+
+{term:'CME Group',en:'Chicago Mercantile Exchange Group',cat:'us',
+short:'全球最大的衍生性商品交易所，ES/NQ/MES/MNQ均在此交易。',
+detail:'台灣人透過海外期貨帳戶（如TOPSTEP、IB等）間接在CME交易。CME實行嚴格的保證金規定和風控制度，並提供近24小時交易（可承接美股盤後動態）。'},
+
+{term:'TOPSTEP',en:'Topstep LLC',cat:'us',
+short:'美國最大的「模擬帳戶挑戰」公司，通過測試後提供真實資金供交易者操作，賺到的利潤可以分成。',
+detail:'<b>帳戶規格</b>：$50K、$100K、$150K三種。<b>挑戰規則</b>：在評估期達到目標獲利同時不觸發最大虧損限制，通過後進入Express Funded Account，可實際出金。<b>分潤比例</b>：交易者保留90%利潤。<b>適合</b>：沒有大量資金但有交易技術的交易者。',
+warn:'$50K帳戶每日虧損上限$1,000，最大虧損上限$2,000（追蹤型），需嚴格遵守，超過規則就被取消資格。'},
+
+{term:'帳戶追蹤虧損',en:'Trailing Drawdown',cat:'us',
+short:'TOPSTEP的特殊規定：最大可虧損上限會隨著累積獲利而往上調，「鎖定」已賺到的部分利潤。',
+detail:'$50K帳戶：追蹤型最大虧損$2,000，且從帳戶最高水位往下算。例：帳戶最高達到$51,500，則停損下限為$49,500（= $51,500 - $2,000）。如果賺到$2,000以上，停損下限不再上調（維持在本金位置）。',
+formula:'停損下限 = 帳戶歷史最高值 − 最大追蹤虧損\n（一旦超過本金$2,000則不再追蹤）'},
+
+{term:'每日虧損上限（TOPSTEP）',en:'Daily Loss Limit',cat:'us',
+short:'TOPSTEP規定每日（按美國中部時間）不能虧損超過特定金額，觸發後當日強制停止交易。',
+detail:'$50K帳戶：每日虧損上限$1,000。$100K帳戶：$2,000。$150K帳戶：$3,000。<b>注意</b>：是「實時未實現損益+已實現損益」的總和，不是收盤才算，開著部位的浮虧也計入。',
+warn:'美國時間和台灣時間相差13~14小時，台灣的夜盤操作時間恰好是美國的交易日，要注意日期重置時間。'},
+];
+
+// JS ENGINE ──────────────────────────────────────────────────────────────
+let currentCat = 'all';
+const catNames = {
+  contract:'📄 合約基礎',
+  margin:'💰 保證金制度',
+  trading:'⚡ 交易術語',
+  risk:'🛡 風險管理',
+  us:'🇺🇸 美股期貨'
+};
+const badgeClass = {
+  contract:'badge-contract',
+  margin:'badge-margin',
+  trading:'badge-trading',
+  risk:'badge-risk',
+  us:'badge-us'
+};
+function render(terms){
+  const g = document.getElementById('glossary');
+  if(!terms.length){g.innerHTML='<div class="empty">找不到符合的術語</div>';document.getElementById('showing').textContent=0;return;}
+  let html='',lastCat='';
+  terms.forEach(t=>{
+    if(currentCat==='all'&&t.cat!==lastCat){lastCat=t.cat;html+=`<div class="sec-label">${catNames[t.cat]}</div>`;}
+    const badge=`<span class="tc-badge ${badgeClass[t.cat]}">${catNames[t.cat].replace(/^../,'')}</span>`;
+    let extra='';
+    if(t.formula)extra+=`<div class="tc-formula">${t.formula.replace(/\n/g,'<br>')}</div>`;
+    if(t.eg)extra+=`<div class="tc-eg">📌 ${t.eg}</div>`;
+    if(t.warn)extra+=`<div class="tc-warn">⚠️ ${t.warn}</div>`;
+    html+=`<div class="term-card">
+      <div class="tc-top"><div><div class="tc-name">${t.term}</div><div class="tc-en">${t.en}</div></div>${badge}</div>
+      <div class="tc-short">${t.short}</div>
+      <div class="tc-detail">${t.detail}${extra}</div>
+    </div>`;
+  });
+  g.innerHTML=html;
+  document.getElementById('showing').textContent=terms.length;
+}
+function filter(){
+  const q=document.getElementById('q').value.toLowerCase();
+  let terms=TERMS.filter(t=>currentCat==='all'||t.cat===currentCat);
+  if(q)terms=terms.filter(t=>t.term.toLowerCase().includes(q)||t.en.toLowerCase().includes(q)||t.short.toLowerCase().includes(q)||t.detail.toLowerCase().includes(q));
+  render(terms);
+}
+function setCat(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filter();
+}
+document.getElementById('total').textContent=TERMS.length;
+filter();
+</script>
+</body>
+</html>

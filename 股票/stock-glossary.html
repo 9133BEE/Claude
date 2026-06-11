@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股票術語字典 — 股學筆記</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:#161b22;color:#e6edf3;min-height:100vh;font-size:15px}
+a{color:inherit;text-decoration:none}
+
+/* TOPBAR */
+.topbar{background:#0d1117;border-bottom:1px solid #21262d;padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.tb-back{color:#484f58;font-size:.8rem;cursor:pointer;transition:color .15s}
+.tb-back:hover{color:#8b949e}
+.tb-title{font-size:1rem;font-weight:700;color:#e6edf3;flex:1}
+.tb-sub{font-size:.78rem;color:#484f58}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);padding:36px 24px 28px;border-bottom:1px solid #21262d;text-align:center}
+.hero h1{font-size:1.7rem;font-weight:800;color:#e6edf3;margin-bottom:8px}
+.hero p{color:#8b949e;font-size:.9rem;margin-bottom:20px}
+.search-wrap{max-width:520px;margin:0 auto;position:relative}
+.search-wrap input{width:100%;padding:13px 16px 13px 44px;background:#21262d;border:1px solid #30363d;border-radius:10px;color:#e6edf3;font-size:.95rem;outline:none;transition:border .15s;font-family:inherit}
+.search-wrap input:focus{border-color:#58a6ff}
+.search-wrap input::placeholder{color:#484f58}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#484f58;font-size:1rem;pointer-events:none}
+.count{color:#484f58;font-size:.8rem;margin-top:8px}
+
+/* CATEGORY FILTERS */
+.cats{display:flex;gap:8px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid #21262d;justify-content:center}
+.cat-btn{padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid #30363d;background:transparent;color:#8b949e;transition:all .15s}
+.cat-btn:hover{border-color:#58a6ff;color:#58a6ff}
+.cat-btn.active{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.cat-btn[data-cat="technical"].active{background:#7c3aed;border-color:#7c3aed}
+.cat-btn[data-cat="chips"].active{background:#b45309;border-color:#b45309}
+.cat-btn[data-cat="pattern"].active{background:#0e7490;border-color:#0e7490}
+.cat-btn[data-cat="market"].active{background:#166534;border-color:#166534}
+
+/* TERMS GRID */
+.glossary{max-width:1100px;margin:0 auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.term-card{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:18px 20px;transition:border-color .15s}
+.term-card:hover{border-color:#484f58}
+.term-card[style*="display:none"]{display:none!important}
+.tc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px}
+.tc-name{font-size:1.05rem;font-weight:800;color:#e6edf3;line-height:1.3}
+.tc-en{font-size:.73rem;color:#484f58;margin-top:2px}
+.tc-badge{flex-shrink:0;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:2px}
+.badge-basic{background:rgba(31,111,235,.15);color:#58a6ff;border:1px solid rgba(31,111,235,.3)}
+.badge-technical{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.badge-chips{background:rgba(180,83,9,.15);color:#fb923c;border:1px solid rgba(180,83,9,.3)}
+.badge-pattern{background:rgba(14,116,144,.15);color:#22d3ee;border:1px solid rgba(14,116,144,.3)}
+.badge-market{background:rgba(22,101,52,.15);color:#4ade80;border:1px solid rgba(22,101,52,.3)}
+.tc-short{font-size:.85rem;color:#8b949e;line-height:1.6;margin-bottom:8px}
+.tc-detail{font-size:.83rem;color:#c9d1d9;line-height:1.7;border-top:1px solid #21262d;padding-top:8px}
+.tc-detail b,.tc-detail strong{color:#e6edf3}
+.tc-formula{background:#0d1117;border-radius:6px;padding:8px 12px;margin:8px 0;font-family:monospace;font-size:.78rem;color:#7dd3fc;border-left:3px solid #1f6feb}
+.tc-eg{background:rgba(35,134,54,.08);border-left:2px solid #238636;padding:6px 10px;margin:6px 0;font-size:.8rem;color:#7ee787;border-radius:0 4px 4px 0}
+.tc-warn{background:rgba(210,153,34,.08);border-left:2px solid #d29922;padding:6px 10px;margin:6px 0;font-size:.8rem;color:#e3b341;border-radius:0 4px 4px 0}
+
+/* SECTION LABEL */
+.sec-label{grid-column:1/-1;padding:8px 4px 4px;color:#484f58;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #21262d;margin-bottom:2px}
+
+.empty{grid-column:1/-1;text-align:center;padding:60px;color:#484f58;font-size:.9rem}
+
+@media(max-width:600px){
+  .glossary{padding:14px;grid-template-columns:1fr}
+  .hero{padding:24px 16px 18px}
+  .hero h1{font-size:1.4rem}
+  .cats{padding:12px 14px}
+  .topbar{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="tb-back" onclick="location.href='index.html'">← 股學筆記</span>
+  <span class="tb-title">股票術語字典</span>
+  <span class="tb-sub">共 <span id="total">0</span> 個詞條</span>
+</div>
+
+<div class="hero">
+  <h1>📖 股票術語字典</h1>
+  <p>技術分析 · 基本面 · 籌碼 · 型態 — 查詞、學習、快速複習</p>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="q" placeholder="搜尋術語、英文、定義..." oninput="filter()">
+  </div>
+  <div class="count">顯示 <span id="showing">0</span> 個詞條</div>
+</div>
+
+<div class="cats" id="cats">
+  <button class="cat-btn active" data-cat="all" onclick="setCat('all',this)">全部</button>
+  <button class="cat-btn" data-cat="basic" onclick="setCat('basic',this)">📊 基礎概念</button>
+  <button class="cat-btn" data-cat="technical" onclick="setCat('technical',this)">📈 技術分析</button>
+  <button class="cat-btn" data-cat="chips" onclick="setCat('chips',this)">🏦 籌碼分析</button>
+  <button class="cat-btn" data-cat="pattern" onclick="setCat('pattern',this)">🔷 K線型態</button>
+  <button class="cat-btn" data-cat="market" onclick="setCat('market',this)">🏛 市場規則</button>
+</div>
+
+<div class="glossary" id="glossary"></div>
+
+<script>
+const TERMS = [
+// ── 基礎概念 ──────────────────────────────────────────────────────────────
+{term:'股票',en:'Stock / Share',cat:'basic',
+short:'公司向公眾募資時發行的所有權憑證，持有者稱為「股東」。',
+detail:'持有股票就擁有公司一小部分。股票可在證券交易所（台灣為TWSE/TPEx）買賣。公司獲利可發放<b>股息</b>給股東，股價漲跌讓持有者有資本利得或損失。'},
+
+{term:'市值',en:'Market Capitalization',cat:'basic',
+short:'目前股價 × 流通在外股數，代表市場對公司的整體估值。',
+detail:'<b>大型股</b>（市值>1000億）：如台積電，流動性佳但波動小。<b>中型股</b>（100~1000億）：報酬與風險居中。<b>小型股</b>（<100億）：波動大，容易受主力控制。',
+formula:'市值 = 目前股價 × 流通在外股數'},
+
+{term:'本益比 P/E',en:'Price-to-Earnings Ratio',cat:'basic',
+short:'股價相對於每股盈餘的倍數，代表市場願意為這家公司的獲利付多少錢。',
+detail:'P/E=15 表示市場願意付 15 元來買這家公司每賺 1 元的獲利。<b>低P/E不一定便宜</b>（可能是獲利衰退）；<b>高P/E不一定貴</b>（可能是成長股溢價）。台股平均本益比約 15~18 倍。',
+formula:'P/E = 股價 ÷ 每股盈餘（EPS）',
+eg:'台積電股價800，EPS=33 → P/E = 800÷33 ≈ 24倍（科技股溢價合理）'},
+
+{term:'EPS',en:'Earnings Per Share / 每股盈餘',cat:'basic',
+short:'公司每一股所賺的淨利，是最直接衡量獲利能力的指標。',
+detail:'EPS 持續成長的公司通常股價也跟著走高。要注意「一次性業外收益」可能讓 EPS 虛高，應優先看<b>本業EPS</b>（營業利益÷股數）。',
+formula:'EPS = 稅後淨利 ÷ 流通在外股數'},
+
+{term:'殖利率',en:'Dividend Yield',cat:'basic',
+short:'每年拿到的股息相對於股價的百分比，存股族最重視的指標。',
+detail:'台灣市場殖利率普遍高於其他亞洲市場，優質定存股殖利率約 4~7%。<b>殖利率過高要小心</b>：可能是股價跌太多（分母變小）而非公司真的賺很多。',
+formula:'殖利率 = 年配息 ÷ 目前股價 × 100%',
+eg:'某股每年配 2 元，股價 40 元 → 殖利率 = 2÷40 = 5%'},
+
+{term:'ROE',en:'Return on Equity / 股東權益報酬率',cat:'basic',
+short:'公司用股東的錢能賺多少錢，是衡量「幫股東賺錢效率」最重要的指標。',
+detail:'巴菲特標準：<b>ROE 連續5年>15%</b> 才算優質企業。ROE = ROA × 財務槓桿；高ROE可能源自高負債，需要一起看。台積電ROE長期在25%以上。',
+formula:'ROE = 稅後淨利 ÷ 股東權益 × 100%'},
+
+{term:'股息 / 配息',en:'Dividend',cat:'basic',
+short:'公司將盈餘分配給股東的現金或股票，台灣多為一年一次。',
+detail:'<b>現金股利</b>：直接拿到錢（需繳稅）。<b>股票股利</b>：拿到更多股票但股價會「除權」下調。台灣存股族偏愛高現金股利的個股（如金融股、電信股）。'},
+
+{term:'除權/除息',en:'Ex-Rights / Ex-Dividend',cat:'basic',
+short:'公司發放股票/股息前一天會調降股價，稱為「除權」或「除息」。',
+detail:'<b>填權息</b>：除權息後股價回補到原本水位，代表公司繼續獲利支撐。<b>貼權息</b>：股價未能回補，實際上持有者財富縮水。高殖利率股不一定划算，要看能否順利填權息。'},
+
+{term:'融資',en:'Margin / Long Margin',cat:'basic',
+short:'向券商借錢買股票，等於用槓桿做多，最高可借到六成。',
+detail:'融資維持率低於130%會收到追繳通知，低於120%（各券商不同）則強制斷頭賣出。<b>融資增加</b>代表散戶增加看多；<b>融資餘額高的股票</b>在大跌時賣壓更重（斷頭賣壓）。',
+eg:'買10萬的股票，自備4萬，融資借6萬（融資比率60%）'},
+
+{term:'融券',en:'Short Selling / Short Margin',cat:'basic',
+short:'向券商借股票賣出、等跌了再買回還給券商，做空的工具。',
+detail:'融券維持率低於130%會被追繳（軋空行情）。<b>融券回補</b>：放空者被迫買回股票還券，造成短期急漲（軋空）。除權息前需回補融券，容易推升股價。',
+eg:'借100張台積電在500元賣出，跌到480元買回 → 獲利2000元/張'},
+
+{term:'ETF',en:'Exchange-Traded Fund / 指數股票型基金',cat:'basic',
+short:'追蹤指數或一籃子股票的基金，像股票一樣在交易所買賣。',
+detail:'台灣最大 ETF：<b>0050</b>（追蹤台灣50大市值）、<b>0056</b>（高股息）、<b>00878</b>（ESG）。低費用率、分散風險，適合長期投資。但ETF也需要看技術面，高點追買一樣虧錢。'},
+
+{term:'除息日',en:'Ex-Dividend Date',cat:'basic',
+short:'股息的「基準日」，在這天前持有股票才能領到股息。',
+detail:'台灣大多數公司在每年5~9月間辦理除息。除息日當天開盤股價會自動下調（扣除股息金額），投資人不是真的「賺到」股息——除非事後填息。'},
+
+{term:'指數',en:'Index',cat:'basic',
+short:'代表一群股票整體表現的數值，台灣加權指數是最主要的市場溫度計。',
+detail:'<b>台灣加權指數</b>（TWSE）：含所有上市股票，以市值加權。<b>台灣50</b>：前50大市值公司。<b>道瓊斯</b>（美股）：30家大型企業，不常用於期貨。<b>S&P500</b>（美股）：500家公司，最具代表性。<b>那斯達克</b>：科技股為主。'},
+
+{term:'漲跌停',en:'Limit Up / Limit Down',cat:'market',
+short:'台灣規定單日股價最大漲幅或跌幅為10%，到達上限即不能再往該方向交易。',
+detail:'<b>漲停鎖死</b>：市場搶進讓掛單全是買單，主力可能在鎖死前出貨。<b>跌停鎖死</b>：賣不出去，隔日可能繼續跌。<b>注意</b>：期貨和ETF沒有漲跌停限制（或限制更寬）。',
+warn:'漲停不代表「一定要追」——隔天可能開低，追漲停是危險行為。'},
+
+// ── 技術分析 ──────────────────────────────────────────────────────────────
+{term:'K線 / 蠟燭圖',en:'Candlestick / K-Line',cat:'technical',
+short:'用四個價格（開盤、最高、最低、收盤）表現一段時間內價格變化的圖形。',
+detail:'<b>陽線（紅色）</b>：收盤 > 開盤，代表這段時間買方佔優勢。<b>陰線（黑/綠）</b>：收盤 < 開盤，賣方佔優勢。<b>上影線</b>：最高價超出實體的部分，代表上方遭到賣壓。<b>下影線</b>：最低價低於實體，代表下方有買盤支撐。',
+eg:'長下影線陽線（錘型）通常代表跌勢暫止，買方積極承接。'},
+
+{term:'支撐',en:'Support Level',cat:'technical',
+short:'歷史上股價多次下跌到這個區域就反彈，代表買方願意在此積極進場。',
+detail:'支撐形成的原因：1) 前次低點（投資者認為相對便宜）; 2) 整數關卡（心理作用）; 3) 均線（如MA20多次扮演支撐）; 4) 成交量密集區（大量籌碼在此換手）。<b>跌破支撐</b>代表市場結構轉弱，原支撐變成壓力。',
+warn:'支撐不是永遠成立，假突破（跌破後快速拉回）會讓停損觸發後股價反轉。'},
+
+{term:'壓力',en:'Resistance Level',cat:'technical',
+short:'歷史上股價多次上漲到這個區域就遇到賣壓，代表賣方在此積極出貨。',
+detail:'壓力形成的原因：1) 前次高點（套牢者解套想賣）; 2) 整數關卡（心理滿足點）; 3) 下彎均線阻擋; 4) 前期密集成交區。<b>突破壓力</b>（尤其放量突破）通常是強烈的買進訊號。',
+eg:'某股反覆在150元遇到賣壓 → 150元是強壓力，放量突破後可追入。'},
+
+{term:'趨勢線',en:'Trend Line',cat:'technical',
+short:'連接多個低點（上升趨勢）或高點（下降趨勢）所畫出的斜線，代表市場方向。',
+detail:'<b>上升趨勢線</b>：連接連續2個以上的波谷，有效支撐多次為強趨勢線。<b>下降趨勢線</b>：連接連續波峰，多次阻擋就是強壓力。<b>突破趨勢線</b>：可能是趨勢反轉的訊號，配合成交量更可靠。<b>口袋小學堂EP7重點</b>：歷史會重演，趨勢線可以預判未來的支撐壓力位。',
+eg:'趨勢線被三次測試且守住，第四次進場勝率大幅提升。'},
+
+{term:'移動平均線 MA',en:'Moving Average',cat:'technical',
+short:'過去N天收盤價的平均值，平滑化價格波動讓趨勢更清晰。',
+detail:'<b>MA5（週線）</b>：短線動能指標，常被主力用來控盤。<b>MA10（雙週線）</b>：短中線觀察用。<b>MA20（月線）</b>：最重要的中線支撐/壓力，很多散戶和機構用它。<b>MA60（季線）</b>：趨勢轉折重要參考。<b>MA240（年線）</b>：多空分界線，年線之上偏多，年線之下偏空。',
+formula:'MA20 = 最近20天收盤價總和 ÷ 20'},
+
+{term:'黃金交叉 / 死亡交叉',en:'Golden Cross / Death Cross',cat:'technical',
+short:'短期均線向上穿越長期均線（黃金交叉）或向下穿越（死亡交叉），代表趨勢可能轉向。',
+detail:'常見組合：MA5穿越MA20、MA20穿越MA60。<b>黃金交叉</b>：短線轉多，理論上買進訊號。<b>死亡交叉</b>：短線轉空，理論上賣出訊號。<b>注意</b>：交叉訊號有時間滯後，在橫盤整理中頻繁假訊號，不能單獨使用。',
+warn:'單純靠均線交叉操作成功率不高，需要配合成交量和市場情境。'},
+
+{term:'MACD',en:'Moving Average Convergence Divergence',cat:'technical',
+short:'由快慢兩條均線的差值組成，可判斷趨勢方向、強弱、以及潛在反轉。',
+detail:'三個組成部分：<b>DIF線</b>（12日EMA-26日EMA）、<b>DEA線</b>（DIF的9日平均）、<b>柱狀體</b>（DIF-DEA的差值）。DIF在DEA上方且柱狀體為正 → 多頭。柱狀體縮短 → 動能減弱。<b>背離</b>：股價創新高但MACD沒有跟著創高 → 頂部警訊。',
+formula:'DIF = EMA12 - EMA26\nDEA = DIF的9日平滑平均\n柱狀 = (DIF - DEA) × 2'},
+
+{term:'KD指標',en:'Stochastic Oscillator',cat:'technical',
+short:'衡量目前收盤價在最近N天價格區間中的相對位置，判斷超買超賣。',
+detail:'K值和D值均在0~100之間。<b>K、D<20</b>：超賣區，可能觸底反彈。<b>K、D>80</b>：超買區，可能見頂回落。<b>黃金交叉</b>：K穿越D向上，買進訊號（在低檔更可靠）。<b>鈍化</b>：強勢股中KD可以長期在80以上，不能看到高就放空。',
+formula:'RSV = (收盤-最低) ÷ (最高-最低) × 100\nK = 前日K × 2/3 + 今日RSV × 1/3\nD = 前日D × 2/3 + 今日K × 1/3',
+warn:'KD在台股很多人用，容易成為自我實現預言，但在強趨勢時容易鈍化，勿逆勢。'},
+
+{term:'RSI',en:'Relative Strength Index / 相對強弱指標',cat:'technical',
+short:'衡量一段時間內漲幅與跌幅的比例，判斷多空力道的強弱。',
+detail:'RSI值在0~100之間。<b>RSI>70</b>：超買（偏空）。<b>RSI<30</b>：超賣（偏多）。台股常用 RSI6 和 RSI12 兩條搭配。<b>背離</b>：股價創新高而RSI沒有跟著創高 → 動能減弱，注意風險。',
+formula:'RS = N日內平均漲幅 ÷ N日內平均跌幅\nRSI = 100 - (100 ÷ (1+RS))'},
+
+{term:'布林通道',en:'Bollinger Bands',cat:'technical',
+short:'以20日均線為中軸，上下各加減兩個標準差，形成股價的「正常波動區間」。',
+detail:'<b>上軌（+2σ）</b>：約95%時間股價在此之下，觸碰上軌表示相對高估。<b>下軌（-2σ）</b>：觸碰下軌表示相對低估。<b>收縮</b>：波動縮小，通常在大行情之前。<b>擴張</b>：波動放大，趨勢確立中。<b>追漲不追高</b>：布林通道收縮後突破上軌放量才是真突破。',
+formula:'中軌 = MA20\n上軌 = MA20 + 2×標準差\n下軌 = MA20 - 2×標準差'},
+
+{term:'成交量',en:'Trading Volume',cat:'technical',
+short:'一段時間內買賣雙方成交的總股數，是技術分析中最重要的佐證指標。',
+detail:'<b>量價齊揚</b>：股價上漲+成交量放大 → 強烈的多頭訊號。<b>量縮價漲</b>：缺乏買盤支撐的上漲，不可靠。<b>量縮價跌</b>：跌勢中的正常喘息，止跌後反彈需要看是否出現「止跌量」。<b>爆量</b>：成交量突然放大至平均的3倍以上，通常是行情轉折點（可能是主力出貨）。',
+warn:'脫離成交量看價格訊號是不完整的，這是初學者最常犯的錯誤。'},
+
+{term:'背離',en:'Divergence',cat:'technical',
+short:'股價走勢和技術指標（MACD/RSI/KD）走勢方向不一致，預示趨勢可能轉換。',
+detail:'<b>頂部背離（負背離）</b>：股價創新高，但指標沒有跟著創新高 → 動能減弱，留意回調。<b>底部背離（正背離）</b>：股價創新低，但指標沒有跟著創新低 → 跌勢動能衰竭，可能反彈。背離在MACD上最明顯，也最常被專業交易者使用。',
+eg:'2021年11月比特幣創歷史高點，但MACD柱狀體縮短且DIF未創高 → 頂部訊號，後來大跌70%。'},
+
+// ── K線型態 ────────────────────────────────────────────────────────────────
+{term:'缺口',en:'Price Gap',cat:'pattern',
+short:'相鄰兩根K線之間有空白區域，代表市場情緒強烈跳空，分為突破缺口、逃逸缺口、竭盡缺口。',
+detail:'<b>突破缺口</b>（Breakaway Gap）：股價突破盤整區，多半放量，後續走勢延伸機率高。<b>逃逸缺口</b>（Runaway Gap）：趨勢中途出現，代表趨勢加速。<b>竭盡缺口</b>（Exhaustion Gap）：趨勢末端出現，之後容易反轉。台灣俗語：「缺口終會被填滿」——但不一定短期，也不100%成立。',
+warn:'竭盡缺口回補與突破缺口延伸很難即時判斷，最好等量能確認。'},
+
+{term:'頭肩頂 / 頭肩底',en:'Head & Shoulders (Top/Bottom)',cat:'pattern',
+short:'由三個波峰（或波谷）形成，中間最高（最低），是最可靠的趨勢反轉型態之一。',
+detail:'<b>頭肩頂</b>（賣出訊號）：三個波峰，中間最高（頭），兩側較低（肩）。頸線（連接兩個波谷）跌破後確認反轉。<b>頭肩底</b>（買入訊號）：相反。<b>注意</b>：右肩成交量往往少於左肩，是型態成立的關鍵確認。',
+formula:'目標跌幅 = 頭頂到頸線距離（跌破頸線後向下延伸同等距離）'},
+
+{term:'雙頂 / 雙底',en:'Double Top / Double Bottom',cat:'pattern',
+short:'股價兩次觸及相同高點（或低點）後反轉，是常見的反轉型態。',
+detail:'<b>雙頂（M頭）</b>：兩個相近的高點，中間有一個低谷（頸線）。跌破頸線後確認做空訊號。<b>雙底（W底）</b>：兩個相近的低點，中間有一個小高點。突破頸線後確認做多訊號。注意第二個頂/底的成交量通常較第一個少。',
+eg:'台積電在某區間兩次都在480元被擋下，頸線為440元，跌破後的目標：480-440=40元，即跌至400元。'},
+
+{term:'旗形整理',en:'Bull/Bear Flag',cat:'pattern',
+short:'在趨勢快速上漲/下跌後出現短暫橫盤或小幅回調，形狀像旗幟，是趨勢延續型態。',
+detail:'<b>牛旗（多頭旗形）</b>：急漲一段後小幅整理（旗身與旗桿反向），突破整理高點放量後繼續上漲。<b>熊旗（空頭旗形）</b>：相反。旗形是技術分析中很可靠的<b>延續型態</b>，因為它代表主力在「洗籌碼」後繼續推升。',
+formula:'目標漲幅 = 旗桿高度（突破後向上延伸旗桿等距）'},
+
+{term:'三角收斂',en:'Triangle Consolidation',cat:'pattern',
+short:'股價的高點持續降低、低點持續升高，形成三角形，代表多空力道在縮小，即將有較大行情。',
+detail:'<b>對稱三角形</b>：突破方向不確定，需等待。<b>上升三角形</b>：低點持續升高但高點水平，偏多（壓力在上方，蓄勢待發）。<b>下降三角形</b>：高點持續降低但低點水平，偏空。<b>關鍵</b>：三角收縮時成交量縮減，突破時量大才可信。'},
+
+{term:'錘型線',en:'Hammer',cat:'pattern',
+short:'下影線很長（至少是實體2倍）、實體短小、上影線極短，出現在下跌趨勢中是重要止跌訊號。',
+detail:'下影線代表下方有強力買盤，雖然盤中跌很深，但收盤前被拉回。配合支撐位和量能更可靠。相反型態（出現在上漲末端）稱為「上吊線」，是賣出訊號，形狀一樣但意義相反（脈絡不同）。',
+warn:'錘型線必須出現在下跌後的支撐附近才有效，在上漲途中出現的長下影線意義不同。'},
+
+// ── 籌碼分析 ───────────────────────────────────────────────────────────────
+{term:'三大法人',en:'Three Major Institutional Investors',cat:'chips',
+short:'外資、投信、自營商三類機構投資人，每日必須公告買賣情況，是台股最重要的籌碼指標。',
+detail:'<b>外資（Foreign Investment）</b>：外國基金，台股最大的推手，動向代表國際資金對台股的態度。<b>投信（Investment Trust）</b>：國內基金公司，常在月底/季底「作帳」拉抬持股。<b>自營商（Dealers）</b>：券商自有資金操作，常反向操作，參考性較低。<b>法人買超</b>：機構購買的股數多於賣出，代表看好。'},
+
+{term:'外資動向',en:'Foreign Capital Flow',cat:'chips',
+short:'外資是台股最大的長線資金，持股約佔加權指數40%以上，外資轉向買超通常預告大盤走強。',
+detail:'<b>外資買超大盤</b>：台幣通常同步升值（外資換台幣買股）→ 出口商受壓。<b>外資賣超</b>：台幣貶值，但大盤不一定跌（可能只是期貨避險）。<b>外資期現貨同步偏空</b>（現貨賣超+期貨大量空單）→ 最強的看空訊號。',
+warn:'外資有時會現貨賣、期貨買（利用資訊優勢套利），不能只看現貨方向。'},
+
+{term:'投信買賣超',en:'Investment Trust Net Buy/Sell',cat:'chips',
+short:'台灣本土基金公司的每日進出，作帳月份（3、6、9、12月底前）常積極拉抬持股。',
+detail:'投信連續買超的股票往往是「投信概念股」，在基金績效比較期（月底前）有人為拉抬動機。但一旦基金要贖回，這些股票會大量賣出。<b>觀察技巧</b>：投信在低檔連買5天以上、外資也同步買 → 籌碼相當良性。'},
+
+{term:'融資增減',en:'Margin Balance Change',cat:'chips',
+short:'融資餘額增加代表散戶槓桿做多意願上升，通常在市場末段大量出現（警訊）。',
+detail:'<b>融資大增 + 股價創高</b>：短線可能繼續，但風險急增（散戶過度樂觀）。<b>融資大減 + 股價不跌</b>：籌碼乾淨，上漲更健康。<b>融資斷頭</b>：下跌時觸發大量停損賣出，加速下跌，常是「恐慌底」的形成時機。',
+warn:'融資高檔出現時，通常已接近短線頂部，散戶參與度過高。'},
+
+{term:'融券餘額',en:'Short Selling Balance',cat:'chips',
+short:'市場上借股票做空的人有多少，融券增加代表空方力量增加。',
+detail:'<b>融券大增</b>：短線下跌空間有限（因為這些都是日後的潛在買盤），但代表市場情緒偏空。<b>軋空行情</b>：做空者被迫買回（追繳或股價上漲），觸發短期急拉。<b>除權息前回補</b>：融券必須在除息日前回補，容易造成除息前的短線拉升。'},
+
+{term:'券資比',en:'Short/Long Ratio',cat:'chips',
+short:'融券÷融資，比率高代表空方相對強，比率低代表多方力道大。',
+detail:'<b>券資比>25%</b>：空方力量不容小覷，注意可能軋空。<b>券資比<5%</b>：幾乎沒有空方力量，多方完全主導。台股整體券資比長期在15%左右。',
+formula:'券資比 = 融券餘額 ÷ 融資餘額 × 100%'},
+
+{term:'主力進出',en:'Big Player Activity',cat:'chips',
+short:'透過券商進出明細（分點資料）分析是否有特定法人或大戶在特定券商大量買賣。',
+detail:'<b>分點資料</b>：每家券商的買賣超金額每日公開，可以看出哪些主力在哪間券商集中進出。<b>主力連續買超</b>某支股票 → 主力在佈局。<b>主力出貨訊號</b>：股價創高時主力從買超變成賣超。這是散戶最難追蹤的資訊，市面上有「籌碼K線」等軟體專門分析。'},
+
+// ── 市場規則 ───────────────────────────────────────────────────────────────
+{term:'T+2交割',en:'T+2 Settlement',cat:'market',
+short:'台灣股票買入後第2個交易日才正式交割（資金和股票完成轉移）。',
+detail:'<b>實務意義</b>：買股票時帳戶不需立刻有足夠現金，但T+2時一定要備妥。賣股後T+2才能提現。<b>和期貨不同</b>：期貨是當日結算，每天計算損益轉移保證金。'},
+
+{term:'信用交易',en:'Margin Trading',cat:'market',
+short:'使用融資或融券，透過槓桿放大部位，需開立「信用帳戶」才能使用。',
+detail:'開立信用帳戶門檻：最近一年交易超過10筆、帳戶總資產超過50萬（各券商不同）。信用帳戶有「整戶維持率」，低於130%需追繳，低於120%可能斷頭。'},
+
+{term:'開盤集合競價',en:'Opening Auction',cat:'market',
+short:'台股每天8:30~9:00為「集合競價」，9:00開盤一次撮合決定開盤價，不是逐筆即時成交。',
+detail:'集合競價階段可以掛單但不立刻成交，9:00時以讓成交量最大的價格決定開盤價。<b>意義</b>：開盤前的掛單量和方向可以預測今日強弱，如果賣單遠多於買單，開盤可能跌停或大跌。'},
+
+{term:'台股交易時間',en:'TWSE Trading Hours',cat:'market',
+short:'台灣股市周一到周五，9:00~13:30（日盤）。',
+detail:'<b>集合競價</b>：8:30~9:00（掛單但不成交）。<b>盤中交易</b>：9:00~13:25（逐筆成交）。<b>收盤集合競價</b>：13:25~13:30（最後5分鐘集合競價決定收盤價）。<b>盤後交易</b>：14:00~14:30（以收盤價成交，用於調整部位）。'},
+
+{term:'除權息日程',en:'Ex-Date Calendar',cat:'market',
+short:'通常每年5~9月為台灣股票密集除權息期，需注意持股的配發方式和填息記錄。',
+detail:'查詢方式：台灣證券交易所官網、券商看盤軟體。<b>操作策略</b>：除息前股價通常受融券回補支撐；除息後如果公司體質好，通常能在幾週到幾個月內填息。'},
+];
+
+// ── JS ENGINE ──────────────────────────────────────────────────────────────
+let currentCat = 'all';
+
+const catNames = {
+  basic:'📊 基礎概念',
+  technical:'📈 技術分析',
+  chips:'🏦 籌碼分析',
+  pattern:'🔷 K線型態',
+  market:'🏛 市場規則'
+};
+
+const badgeClass = {
+  basic:'badge-basic',
+  technical:'badge-technical',
+  chips:'badge-chips',
+  pattern:'badge-pattern',
+  market:'badge-market'
+};
+
+function render(terms){
+  const g = document.getElementById('glossary');
+  if(!terms.length){
+    g.innerHTML = '<div class="empty">找不到符合的術語</div>';
+    document.getElementById('showing').textContent = 0;
+    return;
+  }
+  let html = '';
+  let lastCat = '';
+  terms.forEach(t => {
+    if(currentCat === 'all' && t.cat !== lastCat){
+      lastCat = t.cat;
+      html += `<div class="sec-label">${catNames[t.cat]}</div>`;
+    }
+    const badge = `<span class="tc-badge ${badgeClass[t.cat]}">${catNames[t.cat].replace(/^../,'')}</span>`;
+    let extra = '';
+    if(t.formula) extra += `<div class="tc-formula">${t.formula.replace(/\n/g,'<br>')}</div>`;
+    if(t.eg) extra += `<div class="tc-eg">📌 ${t.eg}</div>`;
+    if(t.warn) extra += `<div class="tc-warn">⚠️ ${t.warn}</div>`;
+    html += `<div class="term-card">
+      <div class="tc-top">
+        <div>
+          <div class="tc-name">${t.term}</div>
+          <div class="tc-en">${t.en}</div>
+        </div>
+        ${badge}
+      </div>
+      <div class="tc-short">${t.short}</div>
+      <div class="tc-detail">${t.detail}${extra}</div>
+    </div>`;
+  });
+  g.innerHTML = html;
+  document.getElementById('showing').textContent = terms.length;
+}
+
+function filter(){
+  const q = document.getElementById('q').value.toLowerCase();
+  let terms = TERMS.filter(t => currentCat === 'all' || t.cat === currentCat);
+  if(q) terms = terms.filter(t =>
+    t.term.toLowerCase().includes(q) ||
+    t.en.toLowerCase().includes(q) ||
+    t.short.toLowerCase().includes(q) ||
+    t.detail.toLowerCase().includes(q)
+  );
+  render(terms);
+}
+
+function setCat(cat, btn){
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filter();
+}
+
+document.getElementById('total').textContent = TERMS.length;
+filter();
+</script>
+</body>
+</html>
