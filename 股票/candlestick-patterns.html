@@ -158,6 +158,15 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 .block-indicator .detail-block-content{color:var(--text-secondary)}
 .block-indicator .detail-block-content span{display:inline-flex;align-items:center;gap:4px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.22);border-radius:6px;padding:1px 8px;font-size:.75rem;margin:2px 3px 2px 0}
 
+/* CHART BLOCK */
+.block-chart{background:rgba(29,78,216,.04);border:1px solid rgba(29,78,216,.15)}
+.block-chart .detail-block-title{color:var(--color-primary)}
+.chart-frame-wrap{border-radius:8px;overflow:hidden;height:280px;background:var(--bg-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative}
+.chart-frame-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.chart-ph{color:var(--text-faint);font-size:.8rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.chart-ph svg{opacity:.3;width:28px;height:28px}
+.chart-note{font-size:.75rem;color:var(--text-muted);margin-top:7px;padding-left:2px}
+
 /* FOOTER */
 .footer{background:var(--bg-inset);border-top:1px solid var(--border);padding:40px 24px;text-align:center;color:var(--text-muted)}
 .footer-logo{font-family:var(--font-en);font-size:1rem;font-weight:700;color:var(--text-secondary);margin-bottom:6px}
@@ -870,6 +879,65 @@ const COMBOS = [
 ];
 PATTERNS.push(...COMBOS);
 
+// ─── CHART SYMBOLS MAP ────────────────────────────────────────────────
+const CHART_SYMBOLS = {
+  // Single K
+  hammer:           {s:'TWSE:2330',n:'台積電 (2330) 日線 — 在下跌趨勢末端尋找錘子線型態'},
+  hanging_man:      {s:'TWSE:2330',n:'台積電 (2330) 日線 — 在上漲高點觀察是否出現上吊線'},
+  inverted_hammer:  {s:'TWSE:2454',n:'聯發科 (2454) 日線 — 下跌趨勢末端尋找倒錘線訊號'},
+  shooting_star:    {s:'TWSE:2317',n:'鴻海 (2317) 日線 — 上漲高點的射擊之星看跌訊號'},
+  doji:             {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 整數關卡附近尋找十字線'},
+  long_legged_doji: {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 重大事件日的長腳十字線'},
+  dragonfly_doji:   {s:'TWSE:2884',n:'玉山金 (2884) 日線 — 季線附近的蜻蜓十字線'},
+  gravestone_doji:  {s:'TWSE:2002',n:'中鋼 (2002) 日線 — 壓力區的墓碑十字線訊號'},
+  marubozu_bull:    {s:'TWSE:2382',n:'廣達 (2382) 日線 — AI概念股題材帶動的多頭禿頭線'},
+  marubozu_bear:    {s:'TWSE:2317',n:'鴻海 (2317) 日線 — 利空消息出現後的空頭禿頭線'},
+  spinning_top:     {s:'TWSE:2330',n:'台積電 (2330) 日線 — 整理平台中的紡錘線'},
+  high_wave:        {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 波動劇烈時的高浪線'},
+  upper_limit:      {s:'TWSE:2379',n:'瑞昱 (2379) 日線 — AI概念股業績驅動的漲停板K'},
+  lower_limit:      {s:'TWSE:2317',n:'鴻海 (2317) 日線 — 利空公告後的跌停板K'},
+  bullish_lower_shadow:{s:'TWSE:2330',n:'台積電 (2330) 日線 — 帶長下影線的多頭強勢K'},
+  four_price_doji:  {s:'TWSE:2330',n:'台積電 (2330) 日線 — 罕見的四價同一線（量極低時）'},
+  // Double K
+  bullish_engulfing:{s:'TWSE:0050',n:'台灣50 (0050) 日線 — 底部區域的看漲吞噬型態'},
+  bearish_engulfing:{s:'TWSE:2330',n:'台積電 (2330) 日線 — 高點的看跌吞噬型態'},
+  bullish_harami:   {s:'TWSE:2882',n:'國泰金 (2882) 日線 — 支撐區的看漲孕線'},
+  bearish_harami:   {s:'TWSE:2330',n:'台積電 (2330) 日線 — 壓力區的看跌孕線'},
+  dark_cloud_cover: {s:'TWSE:2330',n:'台積電 (2330) 日線 — 法說會後跳空高開壓回的烏雲罩頂'},
+  piercing_line:    {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 季線附近的刺透線訊號'},
+  tweezer_top:      {s:'TWSE:2454',n:'聯發科 (2454) 日線 — 高點確認的鑷子頂'},
+  tweezer_bottom:   {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 底部確認的鑷子底'},
+  // Triple K
+  morning_star:     {s:'TWSE:2330',n:'台積電 (2330) 日線 — 底部轉折的晨星三K組合'},
+  evening_star:     {s:'TWSE:2454',n:'聯發科 (2454) 日線 — 頭部轉折的夜星三K組合'},
+  morning_doji_star:{s:'TWSE:2330',n:'台積電 (2330) 日線 — 底部強力訊號晨星十字'},
+  three_white_soldiers:{s:'TWSE:2382',n:'廣達 (2382) 日線 — AI熱潮帶動的三白兵'},
+  three_black_crows:{s:'TWSE:0050',n:'台灣50 (0050) 日線 — 高點轉折後的三黑鴉'},
+  abandoned_baby_bull:{s:'TWSE:2330',n:'台積電 (2330) 日線 — 罕見的看漲棄嬰型態'},
+  abandoned_baby_bear:{s:'TWSE:2454',n:'聯發科 (2454) 日線 — 罕見的看跌棄嬰型態'},
+  three_inside_up:  {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 底部確認的三內升'},
+  three_inside_down:{s:'TWSE:2330',n:'台積電 (2330) 日線 — 頭部確認的三內降'},
+  upside_gap_two_crows:{s:'TWSE:2330',n:'台積電 (2330) 日線 — 向上跳空後出現兩黑鴉警訊'},
+  // Special
+  gap_up:           {s:'TWSE:2382',n:'廣達 (2382) 日線 — AI業績題材帶動的向上跳空缺口'},
+  gap_down:         {s:'TWSE:2317',n:'鴻海 (2317) 日線 — 利空消息的向下跳空缺口'},
+  island_reversal_top:   {s:'TWSE:2330',n:'台積電 (2330) 日線 — 島型反轉頭部（兩側均有缺口）'},
+  island_reversal_bottom:{s:'TWSE:2330',n:'台積電 (2330) 日線 — 島型反轉底部（兩側均有缺口）'},
+  rising_three_methods:  {s:'TWSE:2382',n:'廣達 (2382) 日線 — 上升趨勢中的上升三法休整'},
+  falling_three_methods: {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 下降趨勢中的下降三法'},
+  // Combo
+  morning_star_combo:         {s:'TWSE:2330',n:'台積電 (2330) 日線 — 底部的早晨之星組合'},
+  evening_star_combo:         {s:'TWSE:2454',n:'聯發科 (2454) 日線 — 頭部的黃昏之星組合'},
+  bullish_engulfing_combo:    {s:'TWSE:0056',n:'高股息 (0056) 日線 — 法人低接的看漲吞噬'},
+  bearish_engulfing_combo:    {s:'TWSE:2330',n:'台積電 (2330) 日線 — 外資出貨的看跌吞噬'},
+  three_white_soldiers_combo: {s:'TWSE:2382',n:'廣達 (2382) 日線 — AI題材驅動的三兵連發'},
+  three_black_crows_combo:    {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 大盤高點的三隻烏鴉'},
+  bullish_harami_combo:       {s:'TWSE:2882',n:'國泰金 (2882) 日線 — 整數關卡附近的看漲孕線'},
+  dark_cloud_cover_combo:     {s:'TWSE:2330',n:'台積電 (2330) 日線 — 法說會後的烏雲蓋頂'},
+  piercing_pattern_combo:     {s:'TWSE:0050',n:'台灣50 (0050) 日線 — 季線附近的穿頭破腳'},
+  bullish_kicker_combo:       {s:'TWSE:2382',n:'廣達 (2382) 日線 — 業績爆發驅動的旭日東升'},
+};
+
 // ─── STATE ─────────────────────────────────────────────────────────────
 let currentCat = 'all', currentDir = 'all', currentDiff = 'all', searchTerm = '';
 let expandedCard = null;
@@ -910,6 +978,15 @@ function renderCard(p) {
   </div>
   <div class="card-detail" id="detail-${p.id}">
     <div class="card-detail-inner">
+      <div class="detail-block block-chart">
+        <div class="detail-block-title">📈 台股對照圖表（TradingView）</div>
+        <div class="detail-block-content">
+          <div class="chart-frame-wrap" id="chart-${p.id}">
+            <div class="chart-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>展開後自動載入即時圖表</div>
+          </div>
+          <p class="chart-note">${(CHART_SYMBOLS[p.id]||{n:''}).n}</p>
+        </div>
+      </div>
       <div class="detail-block block-keypoints">
         <div class="detail-block-title">📌 判讀重點</div>
         <div class="detail-block-content"><ul>${p.points.map(pt=>`<li>${pt}</li>`).join('')}</ul></div>
@@ -1009,7 +1086,25 @@ function toggleCard(id) {
   if (card.classList.contains('expanded')) {
     collapseCard(id);
   } else {
-    detail.style.maxHeight = detail.scrollHeight + 'px';
+    // Lazy-load TradingView chart iframe on first expand
+    const chartWrap = document.getElementById('chart-' + id);
+    if (chartWrap && !chartWrap.querySelector('iframe')) {
+      const cs = CHART_SYMBOLS[id];
+      if (cs) {
+        const src = 'https://s.tradingview.com/widgetembed/?symbol=' + encodeURIComponent(cs.s) +
+          '&interval=D&theme=light&style=1&locale=zh_TW' +
+          '&hide_top_toolbar=0&hide_side_toolbar=1&allow_symbol_change=0&toolbar_bg=f1f3f6';
+        const ifr = document.createElement('iframe');
+        ifr.src = src;
+        ifr.setAttribute('frameborder', '0');
+        ifr.setAttribute('allowtransparency', 'true');
+        ifr.setAttribute('scrolling', 'no');
+        ifr.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0';
+        chartWrap.innerHTML = '';
+        chartWrap.appendChild(ifr);
+      }
+    }
+    detail.style.maxHeight = '1400px';
     card.classList.add('expanded');
     card.querySelector('.expand-label').textContent = '收合詳情';
     expandedCard = id;
