@@ -80,7 +80,7 @@ a{color:inherit;text-decoration:none}
 .btn-done:hover{background:#2ea043}
 .btn-dim{opacity:.3;pointer-events:none}
 .btn-undone{background:transparent;color:#3fb950;border:1px solid #238636}
-.fab-toc{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;border:none;border-radius:50px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;z-index:200;box-shadow:0 4px 20px rgba(245,158,11,.4);align-items:center;gap:8px;white-space:nowrap;letter-spacing:.02em}
+.fab-toc{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;border:none;border-radius:50px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;z-index:200;box-shadow:0 4px 20px rgba(245,158,11,.4);align-items:center;gap:8px;white-space:nowrap}
 @media(max-width:768px){
   body{flex-direction:column}
   .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);width:280px}
@@ -114,8 +114,9 @@ a{color:inherit;text-decoration:none}
   </div>
   <div class="lw" id="lw"></div>
 </main>
+<button class="fab-toc" id="fabToc" onclick="openSB()">☰ 目錄</button>
 <script>
-const CHAPTERS = [
+const CHAPTERS=[
   {label:'第一章：認識台股市場',ids:[0,1,2]},
   {label:'第二章：技術分析精髓',ids:[3,4,5,6,7]},
   {label:'第三章：型態分析實戰',ids:[8,9,10,11]},
@@ -126,125 +127,622 @@ const CHAPTERS = [
 ];
 const LESSONS=[
 /* 0 */
-{num:'1-1',title:'台股市場結構全解析',sub:'搞懂市場的骨架，才能看清資金流向',ch:'第一章：認識台股市場',rt:'8 分鐘',
-cap:'台灣股市三層結構：上市、上櫃、興櫃',
-svg:`<svg viewBox="0 0 580 150" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-<rect width="580" height="150" fill="#f8fafc" rx="8"/>
-<rect x="20" y="20" width="160" height="110" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" rx="8"/>
-<text x="100" y="44" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="700">上市（TWSE）</text>
+{num:'1-1',title:'台股市場結構全解析',sub:'搞懂市場骨架，才能看清資金流向',ch:'第一章：認識台股市場',rt:'8 分鐘',
+cap:'上市、上櫃、ETF：三種市場的關鍵差異',
+svg:`<svg viewBox="0 0 580 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="130" fill="#f8fafc" rx="8"/>
+<rect x="15" y="18" width="170" height="95" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" rx="8"/>
+<text x="100" y="42" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="700">上市（TWSE）</text>
 <text x="100" y="62" text-anchor="middle" fill="#374151" font-size="10">1,000+ 家大型公司</text>
-<text x="100" y="78" text-anchor="middle" fill="#374151" font-size="10">門檻最高</text>
-<text x="100" y="94" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="600">台積電、鴻海</text>
-<text x="100" y="115" text-anchor="middle" fill="#64748b" font-size="9">流動性最佳</text>
-<rect x="210" y="20" width="160" height="110" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="8"/>
-<text x="290" y="44" text-anchor="middle" fill="#166534" font-size="13" font-weight="700">上櫃（TPEx）</text>
+<text x="100" y="80" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="600">台積電 佔大盤28%</text>
+<text x="100" y="104" text-anchor="middle" fill="#64748b" font-size="9">外資主導 · 流動性最佳</text>
+<rect x="205" y="18" width="170" height="95" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" rx="8"/>
+<text x="290" y="42" text-anchor="middle" fill="#166534" font-size="13" font-weight="700">上櫃（TPEx）</text>
 <text x="290" y="62" text-anchor="middle" fill="#374151" font-size="10">800+ 家中小型公司</text>
-<text x="290" y="78" text-anchor="middle" fill="#374151" font-size="10">門檻較低</text>
-<text x="290" y="94" text-anchor="middle" fill="#166534" font-size="10" font-weight="600">許多科技新創</text>
-<text x="290" y="115" text-anchor="middle" fill="#64748b" font-size="9">波動較上市大</text>
-<rect x="400" y="20" width="160" height="110" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5" rx="8"/>
-<text x="480" y="44" text-anchor="middle" fill="#92400e" font-size="13" font-weight="700">ETF / 指數</text>
+<text x="290" y="80" text-anchor="middle" fill="#166534" font-size="10" font-weight="600">散戶比例高</text>
+<text x="290" y="104" text-anchor="middle" fill="#64748b" font-size="9">波動大 · 籌碼易集中</text>
+<rect x="395" y="18" width="170" height="95" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5" rx="8"/>
+<text x="480" y="42" text-anchor="middle" fill="#92400e" font-size="13" font-weight="700">ETF / 指數</text>
 <text x="480" y="62" text-anchor="middle" fill="#374151" font-size="10">追蹤一籃子股票</text>
-<text x="480" y="78" text-anchor="middle" fill="#374151" font-size="10">分散風險</text>
-<text x="480" y="94" text-anchor="middle" fill="#92400e" font-size="10" font-weight="600">0050、0056</text>
-<text x="480" y="115" text-anchor="middle" fill="#64748b" font-size="9">適合長期投資</text>
+<text x="480" y="80" text-anchor="middle" fill="#92400e" font-size="10" font-weight="600">0050 台積電佔35%</text>
+<text x="480" y="104" text-anchor="middle" fill="#64748b" font-size="9">分散風險 · 仍需擇時</text>
 </svg>`,
-body:`<h3>為什麼要理解市場結構？</h3>
-<p>很多人買了股票，卻不知道自己買的是上市還是上櫃。這個差別非常重要：上市股票流動性更好（容易進出），但上櫃公司有時因規模較小，波動更劇烈，主力更容易操控。</p>
-<div class="hl"><b>📌 關鍵差異一張表</b>上市：市值通常較大，機構參與多，外資持有比例高。上櫃：中小企業，散戶比例高，籌碼較集中，波動大但機會也多。</div>
-<h3>台灣加權指數怎麼算</h3>
-<p>台灣加權指數（TAIEX）是所有上市股票的<strong>市值加權平均</strong>。台積電市值佔整個上市市場的28%以上，所以台積電漲跌1%，大盤就動0.28%。這就是為什麼「台積電=台股晴雨表」。</p>
-<div class="pro"><b>💡 專業視角：外資重壓台積電的意義</b>當外資大量賣超台積電時，不只是在賣一支股票——他們同時在打壓整個大盤指數。這是台灣股市特有的「集中度風險」，任何研究台股的人都必須盯緊台積電。</div>
-<h3>ETF不等於安全</h3>
-<p>0050追蹤台灣50大市值，聽起來很分散，但前10大持股就佔了65%以上，而台積電一家就佔35%。ETF在大盤系統性下跌時一樣跌，只是比個股跌少一點。<strong>ETF不是「買了就放著」的安全港灣</strong>，同樣需要看大盤趨勢和買賣時機。</p>`,
-pts:['上市公司流動性佳，上櫃波動大、籌碼易集中','台積電市值佔大盤28%以上，台積電走勢等於台股方向','ETF分散個股風險但無法避開系統性風險','看台股先看台積電外資動向']},
+body:`<h3>市場結構決定你的操作策略</h3>
+<p>上市大型股外資參與多、波動穩定；上櫃中小型股散戶比例高，籌碼集中，主力更容易推高也更容易砸盤。選不同市場，等於選擇不同的敵人和戰場。</p>
+<div class="pro"><b>💡 台積電＝台股晴雨表</b>台積電市值佔上市市場28%以上。外資大賣台積電，等於同時打壓大盤指數。研究台股，每天必看台積電外資買賣超，這是最重要的單一指標。</div>
+<h3>ETF的真相</h3>
+<p>0050前10大持股佔65%，台積電一家佔35%。ETF在大盤系統性下跌時一樣跌，<strong>ETF不是「買了就放著」的安全港灣</strong>，一樣需要看趨勢和進出場時機。</p>`,
+pts:['上市股流動性佳；上櫃股波動大、籌碼易集中','台積電佔大盤28%，台積電方向就是台股方向','ETF分散個股風險，但無法避開系統性下跌','研究台股，每天先看台積電外資動向']},
 
 /* 1 */
-{num:'1-2',title:'看盤工具完全操作指南',sub:'五檔、分時走勢、K線圖——你真的看懂了嗎？',ch:'第一章：認識台股市場',rt:'10 分鐘',
-cap:'五檔報價解讀：買賣力道一目了然',
-svg:`<svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-<rect width="580" height="160" fill="#f8fafc" rx="8"/>
-<text x="290" y="22" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">五檔掛單解讀</text>
-<rect x="30" y="32" width="240" height="120" fill="#fff0f0" stroke="#fecaca" rx="6" stroke-width="1"/>
-<text x="150" y="52" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="700">賣方（Ask）</text>
-<text x="80" y="70" fill="#374151" font-size="10">賣5</text><text x="190" y="70" text-anchor="end" fill="#dc2626" font-size="10" font-weight="600">152.0</text><text x="250" y="70" text-anchor="end" fill="#64748b" font-size="9">320張</text>
-<text x="80" y="86" fill="#374151" font-size="10">賣4</text><text x="190" y="86" text-anchor="end" fill="#dc2626" font-size="10" font-weight="600">151.5</text><text x="250" y="86" text-anchor="end" fill="#64748b" font-size="9">280張</text>
-<text x="80" y="102" fill="#374151" font-size="10">賣3</text><text x="190" y="102" text-anchor="end" fill="#dc2626" font-size="10" font-weight="600">151.0</text><text x="250" y="102" text-anchor="end" fill="#64748b" font-size="9">195張</text>
-<text x="80" y="118" fill="#374151" font-size="10">賣2</text><text x="190" y="118" text-anchor="end" fill="#dc2626" font-size="10" font-weight="600">150.5</text><text x="250" y="118" text-anchor="end" fill="#64748b" font-size="9">88張</text>
-<text x="80" y="134" fill="#374151" font-size="10">賣1</text><text x="190" y="134" text-anchor="end" fill="#dc2626" font-size="10" font-weight="600">150.0</text><text x="250" y="134" text-anchor="end" fill="#64748b" font-size="9">42張</text>
-<rect x="310" y="32" width="240" height="120" fill="#f0fdf4" stroke="#bbf7d0" rx="6" stroke-width="1"/>
-<text x="430" y="52" text-anchor="middle" fill="#166534" font-size="11" font-weight="700">買方（Bid）</text>
-<text x="360" y="70" fill="#374151" font-size="10">買1</text><text x="470" y="70" text-anchor="end" fill="#166534" font-size="10" font-weight="600">149.5</text><text x="530" y="70" text-anchor="end" fill="#166534" font-size="9" font-weight="600">520張</text>
-<text x="360" y="86" fill="#374151" font-size="10">買2</text><text x="470" y="86" text-anchor="end" fill="#166534" font-size="10" font-weight="600">149.0</text><text x="530" y="86" text-anchor="end" fill="#64748b" font-size="9">310張</text>
-<text x="360" y="102" fill="#374151" font-size="10">買3</text><text x="470" y="102" text-anchor="end" fill="#166534" font-size="10" font-weight="600">148.5</text><text x="530" y="102" text-anchor="end" fill="#64748b" font-size="9">200張</text>
-<text x="360" y="118" fill="#374151" font-size="10">買4</text><text x="470" y="118" text-anchor="end" fill="#166534" font-size="10" font-weight="600">148.0</text><text x="530" y="118" text-anchor="end" fill="#64748b" font-size="9">175張</text>
-<text x="360" y="134" fill="#374151" font-size="10">買5</text><text x="470" y="134" text-anchor="end" fill="#166534" font-size="10" font-weight="600">147.5</text><text x="530" y="134" text-anchor="end" fill="#64748b" font-size="9">140張</text>
+{num:'1-2',title:'看盤工具完全操作指南',sub:'五檔、分時圖、K線——你真的看懂了嗎？',ch:'第一章：認識台股市場',rt:'10 分鐘',
+cap:'五檔報價：買賣力道一目了然',
+svg:`<svg viewBox="0 0 580 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="130" fill="#f8fafc" rx="8"/>
+<rect x="20" y="15" width="255" height="105" fill="#fff0f0" stroke="#fecaca" rx="6" stroke-width="1"/>
+<text x="147" y="36" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="700">賣方（Ask）</text>
+<text x="50" y="54" fill="#374151" font-size="10">賣5 152.0</text><text x="255" y="54" text-anchor="end" fill="#64748b" font-size="9">320張</text>
+<text x="50" y="70" fill="#374151" font-size="10">賣3 151.0</text><text x="255" y="70" text-anchor="end" fill="#64748b" font-size="9">195張</text>
+<text x="50" y="86" fill="#dc2626" font-size="10" font-weight="700">賣1 150.0</text><text x="255" y="86" text-anchor="end" fill="#dc2626" font-size="9" font-weight="700">42張 ← 最佳賣價</text>
+<text x="50" y="108" fill="#64748b" font-size="9">賣單少=容易被吃掉→股價上推</text>
+<rect x="305" y="15" width="255" height="105" fill="#f0fdf4" stroke="#bbf7d0" rx="6" stroke-width="1"/>
+<text x="432" y="36" text-anchor="middle" fill="#166534" font-size="11" font-weight="700">買方（Bid）</text>
+<text x="325" y="54" fill="#166534" font-size="10" font-weight="700">買1 149.5</text><text x="550" y="54" text-anchor="end" fill="#166534" font-size="9" font-weight="700">520張 ← 強力支撐</text>
+<text x="325" y="70" fill="#374151" font-size="10">買3 148.5</text><text x="550" y="70" text-anchor="end" fill="#64748b" font-size="9">200張</text>
+<text x="325" y="86" fill="#374151" font-size="10">買5 147.5</text><text x="550" y="86" text-anchor="end" fill="#64748b" font-size="9">140張</text>
+<text x="325" y="108" fill="#64748b" font-size="9">買單遠多於賣單→多方力道強</text>
 </svg>`,
 body:`<h3>五檔報價的秘密</h3>
-<p>五檔報價（Level 2）顯示目前市場上最近五個價位的買賣掛單量。這是理解當下多空力道最直接的工具。從上圖看到，<strong>買1有520張、遠多於賣1的42張</strong>——這代表買方力道遠強，股價極可能被往上推。</p>
-<div class="pro"><b>💡 職業交易者看五檔的方式</b>不只看掛單數量，更看「掛單的真實性」。假掛單（幌騙/Spoofing）：主力掛出大量買單，讓散戶以為有強力支撐而追入，但實際成交前撤單。識別方式：掛單量出現但沒有成交量對應，或掛單在快要成交前消失。</div>
-<h3>分時走勢圖怎麼看</h3>
-<p>分時圖（Tick Chart）顯示當日每筆成交的走勢，配合成交量柱狀圖。<strong>關鍵觀察點</strong>：<br>
-1. 開盤15分鐘的強弱，通常決定當日趨勢<br>
-2. 成交量突然放大的時間點（主力活動訊號）<br>
-3. 尾盤（13:00後）的拉尾盤或打壓，可能是隔日訊號</p>
-<div class="eg"><b>✅ 尾盤觀察法</b>尾盤（13:00~13:30）突然出現大買單拉高，並且收在當日高點附近 → 隔日通常繼續強。相反，尾盤被打壓到低點收盤 → 隔日開盤可能繼續弱。</div>
-<h3>K線週期選擇</h3>
-<p>日K：最常用，一根K線=一天。週K：中線趨勢判斷，過濾日K的雜訊。月K：長線佈局，看大趨勢。<strong>黃金原則</strong>：用大週期定方向，用小週期找進場點。例：月K確認多頭、週K形成黃金交叉後，再用日K找最佳切入點。</p>`,
-pts:['五檔掛單量顯示即時多空力道，但需注意假掛單','開盤15分鐘強弱通常決定全日趨勢','尾盤拉高收在高點是隔日續強訊號','大週期定方向，小週期找進場點']},
+<p>五檔（Level 2）顯示市場上最近五個價位的買賣掛單量。買1掛520張、賣1只有42張——買方力道遠強於賣方，股價極可能被往上推。</p>
+<div class="pro"><b>💡 識別假掛單（Spoofing）</b>主力掛出大量買單製造「有人撐盤」的假象，讓散戶追入，快成交前撤單。識別方式：掛單量龐大但一直沒有對應成交量，或是買單在股價靠近時神秘消失。這是台股小型股最常見的騙局。</div>
+<h3>分時圖三個關鍵觀察</h3>
+<p>1. <strong>開盤15分鐘強弱</strong>通常決定當日趨勢方向。2. <strong>成交量突然放大的時間點</strong>，代表主力在活動。3. <strong>尾盤（13:00後）</strong>突然大買單拉高收在高點→隔日通常續強；尾盤被打壓到低點→隔日開盤可能繼續弱。</p>`,
+pts:['五檔掛單量反映即時多空力道，但需注意主力假掛單（Spoofing）','開盤15分鐘強弱通常決定全日趨勢','尾盤拉高收在高點是隔日續強訊號','大週期定方向，小週期找進場點']},
 
 /* 2 */
-{num:'1-3',title:'交易成本與機制',sub:'手續費、稅、漲跌停——這些細節決定你的實際報酬',ch:'第一章：認識台股市場',rt:'6 分鐘',
-cap:'台股交易成本完整拆解',
-svg:`<svg viewBox="0 0 580 140" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-<rect width="580" height="140" fill="#f8fafc" rx="8"/>
-<text x="290" y="22" text-anchor="middle" fill="#374151" font-size="12" font-weight="700">買賣一次的成本</text>
-<rect x="20" y="32" width="250" height="98" fill="#eff6ff" stroke="#bfdbfe" rx="6" stroke-width="1"/>
-<text x="145" y="52" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="700">買進成本</text>
-<text x="40" y="72" fill="#374151" font-size="10">手續費：</text><text x="260" y="72" text-anchor="end" fill="#1d4ed8" font-size="10" font-weight="700">0.1425%（可折扣至6折）</text>
-<text x="40" y="90" fill="#374151" font-size="10">買進100萬股票實際付：</text><text x="260" y="90" text-anchor="end" fill="#1d4ed8" font-size="10" font-weight="700">~$1,425（可低至$855）</text>
-<text x="40" y="108" fill="#374151" font-size="10">網路下單：</text><text x="260" y="108" text-anchor="end" fill="#059669" font-size="10" font-weight="700">通常5~6折手續費</text>
-<text x="40" y="124" fill="#64748b" font-size="9">（越大額越可談更低折扣）</text>
-<rect x="310" y="32" width="250" height="98" fill="#fff1f2" stroke="#fecdd3" rx="6" stroke-width="1"/>
-<text x="435" y="52" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="700">賣出成本</text>
-<text x="330" y="72" fill="#374151" font-size="10">手續費：</text><text x="550" y="72" text-anchor="end" fill="#dc2626" font-size="10" font-weight="700">0.1425%（同買進）</text>
-<text x="330" y="90" fill="#374151" font-size="10">證交稅（台灣特有）：</text><text x="550" y="90" text-anchor="end" fill="#dc2626" font-size="10" font-weight="700">0.3%（ETF為0.1%）</text>
-<text x="330" y="108" fill="#374151" font-size="10">總賣出成本：</text><text x="550" y="108" text-anchor="end" fill="#dc2626" font-size="10" font-weight="700">~0.4425%</text>
-<text x="330" y="124" fill="#64748b" font-size="9">來回一次約0.585%（網路折扣後）</text>
+{num:'1-3',title:'交易成本與機制',sub:'手續費、稅、漲跌停——這些細節決定實際報酬',ch:'第一章：認識台股市場',rt:'6 分鐘',
+cap:'買賣一次的真實成本拆解',
+svg:`<svg viewBox="0 0 580 120" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="120" fill="#f8fafc" rx="8"/>
+<rect x="15" y="15" width="258" height="92" fill="#eff6ff" stroke="#bfdbfe" rx="6" stroke-width="1"/>
+<text x="144" y="36" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="700">買進成本</text>
+<text x="30" y="56" fill="#374151" font-size="10">手續費：0.1425%（可折到6折）</text>
+<text x="30" y="74" fill="#374151" font-size="10">100萬實付：$1,425 → 折後 $855</text>
+<text x="30" y="92" fill="#059669" font-size="9" font-weight="600">網路下單通常5~6折</text>
+<rect x="307" y="15" width="258" height="92" fill="#fff1f2" stroke="#fecdd3" rx="6" stroke-width="1"/>
+<text x="436" y="36" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="700">賣出成本</text>
+<text x="322" y="56" fill="#374151" font-size="10">手續費：0.1425%（同買進）</text>
+<text x="322" y="74" fill="#dc2626" font-size="10" font-weight="700">+ 證交稅：0.3%（ETF為0.1%）</text>
+<text x="322" y="92" fill="#dc2626" font-size="9" font-weight="700">來回總成本≈0.585%（6折後）</text>
 </svg>`,
-body:`<h3>成本對你的影響有多大</h3>
-<p>買進100萬、賣出100萬，來回成本約0.585%（手續費折6折計算），等於一次交易就花掉約5,850元。做短線的人每週交易10次，一個月成本就是23萬——光要打平手續費就需要2.3%的月報酬率。<strong>這就是為什麼短線難賺錢</strong>：成本吃掉利潤。</p>
-<div class="formula">交易成本計算：
-買進手續費 = 交易金額 × 0.1425% × 折扣（如0.6）
-賣出手續費 = 交易金額 × 0.1425% × 折扣
-證交稅    = 賣出金額 × 0.3%
-來回總成本 ≈ 交易金額 × 0.585%（6折後）</div>
-<h3>漲跌停的操作意義</h3>
-<p>台股每日漲跌幅限制為±10%。<strong>漲停鎖死</strong>代表當日沒有賣單，想買也買不到——這是主力創造「FOMO（害怕錯過）」的工具。隔日是否繼續上漲，取決於：1) 漲停前是否有大量爆量出貨 2) 融資是否大量增加（散戶追高訊號）。</p>
-<div class="warn"><b>⚠️ 漲停追入的最大風險</b>主力在鎖漲停前已大量出貨（量大、但股價被維持在高位），隔日一旦開盤沒有守住，追高者全部套牢。這種情況在小型股非常常見。</div>`,
-pts:['來回交易成本約0.585%（6折手續費），頻繁短線的人光成本就難以獲利','漲停鎖死是FOMO心理戰，追入前先看量和融資','ETF的證交稅只有0.1%，長期投資成本優勢大','T+2交割：買了要第二個交易日才完成交割']},
+body:`<h3>成本吃掉你的利潤</h3>
+<p>買賣100萬，來回成本約5,850元。做短線每週交易10次，一個月光手續費就23萬，等於需要2.3%的月報酬率才能打平。<strong>這就是為什麼短線散戶難賺錢</strong>——券商的利潤來自你的頻繁交易。</p>
+<div class="formula">來回成本 = 買進 × 0.1425% × 折扣 + 賣出 × (0.1425% × 折扣 + 0.3%)
+100萬買賣（6折）：855 + 855 + 3,000 = 4,710元
+ETF100萬買賣（6折）：855 + 855 + 1,000 = 2,710元</div>
+<h3>漲停板的操作意義</h3>
+<p>台股±10%漲跌停。<strong>漲停鎖死代表沒有賣單</strong>，是主力製造FOMO的工具。判斷隔日能否續漲的關鍵：漲停前有沒有爆量出貨？融資有沒有大幅增加（散戶追高）？</p>
+<div class="warn"><b>⚠️ 追漲停最大風險</b>主力在鎖停前已分批出貨，鎖停只是讓散戶以為「有人撐盤」。隔日一旦打開跌停，追高者全部套牢。小型股每年都在發生這種戲碼。</div>`,
+pts:['來回交易成本約0.585%（6折手續費），短線頻繁交易很難獲利','ETF證交稅僅0.1%，長期持有成本優勢顯著','漲停前爆量＝主力出貨，隔日開低則是陷阱','T+2交割：買入後第二個交易日完成資金交割']},
 
 /* 3 */
-{num:'2-1',title:'K線真正的秘密',sub:'不只是「紅漲綠跌」，K線背後藏著主力的意圖',ch:'第二章：技術分析精髓',rt:'12 分鐘',
-cap:'五種關鍵K線型態與主力意圖解讀',
-svg:`<svg viewBox="0 0 580 165" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-<rect width="580" height="165" fill="#f8fafc" rx="8"/>
-<text x="290" y="18" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">五種關鍵K線（位置比形狀更重要）</text>
-<!-- 長陽線 -->
-<rect x="26" y="30" width="18" height="80" fill="#dc2626" rx="2"/>
-<line x1="35" y1="20" x2="35" y2="30" stroke="#dc2626" stroke-width="2"/>
-<line x1="35" y1="110" x2="35" y2="120" stroke="#dc2626" stroke-width="2"/>
-<text x="35" y="138" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">長陽線</text>
-<text x="35" y="150" text-anchor="middle" fill="#64748b" font-size="8">多方主導</text>
-<text x="35" y="162" text-anchor="middle" fill="#dc2626" font-size="8">爆量=注意</text>
-<!-- 錘型 -->
-<rect x="106" y="58" width="16" height="18" fill="#dc2626" rx="2"/>
-<line x1="114" y1="76" x2="114" y2="115" stroke="#dc2626" stroke-width="2"/>
-<line x1="114" y1="54" x2="114" y2="58" stroke="#dc2626" stroke-width="2"/>
-<text x="114" y="130" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">錘型線</text>
-<text x="114" y="142" text-anchor="middle" fill="#64748b" font-size="8">支撐有效</text>
-<text x="114" y="154" text-anchor="middle" fill="#059669" font-size="8">止跌訊號</text>
-<!-- 十字線 -->
-<line x1="194" y1="66" x2="194" y2="100" stroke="#374151" stroke-width="2"/>
-<line x1="183" y1="80" x2="205" y2="80" stroke="#374151" stroke-width="2"/>
-<text x="194" y="118" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">十字線
+{num:'2-1',title:'K線真正的秘密',sub:'不只是紅漲綠跌，K線藏著主力的意圖',ch:'第二章：技術分析精髓',rt:'14 分鐘',
+cap:'五種關鍵K線：位置比形狀更重要',
+svg:`<svg viewBox="0 0 580 150" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="150" fill="#f8fafc" rx="8"/>
+<text x="290" y="16" text-anchor="middle" fill="#374151" font-size="10" font-weight="600">五種關鍵K線與主力意圖</text>
+<rect x="26" y="28" width="18" height="75" fill="#dc2626" rx="2"/>
+<line x1="35" y1="18" x2="35" y2="28" stroke="#dc2626" stroke-width="2"/>
+<line x1="35" y1="103" x2="35" y2="115" stroke="#dc2626" stroke-width="2"/>
+<text x="35" y="130" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">長陽線</text>
+<text x="35" y="143" text-anchor="middle" fill="#dc2626" font-size="8">爆量高位=出貨</text>
+<rect x="102" y="62" width="16" height="16" fill="#dc2626" rx="2"/>
+<line x1="110" y1="78" x2="110" y2="115" stroke="#dc2626" stroke-width="2"/>
+<line x1="110" y1="50" x2="110" y2="62" stroke="#dc2626" stroke-width="2"/>
+<text x="110" y="130" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">錘型線</text>
+<text x="110" y="143" text-anchor="middle" fill="#059669" font-size="8">低位=止跌</text>
+<line x1="185" y1="50" x2="185" y2="95" stroke="#374151" stroke-width="2"/>
+<line x1="170" y1="72" x2="200" y2="72" stroke="#374151" stroke-width="2"/>
+<text x="185" y="115" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">十字線</text>
+<text x="185" y="128" text-anchor="middle" fill="#92400e" font-size="8">多空轉折訊號</text>
+<rect x="258" y="62" width="16" height="16" fill="#dc2626" rx="2"/>
+<line x1="266" y1="40" x2="266" y2="62" stroke="#dc2626" stroke-width="2"/>
+<line x1="266" y1="78" x2="266" y2="90" stroke="#dc2626" stroke-width="2"/>
+<text x="266" y="115" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">長上影線</text>
+<text x="266" y="128" text-anchor="middle" fill="#dc2626" font-size="8">高位出貨訊號</text>
+<rect x="340" y="55" width="18" height="60" fill="#166534" rx="2"/>
+<line x1="349" y1="38" x2="349" y2="55" stroke="#166534" stroke-width="2"/>
+<line x1="349" y1="115" x2="349" y2="125" stroke="#166534" stroke-width="2"/>
+<text x="349" y="140" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">大陽吞噬</text>
+<text x="349" y="150" text-anchor="middle" fill="#059669" font-size="8">反轉訊號</text>
+<rect x="420" y="15" width="145" height="130" fill="#fffbeb" stroke="#fde68a" rx="6" stroke-width="1"/>
+<text x="492" y="34" text-anchor="middle" fill="#92400e" font-size="10" font-weight="700">專業觀察點</text>
+<text x="433" y="52" fill="#374151" font-size="9">▸ 同樣錘型，低位=買訊</text>
+<text x="433" y="68" fill="#374151" font-size="9">▸ 高位錘型=小心反轉</text>
+<text x="433" y="84" fill="#374151" font-size="9">▸ 大陽爆量=注意出貨</text>
+<text x="433" y="100" fill="#374151" font-size="9">▸ 量縮長陽=主力鎖貨</text>
+<text x="433" y="116" fill="#374151" font-size="9">▸ 跳空缺口=支撐壓力</text>
+<text x="433" y="135" fill="#92400e" font-size="9" font-weight="600">位置&gt;形狀，量是靈魂</text>
+</svg>`,
+body:`<h3>K線的靈魂在「位置」和「量」</h3>
+<p>同樣一根錘型線，出現在下跌趨勢的低點是強力止跌訊號；出現在高位是「上影小、下影長」，代表買了被出貨，要小心。<strong>K線形狀是手段，位置才是答案。</strong></p>
+<div class="pro"><b>💡 大陽線爆量的兩種情境（外面不會告訴你）</b>
+情境A：大陽線爆量後股價繼續上漲，且隔日開高走高→主力確認突破，繼續追。
+情境B：大陽線爆量後，隔日開低或量縮下跌→當日爆量是主力出貨日，散戶全部接了。
+區別在於「之後三天的走勢」，不是當天的K線形狀。</div>
+<h3>主力吸籌的K線特徵</h3>
+<p>主力在吸貨時，<strong>不會讓你看到長陽線</strong>。他們用的方式是：連續小量的十字線和小紅K，股價橫在低位，成交量萎縮到極低。散戶以為沒希望就賣掉，主力默默吸收。等到吸夠了才拉。</p>
+<div class="eg"><b>✅ 吸籌識別法：低位量縮橫盤</b>股價跌了一段後，出現10~20天的橫盤，成交量比跌勢中還低（量縮到平均量的30%以下），K線小陰小陽交錯——這是最強的吸籌訊號，等爆量突破確認後進場。</div>
+<h3>長上影線：最被低估的出貨訊號</h3>
+<p>長上影線代表當天被推高後又被賣回來。高位出現長上影線，代表有人在高點出貨，多方攻擊被空方打回。連續出現長上影線且無法突破同一壓力區→這個區間有大量賣壓，需要時間消化。</p>`,
+pts:['K線位置比形狀重要，同一形狀在不同位置意義完全相反','大陽爆量後隔日不漲=主力出貨日，散戶都接到貨','低位量縮橫盤是吸籌訊號，等爆量突破後才進場','長上影線高位連續出現=有賣壓，謹慎做多']},
+
+/* 4 */
+{num:'2-2',title:'成交量：真正的主力偵測器',sub:'量是K線的靈魂，沒有量的技術分析是殘缺的',ch:'第二章：技術分析精髓',rt:'12 分鐘',
+cap:'量價關係四象限：判斷主力動向',
+svg:`<svg viewBox="0 0 580 140" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="140" fill="#f8fafc" rx="8"/>
+<text x="290" y="15" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">量價關係四象限</text>
+<rect x="15" y="22" width="270" height="52" fill="#dcfce7" stroke="#86efac" rx="6" stroke-width="1"/>
+<text x="30" y="42" fill="#166534" font-size="11" font-weight="700">量增價漲 ✅ 最強</text>
+<text x="30" y="58" fill="#374151" font-size="9">資金持續流入，主力在拉抬，趨勢確立</text>
+<text x="30" y="70" fill="#064e3b" font-size="9" font-weight="600">操作：積極做多，停損設在前低</text>
+<rect x="295" y="22" width="270" height="52" fill="#fef9c3" stroke="#fde047" rx="6" stroke-width="1"/>
+<text x="310" y="42" fill="#92400e" font-size="11" font-weight="700">量縮價漲 ⚠️ 謹慎</text>
+<text x="310" y="58" fill="#374151" font-size="9">籌碼鎖定、主力鎖貨或買氣不足</text>
+<text x="310" y="70" fill="#78350f" font-size="9" font-weight="600">觀察：量能能否回升，否則可能假漲</text>
+<rect x="15" y="82" width="270" height="52" fill="#fef9c3" stroke="#fde047" rx="6" stroke-width="1"/>
+<text x="30" y="102" fill="#92400e" font-size="11" font-weight="700">量增價跌 ⚠️ 警報</text>
+<text x="30" y="118" fill="#374151" font-size="9">有人在出貨，主力趁反彈分批賣出</text>
+<text x="30" y="130" fill="#78350f" font-size="9" font-weight="600">操作：減碼或出場，不宜逢低承接</text>
+<rect x="295" y="82" width="270" height="52" fill="#fee2e2" stroke="#fca5a5" rx="6" stroke-width="1"/>
+<text x="310" y="102" fill="#dc2626" font-size="11" font-weight="700">量縮價跌 📌 底部徵兆</text>
+<text x="310" y="118" fill="#374151" font-size="9">賣壓逐漸消化，接近底部區間</text>
+<text x="310" y="130" fill="#991b1b" font-size="9" font-weight="600">等待：量縮到極限後的爆量反彈確認</text>
+</svg>`,
+body:`<h3>量是主力的腳印</h3>
+<p>主力買賣的規模龐大，無法隱藏成交量。量的異常放大，代表「有人在做某件事」。<strong>散戶的交易量不足以讓成交量爆增——爆量一定是主力或法人在動作。</strong></p>
+<div class="pro"><b>💡 量縮底部識別法（最重要技巧）</b>真正的底部有個特徵：量縮到你覺得「這支票是不是沒人要了」的地步。當跌幅越來越小（從跌3%→跌1%→微跌），但量也同步萎縮，代表賣壓消化完畢。等第一根爆量的陽線出現，才是確認進場訊號。光量縮不夠，要等量爆。</div>
+<h3>爆量出貨 vs 爆量突破：如何區分</h3>
+<table class="cmp-table">
+<tr><th>特徵</th><th>爆量突破（做多）</th><th>爆量出貨（離場）</th></tr>
+<tr><td>位置</td><td>長期盤整後首次突破</td><td>漲了一大段後的高位</td></tr>
+<tr><td>收盤</td><td>收在突破點之上</td><td>收在當日最高點下方</td></tr>
+<tr><td>隔日</td><td>開高或持平繼續漲</td><td>開低或拉高後賣壓出現</td></tr>
+<tr><td>融資</td><td>融資小幅增加</td><td>融資大幅增加（散戶追）</td></tr>
+</table>
+<div class="warn"><b>⚠️ 最危險的假突破陷阱</b>爆量衝高，很多人興奮追入，但收盤回到突破點之下——這是主力刻意製造的假突破。衝高時散戶追，收盤回落時主力出貨。判斷突破真偽，必須看<strong>收盤價</strong>，不是盤中最高價。</div>`,
+pts:['量增價漲最強，量縮價漲要謹慎（買氣可能不足）','底部特徵：量縮到極低，跌幅越來越小，等爆量陽線確認','爆量後看收盤位置：收在高點→突破；收在低點→出貨','假突破識別：衝高後收盤跌回突破點以下，是主力出貨陷阱']},
+
+/* 5 */
+{num:'2-3',title:'MACD：趨勢確認的王者',sub:'不只看金叉死叉，零軸位置才是秘密',ch:'第二章：技術分析精髓',rt:'13 分鐘',
+cap:'MACD零軸理論：金叉在哪裡發生決定一切',
+svg:`<svg viewBox="0 0 580 140" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="140" fill="#f8fafc" rx="8"/>
+<line x1="15" y1="70" x2="565" y2="70" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="20" y="66" fill="#64748b" font-size="9">零軸</text>
+<polyline points="15,110 80,95 120,100 170,60 230,45 280,50 330,40 380,35 430,42 480,38 530,30" stroke="#3b82f6" stroke-width="2" fill="none"/>
+<polyline points="15,118 80,108 120,112 170,72 230,58 280,62 330,52 380,46 430,53 480,49 530,42" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+<circle cx="170" cy="66" r="6" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>
+<text x="160" y="55" fill="#166534" font-size="9" font-weight="700">零軸上金叉</text>
+<text x="155" y="45" fill="#166534" font-size="8">最強訊號★★★</text>
+<circle cx="80" cy="101" r="6" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>
+<text x="90" y="92" fill="#dc2626" font-size="9" font-weight="700">零軸下金叉</text>
+<text x="90" y="102" fill="#dc2626" font-size="8">反彈訊號★</text>
+<rect x="380" y="15" width="190" height="70" fill="#fffbeb" stroke="#fde68a" rx="6" stroke-width="1"/>
+<text x="475" y="32" text-anchor="middle" fill="#92400e" font-size="10" font-weight="700">MACD強度排名</text>
+<text x="393" y="48" fill="#374151" font-size="9">★★★ 零軸上方金叉</text>
+<text x="393" y="63" fill="#374151" font-size="9">★★ 零軸下方金叉+底背離</text>
+<text x="393" y="78" fill="#374151" font-size="9">★ 零軸下方普通金叉</text>
+</svg>`,
+body:`<h3>零軸位置決定金叉的力度</h3>
+<p>大多數人只看「金叉就做多」，但這是不完整的。<strong>零軸上方的金叉比零軸下方的金叉強三倍以上</strong>。零軸上方代表中期均線的多頭排列已確立，此時金叉是趨勢的確認，不是反彈。零軸下方的金叉只是技術性反彈，常常「金叉之後繼續跌」。</p>
+<div class="pro"><b>💡 DIF線斜率：專業交易者的隱藏觀察</b>DIF線本身的斜率和方向比柱狀圖更早出現訊號。DIF線由平坦轉向上揚（斜率增加），通常比金叉早2~3天出現。當你在等金叉，專業交易者已經在DIF線斜率轉正時進場。</div>
+<h3>底背離：逆勢操作的最強依據</h3>
+<p><strong>底背離定義</strong>：股價創新低，但MACD的低點比前一個低點高（不創低）。這代表下跌動能在衰減，賣方力量正在枯竭。底背離不是立即進場訊號——需要等MACD金叉確認後才買入。光有背離沒有金叉，股價可能繼續創低。</p>
+<div class="eg"><b>✅ 底背離操作SOP</b>① 確認股價創新低 ② 確認MACD低點未創低（背離成立）③ 等待MACD出現金叉 ④ 進場，停損設在股價低點之下1~2%</div>
+<h3>週線MACD vs 日線MACD</h3>
+<p>週線MACD的訊號比日線可靠3~5倍，因為週線過濾了更多雜訊。週線MACD在零軸以上金叉，對應日線MACD出現底背離→這是罕見但威力極強的多重確認訊號。</p>`,
+pts:['零軸上方金叉最強（趨勢確認），零軸下方金叉只是反彈','DIF線斜率轉正比金叉早2~3天出現，是更早的進場訊號','底背離需等MACD金叉確認，光背離不夠','週線MACD比日線可靠，兩者共振時訊號最強']},
+
+/* 6 */
+{num:'2-4',title:'KD與RSI：超買超賣的真相',sub:'KD不是「80就賣、20就買」這麼簡單',ch:'第二章：技術分析精髓',rt:'11 分鐘',
+cap:'KD鈍化與第二次死叉：真正的進出訊號',
+svg:`<svg viewBox="0 0 580 135" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="135" fill="#f8fafc" rx="8"/>
+<line x1="15" y1="42" x2="400" y2="42" stroke="#fca5a5" stroke-width="1" stroke-dasharray="3,2"/>
+<line x1="15" y1="100" x2="400" y2="100" stroke="#86efac" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="404" y="46" fill="#dc2626" font-size="9">80</text>
+<text x="404" y="104" fill="#059669" font-size="9">20</text>
+<polyline points="15,110 60,90 100,65 140,38 180,32 220,30 260,35 300,55 340,75 390,95" stroke="#3b82f6" stroke-width="2.5" fill="none"/>
+<circle cx="220" cy="30" r="5" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+<text x="195" y="22" fill="#92400e" font-size="9" font-weight="700">鈍化區間</text>
+<text x="190" y="14" fill="#92400e" font-size="8">在80以上橫走=強勢股</text>
+<circle cx="300" cy="55" r="5" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>
+<text x="308" y="52" fill="#dc2626" font-size="9">第一次死叉（常洗盤）</text>
+<circle cx="390" cy="95" r="5" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>
+<text x="398" y="92" fill="#dc2626" font-size="8">第二次死叉</text>
+<text x="398" y="103" fill="#dc2626" font-size="8">才是真出場</text>
+<rect x="15" y="112" width="390" height="18" fill="#eff6ff" rx="4"/>
+<text x="210" y="124" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="600">黃金交叉在20以下 + 量能回升 = 強力買訊</text>
+</svg>`,
+body:`<h3>KD鈍化：散戶最常犯的錯誤</h3>
+<p>很多人看到KD到80就急著賣，結果賣掉後股票繼續漲。<strong>強勢股的KD會在80以上橫走很久，這叫「鈍化」</strong>，是主力持續推高的表現。鈍化期間死叉通常是洗盤，不是真正的出場訊號。</p>
+<div class="pro"><b>💡 第二次死叉才是真訊號（職業交易者秘訣）</b>強勢股的第一次死叉，KD從高位交叉向下，但股價只是短暫回檔就繼續創高。第二次死叉才是趨勢真正轉弱的訊號——此時配合MACD死叉或週線走弱，確認性更高。台股超過70%的強勢股符合「第二次死叉才出場」的規律。</div>
+<h3>KD在低位的應用</h3>
+<p>KD低於20出現黃金交叉，是短線超賣反彈的訊號。但不能只看這一個訊號——需要同時確認：① 量能有沒有回升 ② 股價有沒有守住支撐 ③ 日線有沒有止跌的K線型態（錘型、長下影）。三個條件同時滿足，才是高勝率的買點。</p>
+<h3>RSI的隱藏用法</h3>
+<p>RSI 50是多空分界線，不只是看超買超賣。<strong>RSI重新站上50</strong>代表中期多頭重新確立，是追強勢股的確認訊號。RSI跌破50，代表中期趨勢走弱，不宜逆勢做多。</p>`,
+pts:['KD鈍化（停在80以上）是強勢訊號，不要急著賣','第一次死叉常是洗盤，第二次死叉才是真正的出場訊號','KD低於20黃金交叉需配合量能回升和止跌K線','RSI 50是多空分界，站上50才能積極做多']},
+
+/* 7 */
+{num:'2-5',title:'均線系統：主力成本的地圖',sub:'均線不只是趨勢指標，它是主力的心理防線',ch:'第二章：技術分析精髓',rt:'10 分鐘',
+cap:'均線扣抵值：預測均線走向的秘密武器',
+svg:`<svg viewBox="0 0 580 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="130" fill="#f8fafc" rx="8"/>
+<text x="290" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">均線多頭排列：20MA是主力成本線</text>
+<polyline points="15,115 80,100 140,80 200,60 260,45 320,35 380,30 440,28 500,25 560,22" stroke="#ef4444" stroke-width="2" fill="none"/>
+<polyline points="15,120 80,110 140,95 200,78 260,65 320,55 380,48 440,45 500,42 560,40" stroke="#f59e0b" stroke-width="2" fill="none"/>
+<polyline points="15,125 80,120 140,112 200,100 260,90 320,82 380,76 440,73 500,70 560,68" stroke="#22c55e" stroke-width="2" fill="none"/>
+<text x="562" y="22" fill="#ef4444" font-size="9">5MA</text>
+<text x="562" y="42" fill="#f59e0b" font-size="9">20MA</text>
+<text x="562" y="70" fill="#22c55e" font-size="9">60MA</text>
+<rect x="15" y="18" width="200" height="60" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1" rx="4" stroke-dasharray="3,2"/>
+<text x="115" y="38" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">多頭排列</text>
+<text x="115" y="54" text-anchor="middle" fill="#374151" font-size="9">5MA&gt;20MA&gt;60MA</text>
+<text x="115" y="70" text-anchor="middle" fill="#166534" font-size="9">趨勢確立，買點回踩均線</text>
+</svg>`,
+body:`<h3>20MA = 主力平均成本線</h3>
+<p>20日均線代表過去20天的平均成交價，也就是近期持有者的平均成本。<strong>主力不會輕易讓股價跌破自己的成本線</strong>，因此20MA在多頭格局中是強力支撐，跌到20MA附近往往是好買點。</p>
+<div class="pro"><b>💡 均線扣抵值：預測均線方向（外面幾乎沒人教）</b>20MA今天的值，會受到「今天新增的收盤價」和「20天前的收盤價」共同影響——新進來的值扣掉20天前的值。如果20天前是一個高價日，今天的均線即使股價平盤，均線也會向下彎。你可以提前知道均線未來的走向，這叫「扣抵值效應」。操作應用：如果接下來幾天要扣掉的都是低價，均線將持續上揚——這是正向加速訊號。</div>
+<h3>均線糾結後的爆發</h3>
+<p>當5MA、20MA、60MA三條均線糾結在一起（三線合一），代表多空力量完全平衡，一旦爆量突破，就是主力正式宣告方向。<strong>均線糾結後的突破方向，就是主力選擇的方向</strong>，這種走勢往往有很大的延伸空間。</p>
+<h3>葛蘭碧八法精選兩個最強買點</h3>
+<p><strong>買點1</strong>：均線由下彎轉為走平，股價由下突破均線 → 趨勢反轉的最早訊號。<strong>買點2</strong>：均線持續上揚，股價回踩均線後獲得支撐 → 多頭格局中最穩定的加碼點。這兩個買點佔了台股超過60%的最佳進場機會。</p>`,
+pts:['20MA是主力平均成本線，多頭格局中是強力支撐','扣抵值效應：可提前預測均線未來走向', '三線糾結後的爆量突破，方向就是主力選擇的方向','葛蘭碧買點2（回踩上升均線）是多頭格局最穩定進場點']},
+
+/* 8 */
+{num:'3-1',title:'K線組合型態：反轉的訊號',sub:'晨星、島型反轉、多頭吞噬——三種最強反轉K',ch:'第三章：型態分析實戰',rt:'12 分鐘',
+cap:'三種最強K線組合反轉型態',
+svg:`<svg viewBox="0 0 580 145" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="145" fill="#f8fafc" rx="8"/>
+<text x="86" y="16" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">晨星（Morning Star）</text>
+<rect x="28" y="25" width="14" height="60" fill="#166534" rx="2"/><line x1="35" y1="20" x2="35" y2="25" stroke="#166534" stroke-width="2"/>
+<rect x="58" y="72" width="12" height="10" fill="#92400e" rx="2"/>
+<rect x="86" y="42" width="14" height="50" fill="#dc2626" rx="2"/><line x1="93" y1="35" x2="93" y2="42" stroke="#dc2626" stroke-width="2"/>
+<text x="65" y="100" text-anchor="middle" fill="#059669" font-size="9">跳空小十字→反攻陽線</text>
+<text x="65" y="112" text-anchor="middle" fill="#059669" font-size="9">三天確認底部</text>
+<text x="170" y="16" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">島型反轉（Island Reversal）</text>
+<rect x="130" y="30" width="12" height="40" fill="#dc2626" rx="2"/>
+<line x1="145" y1="28" x2="155" y2="28" stroke="#374151" stroke-width="1" stroke-dasharray="3,2"/>
+<rect x="158" y="60" width="14" height="35" fill="#dc2626" rx="2"/>
+<rect x="175" y="60" width="14" height="32" fill="#dc2626" rx="2"/>
+<line x1="192" y1="62" x2="200" y2="62" stroke="#374151" stroke-width="1" stroke-dasharray="3,2"/>
+<rect x="200" y="28" width="14" height="40" fill="#166534" rx="2"/>
+<text x="170" y="110" text-anchor="middle" fill="#dc2626" font-size="9">跳空跌下→島型→跳空上漲</text>
+<text x="170" y="122" text-anchor="middle" fill="#dc2626" font-size="9">見底最強型態</text>
+<text x="340" y="16" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">多頭吞噬（Bullish Engulfing）</text>
+<rect x="308" y="38" width="12" height="70" fill="#166534" rx="2"/>
+<line x1="314" y1="30" x2="314" y2="38" stroke="#166534" stroke-width="2"/>
+<line x1="314" y1="108" x2="314" y2="118" stroke="#166534" stroke-width="2"/>
+<rect x="330" y="30" width="20" height="85" fill="#dc2626" rx="2"/>
+<line x1="340" y1="20" x2="340" y2="30" stroke="#dc2626" stroke-width="2"/>
+<line x1="340" y1="115" x2="340" y2="125" stroke="#dc2626" stroke-width="2"/>
+<text x="340" y="138" text-anchor="middle" fill="#059669" font-size="9">大陽K完全吞噬前日陰K</text>
+<rect x="400" y="20" width="165" height="110" fill="#fffbeb" stroke="#fde68a" rx="6" stroke-width="1"/>
+<text x="483" y="38" text-anchor="middle" fill="#92400e" font-size="10" font-weight="700">共同確認條件</text>
+<text x="413" y="56" fill="#374151" font-size="9">① 出現在下跌趨勢末端</text>
+<text x="413" y="72" fill="#374151" font-size="9">② 成交量必須放大</text>
+<text x="413" y="88" fill="#374151" font-size="9">③ 隔日未跌破低點</text>
+<text x="413" y="104" fill="#374151" font-size="9">④ 配合支撐位（均線/前低）</text>
+<text x="413" y="120" fill="#92400e" font-size="9" font-weight="600">三個條件=高勝率底部</text>
+</svg>`,
+body:`<h3>K線組合的力量</h3>
+<p>單根K線只能反映當天的多空，K線組合才能反映趨勢轉折。<strong>最強的反轉訊號需要2~3根K線的確認</strong>，配合成交量和位置，勝率才能超過70%。</p>
+<div class="pro"><b>💡 島型反轉：最被忽略的最強型態</b>島型反轉需要兩個跳空缺口。第一個跳空讓股價「跳到孤島」，第二個跳空讓股價「逃離孤島」。這種型態在台股出現的頻率低，但準確率極高（約80%以上）。跳空缺口產生的原因是重大消息——公司利空消化後的機構收購、或重大利多出現。一旦出現，通常是一波大行情的開始。</div>
+<h3>多頭吞噬的進場技巧</h3>
+<p>多頭吞噬的標準：大陽K的實體必須<strong>完全包住</strong>前一天陰K的實體（不是整根K線，是實體）。進場時機：吞噬陽線收盤後隔日開盤確認，停損設在吞噬陽線的最低點。如果吞噬後的量比前一天的量還小，可信度打折。</p>
+<h3>為什麼位置比型態更重要</h3>
+<p>同樣的晨星型態，出現在下跌趨勢中的長期支撐區（如前一個底部或整數關卡）勝率超過70%；隨機出現在下跌中途，勝率只有40%。<strong>型態是形，位置是神。</strong>學型態之前，先學會看位置。</p>`,
+pts:['島型反轉需兩個跳空缺口，罕見但準確率超過80%','多頭吞噬需大陽K完全吞噬前日陰K實體，量需放大','晨星三根K線確認，低點附近的晨星勝率超過70%','型態需在關鍵支撐位出現才有意義，位置比形狀重要']},
+
+/* 9 */
+{num:'3-2',title:'旗形與三角型態',sub:'最實用的連續型態：旗形的最佳進場點你可能搞錯了',ch:'第三章：型態分析實戰',rt:'13 分鐘',
+cap:'旗形、楔形、三角收斂：目標價計算法',
+svg:`<svg viewBox="0 0 580 140" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="140" fill="#f8fafc" rx="8"/>
+<text x="100" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">旗形（Flag）</text>
+<line x1="15" y1="110" x2="75" y2="35" stroke="#dc2626" stroke-width="3"/>
+<line x1="75" y1="35" x2="115" y2="55" stroke="#374151" stroke-width="1.5"/>
+<line x1="75" y1="45" x2="115" y2="65" stroke="#374151" stroke-width="1.5" stroke-dasharray="3,2"/>
+<line x1="115" y1="55" x2="185" y2="20" stroke="#dc2626" stroke-width="3"/>
+<circle cx="115" cy="55" r="5" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>
+<text x="118" y="75" fill="#059669" font-size="8" font-weight="700">最佳進場：回踩旗頂線</text>
+<line x1="75" y1="35" x2="185" y2="35" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="195" y="22" fill="#dc2626" font-size="8">目標：旗桿等距</text>
+<text x="220" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">上升三角（Ascending Triangle）</text>
+<line x1="200" y1="120" x2="260" y2="80" stroke="#374151" stroke-width="1.5"/>
+<line x1="200" y1="70" x2="360" y2="70" stroke="#374151" stroke-width="2"/>
+<line x1="260" y1="90" x2="310" y2="80" stroke="#374151" stroke-width="1.5"/>
+<line x1="310" y1="80" x2="355" y2="70" stroke="#374151" stroke-width="1.5"/>
+<line x1="355" y1="70" x2="390" y2="45" stroke="#dc2626" stroke-width="3"/>
+<circle cx="355" cy="70" r="5" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>
+<text x="295" y="118" text-anchor="middle" fill="#059669" font-size="8">底部逐步墊高→壓力突破</text>
+<text x="400" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">收斂三角</text>
+<line x1="415" y1="40" x2="540" y2="72" stroke="#374151" stroke-width="1.5"/>
+<line x1="415" y1="110" x2="540" y2="78" stroke="#374151" stroke-width="1.5"/>
+<line x1="538" y1="75" x2="570" y2="50" stroke="#dc2626" stroke-width="3"/>
+<circle cx="538" cy="75" r="5" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>
+<text x="478" y="118" text-anchor="middle" fill="#059669" font-size="8">量縮到極限→爆量突破</text>
+</svg>`,
+body:`<h3>旗形：最穩定的連續型態</h3>
+<p>旗形由「旗桿」（急漲段）和「旗面」（小幅回檔整理）組成。旗面通常維持2~4週，成交量在整理期間萎縮。<strong>目標價 = 突破點 + 旗桿的長度</strong>，勝率在強勢市場中高達75%以上。</p>
+<div class="pro"><b>💡 旗形最佳進場點（大多數人都搞錯了）</b>大多數人等突破才買，但那時候風險報酬比已經變差。專業做法是在旗面整理期間，等股價<strong>回踩旗頂線</strong>（也就是前一波高點）時買入。此時停損只需設在旗底，賺的是整個突破後的漲幅。回踩旗頂線沒跌破，加上量縮，是最佳進場條件。</div>
+<h3>假突破陷阱識別</h3>
+<p>三角收斂的假突破是散戶的噩夢。識別假突破的三個標準：① <strong>收盤必須在突破點之上</strong>（盤中突破不算）② 突破時成交量必須明顯放大 ③ 突破後隔日不能跌回突破點之下。三個條件缺一，都需要謹慎。</p>
+<div class="warn"><b>⚠️ 最常見的陷阱：量縮突破</b>如果突破時量沒有放大，這個突破99%是假的。主力在量縮的情況下用少量資金製造假突破，散戶追入後主力再賣壓回去。量是真假突破的最終仲裁者。</div>
+<h3>上升三角的操作邏輯</h3>
+<p>上升三角的頂部是水平壓力，底部逐步墊高——每次回檔的低點都比上次高，代表買方越來越積極。當底部墊高到壓力附近，幾乎每一筆回落都被立即買回，代表賣壓快被吸收完了。一旦放量突破水平壓力，通常有很大的延伸空間。</p>`,
+pts:['旗形最佳進場：回踩旗頂線+量縮，勝率優於等突破','假突破識別：收盤需在突破點之上，且量必須放大','三角收斂量縮到極限後的爆量突破才可信','目標價計算：旗形=旗桿等距；三角=型態高度']},
+
+/* 10 */
+{num:'3-3',title:'頭肩頂與雙頂：趨勢終結的訊號',sub:'三重確認法：不在沒把握的地方放空',ch:'第三章：型態分析實戰',rt:'12 分鐘',
+cap:'頭肩頂三重確認：成交量是最終裁判',
+svg:`<svg viewBox="0 0 580 145" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="145" fill="#f8fafc" rx="8"/>
+<text x="210" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">頭肩頂（Head and Shoulders Top）</text>
+<polyline points="20,120 60,80 80,95 130,40 180,90 200,80 240,115" stroke="#374151" stroke-width="2" fill="none"/>
+<line x1="80" y1="95" x2="200" y2="95" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="30" y="78" fill="#374151" font-size="9">左肩</text>
+<text x="125" y="35" fill="#dc2626" font-size="9" font-weight="700">頭部</text>
+<text x="205" y="78" fill="#374151" font-size="9">右肩</text>
+<text x="140" y="108" fill="#dc2626" font-size="9">頸線</text>
+<line x1="240" y1="115" x2="280" y2="135" stroke="#dc2626" stroke-width="3"/>
+<text x="255" y="132" fill="#dc2626" font-size="8">破頸→做空</text>
+<rect x="300" y="15" width="265" height="125" fill="#fff" stroke="#e2e8f0" rx="6" stroke-width="1"/>
+<text x="432" y="34" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">頭肩頂三重確認</text>
+<text x="315" y="54" fill="#374151" font-size="9">① 型態確認</text>
+<text x="315" y="68" fill="#64748b" font-size="8">右肩不超過頭部高點</text>
+<text x="315" y="86" fill="#374151" font-size="9">② 成交量確認</text>
+<text x="315" y="100" fill="#64748b" font-size="8">頭部量&gt;左肩；右肩量最小</text>
+<text x="315" y="118" fill="#374151" font-size="9">③ 頸線確認</text>
+<text x="315" y="132" fill="#64748b" font-size="8">收盤跌破頸線+量放大</text>
+</svg>`,
+body:`<h3>頭肩頂的形成邏輯</h3>
+<p>頭肩頂代表多頭力量逐漸衰竭：左肩創高，回檔後反彈再創更高（頭部），但右肩的反彈明顯比左肩弱——多方力量在衰減。三個峰點之間的低點連成「頸線」，跌破頸線代表趨勢反轉。</p>
+<div class="pro"><b>💡 成交量是頭肩頂的靈魂</b>標準的頭肩頂，成交量有規律：左肩量最大，頭部量次之（已比左肩小），右肩量最小。這個量能遞減的過程，代表多頭每次推高都越來越沒有力氣。如果右肩量反而比頭部大，頭肩頂的可信度大幅降低。</div>
+<h3>頸線突破的操作細節</h3>
+<p>不能只看股價跌破頸線——必須收盤在頸線之下，且破頸線當天成交量放大。破頸後常見「回測頸線」（反彈回到頸線附近），這是做空的最佳時機：此時頸線由支撐變為壓力，放空風險低報酬高。</p>
+<div class="eg"><b>✅ 頭肩頂做空SOP</b>① 確認右肩高點低於頭部 ② 確認右肩量縮 ③ 等收盤跌破頸線+量放大 ④ 在回測頸線時放空，停損設在頸線上方2%</div>
+<h3>目標價計算</h3>
+<p>頭肩頂目標價 = 頸線價格 − (頭部高點 − 頸線)。也就是說，跌破頸線後，下跌的幅度等於從頸線到頭部的距離。這個計算法在台股的準確率約65~70%。</p>`,
+pts:['頭肩頂三重確認：型態+量能遞減+收盤跌破頸線','右肩量必須比頭部小，否則頭肩頂可信度低','破頸後回測頸線是最佳做空點（頸線由支撐變壓力）','目標價=頸線−（頭部高點−頸線），準確率約65~70%']},
+
+/* 11 */
+{num:'3-4',title:'W底與杯柄型態',sub:'W底的真正進場點比你想的晚，但安全得多',ch:'第三章：型態分析實戰',rt:'11 分鐘',
+cap:'W底的頸線突破與杯柄型態的目標計算',
+svg:`<svg viewBox="0 0 580 140" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="140" fill="#f8fafc" rx="8"/>
+<text x="145" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">W底（雙底）正確進場點</text>
+<polyline points="15,40 50,100 90,60 130,105 170,30" stroke="#374151" stroke-width="2" fill="none"/>
+<line x1="90" y1="60" x2="185" y2="60" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="90" y="55" fill="#dc2626" font-size="9">頸線</text>
+<circle cx="90" cy="60" r="5" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>
+<circle cx="170" cy="30" r="5" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>
+<text x="175" y="27" fill="#059669" font-size="8" font-weight="700">←真正進場點</text>
+<text x="100" y="80" fill="#064e3b" font-size="8">突破頸線才進！</text>
+<text x="40" y="118" fill="#64748b" font-size="8">第一底</text>
+<text x="118" y="122" fill="#64748b" font-size="8">第二底</text>
+<text x="320" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">杯柄型態（Cup &amp; Handle）</text>
+<path d="M 240,40 Q 320,110 400,40" stroke="#374151" stroke-width="2" fill="none"/>
+<polyline points="400,40 420,55 440,40" stroke="#374151" stroke-width="1.5" fill="none"/>
+<line x1="240" y1="40" x2="450" y2="40" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+<line x1="440" y1="40" x2="490" y2="15" stroke="#dc2626" stroke-width="3"/>
+<circle cx="440" cy="40" r="5" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>
+<text x="360" y="125" text-anchor="middle" fill="#064e3b" font-size="8">圓弧底→柄→突破</text>
+<text x="456" y="30" fill="#dc2626" font-size="8">突破!</text>
+</svg>`,
+body:`<h3>W底最常見的錯誤進場</h3>
+<p>散戶最常在第二個底部（看起來是底部）就進場，結果股票繼續創低，第二個底比第一個低——這就是「虛假W底」。<strong>真正的W底進場點不是在底部，而是在突破頸線的時候。</strong>頸線是兩個底之間的高點連成的水平線。</p>
+<div class="pro"><b>💡 W底的量能鑑別法</b>第一個底通常伴隨恐慌性爆量，第二個底的成交量應該<strong>明顯小於第一個底</strong>——代表賣壓越來越弱。如果第二個底的量反而比第一個底大，代表還有新的賣壓出現，W底可信度很低，不要輕易買入。</div>
+<h3>W底突破後的「回測進場法」</h3>
+<p>W底突破頸線後，有約40%的機率會回測頸線（即漲上去後回落測試頸線是否支撐）。<strong>回測頸線是比突破時更安全的進場點</strong>：停損清晰（跌破頸線就出），且已確認頸線轉為支撐。</p>
+<h3>杯柄型態：美股最喜歡的型態</h3>
+<p>杯柄由圓弧底（「杯」）加上小幅整理（「柄」）組成。杯的深度通常在12~35%，柄的回檔不超過杯深的50%。突破點是杯左緣的高點，目標價 = 突破點 + 杯深。這個型態在台積電、台達電等大型股中出現頻率很高。</p>`,
+pts:['W底真正進場點是突破頸線，不是在第二個底','第二個底的量應小於第一個底，否則W底不可信','突破後回測頸線是更安全的進場機會','杯柄型態：目標=突破點+杯深，柄回檔不超過杯深50%']},
+
+/* 12 */
+{num:'4-1',title:'外資動向：最大莊家的籌碼',sub:'外資連買連賣的訊號，比任何技術指標都準',ch:'第四章：籌碼分析',rt:'10 分鐘',
+cap:'外資買賣超判讀：連續天數才是關鍵',
+svg:`<svg viewBox="0 0 580 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="130" fill="#f8fafc" rx="8"/>
+<text x="290" y="15" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">外資買賣超對股價的影響</text>
+<rect x="15" y="22" width="168" height="100" fill="#dcfce7" stroke="#86efac" rx="6" stroke-width="1"/>
+<text x="99" y="42" text-anchor="middle" fill="#166534" font-size="11" font-weight="700">外資連續買超</text>
+<text x="99" y="60" text-anchor="middle" fill="#374151" font-size="9">3天以上：短線做多訊號</text>
+<text x="99" y="76" text-anchor="middle" fill="#374151" font-size="9">5天以上：中線佈局確認</text>
+<text x="99" y="92" text-anchor="middle" fill="#374151" font-size="9">10天以上：強力趨勢建立</text>
+<text x="99" y="112" text-anchor="middle" fill="#166534" font-size="9" font-weight="600">同步留意買超金額是否擴大</text>
+<rect x="206" y="22" width="168" height="100" fill="#fee2e2" stroke="#fca5a5" rx="6" stroke-width="1"/>
+<text x="290" y="42" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="700">外資連續賣超</text>
+<text x="290" y="60" text-anchor="middle" fill="#374151" font-size="9">3天以上：短線壓力</text>
+<text x="290" y="76" text-anchor="middle" fill="#374151" font-size="9">台積電連賣：大盤弱勢</text>
+<text x="290" y="92" text-anchor="middle" fill="#374151" font-size="9">外資淨賣超≠股價一定跌</text>
+<text x="290" y="112" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="600">需看融資和投信是否接手</text>
+<rect x="397" y="22" width="168" height="100" fill="#eff6ff" stroke="#bfdbfe" rx="6" stroke-width="1"/>
+<text x="481" y="42" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="700">法人齊買</text>
+<text x="481" y="60" text-anchor="middle" fill="#374151" font-size="9">外資+投信同步買</text>
+<text x="481" y="76" text-anchor="middle" fill="#374151" font-size="9">是最強的上漲訊號</text>
+<text x="481" y="92" text-anchor="middle" fill="#374151" font-size="9">三大法人全買</text>
+<text x="481" y="112" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="600">幾乎不會跌</text>
+</svg>`,
+body:`<h3>外資是最大的莊家</h3>
+<p>外資（外國機構投資人）持有台股約40%的市值，單日買賣動輒數百億。<strong>外資的方向決定大趨勢</strong>，但對個股而言，外資的連續買賣比單日更重要——連續5天以上的買超，通常代表外資正在建立中期部位。</p>
+<div class="pro"><b>💡 外資買賣超的隱藏觀察法</b>外資「賣超但股價不跌」往往比「買超股價上漲」更有意義。代表有人（投信或主力）正在吸收外資的賣壓，籌碼轉移到更積極的手中。這種情況出現在底部區，通常預示大行情。相反，外資買超但股價漲幅越來越小，代表上方有其他賣壓，後市有隱憂。</div>
+<h3>外資期貨未平倉部位</h3>
+<p>外資在台指期的未平倉量也是重要指標。外資期貨<strong>大量淨多單</strong>代表外資看多大盤；大量淨空單代表外資在避險（可能準備賣股）。期貨未平倉量的方向，往往領先現貨市場2~3天。</p>
+<h3>台積電外資動向 = 台股晴雨表</h3>
+<p>每日台積電外資買賣超是必看指標。外資連買台積電5天以上，台股幾乎可以放心做多。外資連賣台積電且期貨轉空，就算個股強勢也要謹慎，整體市場有下行風險。</p>`,
+pts:['外資連買5天以上才算中期佈局，單日買超只是短線','外資賣超但股價不跌=有人在吸籌，比買超更值得注意','外資期貨未平倉淨多/空單，領先現貨市場2~3天','台積電外資動向是台股最重要的單一指標']},
+
+/* 13 */
+{num:'4-2',title:'投信與自營商籌碼',sub:'投信作帳效應：每年兩次的最可靠行情',ch:'第四章：籌碼分析',rt:'9 分鐘',
+cap:'投信的操盤邏輯與作帳時機',
+svg:`<svg viewBox="0 0 580 120" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="120" fill="#f8fafc" rx="8"/>
+<text x="290" y="15" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">投信作帳行情時程表</text>
+<rect x="15" y="22" width="120" height="90" fill="#eff6ff" stroke="#bfdbfe" rx="6" stroke-width="1"/>
+<text x="75" y="42" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="700">3~5月</text>
+<text x="75" y="60" text-anchor="middle" fill="#374151" font-size="9">Q1績效期</text>
+<text x="75" y="76" text-anchor="middle" fill="#374151" font-size="9">投信積極拉抬</text>
+<text x="75" y="92" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="600">持股最高點</text>
+<rect x="155" y="22" width="120" height="90" fill="#fef9c3" stroke="#fde047" rx="6" stroke-width="1"/>
+<text x="215" y="42" text-anchor="middle" fill="#92400e" font-size="10" font-weight="700">6~7月</text>
+<text x="215" y="60" text-anchor="middle" fill="#374151" font-size="9">Q2結算</text>
+<text x="215" y="76" text-anchor="middle" fill="#374151" font-size="9">部分基金換股</text>
+<text x="215" y="92" text-anchor="middle" fill="#92400e" font-size="9">觀察是否續抱</text>
+<rect x="295" y="22" width="120" height="90" fill="#eff6ff" stroke="#bfdbfe" rx="6" stroke-width="1"/>
+<text x="355" y="42" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="700">10~11月</text>
+<text x="355" y="60" text-anchor="middle" fill="#374151" font-size="9">Q4績效衝刺</text>
+<text x="355" y="76" text-anchor="middle" fill="#374151" font-size="9">全年最積極拉抬</text>
+<text x="355" y="92" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="600">作帳行情最強</text>
+<rect x="435" y="22" width="130" height="90" fill="#f0fdf4" stroke="#bbf7d0" rx="6" stroke-width="1"/>
+<text x="500" y="42" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">操作策略</text>
+<text x="448" y="60" fill="#374151" font-size="9">跟著投信連買個股</text>
+<text x="448" y="76" fill="#374151" font-size="9">3~5月、10~12月</text>
+<text x="448" y="92" fill="#166534" font-size="9" font-weight="600">是最佳順勢時機</text>
+</svg>`,
+body:`<h3>投信為什麼要「作帳」</h3>
+<p>基金的績效是按季度或年度向投資人報告的。每到績效結算前，投信基金經理會積極拉抬手中的持股，讓淨值好看——這就是「作帳行情」。<strong>每年最強的兩個作帳期是3~5月（Q1季末）和10~12月（年底）</strong>，這兩段時間跟著投信連買的標的，往往有穩定的短期漲幅。</p>
+<div class="pro"><b>💡 追蹤投信的正確方法</b>不要看單日投信買賣超，要看「連續買超累積張數」。投信連續5天以上買超同一標的，且買超金額逐日擴大，代表該標的已被列入「作帳名單」。特別注意：投信開始買的前幾天，通常已有大股東或主力先行佈局（因為他們知道投信要買）——所以在投信首次買超出現前，分點資料可能已經出現異動。</div>
+<h3>自營商的操作特性</h3>
+<p>自營商以<strong>短線操作</strong>為主，看自營商買超方向只適合當沖或隔日沖。自營商還涉及大量的<strong>選擇權避險</strong>，所以他們的現貨買賣不一定代表真實看法——可能只是對沖期貨或選擇權部位的操作。新手不要過度解讀自營商的單日動作。</p>
+<h3>投信＋外資齊買的威力</h3>
+<p>當外資和投信同步買超同一支股票，且各自連買5天以上，這是台股中極為罕見的強力訊號。這代表：外資看好（國際資金進場）+ 投信看好（有作帳動機）+ 籌碼同步集中，三個條件同時成立，短中期幾乎不可能跌。</p>`,
+pts:['投信作帳行情在3~5月和10~12月最強，跟買連買標的','投信連買5天且金額擴大=被列入作帳名單','自營商以短線和避險為主，不適合長期解讀方向','外資+投信齊買是台股最強的籌碼訊號']},
+
+/* 14 */
+{num:'4-3',title:'融資融券：散戶情緒的溫度計',sub:'融資增加不一定好消息，要看它在哪個位置',ch:'第四章：籌碼分析',rt:'10 分鐘',
+cap:'融資融券的兩種解讀：位置決定意義',
+svg:`<svg viewBox="0 0 580 125" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="125" fill="#f8fafc" rx="8"/>
+<text x="290" y="15" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">融資變化 × 股價位置 = 四種情境</text>
+<rect x="15" y="22" width="133" height="95" fill="#dcfce7" stroke="#86efac" rx="6" stroke-width="1"/>
+<text x="82" y="42" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">融資增+底部</text>
+<text x="82" y="60" text-anchor="middle" fill="#374151" font-size="9">散戶轉為樂觀</text>
+<text x="82" y="76" text-anchor="middle" fill="#374151" font-size="9">但主力未必動</text>
+<text x="82" y="92" text-anchor="middle" fill="#166534" font-size="9">謹慎偏多參考</text>
+<rect x="158" y="22" width="133" height="95" fill="#fee2e2" stroke="#fca5a5" rx="6" stroke-width="1"/>
+<text x="224" y="42" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="700">融資增+高位</text>
+<text x="224" y="60" text-anchor="middle" fill="#374151" font-size="9">散戶高位追入</text>
+<text x="224" y="76" text-anchor="middle" fill="#374151" font-size="9">主力出貨對象</text>
+<text x="224" y="92" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="600">最危險訊號!</text>
+<rect x="301" y="22" width="133" height="95" fill="#eff6ff" stroke="#bfdbfe" rx="6" stroke-width="1"/>
+<text x="368" y="42" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="700">融資減+底部</text>
+<text x="368" y="60" text-anchor="middle" fill="#374151" font-size="9">散戶恐慌殺出</text>
+<text x="368" y="76" text-anchor="middle" fill="#374151" font-size="9">強制斷頭賣壓</text>
+<text x="368" y="92" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="600">賣壓消化=底部</text>
+<rect x="444" y="22" width="121" height="95" fill="#f0fdf4" stroke="#bbf7d0" rx="6" stroke-width="1"/>
+<text x="504" y="42" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">融資減+漲</text>
+<text x="504" y="60" text-anchor="middle" fill="#374151" font-size="9">散戶賣掉了</text>
+<text x="504" y="76" text-anchor="middle" fill="#374151" font-size="9">主力接手</text>
+<text x="504" y="92" text-anchor="middle" fill="#166534" font-size="9" font-weight="600">最強底部訊號</text>
+</svg>`,
+body:`<h3>融資是散戶情緒的溫度計</h3>
+<p>融資代表散戶向券商借錢買股（槓桿1.4倍左右）。融資增加代表散戶在買，融資減少代表散戶在賣或被斷頭。<strong>但融資的意義完全取決於股價的位置。</strong></p>
+<div class="pro"><b>💡 融資大減+股價不跌＝最強底部訊號</b>這是最重要的籌碼底部訊號。融資大減代表大量散戶恐慌斷頭賣出（或主動認賠），但股價卻沒有繼續跌——代表有人（主力或機構）正在吸收所有的賣壓。這種「融資清洗」後的股票，往往在接下來幾週會出現大幅上漲。歷史統計：台股在融資使用率從高峰下降30%以上後，有超過75%的機率見底。</div>
+<h3>融資斷頭的市場效應</h3>
+<p>大跌時，融資維持率低於130%會被強制斷頭（強制賣出）。當市場恐慌，大量融資同時斷頭，會形成「斷頭潮」——股價加速下跌，創造超跌機會。<strong>斷頭潮結束後，往往是最好的短期買點</strong>，因為弱手已經被清洗完畢。</p>
+<h3>融券（放空）的觀察</h3>
+<p>融券增加代表散戶在放空，融券大增+股價橫盤，後續可能出現「軋空行情」——主力拉高，放空的人被迫回補，反而助長漲勢。台股每年都有幾次這樣的軋空行情，識別方法：融券使用率超過市值的2%，且股價沒有繼續跌。</p>`,
+pts:['高位融資大增=散戶追高，是主力出貨的最佳時機','融資大減+股價不跌=底部最強訊號（弱手清洗完畢）','融資斷頭潮結束後往往是超跌反彈買點','融券大增+股價橫盤可能預示軋空行情']},
+
+/* 15 */
+{num:'4-4',title:'分點資料：追蹤主力的GPS',sub:'哪個券商在買賣，比任何指標都直接',ch:'第四章：籌碼分析',rt:'11 分鐘',
+cap:'分點資料解讀：鎖定主力的買賣行為',
+svg:`<svg viewBox="0 0 580 125" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+<rect width="580" height="125" fill="#f8fafc" rx="8"/>
+<text x="290" y="15" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">分點資料的三個核心觀察</text>
+<rect x="15" y="22" width="175" height="97" fill="#eff6ff" stroke="#bfdbfe" rx="6" stroke-width="1"/>
+<text x="103" y="42" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="700">集中買超</text>
+<text x="103" y="60" text-anchor="middle" fill="#374151" font-size="9">1~2家券商連續</text>
+<text x="103" y="76" text-anchor="middle" fill="#374151" font-size="9">大量買超同一標的</text>
+<text x="103" y="92" text-anchor="middle" fill="#1d4ed8" font-size="9">= 主力正在吸籌</text>
+<text x="103" y="108" text-anchor="middle" fill="#64748b" font-size="8">跟蹤該券商後續動作</text>
+<rect x="203" y="22" width="175" height="97" fill="#fef9c3" stroke="#fde047" rx="6" stroke-width="1"/>
+<text x="291" y="42" text-anchor="middle" fill="#92400e" font-size="10" font-weight="700">換手出貨</text>
+<text x="291" y="60" text-anchor="middle" fill="#374151" font-size="9">原本大量買超的</text>
+<text x="291" y="76" text-anchor="middle" fill="#374151" font-size="9">券商轉為賣超</text>
+<text x="291" y="92" text-anchor="middle" fill="#dc2626" font-size="9">= 主力正在出貨</text>
+<text x="291" y="108" text-anchor="middle" fill="#64748b" font-size="8">見此立即減碼</text>
+<rect x="391" y="22" width="174" height="97" fill="#f0fdf4" stroke="#bbf7d0" rx="6" stroke-width="1"/>
+<text x="478" y="42" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">分散買超</text>
+<text x="478" y="60" text-anchor="middle" fill="#374151" font-size="9">多家券商同時買入</text>
+<text x="478" y="76" text-anchor="middle" fill="#374151" font-size="9">（可能是法人）</text>
+<text x="478" y="92" text-anchor="middle" fill="#166534" font-size="9">= 機構性買盤</text>
+<text x="478" y="108" text-anchor="middle" fill="#64748b" font-size="8">外資/投信同步佈局</text>
+</svg>`,
+body:`<h3>什麼是分點資料？</h3>
+<p>台股每天收盤後，會公布各券商分支機構（分點）的買賣明細。透過分析哪個券商持續在買或賣特定股票，可以推斷主力或法人的動向。<strong>這是台股獨有的透明度，是籌碼分析最直接的工具。</strong></p>
+<div class="pro"><b>💡 追蹤主力的三步驟</b>
+步驟1：找近30天內對某支股票集中買超最多的券商分點（通常1~3家佔買超的70%以上）。
+步驟2：確認這些分點是否持續買入，買超量是否增加。
+步驟3：當這些分點開始轉為賣超，這是出場訊號，比技術面訊號早2~5天。
+這個方法在中小型股上效果最佳，因為主力規模相對大盤的比例較高，更容易留下足跡。</div>
+<h3>主力「洗盤」的分點特徵</h3>
+<p>主力在拉高前常常「洗盤」——故意讓股價下跌嚇走散戶，同時自己繼續買入。洗盤期間的分點特徵：當天整體市場賣超，但特定1~2家分點仍在買入或只是小幅賣出。這代表主力沒有真的要出貨，只是在震盪中收集更多籌碼。</p>
+<h3>實際操作資源</h3>
+<p>台灣可以透過「籌碼K線」App、「XQ全球贏家」、「MoneyDJ」等工具查詢分點資料。建議配合K線和量能一起看：分點集中買超（主力吸籌）+ 量縮底部（賣壓消化）= 最高確信度的買點。</p>`,
+pts:['1~2家券商連續大量買超同一標的=主力吸籌，值得追蹤','主力分點由買轉賣是出場訊號，比技術面早2~5天','洗盤期間特定分點持續買入，代表主力不是真出貨','分點資料在中小型股最有效，大型股受外資干擾較多']}
+];
+
+const DONE_KEY='sc-done';
+let done=new Set(JSON.parse(localStorage.getItem(DONE_KEY)||'[]'));
+let cur=0;
+function save(){localStorage.setItem(DONE_KEY,JSON.stringify([...done]))}
+function updateProg(){
+  const n=done.size,t=LESSONS.length;
+  document.getElementById('pFill').style.width=(n/t*100)+'%';
+  document.getElementById('pText').textContent=n+' / '+t+' 堂課完成';
+}
+function chOf(id){return CHAPTERS.find(c=>c.ids.includes(id))}
+function prevOf(id){
+  const ch=chOf(id),ci=CHAPTERS.indexOf(ch),li=ch.ids.indexOf(id);
+  if(li>0)return ch.ids[li-1];
+  if(ci>0)return CHAPTERS[ci-1].ids.slice(-1)[0];
+  return null;
+}
+function nextOf(id){
+  const ch=chOf(id),ci=CHAPTERS.indexOf(ch),li=ch.ids.indexOf(id);
+  if(li<ch.ids.length-1)return ch.ids[li+1];
+  if(ci<CHAPTERS.length-1)return CHAPTERS[ci+1].ids[0];
+  return null;
+}
+function buildSidebar(){
+  const el=document.getElementById('chList');
+  el.innerHTML='';
+  CHAPTERS.forEach(ch=>{
+    const lbl=document.createElement('div');
+    lbl.className='ch-label';lbl.textContent=ch.label;el.appendChild(lbl);
+    ch.ids.forEach(id=>{
+      const L=LESSONS[id];
+      const div=document.createElement('div');
+      div.className='ls-item'+(id===cur?' active':'')+(done.has(id)?' done':'');
+      div.innerHTML=`<div class="ls-num">${L.num}</div><span>${L.title}</span><span class="ls-check">${done.has(id)?'&#10003;':''}</span>`;
+      div.onclick=()=>{cur=id;render();closeSB()};
+      el.appendChild(div);
+    });
+  });
+}
+function render(){
+  const L=LESSONS[cur];
+  const ch=chOf(cur);
+  const prev=prevOf(cur),next=nextOf(cur);
+  const isDone=done.has(cur);
+  document.getElementById('lw').innerHTML=`
+<div class="breadcrumb">台股完整課程<span class="bc-sep"> &#x203a; </span>${ch.label}<span class="bc-sep"> &#x203a; </span><span class="bc-cur">${L.title}</span></div>
+<div class="lesson-header">
+<div class="ch-badge">${ch.label}</div>
+<div class="ls-title">${L.title}</div>
+<div class="ls-sub">${L.sub}</div>
+<div class="ls-meta-row">&#9201; ${L.rt}${isDone?' <span class="done-tag">&#10003; 已完成</span>':''}</div>
+</div>
+<div class="diag">${L.svg}<div class="diag-cap">${L.cap}</div></div>
+<div class="body-card">${L.body}</div>
+<div class="kp-box"><h4>本課重點</h4><ul>${L.pts.map(p=>`<li>${p}</li>`).join('')}</ul></div>
+<div class="ls-footer">
+<button class="btn btn-ghost${prev===null?' btn-dim':''}" onclick="go(${prev})">&#8592; 上一課</button>
+<button class="btn ${isDone?'btn-undone':'btn-done'}" onclick="toggleDone()">${isDone?'&#8617; 標記未讀':'&#10003; 完成本課'}</button>
+<button class="btn btn-primary${next===null?' btn-dim':''}" onclick="go(${next})">下一課 &#8594;</button>
+</div>`;
+  buildSidebar();updateProg();
+  document.querySelector('.main').scrollTo(0,0);
+}
+function go(id){if(id!==null){cur=id;render()}}
+function toggleDone(){if(done.has(cur))done.delete(cur);else done.add(cur);save();render()}
+function openSB(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+render();
+</script>
+</body>
+</html>
