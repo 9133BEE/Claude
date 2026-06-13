@@ -90,11 +90,26 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 .cards-section{max-width:1200px;margin:0 auto;padding:20px 24px 64px}
 .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 @media(max-width:1024px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){
+  .cards-section{padding:16px 12px 56px}
+  .filter-bar{padding:12px 12px 2px}
+  .card-detail-inner{padding:0 14px 20px;gap:16px}
+  .detail-block-title{padding:10px 14px 5px}
+  .detail-block-content{padding:5px 14px 12px;font-size:.88rem}
+  .chart-stock-label{font-size:.85rem}
+}
 @media(max-width:640px){
   .cards-grid{grid-template-columns:1fr}
   .hero-inner{grid-template-columns:1fr}
   .hero-preview{display:none}
-  .tab-btn{padding:0 16px}
+  .tab-btn{padding:0 13px;font-size:.82rem}
+  .filter-divider{display:none}
+  .filter-group{flex-wrap:wrap;gap:6px}
+  .chart-stock-row{flex-direction:column;align-items:stretch}
+  .chart-open-btn{justify-content:center;width:100%;padding:12px}
+  .nav-search input{width:140px}
+  .nav-search input:focus{width:180px}
+  .card-body{padding:10px 14px 12px}
 }
 
 /* CARD */
@@ -122,7 +137,7 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 .difficulty-高階{background:var(--advanced-bg);color:var(--advanced-text);border:1px solid rgba(220,38,38,.22)}
 .card-cat-badge{font-size:.65rem;font-weight:700;color:var(--text-faint);letter-spacing:.08em;text-transform:uppercase;font-family:var(--font-en)}
 
-.card-body{padding:8px 16px 12px}
+.card-body{padding:12px 18px 14px}
 .card-title{font-size:.98rem;font-weight:700;line-height:1.4;margin-bottom:1px;color:var(--text-primary)}
 .card-en{font-size:.7rem;color:var(--text-faint);font-family:var(--font-en);margin-bottom:7px}
 .card-summary{font-size:.83rem;color:var(--text-muted);line-height:1.65;margin-bottom:9px}
@@ -137,15 +152,15 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 .card-expand-btn .arrow{transition:transform .3s cubic-bezier(.4,0,.2,1);display:inline-block}
 .card.expanded .card-expand-btn .arrow{transform:rotate(180deg)}
 .card-detail{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.4,0,.2,1)}
-.card-detail-inner{padding:0 16px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--border)}
+.card-detail-inner{padding:0 20px 24px;display:flex;flex-direction:column;gap:20px;border-top:1px solid var(--border)}
 .detail-block{border-radius:10px;overflow:hidden}
-.detail-block-title{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 12px 3px;display:flex;align-items:center;gap:6px}
-.detail-block-content{padding:3px 12px 10px;font-size:.83rem;line-height:1.75}
+.detail-block-title{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:12px 16px 6px;display:flex;align-items:center;gap:6px}
+.detail-block-content{padding:6px 16px 14px;font-size:.92rem;line-height:1.88}
 .block-keypoints{background:var(--accent-dim);border:1px solid var(--accent-border)}
 .block-keypoints .detail-block-title{color:var(--color-primary)}
 .block-keypoints .detail-block-content{color:var(--text-secondary)}
-.block-keypoints ul{padding-left:16px}
-.block-keypoints li{margin-bottom:5px}
+.block-keypoints ul{padding-left:18px}
+.block-keypoints li{margin-bottom:10px}
 .block-keypoints li::marker{color:var(--color-primary)}
 .block-example{background:#fff;border:1px solid var(--border);border-left:3px solid var(--color-primary)}
 .block-example .detail-block-title{color:var(--color-primary)}
@@ -161,11 +176,11 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 /* CHART BLOCK */
 .block-chart{background:rgba(29,78,216,.04);border:1px solid rgba(29,78,216,.15)}
 .block-chart .detail-block-title{color:var(--color-primary)}
-.chart-frame-wrap{border-radius:8px;overflow:hidden;height:280px;background:var(--bg-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative}
-.chart-frame-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
-.chart-ph{color:var(--text-faint);font-size:.8rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
-.chart-ph svg{opacity:.3;width:28px;height:28px}
-.chart-note{font-size:.75rem;color:var(--text-muted);margin-top:7px;padding-left:2px}
+.chart-stock-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chart-stock-label{color:var(--text-secondary);font-size:.9rem;flex:1;min-width:160px;line-height:1.55}
+.chart-open-btn{display:inline-flex;align-items:center;gap:7px;background:var(--color-primary);color:#fff;padding:10px 22px;border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:background .15s;flex-shrink:0}
+.chart-open-btn:hover{background:var(--color-primary-light)}
+.chart-note{font-size:.78rem;color:var(--text-muted);margin-top:11px;line-height:1.7;border-top:1px solid rgba(29,78,216,.1);padding-top:9px}
 
 /* FOOTER */
 .footer{background:var(--bg-inset);border-top:1px solid var(--border);padding:40px 24px;text-align:center;color:var(--text-muted)}
@@ -235,17 +250,17 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
   <div class="filter-group">
     <span class="filter-label">方向：</span>
     <button class="filter-btn bull-btn active-bull" data-dir="all" onclick="filterDir('all',this)">全部</button>
-    <button class="filter-btn bull-btn" data-dir="true" onclick="filterDir('true',this)">🟢 看漲</button>
-    <button class="filter-btn bear-btn" data-dir="false" onclick="filterDir('false',this)">🔴 看跌</button>
-    <button class="filter-btn neutral-btn" data-dir="null" onclick="filterDir('null',this)">⚪ 中性</button>
+    <button class="filter-btn bull-btn" data-dir="true" onclick="filterDir('true',this)">看漲</button>
+    <button class="filter-btn bear-btn" data-dir="false" onclick="filterDir('false',this)">看跌</button>
+    <button class="filter-btn neutral-btn" data-dir="null" onclick="filterDir('null',this)">中性</button>
   </div>
   <div class="filter-divider"></div>
   <div class="filter-group">
     <span class="filter-label">難度：</span>
     <button class="filter-btn diff-btn active-diff" data-diff="all" onclick="filterDiff('all',this)">全部</button>
-    <button class="filter-btn diff-btn" data-diff="入門" onclick="filterDiff('入門',this)">🟢 入門</button>
-    <button class="filter-btn diff-btn" data-diff="進階" onclick="filterDiff('進階',this)">🟡 進階</button>
-    <button class="filter-btn diff-btn" data-diff="高階" onclick="filterDiff('高階',this)">🔴 高階</button>
+    <button class="filter-btn diff-btn" data-diff="入門" onclick="filterDiff('入門',this)">入門</button>
+    <button class="filter-btn diff-btn" data-diff="進階" onclick="filterDiff('進階',this)">進階</button>
+    <button class="filter-btn diff-btn" data-diff="高階" onclick="filterDiff('高階',this)">高階</button>
   </div>
 </div>
 
@@ -947,9 +962,9 @@ const CAT_LABEL = {single:'單K',double:'雙K',triple:'三K',special:'特殊',co
 
 // ─── DIRECTION BADGE ───────────────────────────────────────────────────
 function dirBadge(bullish) {
-  if (bullish === true)  return '<span class="dir-badge dir-bull">🟢 看漲</span>';
-  if (bullish === false) return '<span class="dir-badge dir-bear">🔴 看跌</span>';
-  return '<span class="dir-badge dir-neutral">⚪ 中性</span>';
+  if (bullish === true)  return '<span class="dir-badge dir-bull">看漲</span>';
+  if (bullish === false) return '<span class="dir-badge dir-bear">看跌</span>';
+  return '<span class="dir-badge dir-neutral">中性</span>';
 }
 
 // ─── RENDER CARD ──────────────────────────────────────────────────────
@@ -979,28 +994,29 @@ function renderCard(p) {
   <div class="card-detail" id="detail-${p.id}">
     <div class="card-detail-inner">
       <div class="detail-block block-chart">
-        <div class="detail-block-title">📈 台股對照圖表（TradingView）</div>
+        <div class="detail-block-title">台股對照圖表</div>
         <div class="detail-block-content">
-          <div class="chart-frame-wrap" id="chart-${p.id}">
-            <div class="chart-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>展開後自動載入即時圖表</div>
+          <div class="chart-stock-row">
+            <span class="chart-stock-label">${(CHART_SYMBOLS[p.id]||{n:'參考台灣加權指數走勢'}).n}</span>
+            <a href="https://tw.tradingview.com/chart/?symbol=${encodeURIComponent((CHART_SYMBOLS[p.id]||{s:'TWSE:0050'}).s)}" target="_blank" rel="noopener" class="chart-open-btn">開啟即時圖表 →</a>
           </div>
-          <p class="chart-note">${(CHART_SYMBOLS[p.id]||{n:''}).n}</p>
+          <p class="chart-note">在 TradingView 選擇日線，尋找此股票在下跌 / 上漲趨勢中曾出現此型態的位置，並觀察量能變化。</p>
         </div>
       </div>
       <div class="detail-block block-keypoints">
-        <div class="detail-block-title">📌 判讀重點</div>
+        <div class="detail-block-title">判讀重點</div>
         <div class="detail-block-content"><ul>${p.points.map(pt=>`<li>${pt}</li>`).join('')}</ul></div>
       </div>
       <div class="detail-block block-example">
-        <div class="detail-block-title">📖 台股實例</div>
+        <div class="detail-block-title">台股實例</div>
         <div class="detail-block-content">${p.example}</div>
       </div>
       <div class="detail-block block-tip">
-        <div class="detail-block-title">💡 操作技巧</div>
+        <div class="detail-block-title">操作技巧</div>
         <div class="detail-block-content">${p.tip}</div>
       </div>
       <div class="detail-block block-indicator">
-        <div class="detail-block-title">🔧 建議搭配指標</div>
+        <div class="detail-block-title">建議搭配指標</div>
         <div class="detail-block-content">${indHtml}</div>
       </div>
     </div>
@@ -1086,25 +1102,7 @@ function toggleCard(id) {
   if (card.classList.contains('expanded')) {
     collapseCard(id);
   } else {
-    // Lazy-load TradingView chart iframe on first expand
-    const chartWrap = document.getElementById('chart-' + id);
-    if (chartWrap && !chartWrap.querySelector('iframe')) {
-      const cs = CHART_SYMBOLS[id];
-      if (cs) {
-        const src = 'https://s.tradingview.com/widgetembed/?symbol=' + encodeURIComponent(cs.s) +
-          '&interval=D&theme=light&style=1&locale=zh_TW' +
-          '&hide_top_toolbar=0&hide_side_toolbar=1&allow_symbol_change=0&toolbar_bg=f1f3f6';
-        const ifr = document.createElement('iframe');
-        ifr.src = src;
-        ifr.setAttribute('frameborder', '0');
-        ifr.setAttribute('allowtransparency', 'true');
-        ifr.setAttribute('scrolling', 'no');
-        ifr.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0';
-        chartWrap.innerHTML = '';
-        chartWrap.appendChild(ifr);
-      }
-    }
-    detail.style.maxHeight = '1400px';
+    detail.style.maxHeight = detail.scrollHeight + 'px';
     card.classList.add('expanded');
     card.querySelector('.expand-label').textContent = '收合詳情';
     expandedCard = id;
