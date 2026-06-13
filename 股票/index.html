@@ -478,8 +478,6 @@ a { color: inherit; text-decoration: none; }
     <span class="nav-logo-text"><strong>股學</strong>筆記</span>
   </a>
   <div class="nav-spacer"></div>
-  <a href="candlestick-patterns.html" class="nav-link-btn">📊 K線型態圖鑑</a>
-  <a href="futures-course.html" class="nav-link-btn" style="background:#059669;color:#fff;margin-left:6px">📈 期貨課程</a>
   <span id="search-count"></span>
   <div class="nav-search">
     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -495,16 +493,23 @@ a { color: inherit; text-decoration: none; }
     <!-- 股票 -->
     <div class="gnav-group" id="gnav-stocks">
       <button class="gnav-btn active" onclick="toggleDrop('stocks')">
-        📈 股票 <span class="gnav-sub" id="sub-stocks">全部</span> <span class="gnav-arrow">▾</span>
+        📈 股票 <span class="gnav-sub" id="sub-stocks">技術</span> <span class="gnav-arrow">▾</span>
       </button>
       <div class="gnav-drop">
-        <button class="gnav-item cur" onclick="switchTab('all');closeDrop('stocks')">全部</button>
-        <button class="gnav-item" onclick="switchTab('technical');closeDrop('stocks')">技術</button>
+        <button class="gnav-item cur" onclick="switchTab('technical');closeDrop('stocks')">技術</button>
         <button class="gnav-item" onclick="switchTab('fundamental');closeDrop('stocks')">基本</button>
         <button class="gnav-item" onclick="switchTab('chip');closeDrop('stocks')">籌碼</button>
         <button class="gnav-item" onclick="switchTab('news');closeDrop('stocks')">消息</button>
-        <a class="gnav-item" href="stock-glossary.html">📖 股票字典</a>
-        <a class="gnav-item" href="stock-course.html">📚 台股完整課程</a>
+      </div>
+    </div>
+    <!-- 期貨 -->
+    <div class="gnav-group" id="gnav-futures">
+      <button class="gnav-btn" onclick="toggleDrop('futures-nav')">
+        📉 期貨 <span class="gnav-sub" id="sub-futures">台股</span> <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <button class="gnav-item cur" onclick="switchFutures('tw');closeDrop('futures-nav')">台股期貨</button>
+        <button class="gnav-item" onclick="switchFutures('us');closeDrop('futures-nav')">美股期貨</button>
       </div>
     </div>
     <!-- 圖鑑 -->
@@ -521,17 +526,26 @@ a { color: inherit; text-decoration: none; }
         <a class="gnav-item" href="candlestick-patterns.html?cat=combo">組合型態</a>
       </div>
     </div>
-    <!-- 期貨 -->
-    <div class="gnav-group" id="gnav-futures">
-      <button class="gnav-btn" onclick="toggleDrop('futures-nav')">
-        📉 期貨 <span class="gnav-arrow">▾</span>
+    <!-- 課程 -->
+    <div class="gnav-group" id="gnav-courses">
+      <button class="gnav-btn" onclick="toggleDrop('courses')">
+        📚 課程 <span class="gnav-arrow">▾</span>
       </button>
       <div class="gnav-drop">
-        <button class="gnav-item" onclick="switchTab('futures');closeDrop('futures-nav')">期貨卡片</button>
+        <a class="gnav-item" href="stock-course.html">台股課程</a>
         <a class="gnav-item" href="futures-course.html">台指期課程</a>
-        <a class="gnav-item" href="us-futures-course.html">TOPSTEP課程</a>
         <a class="gnav-item" href="us-futures-course.html">美股期貨課程</a>
-        <a class="gnav-item" href="futures-glossary.html">📖 期貨字典</a>
+      </div>
+    </div>
+    <!-- 專有名詞及策略 -->
+    <div class="gnav-group" id="gnav-glossary">
+      <button class="gnav-btn" onclick="toggleDrop('glossary')">
+        📖 名詞及策略 <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <a class="gnav-item" href="stock-glossary.html">股票專有名詞</a>
+        <a class="gnav-item" href="futures-glossary.html">期貨專有名詞</a>
+        <a class="gnav-item" href="strategy-glossary.html">技術分析策略</a>
       </div>
     </div>
   </div>
@@ -997,11 +1011,39 @@ const DATA = [
        formula:"同等市場暴露度持有3個月的成本比較（追蹤台股100萬元部位）：\n\n期貨（大台多單）：\n  使用資金：184,000元（保證金）\n  換倉成本：30點×200元×3次 = 18,000元\n  手續費：~1,200元\n  合計隱性成本：~19,200元\n\nETF（買0050）：\n  使用資金：1,000,000元\n  買賣手續費：~1,430元（來回0.1425%）\n  合計成本：~1,430元\n\n結論：期貨資金效率高，但持有成本高出13倍\n（期貨適合槓桿增益，ETF適合低成本長持）",
        example:"2023年台股全年漲43%（14,000→20,000點）：①買入0050 ETF 100萬元 → 年底約獲利43萬；②投入184,000元保證金買大台波段多單，換倉成本7.2萬，獲利6,000點×200元 = 120萬，淨獲利約113萬，槓桿貢獻巨大。但反例：2022年台股跌29%，ETF虧損29%可繼續持有等反彈；期貨多單若未嚴格停損，可能在大跌中爆倉負債，兩者風險性質截然不同。",
        tip:"最佳實戰組合：以ETF（0050或006208）做長期核心持倉（70–80%資金），用期貨做戰術加減碼（10–20%資金）。多頭確立時用小台加倉放大報酬；看跌時賣台指期對沖ETF部位。既享受長期複利，又有期貨靈活性，這是機構常用的「核心 + 衛星」配置策略。"}
+      ,{id:"us-es-nq",title:"ES / NQ 合約規格完整解析",en:"E-mini S&P 500 & NASDAQ-100 Futures Specs",diff:"入門",mkt:"us",
+       tags:["ES","NQ","MES","MNQ","S&P500","NASDAQ","CME","合約規格"],
+       summary:"ES（E-mini S&P 500）和NQ（E-mini NASDAQ-100）是全球流動性最高的股票指數期貨，微型合約MES/MNQ讓散戶也能以低資金參與美股。",
+       points:["ES（E-mini S&P500）：每點$50，最小跳動0.25點=$12.5，保證金約$14,000/口，日均成交量超過100萬口，是全球流動性之王","NQ（E-mini NASDAQ-100）：每點$20，最小跳動0.25點=$5，保證金約$21,000/口，科技股集中，波動比ES大30~50%","MES（Micro E-mini S&P500）：ES的1/10合約，每點$5，保證金約$1,400/口，適合初學者和小資金練習","MNQ（Micro NASDAQ-100）：NQ的1/10合約，每點$2，保證金約$2,100/口，日均波動100~200點=賺虧$200~400","交易時間（台灣時間）：日盤6:00~次日5:00（近24小時），美股開盤時段22:30~次日5:00最活躍、點差最小","結算方式：每季最後一個月（3/6/9/12月）第三個週五現金結算，通常在到期前換倉至下季合約"],
+       formula:"ES合約損益計算：\n1口ES，從4,500點漲至4,520點（+20點）\n獲利 = 20點 × $50 = +$1,000\n\n1口MES同樣走勢：\n獲利 = 20點 × $5 = +$100\n\nNQ合約損益計算：\n1口NQ，從15,000點跌至14,950點（-50點）\n虧損 = 50點 × $20 = -$1,000\n\n1口MNQ同樣走勢：\n虧損 = 50點 × $2 = -$100",
+       example:"2024年NVIDIA財報後AI熱潮，NQ單日上漲350點，持有1口NQ多單獲利350×$20=$7,000；持有1口MNQ獲利350×$2=$700。若用台灣帳戶（Interactive Brokers）操作MNQ，以台幣計算，$700×32=22,400元台幣，相當於一週台指期小台的波段獲利。",
+       tip:"新手從MES/MNQ開始，不要直接做ES/NQ。原因：ES和NQ一個點差就是數百美元，帳戶100萬台幣（約$30,000）交易1口ES，槓桿僅2倍，但心理壓力巨大。MES/MNQ每點只有$5/$2，在真實市場感受波動，練習到穩定獲利後再升級合約。"},
+      {id:"us-futures-hours",title:"美股期貨最佳交易時段",en:"US Futures Optimal Trading Sessions",diff:"進階",mkt:"us",
+       tags:["交易時段","美股開盤","CPI","Fed","夜盤","波動","流動性"],
+       summary:"美股期貨近24小時交易，但不同時段的流動性和波動截然不同——找對時段，才能在最有利的條件下交易。",
+       points:["亞洲時段（台灣6:00-21:00）：流動性低、點差大、常有假突破，不建議主動交易，適合觀察和做計畫","歐洲開盤（台灣15:30-17:00）：英德法股市開盤，帶動美股期貨量能回升，常出現第一波趨勢方向","美股開盤（台灣22:30-0:30）：全天流動性最高峰，點差最小，主力資金進場。開盤前30分鐘是最危險也最機會的時段","財報/數據發布（不固定）：CPI、FOMC會議紀錄、非農就業等數據發布前後，ES/NQ可單日波動200-500點","美股收盤（台灣4:00-5:00）：基金調倉尾盤，常出現拉高或打壓，隔日可能反轉","CME Globex盤中休市：美東時間5:00 PM–6:00 PM（台灣6:00-7:00）每日休市1小時，注意跳空缺口"],
+       formula:"最佳交易時窗（台灣時間）：\n\n優先時段：22:30-00:30（美股開盤後1.5小時）\n  → 流動性最佳，趨勢最清晰\n\n次選時段：15:30-17:00（歐洲開盤）\n  → 第一波波動，可抓小波段\n\n避開時段：6:00-15:00（亞洲低流動性）\n  → 假突破多，點差大，滑價嚴重",
+       example:"2024年3月CPI數據發布（台灣時間21:30），通膨高於預期，ES單根1分鐘K線下跌80點（=每口虧損$4,000），10分鐘後反彈60點。若在數據前持有多單，停損不及可能一次虧損4,000-5,000美元。原則：重大數據發布前30分鐘平倉，等數據塵埃落定後再找方向，不做猜方向的賭注。",
+       tip:"建議台灣交易者的作息：白天工作，晚上10:30~12:30專注交易2小時（美股最活躍時段），完成後收盤離場。不要整晚盯著盤，疲勞交易是最大虧損來源。只在這個最有利的時窗操作，其他時間休息。"},
+      {id:"us-prop-firm",title:"Prop Firm挑戰：TOPSTEP完整攻略",en:"Proprietary Trading Firm: TOPSTEP Full Guide",diff:"進階",mkt:"us",
+       tags:["TOPSTEP","Prop Firm","評估帳戶","損益目標","日虧損限制","一致性規則"],
+       summary:"Prop Firm讓你用公司資金交易——通過評估後可操作$50K~$150K美元帳戶，利潤分享80~90%，是低自有資金啟動交易事業的最佳途徑。",
+       points:["TOPSTEP評估流程：用模擬帳戶（Trading Combine）達成盈利目標（$50K帳戶需賺$3,000），同時不能觸犯最大日虧損($1,000)和總回撤($2,000)限制","通過評估後，獲得Funded Account（真實資金帳戶），初始規模$50K/$100K/$150K，可操作ES/NQ/MES/MNQ/YM/RTY","利潤分成：前$10,000利潤你拿90%，之後拿80%；TOPSTEP收取10-20%。月提款，最低提款$200","最重要的一致性規則：單日獲利不能超過總盈利目標的30%——這防止僥倖大勝通過評估","常見違規：不能持倉過新聞（CPI、FOMC、非農）；達成盈利目標當日必須停止交易（防過度交易）","除TOPSTEP外的主要Prop Firm：Apex Trader Funding（費用較低）、Earn2Trade、MyFundedFutures（MFF），各有不同規則"],
+       formula:"TOPSTEP $50K評估帳戶規則：\n初始餘額：$50,000（模擬）\n盈利目標：+$3,000（達到$53,000）\n最大日虧損：-$1,000（不可超過）\n最大總回撤：-$2,000（帳戶不可低於$48,000）\n\n一致性規則：\n若已累積獲利$3,000，最後一天（D-Day）\n任何一天的獲利不能 > $3,000 × 30% = $900\n\nFunded Account利潤分成：\n你的獲利$10,000 → 你拿$9,000（90%）",
+       example:"實際案例：台灣交易者A，花費$165美元買TOPSTEP $50K評估帳戶。用MNQ交易，花了3週，每天平均盈利$100~150，總共賺$3,200（超過$3,000目標）。注意控制日虧損在$500以內（遠低於$1,000限制），通過評估後取得$50K真實帳戶。第一個月Funded帳戶獲利$1,800，實際提款$1,620（90%），換算台幣約52,000元，成本僅$165（約$5,400台幣）。",
+       tip:"新手通過TOPSTEP最高效的策略：① 每天只交易1~2口MNQ，目標每天$100，② 若虧損達$400即停止當天操作（遠低於$1,000日限），③ 不交易CPI/FOMC等重大數據，④ 盈利目標達成後立即申請Funded，不要再交易額外的天數（避免意外違規）。紀律比技術更重要。"},
+      {id:"us-futures-risk",title:"美股期貨風險管理：保命第一",en:"US Futures Risk Management: Survival First",diff:"進階",mkt:"us",
+       tags:["風險管理","停損","每日最大虧損","過夜風險","跳空","波動率","VIX"],
+       summary:"美股期貨的波動是台指期的3~5倍，適用不同的風險框架——沒有針對性的風控，技術再好也會爆倉。",
+       points:["每日最大虧損上限（Hard Stop）：帳戶的1.5~2%，或固定美元金額（如$300/天）。觸及即完全停止交易，不找回今天的虧損","單筆交易最大虧損：帳戶的0.5~1%。$30,000帳戶做MNQ，每筆最多虧損$150~300，換算點數=75~150點","過夜持倉的跳空風險：美股新聞24小時發生，夜間跳空100~200點很常見，不建議初學者過夜持倉","VIX（恐慌指數）> 25時：ES/NQ波動暴增，原本50點停損可能被跳過，考慮縮小部位或不交易","最危險的三個場景：① 美聯儲FOMC聲明 ② 非農就業報告 ③ 財報季大型科技股（NVDA、AAPL、TSLA），這些時間前必須平倉","資金分配：操作美股期貨的資金不超過總投資組合的20%。以$100,000台幣為例，只放$20,000入期貨帳戶，大部分留ETF"],
+       formula:"美股期貨每日風控計算（$30,000帳戶，MNQ）：\n\n每日最大虧損：$30,000 × 2% = $600\nMNQ每點$2 → 最多虧損 $600/$2 = 300點\n\n單筆停損：$30,000 × 0.5% = $150 = 75點\n\nVIX校正（VIX>25時縮小50%）：\n單筆停損縮至 75 × 50% = 37~38點\n\n建議倉位（正常市況）：1~2口MNQ\n每點$2，75點停損 = $150/筆",
+       example:"2024年8月日本央行升息衝擊，全球股市單日暴跌，NQ單日下跌1,200點（每口MNQ虧損$2,400）。若沒有日虧損停止機制，一個帳戶可能在一天內被清空。當天VIX飆升到65，是正常值的三倍。有經驗的交易者在VIX > 30後完全停止交易，保住帳戶等市場恢復正常後再進場。",
+       tip:"最重要的美股期貨生存法則：永遠設定真實的停損單（非心理停損）。ES/NQ移動速度極快，市場恐慌時一根蠟燭可以跌200點，心理停損根本來不及執行。在開倉的同時，立刻掛出停損單，這是比任何技術分析都重要的基本功。"}
     ]
   }
 ];
 
-let currentSection = 'all';
+let currentSection = 'technical';
 let currentDiff = 'all';
 let searchTerm = '';
 let expandedCard = null;
@@ -1054,6 +1096,14 @@ function getSection(id) {
     return { id:'all', title:'全部', icon:'🗂', accent:'var(--accent)', kpBg:'rgba(59,130,246,.06)', kpBorder:'rgba(59,130,246,.18)',
       cards: DATA.reduce((acc,s) => acc.concat(s.cards.map(c=>({...c,_sec:s}))), []) };
   }
+  if (id === 'futures-tw') {
+    const s = DATA.find(s=>s.id==='futures');
+    return {...s, id:'futures-tw', cards: s.cards.filter(c=>c.mkt!=='us')};
+  }
+  if (id === 'futures-us') {
+    const s = DATA.find(s=>s.id==='futures');
+    return {...s, id:'futures-us', cards: s.cards.filter(c=>c.mkt==='us')};
+  }
   return DATA.find(s => s.id === id);
 }
 
@@ -1072,20 +1122,38 @@ function renderSection(sectionId) {
 function switchTab(id) {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
   currentSection = id;
-  const labels = {all:'全部', technical:'技術', fundamental:'基本', chip:'籌碼', news:'消息', futures:'期貨'};
+  const labels = {all:'全部', technical:'技術', fundamental:'基本', chip:'籌碼', news:'消息'};
   const subEl = document.getElementById('sub-stocks');
-  if (subEl) subEl.textContent = labels[id] || '全部';
+  if (subEl) subEl.textContent = labels[id] || '技術';
   document.querySelectorAll('#gnav-stocks .gnav-item').forEach(b => {
-    b.classList.toggle('cur', b.textContent.trim() === (labels[id] || '全部'));
+    b.classList.toggle('cur', b.textContent.trim() === (labels[id] || '技術'));
   });
+  document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.add('active');
+  document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.remove('active');
+  renderSection(id);
+  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function switchFutures(mkt) {
+  if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  const id = mkt === 'us' ? 'futures-us' : 'futures-tw';
+  currentSection = id;
+  const subEl = document.getElementById('sub-futures');
+  if (subEl) subEl.textContent = mkt === 'us' ? '美股' : '台股';
+  document.querySelectorAll('#gnav-futures .gnav-item').forEach(b => {
+    b.classList.toggle('cur', (mkt === 'us' && b.textContent.trim() === '美股期貨') || (mkt === 'tw' && b.textContent.trim() === '台股期貨'));
+  });
+  document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.add('active');
+  document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.remove('active');
   renderSection(id);
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function toggleDrop(id) {
-  const groups = ['stocks', 'chart', 'futures-nav'];
+  const groups = ['stocks', 'futures-nav', 'chart', 'courses', 'glossary'];
   groups.forEach(g => {
-    const el = document.getElementById('gnav-' + (g === 'futures-nav' ? 'futures' : g));
+    const elId = 'gnav-' + (g === 'futures-nav' ? 'futures' : g);
+    const el = document.getElementById(elId);
     if (!el) return;
     if (g === id) el.classList.toggle('open');
     else el.classList.remove('open');
@@ -1093,13 +1161,14 @@ function toggleDrop(id) {
 }
 
 function closeDrop(id) {
-  const el = document.getElementById('gnav-' + (id === 'futures-nav' ? 'futures' : (id || 'stocks')));
+  const map = {'stocks':'stocks','futures-nav':'futures','chart':'chart','courses':'courses','glossary':'glossary'};
+  const el = document.getElementById('gnav-' + (map[id] || id));
   if (el) el.classList.remove('open');
 }
 
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.gnav-group')) {
-    ['stocks','chart','futures'].forEach(g => {
+    ['stocks','futures','chart','courses','glossary'].forEach(g => {
       const el = document.getElementById('gnav-' + g);
       if (el) el.classList.remove('open');
     });
@@ -1200,7 +1269,7 @@ document.getElementById('search-input').addEventListener('input', function() {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderSection('all');
+  renderSection('technical');
 });
 
 window.addEventListener('resize', updateTabIndicator);
