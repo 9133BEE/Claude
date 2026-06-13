@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技術分析策略 — 股學筆記</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#161b22;--bg2:#0d1117;--card:#21262d;--border:#30363d;--border2:#21262d;--text:#e6edf3;--text2:#c9d1d9;--text3:#8b949e;--text4:#484f58;--accent:#f59e0b;--accent2:#fbbf24;--green:#3fb950;--green2:#238636;--red:#f85149;--purple:#a78bfa;--blue:#58a6ff}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.75}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+.topnav{background:var(--bg2);border-bottom:1px solid var(--border2);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.back-btn{color:var(--text3);font-size:.82rem;display:flex;align-items:center;gap:4px;transition:color .15s}
+.back-btn:hover{color:var(--text)}
+.nav-title{font-size:.95rem;font-weight:700;color:var(--text)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,rgba(245,158,11,.06) 0%,transparent 60%);border-bottom:1px solid var(--border2);padding:36px 24px 28px;text-align:center}
+.hero h1{font-size:1.8rem;font-weight:800;color:var(--text);margin-bottom:8px}
+.hero p{color:var(--text3);font-size:.95rem;max-width:560px;margin:0 auto 20px}
+
+/* SEARCH */
+.search-wrap{max-width:460px;margin:0 auto;position:relative}
+.search-wrap input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 16px 11px 40px;color:var(--text);font-size:.9rem;font-family:inherit;outline:none;transition:border-color .15s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--text4)}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text4);width:16px;height:16px}
+
+/* FILTER */
+.filter-bar{display:flex;gap:8px;justify-content:center;padding:20px 24px 0;flex-wrap:wrap}
+.flt-btn{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:20px;font-size:.82rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.flt-btn:hover{border-color:var(--accent);color:var(--accent2)}
+.flt-btn.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:var(--accent2);font-weight:600}
+
+/* MAIN GRID */
+.container{max-width:960px;margin:0 auto;padding:28px 20px 80px}
+.count-label{color:var(--text4);font-size:.78rem;margin-bottom:18px;text-align:right}
+
+/* STRATEGY CARD */
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:20px;overflow:hidden;transition:border-color .2s}
+.sc:hover{border-color:var(--accent)}
+.sc.hidden{display:none}
+.sc-head{padding:22px 24px 0;display:flex;align-items:flex-start;gap:14px;cursor:pointer}
+.sc-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}
+.sc-meta{flex:1}
+.sc-badges{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:12px;letter-spacing:.04em;text-transform:uppercase}
+.badge-theory{background:rgba(88,166,255,.12);color:var(--blue);border:1px solid rgba(88,166,255,.25)}
+.badge-indicator{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.25)}
+.badge-pattern{background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.25)}
+.badge-foundation{background:rgba(245,158,11,.12);color:var(--accent2);border:1px solid rgba(245,158,11,.25)}
+.badge-hot{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.sc-name{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:3px}
+.sc-en{color:var(--text3);font-size:.8rem}
+.sc-short{color:var(--text2);font-size:.88rem;line-height:1.7;padding:10px 24px 16px 60px}
+.sc-body{padding:0 24px 24px;border-top:1px solid var(--border2);margin-top:16px}
+.sc-body.collapsed{display:none}
+
+/* DIAGRAM */
+.diag{background:#f6f8fa;border-radius:10px;padding:18px;margin:18px 0;border:1px solid #d0d7de;text-align:center;overflow-x:auto}
+.diag svg{max-width:100%;display:block;margin:0 auto}
+.diag-cap{color:#57606a;font-size:.74rem;margin-top:8px;text-align:center}
+
+/* CONTENT BLOCKS */
+.blk{margin-top:18px}
+.blk-title{font-size:.72rem;font-weight:700;color:var(--text4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.blk-title::after{content:'';flex:1;height:1px;background:var(--border2)}
+.blk p{color:var(--text2);font-size:.9rem;line-height:1.85;margin-bottom:10px}
+.blk ul,.blk ol{padding-left:20px;color:var(--text2);font-size:.9rem}
+.blk li{margin-bottom:6px;line-height:1.75}
+.hl{background:rgba(245,158,11,.07);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:11px 14px;margin:10px 0;color:#fde68a;font-size:.88rem}
+.hl b{display:block;color:var(--accent2);margin-bottom:3px;font-size:.82rem}
+.eg{background:rgba(35,134,54,.07);border-left:3px solid var(--green2);border-radius:0 6px 6px 0;padding:11px 14px;margin:10px 0;color:#7ee787;font-size:.88rem}
+.eg b{display:block;color:var(--green);margin-bottom:3px;font-size:.82rem}
+.warn{background:rgba(248,81,73,.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:11px 14px;margin:10px 0;color:#ffa198;font-size:.88rem}
+.warn b{display:block;color:var(--red);margin-bottom:3px;font-size:.82rem}
+.pro{background:rgba(167,139,250,.07);border-left:3px solid var(--purple);border-radius:0 6px 6px 0;padding:11px 14px;margin:10px 0;color:#c4b5fd;font-size:.88rem}
+.pro b{display:block;color:var(--purple);margin-bottom:3px;font-size:.82rem}
+
+/* CHECKLIST */
+.checklist{list-style:none;padding:0;display:grid;gap:6px}
+.checklist li{display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:.88rem;line-height:1.6}
+.checklist li::before{content:'□';color:var(--accent);font-size:1rem;flex-shrink:0;margin-top:1px}
+.checklist li.pass::before{content:'✓';color:var(--green)}
+.checklist li.fail::before{content:'✗';color:var(--red)}
+
+/* TWO-COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+
+.mini-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.mini-card h4{font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.mini-card p,.mini-card li{color:var(--text3);font-size:.82rem;line-height:1.65}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+.tbl th{background:var(--bg2);color:var(--text);padding:9px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border);font-size:.78rem}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border2);color:var(--text2);vertical-align:top}
+.tbl tr:hover td{background:rgba(255,255,255,.015)}
+
+/* TOGGLE */
+.toggle-btn{display:flex;align-items:center;gap:6px;color:var(--text3);font-size:.8rem;cursor:pointer;padding:10px 24px 14px;user-select:none}
+.toggle-btn:hover{color:var(--accent2)}
+.toggle-arrow{transition:transform .2s;display:inline-block}
+.sc.open .toggle-arrow{transform:rotate(90deg)}
+
+@media(max-width:640px){
+  .sc-head{padding:18px 16px 0}
+  .sc-short{padding-left:16px}
+  .sc-body{padding:0 16px 20px}
+  .hero h1{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="back-btn" href="index.html">← 返回股學筆記</a>
+  <span class="nav-title">📐 技術分析策略</span>
+</nav>
+
+<div class="hero">
+  <h1>📐 技術分析策略大全</h1>
+  <p>從道氏理論到型態辨識，每個策略附上判斷步驟與圖例，讓你看圖就會</p>
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="searchInput" placeholder="搜尋策略、指標、型態…" autocomplete="off">
+  </div>
+</div>
+
+<div class="filter-bar">
+  <button class="flt-btn active" onclick="filter('all',this)">全部</button>
+  <button class="flt-btn" onclick="filter('theory',this)">核心理論</button>
+  <button class="flt-btn" onclick="filter('indicator',this)">技術指標</button>
+  <button class="flt-btn" onclick="filter('pattern',this)">型態辨識</button>
+  <button class="flt-btn" onclick="filter('foundation',this)">基礎工具</button>
+</div>
+
+<div class="container">
+<div class="count-label" id="countLabel"></div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 1. 道氏理論 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc open" data-cat="theory" data-keywords="道氏理論 dow theory 趨勢 高點 低點 確認">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">📉</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-theory">核心理論</span></div>
+      <div class="sc-name">道氏理論</div>
+      <div class="sc-en">Dow Theory</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">所有技術分析的根基——趨勢的定義、多空轉折的判斷，都源自查爾斯·道的六大原則。</div>
+  <div class="sc-body">
+    <div class="diag">
+      <svg viewBox="0 0 580 140" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="140" fill="#f8fafc" rx="8"/>
+        <text x="140" y="16" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">多頭趨勢：高點越來越高，低點越來越高</text>
+        <polyline points="15,120 60,95 90,105 140,70 175,82 230,48 265,60 320,28 355,42 400,18" stroke="#dc2626" stroke-width="2.5" fill="none"/>
+        <circle cx="60" cy="95" r="4" fill="#dc2626"/>
+        <circle cx="140" cy="70" r="4" fill="#dc2626"/>
+        <circle cx="230" cy="48" r="4" fill="#dc2626"/>
+        <circle cx="90" cy="105" r="4" fill="#166534"/>
+        <circle cx="175" cy="82" r="4" fill="#166534"/>
+        <circle cx="265" cy="60" r="4" fill="#166534"/>
+        <text x="62" y="88" fill="#dc2626" font-size="8">H1</text>
+        <text x="142" y="63" fill="#dc2626" font-size="8">H2↑</text>
+        <text x="232" y="41" fill="#dc2626" font-size="8">H3↑</text>
+        <text x="68" y="118" fill="#166534" font-size="8">L1</text>
+        <text x="153" y="95" fill="#166534" font-size="8">L2↑</text>
+        <text x="243" y="73" fill="#166534" font-size="8">L3↑</text>
+        <rect x="410" y="10" width="160" height="120" fill="#fff" stroke="#e2e8f0" rx="6" stroke-width="1"/>
+        <text x="490" y="28" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">趨勢轉折訊號</text>
+        <text x="420" y="46" fill="#dc2626" font-size="9">⚠️ 多→空：低點被跌破</text>
+        <text x="420" y="62" fill="#374151" font-size="8">前低被破 = 多頭結束</text>
+        <text x="420" y="82" fill="#166534" font-size="9">⚠️ 空→多：高點被突破</text>
+        <text x="420" y="98" fill="#374151" font-size="8">前高被突破 = 空頭結束</text>
+        <text x="420" y="118" fill="#92400e" font-size="8" font-weight="600">需兩種工具（指數）相互確認</text>
+      </svg>
+      <div class="diag-cap">多頭趨勢：每次回檔的低點（L）都比前一個低點高，每次上漲的高點（H）也持續創高</div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">六大核心原則</div>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>① 市場反映一切</h4>
+          <p>所有已知和可預見的資訊，已全部反映在股價中。分析師的工作是解讀市場，而非預測。</p>
+        </div>
+        <div class="mini-card">
+          <h4>② 趨勢分三類</h4>
+          <p>主要趨勢（月～年）、次要趨勢（週～月，回檔修正）、短期趨勢（日內～週）。</p>
+        </div>
+        <div class="mini-card">
+          <h4>③ 主要趨勢三階段</h4>
+          <p>累積期（主力吸籌）→ 公眾參與期（散戶進場）→ 分配期（主力出貨）。</p>
+        </div>
+        <div class="mini-card">
+          <h4>④ 指數相互確認</h4>
+          <p>台股：加權指數 + 電子類股指數需同步確認，單一指數突破不算有效突破。</p>
+        </div>
+        <div class="mini-card">
+          <h4>⑤ 成交量確認趨勢</h4>
+          <p>量增價漲 = 趨勢確認；量縮價漲 = 趨勢疑問；量增價跌 = 賣壓沉重。</p>
+        </div>
+        <div class="mini-card">
+          <h4>⑥ 趨勢持續直到明確反轉</h4>
+          <p>不要因為「感覺漲太多了」就逆勢做空。趨勢需要明確的技術訊號才算結束。</p>
+        </div>
+      </div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">實戰判斷法</div>
+      <div class="hl"><b>📌 多頭確認條件（三選三）</b>① 價格創近期新高 ② 回檔低點高於前低 ③ 量增配合漲勢。三個全中 = 安心做多。缺其中一個 = 謹慎。</div>
+      <div class="warn"><b>⚠️ 多頭終結訊號</b>前一個重要低點被有效跌破（收盤在低點之下），代表「高點越來越高、低點越來越高」的格局破壞，多頭趨勢宣告終結。</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>收合</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 2. 波浪理論 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="theory" data-keywords="波浪理論 elliott wave 艾略特 推進浪 修正浪 五浪三浪">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🌊</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-theory">核心理論</span></div>
+      <div class="sc-name">艾略特波浪理論</div>
+      <div class="sc-en">Elliott Wave Theory</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">市場按「5浪推進＋3浪修正」的節奏循環——理解波浪，你就能預判當前是趨勢浪還是修正浪。</div>
+  <div class="sc-body collapsed">
+    <div class="diag">
+      <svg viewBox="0 0 580 155" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="155" fill="#f8fafc" rx="8"/>
+        <text x="180" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">推進浪（1-5）+ 修正浪（A-B-C）</text>
+        <polyline points="15,130 70,80 100,100 160,45 195,65 255,20 310,55 355,30 410,65 455,40 520,90" stroke="#374151" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+        <polyline points="15,130 70,80" stroke="#dc2626" stroke-width="2.5" fill="none"/>
+        <polyline points="70,80 100,100" stroke="#64748b" stroke-width="2" fill="none"/>
+        <polyline points="100,100 160,45" stroke="#dc2626" stroke-width="2.5" fill="none"/>
+        <polyline points="160,45 195,65" stroke="#64748b" stroke-width="2" fill="none"/>
+        <polyline points="195,65 255,20" stroke="#dc2626" stroke-width="2.5" fill="none"/>
+        <polyline points="255,20 310,55" stroke="#166534" stroke-width="2.5" fill="none"/>
+        <polyline points="310,55 355,30" stroke="#064e3b" stroke-width="2" stroke-dasharray="4,2" fill="none"/>
+        <polyline points="355,30 410,65" stroke="#166534" stroke-width="2.5" fill="none"/>
+        <text x="43" y="75" fill="#dc2626" font-size="11" font-weight="700">1</text>
+        <text x="85" y="95" fill="#64748b" font-size="11" font-weight="700">2</text>
+        <text x="130" y="40" fill="#dc2626" font-size="11" font-weight="700">3</text>
+        <text x="178" y="60" fill="#64748b" font-size="11" font-weight="700">4</text>
+        <text x="225" y="16" fill="#dc2626" font-size="11" font-weight="700">5</text>
+        <text x="282" y="50" fill="#166534" font-size="11" font-weight="700">A</text>
+        <text x="336" y="26" fill="#064e3b" font-size="11" font-weight="700">B</text>
+        <text x="385" y="60" fill="#166534" font-size="11" font-weight="700">C</text>
+        <rect x="15" y="135" width="240" height="14" fill="#fee2e2" rx="3"/>
+        <text x="135" y="145" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="600">推進浪（與大趨勢同向，做多）</text>
+        <rect x="260" y="135" width="150" height="14" fill="#dcfce7" rx="3"/>
+        <text x="335" y="145" text-anchor="middle" fill="#166534" font-size="9" font-weight="600">修正浪（逆趨勢，避開）</text>
+      </svg>
+      <div class="diag-cap">推進浪1、3、5是做多機會；2、4浪是修正不追高；A、C浪是空頭機會或離場時機</div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">三個不可違反的法則</div>
+      <ul class="checklist">
+        <li class="fail">浪2不能跌破浪1的起點（若跌破，重新數浪）</li>
+        <li class="fail">浪3不能是最短的推進浪（1、3、5中）</li>
+        <li class="fail">浪4不能進入浪1的價格區間（重疊，波浪失效）</li>
+      </ul>
+    </div>
+    <div class="blk">
+      <div class="blk-title">實戰應用</div>
+      <div class="hl"><b>📌 最重要的機會：浪3</b>浪3是推進浪中最強、最長的浪。識別方式：浪2回檔結束（守住浪1起點之上），MACD金叉配合，量能回升 → 這是波浪理論中最高勝率的買點。</div>
+      <div class="pro"><b>💡 數浪困難怎麼辦</b>波浪理論的最大問題是「事後才看清楚」。實際操作建議：只用波浪確認你已知的趨勢方向，不要只靠波浪猜測未來。週線波浪比日線可靠。</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 3. 斐波那契 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="indicator" data-keywords="斐波那契 fibonacci 回撤 黃金比例 0.618 支撐 壓力">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🌀</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-indicator">技術指標</span></div>
+      <div class="sc-name">斐波那契回撤</div>
+      <div class="sc-en">Fibonacci Retracement</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">神奇數字23.6%、38.2%、50%、61.8%是市場最常回撤停留的位置，也是主力最愛設定進出場的關鍵價位。</div>
+  <div class="sc-body collapsed">
+    <div class="diag">
+      <svg viewBox="0 0 580 150" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="150" fill="#f8fafc" rx="8"/>
+        <line x1="60" y1="120" x2="300" y2="20" stroke="#dc2626" stroke-width="2.5"/>
+        <polyline points="300,20 380,65 430,55 480,80 530,45" stroke="#374151" stroke-width="2" fill="none"/>
+        <line x1="40" y1="20" x2="560" y2="20" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,2"/><text x="30" y="23" fill="#dc2626" font-size="9" font-weight="700">0%</text>
+        <line x1="40" y1="44" x2="560" y2="44" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2"/><text x="25" y="47" fill="#f59e0b" font-size="9">23.6%</text>
+        <line x1="40" y1="62" x2="560" y2="62" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/><text x="25" y="65" fill="#3b82f6" font-size="9">38.2%</text>
+        <line x1="40" y1="70" x2="560" y2="70" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,2"/><text x="33" y="73" fill="#8b5cf6" font-size="9">50%</text>
+        <line x1="40" y1="82" x2="560" y2="82" stroke="#059669" stroke-width="2" stroke-dasharray="3,2"/><text x="25" y="85" fill="#059669" font-size="9" font-weight="700">61.8%★</text>
+        <line x1="40" y1="96" x2="560" y2="96" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,2"/><text x="25" y="99" fill="#dc2626" font-size="9">78.6%</text>
+        <line x1="40" y1="120" x2="560" y2="120" stroke="#374151" stroke-width="1" stroke-dasharray="3,2"/><text x="27" y="123" fill="#374151" font-size="9">100%</text>
+        <circle cx="480" cy="80" r="6" fill="#059669" stroke="#fff" stroke-width="1.5"/>
+        <text x="490" y="77" fill="#059669" font-size="8" font-weight="700">回測61.8%後反彈</text>
+        <text x="490" y="87" fill="#059669" font-size="8">最強支撐點</text>
+      </svg>
+      <div class="diag-cap">從低點（100%）到高點（0%）拉斐氏線。回撤到各比例線時觀察是否獲得支撐</div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">五個關鍵比例與意義</div>
+      <table class="tbl">
+        <tr><th>比例</th><th>意義</th><th>操作</th></tr>
+        <tr><td><b>23.6%</b></td><td>強勢回檔，趨勢很強</td><td>可在此加碼，強者恆強</td></tr>
+        <tr><td><b>38.2%</b></td><td>正常健康回檔</td><td>多頭第一個觀察支撐</td></tr>
+        <tr><td><b>50%</b></td><td>心理關卡，半數回吐</td><td>量縮回踩時買入</td></tr>
+        <tr><td><b style="color:#059669">61.8%★</b></td><td>黃金分割，最重要支撐</td><td>最高勝率進場點，跌破才認輸</td></tr>
+        <tr><td><b>78.6%</b></td><td>最後防線</td><td>跌破代表趨勢可能反轉</td></tr>
+      </table>
+    </div>
+    <div class="blk">
+      <div class="blk-title">正確操作方式</div>
+      <div class="hl"><b>📌 斐氏線怎麼畫</b>上漲趨勢：從最低點拉到最高點。下跌趨勢：從最高點拉到最低點。台股常用「波段低點→波段高點」，不要用日內高低點，要用週線或月線的重要轉折點。</div>
+      <div class="eg"><b>✅ 實戰進場法</b>① 畫出斐氏線 ② 等股價回踩至61.8%區間 ③ 確認K線止跌（錘型、吞噬） ④ 量縮後放量翻紅 ⑤ 進場，停損設61.8%之下2%</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 4. 布林通道 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="indicator" data-keywords="布林通道 bollinger bands 上軌 下軌 中軌 擠壓 突破 波動率">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">📊</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-indicator">技術指標</span></div>
+      <div class="sc-name">布林通道</div>
+      <div class="sc-en">Bollinger Bands</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">中軌是20MA，上下軌是±2倍標準差——通道寬窄反映市場波動率，擠壓後的爆發才是最強訊號。</div>
+  <div class="sc-body collapsed">
+    <div class="diag">
+      <svg viewBox="0 0 580 150" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="150" fill="#f8fafc" rx="8"/>
+        <path d="M15,50 Q80,30 150,45 Q220,60 290,42 Q360,25 430,38 Q500,50 560,35" stroke="#dc2626" stroke-width="1.5" fill="none" stroke-dasharray="4,2"/>
+        <path d="M15,80 Q80,75 150,78 Q220,82 290,76 Q360,70 430,74 Q500,78 560,72" stroke="#374151" stroke-width="2" fill="none"/>
+        <path d="M15,115 Q80,120 150,112 Q220,105 290,110 Q360,115 430,110 Q500,108 560,112" stroke="#166534" stroke-width="1.5" fill="none" stroke-dasharray="4,2"/>
+        <text x="562" y="38" fill="#dc2626" font-size="9">上軌</text>
+        <text x="562" y="75" fill="#374151" font-size="9">中軌</text>
+        <text x="562" y="115" fill="#166534" font-size="9">下軌</text>
+        <rect x="15" y="30" width="60" height="95" fill="rgba(59,130,246,0.06)" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" rx="4"/>
+        <text x="45" y="140" text-anchor="middle" fill="#3b82f6" font-size="8" font-weight="700">擠壓期</text>
+        <line x1="75" y1="20" x2="75" y2="145" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3,2"/>
+        <text x="82" y="25" fill="#f59e0b" font-size="9" font-weight="700">突破!</text>
+        <circle cx="280" cy="110" r="5" fill="#166534" stroke="#fff" stroke-width="1.5"/>
+        <text x="255" y="130" fill="#166534" font-size="8">碰下軌反彈</text>
+        <circle cx="360" cy="25" r="5" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>
+        <text x="338" y="20" fill="#dc2626" font-size="8">碰上軌壓回</text>
+      </svg>
+      <div class="diag-cap">通道擠壓（變窄）→ 爆量突破一側 → 後續趨勢延伸。這是布林最強的做法。</div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">四種操作訊號</div>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>① 布林擠壓後突破（最強）</h4>
+          <p>上下軌收窄到極限，代表波動率降到低點。一旦爆量突破任何一側，是大行情的開始。</p>
+        </div>
+        <div class="mini-card">
+          <h4>② 碰下軌反彈（區間操作）</h4>
+          <p>在震盪格局中，股價碰觸下軌且量縮，隔日出現止跌K線 → 短線買入，目標中軌。</p>
+        </div>
+        <div class="mini-card">
+          <h4>③ 走廊外爆走（強勢股）</h4>
+          <p>股價連續在上軌之上行走 = 超強勢。不要因為「超買」就賣，這是主力鎖倉拉高。</p>
+        </div>
+        <div class="mini-card">
+          <h4>④ W底+中軌確認</h4>
+          <p>布林下軌出現W底，第二個底守住且股價突破中軌（20MA）→ 是轉強的確認訊號。</p>
+        </div>
+      </div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">公式</div>
+      <div style="background:var(--bg2);border-radius:6px;padding:14px 18px;font-family:Consolas,monospace;font-size:.82rem;color:var(--text);border:1px solid var(--border);border-left:3px solid var(--accent);white-space:pre;overflow-x:auto">中軌 = 20日收盤價均值（20MA）
+上軌 = 中軌 + 2 × 20日收盤價標準差
+下軌 = 中軌 − 2 × 20日收盤價標準差
+
+理論上：95%的價格在上下軌之間
+帶寬 = (上軌 - 下軌) / 中軌（帶寬越小=擠壓越緊）</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 5. 維加斯通道 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="indicator" data-keywords="維加斯通道 vegas tunnel 144 169 EMA 趨勢跟隨">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🌐</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-indicator">技術指標</span></div>
+      <div class="sc-name">維加斯通道</div>
+      <div class="sc-en">Vegas Tunnel</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">用144和169兩條EMA形成「隧道」，股價在隧道上方做多、下方做空，回踩隧道時進場——簡單卻有效。</div>
+  <div class="sc-body collapsed">
+    <div class="diag">
+      <svg viewBox="0 0 580 145" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="145" fill="#f8fafc" rx="8"/>
+        <path d="M15,110 Q100,90 200,72 Q300,55 400,40 Q500,28 560,22" stroke="#3b82f6" stroke-width="2" fill="none"/>
+        <path d="M15,120 Q100,100 200,82 Q300,65 400,50 Q500,38 560,32" stroke="#8b5cf6" stroke-width="2" fill="none"/>
+        <text x="562" y="22" fill="#3b82f6" font-size="9">144 EMA</text>
+        <text x="562" y="34" fill="#8b5cf6" font-size="9">169 EMA</text>
+        <path d="M15,110 Q100,90 200,72 Q300,55 400,40 Q500,28 560,22 L560,32 Q500,38 400,50 Q300,65 200,82 Q100,100 15,120 Z" fill="rgba(99,102,241,0.08)"/>
+        <polyline points="15,125 70,100 110,105 160,78 200,72 250,50 310,35 360,28 410,22 460,18 510,12" stroke="#dc2626" stroke-width="2.5" fill="none"/>
+        <circle cx="110" cy="105" r="5" fill="#059669" stroke="#fff" stroke-width="1.5"/>
+        <text x="95" y="120" fill="#059669" font-size="8" font-weight="700">回踩隧道↗</text>
+        <circle cx="200" cy="72" r="5" fill="#059669" stroke="#fff" stroke-width="1.5"/>
+        <text x="185" y="67" fill="#059669" font-size="8" font-weight="700">再次回踩↗</text>
+        <text x="290" y="14" fill="#374151" font-size="9" font-weight="600">股價持續在隧道上方 = 多頭格局，回踩隧道 = 買點</text>
+      </svg>
+      <div class="diag-cap">144 EMA（藍）和 169 EMA（紫）形成隧道。股價在隧道上方每次回踩都是加碼機會。</div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">操作規則</div>
+      <ul class="checklist">
+        <li class="pass">144 EMA 在 169 EMA 之上 = 多頭格局，只做多</li>
+        <li class="pass">股價在隧道之上 + 回踩至隧道附近 = 最佳買點</li>
+        <li class="pass">進場：K線止跌（錘型/吞噬）+ 量縮後放量</li>
+        <li class="fail">股價跌入隧道內部 = 多空不明，等待方向確認</li>
+        <li class="fail">股價在隧道之下 = 做空格局，不做多</li>
+      </ul>
+      <div class="pro"><b>💡 為何是144和169</b>144 = 12×12（一年交易週數×月數），169 = 13×13。這兩個數字都是斐波那契數列的倍數，在外匯和商品期貨市場有大量機構參與者使用，形成自我實現的支撐/壓力。台股因外資影響，也有一定效果，但效果不如外匯市場穩定。</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 6. W底 & M頭（詳細） -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc open" data-cat="pattern" data-keywords="W底 M頭 雙底 雙頂 double bottom double top 頸線 反轉">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">〽️</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-pattern">型態辨識</span><span class="badge badge-hot">常見難點</span></div>
+      <div class="sc-name">W底 ＆ M頭完整判斷法</div>
+      <div class="sc-en">Double Bottom &amp; Double Top</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">看不出W底和M頭，大多是因為進場時機搞錯了——真正的進場點不在底部，而在突破頸線的那一刻。</div>
+  <div class="sc-body">
+    <div class="diag">
+      <svg viewBox="0 0 580 165" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="165" fill="#f8fafc" rx="8"/>
+        <!-- W底 -->
+        <text x="143" y="14" text-anchor="middle" fill="#166534" font-size="11" font-weight="700">W底（雙底）</text>
+        <polyline points="15,120 45,130 90,68 135,125 175,65 210,30" stroke="#374151" stroke-width="2" fill="none"/>
+        <line x1="90" y1="68" x2="240" y2="68" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="242" y="71" fill="#dc2626" font-size="9" font-weight="700">頸線</text>
+        <circle cx="45" cy="130" r="5" fill="#374151"/><text x="30" y="145" fill="#374151" font-size="8">下跌</text>
+        <circle cx="90" cy="68" r="6" fill="#dc2626" stroke="#fff" stroke-width="1.5"/><text x="74" y="60" fill="#dc2626" font-size="9" font-weight="700">第一底</text>
+        <circle cx="135" cy="125" r="6" fill="#166534" stroke="#fff" stroke-width="1.5"/><text x="118" y="140" fill="#166534" font-size="9" font-weight="700">第二底</text>
+        <text x="118" y="150" fill="#166534" font-size="8">量要小</text>
+        <circle cx="175" cy="65" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/>
+        <text x="160" y="58" fill="#f59e0b" font-size="9" font-weight="700">突破頸線</text>
+        <text x="158" y="48" fill="#059669" font-size="9" font-weight="700">★真正進場點</text>
+        <text x="158" y="38" fill="#059669" font-size="8">收盤在頸線上</text>
+        <!-- M頭 -->
+        <text x="430" y="14" text-anchor="middle" fill="#dc2626" font-size="11" font-weight="700">M頭（雙頂）</text>
+        <polyline points="290,100 320,90 365,38 410,80 450,32 490,100 530,130" stroke="#374151" stroke-width="2" fill="none"/>
+        <line x1="365" y1="80" x2="560" y2="80" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="562" y="83" fill="#dc2626" font-size="9" font-weight="700">頸線</text>
+        <circle cx="365" cy="38" r="6" fill="#dc2626" stroke="#fff" stroke-width="1.5"/><text x="349" y="30" fill="#dc2626" font-size="9" font-weight="700">第一頂</text>
+        <circle cx="410" cy="80" r="5" fill="#374151"/>
+        <circle cx="450" cy="32" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5"/><text x="434" y="24" fill="#f59e0b" font-size="9" font-weight="700">第二頂</text>
+        <text x="434" y="16" fill="#f59e0b" font-size="8">量要小</text>
+        <circle cx="490" cy="100" r="6" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>
+        <text x="465" y="115" fill="#dc2626" font-size="9" font-weight="700">破頸線</text>
+        <text x="463" y="125" fill="#dc2626" font-size="9" font-weight="700">★放空進場點</text>
+      </svg>
+      <div class="diag-cap">W底進場 = 收盤突破頸線；M頭放空 = 收盤跌破頸線。兩者都不在頂底進場。</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">W底逐步辨識清單（按順序確認）</div>
+      <ul class="checklist">
+        <li>股價處於明顯的下跌趨勢後（不是橫盤出現的W）</li>
+        <li>出現第一個底部，通常伴隨較大的恐慌性成交量</li>
+        <li>股價從第一個底反彈 10%~30%，形成「頸線」（兩底間最高點）</li>
+        <li>第二個底部的低點 ≤ 第一個底（不比第一個低太多）</li>
+        <li class="pass">第二個底的成交量明顯小於第一個底（最重要！）</li>
+        <li class="pass">等股價收盤突破頸線（不是盤中短暫穿過）才進場</li>
+        <li class="pass">突破頸線當天量能放大 = 高確信突破</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">W底 vs 假W底：如何區分</div>
+      <table class="tbl">
+        <tr><th></th><th>真W底 ✅</th><th>假W底 ❌</th></tr>
+        <tr><td>第二底位置</td><td>≤ 第一底（不創新低）</td><td>明顯低於第一底</td></tr>
+        <tr><td>第二底量能</td><td>萎縮（&lt;第一底量）</td><td>放大或相近</td></tr>
+        <tr><td>反彈形態</td><td>頸線附近有整理</td><td>一路急漲急跌</td></tr>
+        <tr><td>頸線突破</td><td>量增收盤在頸線上</td><td>盤中穿過隨即跌回</td></tr>
+        <tr><td>操作</td><td>突破頸線買入</td><td>繼續觀望</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">目標價計算與停損設定</div>
+      <div style="background:var(--bg2);border-radius:6px;padding:14px 18px;font-family:Consolas,monospace;font-size:.82rem;color:var(--text);border:1px solid var(--border);border-left:3px solid var(--green2);white-space:pre;overflow-x:auto">W底目標價 = 頸線價格 + (頸線 − W底部)
+範例：頸線 = 100元，W底 = 85元
+目標 = 100 + (100 − 85) = 115元
+
+停損設定：跌破頸線就出場
+（確認是假突破，立刻停損）
+
+M頭目標價 = 頸線價格 − (M頂部 − 頸線)
+範例：頸線 = 100元，M頂 = 115元
+目標 = 100 − (115 − 100) = 85元</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">最常見的三個錯誤</div>
+      <div class="warn"><b>❌ 錯誤1：在第二個底就買入</b>這是最常見的錯誤。你以為找到底部，但股價可能繼續創低。只有突破頸線才代表趨勢轉折確認。</div>
+      <div class="warn"><b>❌ 錯誤2：只看形狀不看量</b>W底必須配合量縮的第二個底。如果第二個底量比第一個底還大，代表賣壓仍在，W底不成立。</div>
+      <div class="warn"><b>❌ 錯誤3：用盤中高點當「突破」</b>突破頸線必須是收盤價在頸線之上，盤中短暫穿越後又跌回去不算突破，這是假突破陷阱。</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">M頭判斷（W底鏡像邏輯）</div>
+      <ul class="checklist">
+        <li>股價處於明顯的上漲趨勢後（不是橫盤中出現）</li>
+        <li>第一個頂部伴隨量大，回檔後形成頸線</li>
+        <li>第二個頂的高點 ≥ 第一個頂（不突破新高）</li>
+        <li class="fail">第二個頂的量明顯縮小 = 多頭力量衰竭</li>
+        <li class="fail">收盤跌破頸線 + 量放大 = 放空或離場訊號</li>
+        <li class="pass">回測頸線（跌破後反彈至頸線附近）= 最佳放空點</li>
+      </ul>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>收合</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 7. 缺口理論（詳細） -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc open" data-cat="pattern" data-keywords="缺口 gap 普通缺口 突破缺口 逃逸缺口 竭盡缺口 跳空 回補">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">⬜</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-pattern">型態辨識</span><span class="badge badge-hot">常見難點</span></div>
+      <div class="sc-name">缺口理論完整解析</div>
+      <div class="sc-en">Gap Theory — 4 Types</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">缺口就是兩根K線之間完全沒有交易的空白區域。看到缺口別慌，先判斷是哪一種，才能決定要追還是要跑。</div>
+  <div class="sc-body">
+    <div class="diag">
+      <svg viewBox="0 0 580 155" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="155" fill="#f8fafc" rx="8"/>
+        <!-- 普通缺口 -->
+        <rect x="10" y="60" width="8" height="30" fill="#374151" rx="1"/>
+        <rect x="22" y="58" width="8" height="28" fill="#374151" rx="1"/>
+        <rect x="34" y="52" width="8" height="30" fill="#374151" rx="1"/>
+        <rect x="46" y="38" width="8" height="12" fill="#dc2626" rx="1"/><line x1="50" y1="38" x2="50" y2="35" stroke="#dc2626" stroke-width="1.5"/><line x1="50" y1="50" x2="50" y2="54" stroke="#dc2626" stroke-width="1.5"/>
+        <rect x="58" y="42" width="8" height="18" fill="#374151" rx="1"/>
+        <rect x="70" y="48" width="8" height="22" fill="#374151" rx="1"/>
+        <text x="40" y="145" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">普通缺口</text>
+        <text x="40" y="155" text-anchor="middle" fill="#64748b" font-size="8">很快被回補</text>
+        <!-- 突破缺口 -->
+        <rect x="130" y="80" width="8" height="40" fill="#374151" rx="1"/>
+        <rect x="142" y="75" width="8" height="38" fill="#374151" rx="1"/>
+        <rect x="154" y="70" width="8" height="35" fill="#374151" rx="1"/>
+        <rect x="175" y="35" width="8" height="30" fill="#dc2626" rx="1"/><line x1="179" y1="35" x2="179" y2="30" stroke="#dc2626" stroke-width="1.5"/>
+        <rect x="187" y="30" width="8" height="28" fill="#dc2626" rx="1"/>
+        <rect x="199" y="25" width="8" height="26" fill="#dc2626" rx="1"/>
+        <text x="130" y="8" fill="#1d4ed8" font-size="8">盤整區</text>
+        <line x1="130" y1="70" x2="175" y2="70" stroke="#1d4ed8" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="160" y="140" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="700">突破缺口</text>
+        <text x="160" y="150" text-anchor="middle" fill="#dc2626" font-size="8">量爆 不回補</text>
+        <!-- 逃逸缺口 -->
+        <polyline points="260,125 280,100 300,85 320,70" stroke="#374151" stroke-width="2" fill="none"/>
+        <rect x="332" y="48" width="8" height="20" fill="#dc2626" rx="1"/><line x1="336" y1="48" x2="336" y2="42" stroke="#dc2626" stroke-width="1.5"/>
+        <polyline points="340,42 360,28 380,18 400,12" stroke="#374151" stroke-width="2" fill="none"/>
+        <text x="332" y="140" text-anchor="middle" fill="#059669" font-size="9" font-weight="700">逃逸缺口</text>
+        <text x="332" y="150" text-anchor="middle" fill="#059669" font-size="8">趨勢中段 測量用</text>
+        <!-- 竭盡缺口 -->
+        <polyline points="445,110 465,80 480,60 495,45" stroke="#374151" stroke-width="2" fill="none"/>
+        <rect x="506" y="22" width="8" height="22" fill="#dc2626" rx="1"/><line x1="510" y1="22" x2="510" y2="16" stroke="#dc2626" stroke-width="1.5"/>
+        <polyline points="514,30 530,50 548,70 565,95" stroke="#374151" stroke-width="2" fill="none"/>
+        <text x="510" y="140" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="700">竭盡缺口</text>
+        <text x="510" y="150" text-anchor="middle" fill="#dc2626" font-size="8">末段 快速回補</text>
+      </svg>
+      <div class="diag-cap">從左到右：普通缺口（無意義）、突破缺口（做多）、逃逸缺口（繼續持有）、竭盡缺口（減碼）</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">四種缺口一覽表</div>
+      <table class="tbl">
+        <tr><th>類型</th><th>出現位置</th><th>成交量</th><th>是否回補</th><th>交易意義</th></tr>
+        <tr><td><b>普通缺口</b></td><td>盤整區間中</td><td>正常</td><td>✅ 快速回補</td><td>無意義，不操作</td></tr>
+        <tr><td><b style="color:#1d4ed8">突破缺口</b></td><td>盤整後突破時</td><td>爆量</td><td>❌ 不回補</td><td>⬆️ 趨勢啟動，追入</td></tr>
+        <tr><td><b style="color:#059669">逃逸缺口</b></td><td>趨勢中段</td><td>放量</td><td>❌ 不回補</td><td>⬆️ 繼續持有/加碼</td></tr>
+        <tr><td><b style="color:#dc2626">竭盡缺口</b></td><td>趨勢末段</td><td>放量後萎縮</td><td>✅ 快速回補</td><td>⚠️ 準備離場</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">逃逸缺口測量目標價</div>
+      <div class="hl"><b>📌 逃逸缺口又叫「量測缺口」</b>因為它通常出現在整段趨勢的中點。公式：<br>目標價 = 逃逸缺口位置 + (逃逸缺口位置 − 起漲點)<br>例：起漲 100元 → 逃逸缺口在 130元 → 目標 130 + (130−100) = 160元</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">竭盡缺口的辨識：最難但最重要</div>
+      <ul class="checklist">
+        <li>股價已大幅上漲一段（通常>30%）</li>
+        <li>出現跳空向上的缺口</li>
+        <li class="fail">跳空當天量極大（全天最大量之一）</li>
+        <li class="fail">當天K線收盤接近開盤價（盤中拉高後賣壓出現）</li>
+        <li class="fail">隔天或兩三天內股價跌回缺口 = 缺口開始被填補</li>
+        <li class="pass">一旦確認是竭盡缺口：減碼出場，不要等</li>
+      </ul>
+      <div class="warn"><b>⚠️ 除權除息的假缺口</b>股票除息日當天會出現向下跳空，這不是真正的技術缺口，而是股價調整配息金額的結果。分析時必須使用「還原除息報價」，才不會誤判缺口訊號。</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">判斷突破缺口 vs 竭盡缺口</div>
+      <div class="pro"><b>💡 三天觀察法</b>跳空後觀察三天：① 若股價持續在缺口之上，且量能維持 = 突破缺口，繼續做多。② 若股價在1~3天內跌回填補缺口 = 竭盡缺口，立刻出場。③ 不確定時：先減半部位，等方向明確再決定。</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>收合</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 8. 旗形型態（詳細） -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc open" data-cat="pattern" data-keywords="旗形 flag 旗桿 旗面 連續型態 目標價 進場點 三角旗">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🚩</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-pattern">型態辨識</span><span class="badge badge-hot">常見難點</span></div>
+      <div class="sc-name">旗形與三角旗型態</div>
+      <div class="sc-en">Flag &amp; Pennant Pattern</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">旗形是最穩定的連續型態，等旗面整理結束後突破，趨勢繼續延伸。但大多數人等突破才買，其實有更好的進場點。</div>
+  <div class="sc-body">
+    <div class="diag">
+      <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="160" fill="#f8fafc" rx="8"/>
+        <!-- 旗形 -->
+        <text x="150" y="14" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">旗形（Flag）</text>
+        <line x1="30" y1="140" x2="120" y2="28" stroke="#dc2626" stroke-width="4"/>
+        <text x="55" y="110" fill="#dc2626" font-size="10" font-weight="700">旗桿</text>
+        <text x="55" y="122" fill="#64748b" font-size="9">急漲段</text>
+        <line x1="120" y1="28" x2="185" y2="55" stroke="#374151" stroke-width="1.5"/>
+        <line x1="120" y1="48" x2="185" y2="75" stroke="#374151" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <rect x="120" y="25" width="68" height="55" fill="rgba(59,130,246,0.06)" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" rx="3"/>
+        <text x="154" y="78" text-anchor="middle" fill="#3b82f6" font-size="9">旗面（量縮）</text>
+        <circle cx="185" cy="55" r="6" fill="#059669" stroke="#fff" stroke-width="1.5"/>
+        <text x="165" y="45" fill="#059669" font-size="9" font-weight="700">★最佳進場</text>
+        <text x="163" y="35" fill="#059669" font-size="8">回踩旗頂線</text>
+        <line x1="185" y1="55" x2="270" y2="15" stroke="#dc2626" stroke-width="3"/>
+        <line x1="120" y1="28" x2="280" y2="28" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="282" y="31" fill="#374151" font-size="8">旗頂線</text>
+        <line x1="195" y1="60" x2="280" y2="60" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="282" y="63" fill="#dc2626" font-size="8">突破進場（次選）</text>
+        <!-- 三角旗 -->
+        <text x="430" y="14" text-anchor="middle" fill="#374151" font-size="11" font-weight="700">三角旗（Pennant）</text>
+        <line x1="320" y1="145" x2="400" y2="32" stroke="#dc2626" stroke-width="4"/>
+        <text x="345" y="110" fill="#dc2626" font-size="10" font-weight="700">旗桿</text>
+        <line x1="400" y1="32" x2="460" y2="55" stroke="#374151" stroke-width="1.5"/>
+        <line x1="400" y1="52" x2="460" y2="45" stroke="#374151" stroke-width="1.5"/>
+        <line x1="400" y1="32" x2="462" y2="32" stroke="#374151" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="400" y1="62" x2="462" y2="62" stroke="#374151" stroke-width="1" stroke-dasharray="3,2"/>
+        <circle cx="460" cy="48" r="6" fill="#059691" stroke="#fff" stroke-width="1.5"/>
+        <line x1="460" y1="48" x2="540" y2="12" stroke="#dc2626" stroke-width="3"/>
+        <text x="398" y="78" fill="#3b82f6" font-size="9">收斂三角</text>
+        <text x="398" y="88" fill="#3b82f6" font-size="9">量縮到極限</text>
+        <text x="448" y="38" fill="#059669" font-size="9" font-weight="700">★爆量突破</text>
+        <!-- 目標說明 -->
+        <rect x="10" y="115" width="280" height="38" fill="#fff" stroke="#e2e8f0" rx="6" stroke-width="1"/>
+        <text x="150" y="130" text-anchor="middle" fill="#374151" font-size="9" font-weight="700">目標價 = 突破點 + 旗桿長度</text>
+        <text x="150" y="146" text-anchor="middle" fill="#64748b" font-size="8">旗面回檔不超過旗桿的50%，超過就是型態破壞</text>
+      </svg>
+      <div class="diag-cap">旗形最佳進場是「回踩旗頂線+量縮」，比等突破點更早且風險更低</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">旗形辨識完整清單</div>
+      <ul class="checklist">
+        <li class="pass">有一段明顯的快速急漲（旗桿），通常3~10天，漲幅>15%</li>
+        <li class="pass">急漲後出現2~4週的小幅回調整理（旗面），量明顯萎縮</li>
+        <li class="pass">旗面的兩條邊線平行（旗形）或收斂（三角旗）</li>
+        <li class="pass">旗面最大回調幅度不超過旗桿的50%（若超過代表型態破壞）</li>
+        <li class="fail">整理期間量能比旗桿時明顯縮小（必要條件）</li>
+        <li class="fail">若量在旗面期間放大，代表有賣壓，型態可能失效</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">兩種進場方式比較</div>
+      <table class="tbl">
+        <tr><th></th><th>⭐ 最佳進場：回踩旗頂線</th><th>一般進場：突破旗面</th></tr>
+        <tr><td>時機</td><td>旗面整理期間，股價跌回旗桿頂點位置</td><td>股價放量突破旗面上緣</td></tr>
+        <tr><td>停損</td><td>設旗面底部（旗桿頂點下方2%）</td><td>設突破點下方2%</td></tr>
+        <tr><td>風險報酬</td><td>更好（買在更低處，停損更近）</td><td>較差（追高進場）</td></tr>
+        <tr><td>難度</td><td>需要耐心等待</td><td>容易執行但常追高</td></tr>
+        <tr><td>確認條件</td><td>回踩後量縮，K線止跌（錘型）</td><td>突破時量需放大</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">目標價與停損計算</div>
+      <div style="background:var(--bg2);border-radius:6px;padding:14px 18px;font-family:Consolas,monospace;font-size:.82rem;color:var(--text);border:1px solid var(--border);border-left:3px solid var(--accent);white-space:pre;overflow-x:auto">旗桿長度 = 旗桿頂部 − 旗桿起點
+目標價   = 突破點  + 旗桿長度
+
+範例：
+旗桿起點 = 80元，旗桿頂部 = 100元
+旗桿長度 = 100 − 80 = 20元
+突破點   = 98元（突破旗面上緣）
+目標價   = 98 + 20 = 118元
+
+最佳進場停損：
+進場 = 回踩旗頂線（約100元）
+停損 = 旗面底部（例如93元），即-7%
+目標 = 118元，獲利+18%
+風險報酬比 ≈ 1:2.5（非常理想）</div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">旗形失效的訊號</div>
+      <div class="warn"><b>⚠️ 旗面回調超過旗桿50%</b>旗形整理期間，如果股價跌回旗桿漲幅的50%以下，代表賣壓過強，買方無力守住，此旗形很可能失效。此時需觀望，不要強行進場。</div>
+      <div class="warn"><b>⚠️ 旗面量持續放大</b>正常旗形整理時量會萎縮。如果旗面期間量越來越大，代表有人在高位出貨，這不是整理，而是出貨型態。</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>收合</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 9. 支撐與阻力 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="foundation" data-keywords="支撐 阻力 壓力 整數關卡 前高 前低 穿越">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🧱</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-foundation">基礎工具</span></div>
+      <div class="sc-name">支撐與阻力</div>
+      <div class="sc-en">Support &amp; Resistance</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">支撐就是「買方牆」，阻力就是「賣方牆」——學會找關鍵位置，進場點和停損點自然清晰。</div>
+  <div class="sc-body collapsed">
+    <div class="blk">
+      <div class="blk-title">五種重要支撐/阻力來源</div>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>① 前高/前低</h4>
+          <p>曾經的高點會成為壓力，曾經的低點會成為支撐。「角色互換」：突破前高後，前高變支撐。</p>
+        </div>
+        <div class="mini-card">
+          <h4>② 整數關卡</h4>
+          <p>100、200、500、1000元等整數，因為心理因素會有大量掛單。台積電的整百元是強支撐壓力。</p>
+        </div>
+        <div class="mini-card">
+          <h4>③ 均線</h4>
+          <p>20MA、60MA、120MA是主力的平均成本線，多頭格局中是支撐，空頭格局中是壓力。</p>
+        </div>
+        <div class="mini-card">
+          <h4>④ 成交量密集區</h4>
+          <p>過去大量成交的價格區間，有大量套牢或獲利的人，會形成強力支撐（解套賣）或壓力（獲利了結）。</p>
+        </div>
+      </div>
+      <div class="pro"><b>💡 支撐壓力角色互換定律</b>被有效突破的阻力 = 新的支撐；被有效跌破的支撐 = 新的阻力。這是技術分析最核心的一個規律，適用於所有型態。頸線突破後回測就是這個道理。</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 10. 趨勢線 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="foundation" data-keywords="趨勢線 trendline 上升趨勢 下降趨勢 通道 切線">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">📐</div>
+    <div class="sc-meta">
+      <div class="sc-badges"><span class="badge badge-foundation">基礎工具</span></div>
+      <div class="sc-name">趨勢線畫法</div>
+      <div class="sc-en">Trend Line</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">趨勢線需要至少兩個接觸點才有效；接觸點越多、維持時間越長，突破的意義越大。</div>
+  <div class="sc-body collapsed">
+    <div class="diag">
+      <svg viewBox="0 0 580 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="580" height="130" fill="#f8fafc" rx="8"/>
+        <text x="130" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">上升趨勢線（連低點）</text>
+        <line x1="20" y1="110" x2="270" y2="25" stroke="#059669" stroke-width="2" stroke-dasharray="6,3"/>
+        <polyline points="20,110 60,80 85,95 130,55 160,70 205,38 230,52 265,25" stroke="#374151" stroke-width="2" fill="none"/>
+        <circle cx="20" cy="110" r="5" fill="#059669"/>
+        <circle cx="85" cy="95" r="5" fill="#059669"/>
+        <circle cx="160" cy="70" r="5" fill="#059669"/>
+        <text x="300" y="14" text-anchor="middle" fill="#374151" font-size="10" font-weight="700">下降趨勢線（連高點）</text>
+        <line x1="305" y1="25" x2="555" y2="110" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,3"/>
+        <polyline points="305,28 345,55 370,42 415,75 440,62 480,90 510,78 545,105" stroke="#374151" stroke-width="2" fill="none"/>
+        <circle cx="305" cy="28" r="5" fill="#dc2626"/>
+        <circle cx="370" cy="42" r="5" fill="#dc2626"/>
+        <circle cx="440" cy="62" r="5" fill="#dc2626"/>
+        <text x="45" y="125" fill="#059669" font-size="9">低點越來越高 = 上升趨勢線（只連低點）</text>
+        <text x="320" y="125" fill="#dc2626" font-size="9">高點越來越低 = 下降趨勢線（只連高點）</text>
+      </svg>
+    </div>
+    <div class="blk">
+      <div class="blk-title">畫趨勢線的規則</div>
+      <ul class="checklist">
+        <li class="pass">上升趨勢線：連接兩個以上的「波段低點」</li>
+        <li class="pass">下降趨勢線：連接兩個以上的「波段高點」</li>
+        <li class="fail">不要強迫連線——若連線需要穿過K線實體，這條趨勢線無效</li>
+        <li class="pass">有3個以上的接觸點 = 強力趨勢線，突破更有意義</li>
+      </ul>
+      <div class="hl"><b>📌 趨勢線突破的確認</b>收盤突破趨勢線（不是盤中），且突破時量能放大。突破後回測趨勢線（原來的支撐變壓力，或原壓力變支撐）= 確認進場點。</div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+let currentCat = 'all';
+
+function toggle(headEl) {
+  let sc = headEl;
+  while(sc && !sc.classList.contains('sc')) sc = sc.parentElement;
+  if(!sc) return;
+  const body = sc.querySelector('.sc-body');
+  const btnSpan = sc.querySelector('.toggle-btn span:last-child');
+  if(!body) return;
+  if(body.classList.contains('collapsed')){
+    body.classList.remove('collapsed');
+    sc.classList.add('open');
+    if(btnSpan) btnSpan.textContent = '收合';
+  } else {
+    body.classList.add('collapsed');
+    sc.classList.remove('open');
+    if(btnSpan) btnSpan.textContent = '展開詳細';
+  }
+}
+
+function filter(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.flt-btn').forEach(b => b.classList.toggle('active', b === btn));
+  applyAll();
+}
+
+document.getElementById('searchInput').addEventListener('input', function(){
+  applyAll();
+});
+
+function applyAll() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let count = 0;
+  document.querySelectorAll('.sc').forEach(sc => {
+    const catMatch = currentCat === 'all' || sc.dataset.cat === currentCat;
+    const kwMatch = !q || (sc.dataset.keywords||'').includes(q) ||
+      (sc.querySelector('.sc-name')||{textContent:''}).textContent.toLowerCase().includes(q) ||
+      (sc.querySelector('.sc-short')||{textContent:''}).textContent.toLowerCase().includes(q);
+    const hide = !catMatch || !kwMatch;
+    sc.classList.toggle('hidden', hide);
+    if(!hide) count++;
+  });
+  document.getElementById('countLabel').textContent = `顯示 ${count} 個策略`;
+}
+
+applyAll();
+</script>
+</body>
+</html>
