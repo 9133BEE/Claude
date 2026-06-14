@@ -186,7 +186,7 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--border-default);
 }
 .gnav-wrap {
-  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  overflow-x: auto; scrollbar-width: none;
 }
 .gnav-wrap::-webkit-scrollbar { display: none; }
 .gnav {
@@ -216,7 +216,7 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden; -webkit-overflow-scrolling: touch;
 }
 @keyframes dropIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-.gnav-group.open .gnav-drop { display: block; animation: dropIn .15s ease; }
+.gnav-drop.open { display: block; animation: dropIn .15s ease; }
 .gnav-item {
   display: flex; width: 100%; align-items: center;
   padding: 10px 16px; font-size: 13.5px;
@@ -1360,42 +1360,75 @@ function switchUSStocks(id) {
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
+// === 下拉選單：搬到 body 直接子層，避免 iOS Safari overflow/stacking 截斷 ===
+const _DROP_GROUPS = ['gnav-stocks','gnav-usstocks','gnav-futures','gnav-chart','gnav-courses','gnav-glossary'];
+(function initDrops() {
+  _DROP_GROUPS.forEach(function(gid) {
+    const group = document.getElementById(gid);
+    if (!group) return;
+    const drop = group.querySelector('.gnav-drop');
+    if (!drop) return;
+    drop.dataset.owner = gid;
+    document.body.appendChild(drop);
+  });
+})();
+
+function _getOwnerDrop(gid) {
+  return document.querySelector('.gnav-drop[data-owner="' + gid + '"]');
+}
+function _hideGroupDrop(gid) {
+  const group = document.getElementById(gid);
+  if (group) group.classList.remove('open');
+  const drop = _getOwnerDrop(gid);
+  if (drop) drop.classList.remove('open');
+}
+function _showGroupDrop(gid) {
+  const group = document.getElementById(gid);
+  if (!group) return;
+  group.classList.add('open');
+  const drop = _getOwnerDrop(gid);
+  if (!drop) return;
+  const btn = group.querySelector('.gnav-btn');
+  const r = btn.getBoundingClientRect();
+  drop.classList.remove('open');
+  drop.style.top = '';
+  drop.style.left = '';
+  requestAnimationFrame(function() {
+    drop.classList.add('open');
+    const dw = drop.offsetWidth || 160;
+    const clampedLeft = Math.max(8, Math.min(r.left, window.innerWidth - dw - 8));
+    drop.style.top  = (r.bottom + 6) + 'px';
+    drop.style.left = clampedLeft + 'px';
+  });
+}
+
 function toggleDrop(id) {
-  const groups = ['stocks', 'us-stocks', 'futures-nav', 'chart', 'courses', 'glossary'];
-  groups.forEach(g => {
-    const elId = g === 'futures-nav' ? 'gnav-futures' : g === 'us-stocks' ? 'gnav-usstocks' : 'gnav-' + g;
-    const el = document.getElementById(elId);
-    if (!el) return;
-    if (g === id) {
-      const wasOpen = el.classList.contains('open');
-      el.classList.toggle('open');
-      if (!wasOpen) {
-        const btn = el.querySelector('.gnav-btn');
-        const drop = el.querySelector('.gnav-drop');
-        const r = btn.getBoundingClientRect();
-        const dw = drop.offsetWidth || parseInt(getComputedStyle(drop).minWidth) || 160;
-        const clampedLeft = Math.max(8, Math.min(r.left, window.innerWidth - dw - 8));
-        drop.style.top  = (r.bottom + 6) + 'px';
-        drop.style.left = clampedLeft + 'px';
-      }
+  const idMap = {
+    'stocks':'gnav-stocks','us-stocks':'gnav-usstocks',
+    'futures-nav':'gnav-futures','chart':'gnav-chart',
+    'courses':'gnav-courses','glossary':'gnav-glossary'
+  };
+  const targetGid = idMap[id];
+  _DROP_GROUPS.forEach(function(gid) {
+    if (gid === targetGid) {
+      const group = document.getElementById(gid);
+      const wasOpen = group && group.classList.contains('open');
+      if (wasOpen) { _hideGroupDrop(gid); } else { _showGroupDrop(gid); }
     } else {
-      el.classList.remove('open');
+      _hideGroupDrop(gid);
     }
   });
 }
 
 function closeDrop(id) {
-  const map = {'stocks':'stocks','futures-nav':'futures','chart':'chart','courses':'courses','glossary':'glossary'};
-  const el = document.getElementById('gnav-' + (map[id] || id));
-  if (el) el.classList.remove('open');
+  const map = {'stocks':'gnav-stocks','us-stocks':'gnav-usstocks','futures-nav':'gnav-futures','chart':'gnav-chart','courses':'gnav-courses','glossary':'gnav-glossary'};
+  const gid = map[id];
+  if (gid) _hideGroupDrop(gid);
 }
 
 document.addEventListener('click', function(e) {
-  if (!e.target.closest('.gnav-group')) {
-    ['stocks','futures','chart','courses','glossary'].forEach(g => {
-      const el = document.getElementById('gnav-' + g);
-      if (el) el.classList.remove('open');
-    });
+  if (!e.target.closest('.gnav-group') && !e.target.closest('.gnav-drop')) {
+    _DROP_GROUPS.forEach(_hideGroupDrop);
   }
 });
 
