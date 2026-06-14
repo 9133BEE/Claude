@@ -1118,14 +1118,6 @@ function renderCard(p) {
   </div>
   <div class="card-detail" id="detail-${p.id}">
     <div class="card-detail-inner">
-      <div class="detail-block block-chart">
-        <div class="detail-block-content">
-          <div class="chart-stock-row">
-            <span class="chart-stock-label">${(CHART_SYMBOLS[p.id]||{n:''}).n}</span>
-            <a href="https://tw.tradingview.com/chart/?symbol=${encodeURIComponent((CHART_SYMBOLS[p.id]||{s:'TWSE:0050'}).s)}" target="_blank" rel="noopener" class="chart-open-btn">查看即時走勢 →</a>
-          </div>
-        </div>
-      </div>
       <div class="detail-block block-keypoints">
         <div class="detail-block-title">判讀重點</div>
         <div class="detail-block-content"><ul>${p.points.map(pt=>`<li>${pt}</li>`).join('')}</ul></div>
