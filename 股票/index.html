@@ -209,7 +209,7 @@ a { color: inherit; text-decoration: none; }
 .gnav-arrow { font-size: 9px; opacity: .6; transition: transform .2s; }
 .gnav-group.open .gnav-arrow { transform: rotate(180deg); }
 .gnav-drop {
-  display: none; position: absolute; top: calc(100% + 6px); left: 0;
+  display: none; position: fixed;
   background: #fff; border: 1.5px solid var(--border-default);
   border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
   z-index: 500; min-width: 138px; overflow: hidden;
@@ -1160,8 +1160,19 @@ function toggleDrop(id) {
     const elId = 'gnav-' + (g === 'futures-nav' ? 'futures' : g);
     const el = document.getElementById(elId);
     if (!el) return;
-    if (g === id) el.classList.toggle('open');
-    else el.classList.remove('open');
+    if (g === id) {
+      const wasOpen = el.classList.contains('open');
+      el.classList.toggle('open');
+      if (!wasOpen) {
+        const btn = el.querySelector('.gnav-btn');
+        const drop = el.querySelector('.gnav-drop');
+        const r = btn.getBoundingClientRect();
+        drop.style.top  = (r.bottom + 6) + 'px';
+        drop.style.left = r.left + 'px';
+      }
+    } else {
+      el.classList.remove('open');
+    }
   });
 }
 
