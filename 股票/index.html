@@ -505,6 +505,17 @@ a { color: inherit; text-decoration: none; }
         <button class="gnav-item" onclick="switchTab('news');closeDrop('stocks')">消息</button>
       </div>
     </div>
+    <!-- 美股 -->
+    <div class="gnav-group" id="gnav-usstocks">
+      <button class="gnav-btn" onclick="toggleDrop('us-stocks')">
+        美股 <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <button class="gnav-item cur" onclick="switchUSStocks('us-basic');closeDrop('us-stocks')">基礎</button>
+        <button class="gnav-item" onclick="switchUSStocks('us-pick');closeDrop('us-stocks')">選股</button>
+        <button class="gnav-item" onclick="switchUSStocks('us-advanced');closeDrop('us-stocks')">進階</button>
+      </div>
+    </div>
     <!-- 期貨 -->
     <div class="gnav-group" id="gnav-futures">
       <button class="gnav-btn" onclick="toggleDrop('futures-nav')">
@@ -550,6 +561,7 @@ a { color: inherit; text-decoration: none; }
         <a class="gnav-item" href="stock-glossary.html">股票相關名詞</a>
         <a class="gnav-item" href="futures-glossary.html">期貨相關名詞</a>
         <a class="gnav-item" href="strategy-glossary.html">技術分析策略</a>
+        <a class="gnav-item" href="advanced-tips.html">進階技巧</a>
       </div>
     </div>
   </div>
@@ -1046,6 +1058,118 @@ const DATA = [
        tip:"最重要的美股期貨生存法則：永遠設定真實的停損單（非心理停損）。ES/NQ移動速度極快，市場恐慌時一根蠟燭可以跌200點，心理停損根本來不及執行。在開倉的同時，立刻掛出停損單，這是比任何技術分析都重要的基本功。"}
     ]
   }
+  ,{
+    id:"us-basic",title:"美股基礎",icon:"🇺🇸",
+    accent:"#1d4ed8",
+    kpBg:"rgba(29,78,216,.06)",kpBorder:"rgba(29,78,216,.18)",
+    cards:[
+      {id:"us-market-overview",title:"美股三大市場與指數",en:"US Markets & Major Indices",diff:"入門",
+       tags:["NYSE","NASDAQ","S&P 500","道瓊","費半"],
+       summary:"美股是全球最大股市，三大指數各有側重；台灣投資人最需關注費城半導體指數（SOX），因為它是台股科技股的最強領先指標",
+       points:["NYSE（紐約證交所）：傳統藍籌、金融、能源為主（JPM、XOM、BAC）；NASDAQ：科技成長股聚集地（AAPL、NVDA、MSFT、GOOGL）","三大指數：S&P 500（500大企業，最具代表性）、NASDAQ 100（前100科技股，對應QQQ）、DJIA 道瓊30（最古老，30支藍籌）","費城半導體指數（SOX）與台灣的關係最深：SOX成分股（NVDA、AMD、AVGO）的訂單幾乎全在台積電生產，SOX跌代表半導體需求轉弱，通常領先台積電股價3–5個交易日"],
+       formula:"S&P 500權重計算：\n個股權重 = 個股自由流通市值 / S&P 500總市值\n目前前10大成分股合計權重超過35%\n（AAPL+MSFT+NVDA+AMZN+GOOGL合計約25%）",
+       example:"2022年費半指數從高點3,500跌至1,900（跌幅46%），台積電同期從688元跌至370元（跌幅46%），兩者幾乎同步。2023年費半反彈，台積電也從370元漲至680元。監控費半就等於監控台積電的中期方向。",
+       tip:"台灣投資人必看的三個美股指標：①費半SOX（影響台積電、聯發科）②10年期美債殖利率（影響成長股估值）③VIX恐慌指數（市場系統性風險訊號）"},
+      {id:"us-trading-hours",title:"美股交易時間與夜盤邏輯",en:"US Market Hours & Taiwan Investor Strategy",diff:"入門",
+       tags:["交易時間","夏令時間","盤前盤後","台灣時間"],
+       summary:"美股在台灣深夜開盤，長線投資人不需即時盯盤；但了解重要時段的波動規律，能大幅提升進出場品質",
+       points:["夏令時間（3月–11月）：台灣時間 21:30 開盤，04:00 收盤；冬令時間（11月–3月）：延後1小時，22:30–05:00","最活躍的時段：開盤前30分鐘（21:00–21:30 盤前）、開盤後1小時（21:30–22:30）、最後30分鐘（03:30–04:00）。午盤（01:00–02:30）流動性最低","重大事件時間：Fed利率決議通常於台灣時間02:00，CPI/非農數據通常於21:30公布（美東08:30）"],
+       formula:"台灣時間轉換：\n美東時間 + 12小時（夏令） = 台灣時間\n美東時間 + 13小時（冬令） = 台灣時間\n\n例：Fed會議 美東14:00 → 台灣夏令 02:00",
+       example:"2024年3月 Fed 利率決議（台灣時間02:00宣布）：維持利率不變，但點陣圖偏鷹。市場起初下跌，鮑威爾記者會（02:30開始）確認仍有3次降息空間，S&P 500 轉跌為漲1.5%。不了解時間點的投資人在02:00看到下跌就停損，反而錯失隨後的反彈。",
+       tip:"長線投資最佳策略：收盤後（台灣時間04:30後）再下委託單；如果要參與盤中波動，建議只在 21:30–22:30 開盤時段操作，這段時間流動性和確定性最高"},
+      {id:"us-etf-basics",title:"美股ETF入門：SPY/QQQ/VOO",en:"US ETF Fundamentals",diff:"入門",
+       tags:["ETF","SPY","QQQ","VOO","定期定額","費用率"],
+       summary:"ETF是普通投資人進入美股最划算的方式，三支指數ETF各有不同特性，選對了遠比選個股重要",
+       points:["SPY（追蹤S&P 500）：最古老、流動性最好，費用率0.0945%；VOO（同追S&P 500）：費用率更低0.03%，長線定投首選；QQQ（NASDAQ 100）：科技比重高達50%+，波動大、成長力強","ETF費用率的長期影響：$10萬元投入30年，0.03% vs 0.50%的費用率差異最終可達 $80,000 以上","板塊ETF：XLK（科技）、XLF（金融）、XLE（能源）、XLV（醫療）、XLU（公用事業），搭配景氣週期輪動"],
+       formula:"費用率的長期成本：\n管理費年扣除 = 投資金額 × 費用率\n$100,000 × 0.03% = $30/年（VOO）\n$100,000 × 0.20% = $200/年（QQQ）\n30年累計差額：複利計算差距超過$80,000",
+       example:"2004年投入$10,000買SPY，2024年底約成長至$72,000（年化約10.5%），期間歷經2008金融海嘯（-55%）、2020新冠（-34%）、2022升息（-25%），但每次都創新高。這說明長期持有ETF，不需擇時，複利自然發揮。",
+       tip:"台灣複委託可直接買SPY/VOO/QQQ，手續費約0.5–1%；若用IBKR海外券商，手續費接近零。每月定投VOO是巴菲特對普通投資人唯一的具體建議"},
+      {id:"us-account",title:"如何用台灣身份投資美股",en:"Opening US Stock Account from Taiwan",diff:"入門",
+       tags:["複委託","IBKR","開戶","手續費","外匯"],
+       summary:"台灣人投資美股有兩條路：複委託（透過台灣券商，方便但貴）或海外券商IBKR（手續費近零但需自己處理外匯）",
+       points:["複委託優點：台灣身分證開戶、稅務申報方便、有中文客服；缺點：手續費高（每筆0.5–1%），每筆最低約$10–15 USD","IBKR（Interactive Brokers）：手續費每股$0.005（最低$1），可交易股票/ETF/期權；需護照+英文文件，約1–2週審核；適合資金超過US$1萬的投資人","稅務重點：①資本利得台灣端目前免稅 ②美股股息被美國預扣30%，且台美無租稅協定無法退還 ③年度海外所得超過NT$100萬需申報台灣基本所得稅"],
+       formula:"複委託 vs IBKR 手續費對比：\n每月買$2,000 VOO，複委託費用：\n$2,000 × 0.5% = $10/月 = $120/年\nIBKR費用：每次約$1 = $12/年\n10年累計差距：超過$1,000（未計複利）",
+       example:"小資族每月投$500：建議用複委託，手續費雖高但設定方便，富邦/元大/凱基等均支援定期定額申購VOO。資金超過US$2萬的投資人：改用IBKR，一年可省數百美元手續費，長期下來差距顯著。",
+       tip:"IBKR開戶注意：臺灣銀行美元匯款手續費約NT$300–500，IBKR換匯費只需$2；建議一次匯款US$5,000以上分批投入，減少匯款次數的固定成本"}
+    ]
+  }
+  ,{
+    id:"us-pick",title:"美股選股",icon:"🔍",
+    accent:"#7c3aed",
+    kpBg:"rgba(124,58,237,.06)",kpBorder:"rgba(124,58,237,.18)",
+    cards:[
+      {id:"magnificent7",title:"Magnificent 7 七巨頭",en:"The Magnificent Seven",diff:"入門",
+       tags:["AAPL","NVDA","MSFT","AMZN","GOOGL","META","TSLA","七巨頭"],
+       summary:"這七家公司合計佔S&P 500超過30%的權重，了解它們的業務邏輯，幾乎等同於了解整個美股的走向",
+       points:["AAPL蘋果：iPhone生態系+Services（App Store/iCloud）；MSFT微軟：Azure雲端+Office 365+OpenAI投資；NVDA英偉達：AI GPU霸主（H100/H200），數據中心佔營收75%以上","AMZN亞馬遜：電商+AWS雲端（全球最大）+廣告；GOOGL谷歌：搜尋廣告+YouTube+GCP；META：FB/IG/WhatsApp廣告+AI Llama模型；TSLA特斯拉：電動車+FSD自駕+能源儲存","台積電與七巨頭的關係：AAPL的A18、NVDA的H100、AMD的MI300、GOOGL的TPU，全部在台積電先進製程生產。七巨頭資本支出越高，台積電訂單越飽和"],
+       formula:"七巨頭2024年合計市值：約 $14 兆美元\n= 全球GDP第三大（僅次於美國和中國整體GDP）\n\n七巨頭佔S&P 500比重：約30–35%\n→ 七巨頭漲10%，S&P 500整體約漲3–4%",
+       example:"2023年Magnificent 7平均漲幅超過100%（NVDA +240%、META +194%、TSLA +102%），而S&P 500其餘493支股票平均漲幅僅12%。這說明2023年的美股牛市幾乎完全由七巨頭驅動，持有ETF的人大部分收益也來自這七支。",
+       tip:"七巨頭高度相關：AI題材同漲同跌。若只想持有七巨頭可考慮MAGS ETF（專門追蹤Magnificent 7）；不想承受集中風險，就用VOO/SPY分散。"},
+      {id:"us-earnings",title:"美股財報季解讀",en:"US Earnings Season Analysis",diff:"進階",
+       tags:["財報","EPS","Revenue","Guidance","Beat","Miss"],
+       summary:"美股股價短期走向幾乎完全由財報決定——但決定股價的往往不是當季數字，而是下季的「Guidance（前瞻指引）」",
+       points:["財報三大指標：①EPS每股盈餘（vs 分析師預期）②Revenue營收（vs 預期）③Guidance前瞻指引（最重要）","Beat（超預期）不一定漲、Miss（低於預期）不一定跌：若Guidance保守，即使EPS大幅超預期，股價當日仍可能大跌10%以上（典型：2024年GOOGL Q1財報）","財報時間：Q1（4月中旬）、Q2（7月中旬）、Q3（10月中旬）、Q4（1月中旬）。最先公布的通常是大型銀行（JPM），科技股集中在財報季第3–4週"],
+       formula:"Surprise Rate（超預期幅度）：\n= (實際EPS - 分析師共識EPS) / |分析師共識EPS| × 100%\n\n例：NVDA Q1 2024：\n實際EPS $6.12 vs 預期 $5.59\nSurprise = ($6.12-$5.59)/$5.59 = +9.5%",
+       example:"2024年2月 META財報：EPS $5.33 vs 預期 $4.96（Beat +7.5%），Revenue +25%，並宣布首次派發股息。Guidance下季營收$365-390億（高於預期）。結果：隔日股價跳漲20%，單日市值增加$2,000億美元——是美股史上單日市值增加最多的記錄之一。",
+       tip:"財報前建議：①勿重倉，因方向難以預測 ②關注Guidance而非當季數字 ③財報後若股價跳空上漲10%+，不要追高；等回測5日線或缺口附近再進場"},
+      {id:"us-sector-rotation",title:"板塊輪動與Fed週期",en:"Sector Rotation & Fed Cycle",diff:"進階",
+       tags:["板塊輪動","升降息","Fed","XLK","XLF","XLE","板塊ETF"],
+       summary:"美股板塊輪動主要由Fed利率政策驅動：降息利多科技成長股，升息利多金融能源；掌握這個邏輯，可以系統性地調整持股結構",
+       points:["降息週期受益：科技（XLK）、REIT房地產、成長股。原因：折現率下降讓未來現金流現值更高，高估值股估值修復","升息週期受益：金融（XLF，銀行利差擴大）、能源（XLE，通膨環境）、價值股、高股息股","景氣衰退期受益：公用事業（XLU）、必需消費（XLP）、黃金（GLD）、美債（TLT）——防禦型配置"],
+       formula:"降息對成長股估值的影響：\nDCF估值 = 未來現金流 / (1 + 折現率)^n\n折現率 = 無風險利率（美債殖利率）+ 風險溢價\n→ 10年美債 5%→3.5%，高成長股理論估值上升20–35%",
+       example:"2022年Fed連升13次息（0%→5.25%）：QQQ跌33%、XLE漲65%、XLF漲-5%（受傷較小）。2024年9月首次降息後：QQQ反彈30%+、XLU公用事業（因AI用電）同步大漲。板塊輪動教科書案例。",
+       tip:"觀察板塊輪動最簡單的工具：stockanalysis.com 看各板塊ETF年化報酬對比，每季調整一次配置即可。不需要預測Fed，只需要跟著政策方向走"},
+      {id:"us-stock-screen",title:"個股篩選五維度框架",en:"5-Dimension US Stock Screening",diff:"進階",
+       tags:["選股","護城河","PEG","FCF","成長率","估值"],
+       summary:"用五個維度系統性評估任何一支美股，避免因主題熱門而追高，找到真正值得長持的公司",
+       points:["①護城河（Moat）：品牌壁壘（AAPL生態系）、網路效應（META社群）、規模優勢（AMZN物流）、轉換成本（MSFT企業軟體）","②成長力：過去3年營收CAGR > 15%優選；③財務品質：自由現金流FCF / 淨利 > 80%（代表盈餘有含金量、不是會計數字）","④估值：用PEG（P/E ÷ EPS成長率）而非P/E；PEG < 1 通常被認為低估；⑤催化劑：近期新產品、法規鬆綁、行業景氣轉折等"],
+       formula:"PEG（市盈成長比率）：\nPEG = P/E ÷ EPS年增率（%）\nPEG < 1.0 → 相對低估\nPEG 1.0–1.5 → 合理\nPEG > 2.0 → 高估\n\n例：NVDA 2024年 P/E=60，EPS增長率=100%\nPEG = 60/100 = 0.6 → 其實不貴",
+       example:"用PEG分析：2024年MSFT P/E=35，EPS增長率25%，PEG=1.4（合理）；AAPL P/E=28，EPS增長率8%，PEG=3.5（偏貴）；NVDA P/E=60，EPS增長率100%，PEG=0.6（低估）——三者估值排名完全顛覆直覺。",
+       tip:"最快速的篩選流程：①去 finviz.com 篩選 市值>100億、EPS增長率>15%、過去5年股價正報酬 → 大幅縮小名單；②逐一看FCF是否為正；③最後用PEG確認估值合理性"},
+      {id:"us-dividend",title:"美股股息策略",en:"US Dividend Investing Strategy",diff:"入門",
+       tags:["股息","配息","股息成長","REITs","稅務","30%預扣"],
+       summary:"美股配息以季配為主，但股息被美國預扣30%稅——高股息策略在美股的稅後報酬往往不如成長股，需謹慎評估",
+       points:["美股配息方式：絕大多數個股和ETF採季配（每3個月一次）；VYM、DVY等高股息ETF殖利率約3–4%","重要提醒：股息被美國預扣30%（台灣與美國無租稅協定）。例如：配息$100，你只收到$70。高股息股的「真實」殖利率需打七折計算","股息成長股（Dividend Growth）：如JNJ、PG、KO等連續30年以上每年提高股息的公司，雖殖利率不高（2–3%）但長期複利效果優異。VIG ETF（Vanguard股息成長ETF）是這類策略的最佳工具"],
+       formula:"稅後股息殖利率：\n名目殖利率 × 70% = 實際稅後殖利率\n例：REITs殖利率 5% × 70% = 實際 3.5%\n\n與台股比較：\n台股現金股息所得稅 ＝ 最高28%（但可抵繳）\n美股股息實際稅率 ＝ 固定30%（無法退）",
+       example:"2024年SPY（S&P 500 ETF）年度股息殖利率約1.2%，預扣30%後實際到手約0.84%。同期QQQ殖利率僅0.5%。相比之下，VOO的長期資本利得（約10%年化）完全免稅。這解釋了為何長線投資美股應重資本利得、輕股息。",
+       tip:"如果一定要高股息策略：用台灣複委託買SCHD（Schwab高股息ETF，費用率0.06%），SCHD追蹤100支品質最高的高股息股，長期報酬比純高殖利率策略更穩健"}
+    ]
+  }
+  ,{
+    id:"us-advanced",title:"美股進階",icon:"📡",
+    accent:"#059669",
+    kpBg:"rgba(5,150,105,.06)",kpBorder:"rgba(5,150,105,.18)",
+    cards:[
+      {id:"us-vix",title:"VIX 恐慌指數：市場情緒的溫度計",en:"VIX Fear & Greed Index",diff:"進階",
+       tags:["VIX","恐慌指數","期權","波動率","市場底部"],
+       summary:"VIX是台股沒有的獨特工具，歷史上每次VIX衝破40，都是市場接近底部的訊號；學會讀VIX，能讓你在別人恐慌時保持理性",
+       points:["VIX（CBOE波動率指數）衡量S&P 500期權市場對未來30天波動的預期。VIX上升 = 市場恐慌；VIX下降 = 市場平靜","歷史重要水位：VIX < 15（平靜/過度樂觀）、15–25（正常波動）、25–35（偏恐慌）、> 40（極度恐慌，歷史底部區）","VIX與美股相關性：VIX與S&P 500呈強負相關（約-0.7到-0.8）。當VIX暴漲，S&P 500幾乎同時暴跌；VIX回落，股市通常隨後回升"],
+       formula:"VIX的計算基礎：\n基於S&P 500不同履約價的期權隱含波動率加權計算\n反映的是「市場預期未來30天的年化波動率」\n\nVIX 20 → 預期月波動率約 20/√12 ≈ 5.8%\nVIX 40 → 預期月波動率約 40/√12 ≈ 11.5%",
+       example:"2020年3月COVID崩盤：VIX最高飆至82.69（歷史第一），S&P 500從3,380跌至2,237（-34%）。之後VIX回落至20以下，S&P 500反彈至歷史新高。2008年金融海嘯VIX高峰89.53，同樣是歷史底部附近。規律：VIX越極端，回報越可觀。",
+       tip:"VIX實戰應用：①VIX > 30 時加大定投比例（別人恐慌我貪婪）；②VIX < 12 時減少槓桿、適度獲利了結；③VIX突然從低位飆升（如從15跳到30）比絕對水位更重要，代表風險突發"},
+      {id:"us-options-basics",title:"美股期權入門",en:"US Options Basics",diff:"進階",
+       tags:["期權","Call","Put","保護性Put","備兌Call","隱含波動率"],
+       summary:"美股期權市場規模是台灣選擇權的數十倍，活用Call/Put不只是投機工具，更是長線持股的風險管理利器",
+       points:["Call（買權）：買進Call = 看漲，獲得在到期前以特定價格買入股票的權利；Put（賣權）：買進Put = 看跌，相當於「保險」","保護性Put策略：持有AAPL股票擔心跌，買進Put如同為持股買保險。成本 = 保險費（權利金），最大損失鎖定在履約價以上","備兌Call策略（Covered Call）：持有股票同時賣出Call，收取權利金增加收益。適合在橫盤或小漲環境中使用，但會犧牲大漲時的獲利"],
+       formula:"期權基本概念：\nCall獲利 = max(股價 - 履約價 - 權利金, -權利金)\nPut獲利 = max(履約價 - 股價 - 權利金, -權利金)\n\nTime Decay（時間價值衰減）：\n越接近到期日，期權時間價值衰減越快\n→ 買方必須方向對且時間夠，賣方靠時間收租",
+       example:"持有100股AAPL（股價$200），擔心財報波動：買進一口AAPL $190 Put（1個月後到期），花費$3（$300）。若AAPL跌至$170，Put獲利$20 - $3 = $17/股（$1,700），抵消現股損失的85%。這就是機構投資人常用的「尾部風險對沖」。",
+       tip:"新手入場順序建議：①先用紙上交易（Paper Trading）練習3個月 ②從保護性Put開始（最直覺的對沖工具）③再學備兌Call ④最後才考慮裸買Call/Put（風險最高）。IBKR提供完整期權交易功能，且有paper trading環境"},
+      {id:"us-macro",title:"美股宏觀指標解讀",en:"US Macro Indicators for Stock Investors",diff:"進階",
+       tags:["CPI","非農","Fed","殖利率曲線","ISM","宏觀指標"],
+       summary:"美股受宏觀數據牽動極大，五個核心指標足以解釋90%的市場大方向——不需要懂所有經濟學，只需掌握這些關鍵訊號",
+       points:["①CPI（消費者物價指數）：每月第二週四台灣時間21:30公布。CPI高於預期→降息預期降溫→科技股跌；CPI低於預期→降息預期升溫→成長股漲","②非農就業（NFP）：每月第一週五21:30公布。就業太強→Fed不急降息→市場反而可能跌（Bad News is Bad News環境）","③10年期美債殖利率：直接影響股票估值。殖利率每上升1%，高本益比股票理論估值下降約15–20%；VIX和美債是市場的「雙溫度計」"],
+       formula:"殖利率與股票估值的關係：\n股票內在價值（DCF）= FCF / (WACC - g)\nWACC（折現率）受無風險利率（美債）直接影響\n\n美債殖利率 4%→5%（+1%）：\n→ P/E合理值從25倍→20倍（-20%的估值空間）",
+       example:"2022年1月至2022年10月：美債殖利率從1.5%飆升至4.2%，NASDAQ下跌33%。這幾乎完全可以用「殖利率上升 → 成長股估值壓縮」解釋，而非基本面惡化。2023年殖利率從高點回落，科技股全面反彈。",
+       tip:"五大宏觀指標優先序：①美聯儲利率決議 ②CPI ③非農 ④美債10年期殖利率 ⑤VIX。這五個指標能解釋短期市場90%的波動，任何美股投資人都應設定Google新聞提醒"},
+      {id:"us-risk-manage",title:"美股風險管理實務",en:"US Stock Risk Management",diff:"進階",
+       tags:["部位管理","停損","分散投資","DCA","最大回撤","心理建設"],
+       summary:"S&P 500 每年平均至少一次10%以上的回調，每3–5年有一次超過20%的熊市；接受波動是長期高報酬的必要代價，這是投資美股的第一課",
+       points:["部位管理原則：單一個股不超過總資產15%；核心ETF（SPY/VOO）+ 衛星個股（七巨頭）的架構，降低集中風險","停損紀律：個股設定-15%到-20%停損；ETF長線不需停損，但需確保資金不是你的「必要生活費」","心理建設：2008年S&P 500跌57%、2020年跌34%、2022年跌25%，但每次都創新高。「時間在市場中」的長線投資人，打敗95%的主動選股者"],
+       formula:"最大回撤後恢復時間：\n2008年崩盤（-57%）：2013年恢復（5年）\n2020年COVID（-34%）：2020年8月恢復（5個月！）\n2022年熊市（-25%）：2023年底恢復（約1.5年）\n\n回撤後需要的漲幅：\n跌20%需漲25%才能回本\n跌50%需漲100%才能回本",
+       example:"若你在2008年金融海嘯高點（S&P 500 = 1,565點）投入$10,000，2009年3月市值剩下約$4,300（跌57%）。但若持有到2024年底，市值超過$60,000（16年漲6倍，年化約11%）。最壞的進場時機，長期持有依然大幅獲利。",
+       tip:"美股投資的生存法則：①永遠留6個月生活費現金，不借錢投資 ②財報前不重倉 ③VIX>30時加碼（非減碼） ④每年只需看2次投資組合即可（看太多次更容易做出錯誤決策）"}
+    ]
+  }
 ];
 
 let currentSection = 'technical';
@@ -1135,6 +1259,7 @@ function switchTab(id) {
   });
   document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.add('active');
   document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.remove('active');
+  document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.remove('active');
   renderSection(id);
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1150,14 +1275,29 @@ function switchFutures(mkt) {
   });
   document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.add('active');
   document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.remove('active');
+  document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.remove('active');
+  renderSection(id);
+  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function switchUSStocks(id) {
+  if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  currentSection = id;
+  const labels = {'us-basic':'基礎','us-pick':'選股','us-advanced':'進階'};
+  document.querySelectorAll('#gnav-usstocks .gnav-item').forEach(b => {
+    b.classList.toggle('cur', b.textContent.trim() === (labels[id] || '基礎'));
+  });
+  document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.add('active');
+  document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.remove('active');
+  document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.remove('active');
   renderSection(id);
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function toggleDrop(id) {
-  const groups = ['stocks', 'futures-nav', 'chart', 'courses', 'glossary'];
+  const groups = ['stocks', 'us-stocks', 'futures-nav', 'chart', 'courses', 'glossary'];
   groups.forEach(g => {
-    const elId = 'gnav-' + (g === 'futures-nav' ? 'futures' : g);
+    const elId = g === 'futures-nav' ? 'gnav-futures' : g === 'us-stocks' ? 'gnav-usstocks' : 'gnav-' + g;
     const el = document.getElementById(elId);
     if (!el) return;
     if (g === id) {
