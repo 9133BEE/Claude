@@ -349,6 +349,17 @@ a { color: inherit; text-decoration: none; }
   transform: rotate(90deg);
   color: var(--card-accent, var(--accent));
 }
+.card-star {
+  background: none; border: none; cursor: pointer; padding: 4px 2px;
+  font-size: 1.05rem; line-height: 1; color: var(--text-faint);
+  transition: color .15s, transform .15s; flex-shrink: 0;
+}
+.card-star:hover { color: #f59e0b; transform: scale(1.25); }
+.card-star.starred { color: #f59e0b; }
+.fav-empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.fav-empty-icon{font-size:2.5rem;margin-bottom:12px}
+.fav-empty p{font-size:.9rem}
+.gnav-btn.fav-btn.active{background:#f59e0b;border-color:#f59e0b;color:#fff}
 
 .card-tags { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 18px 10px; }
 .card-tag {
@@ -551,6 +562,12 @@ a { color: inherit; text-decoration: none; }
         <a class="gnav-item" href="futures-course.html">台指期課程</a>
         <a class="gnav-item" href="us-futures-course.html">美股期貨課程</a>
       </div>
+    </div>
+    <!-- 收藏 -->
+    <div class="gnav-group" id="gnav-fav" style="margin-left:auto">
+      <button class="gnav-btn fav-btn" onclick="switchFavorites()" id="fav-btn">
+        ☆ 收藏
+      </button>
     </div>
     <!-- 專有名詞及策略 -->
     <div class="gnav-group" id="gnav-glossary">
@@ -1176,6 +1193,38 @@ let currentSection = 'technical';
 let currentDiff = 'all';
 let searchTerm = '';
 let expandedCard = null;
+let favorites = new Set(JSON.parse(localStorage.getItem('stock-favorites') || '[]'));
+
+function saveFavorites() {
+  localStorage.setItem('stock-favorites', JSON.stringify([...favorites]));
+}
+
+function toggleStar(id, e) {
+  e.stopPropagation();
+  if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+  saveFavorites();
+  document.querySelectorAll(`[data-id="${id}"] .card-star`).forEach(btn => {
+    btn.classList.toggle('starred', favorites.has(id));
+    btn.textContent = '★';
+  });
+  const favBtn = document.getElementById('fav-btn');
+  if (favBtn) favBtn.textContent = favorites.size > 0 ? `★ 收藏 ${favorites.size}` : '☆ 收藏';
+  if (currentSection === 'favorites') renderSection('favorites');
+}
+
+function switchFavorites() {
+  if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  currentSection = 'favorites';
+  document.querySelectorAll('.gnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('fav-btn').classList.add('active');
+  renderSection('favorites');
+  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function updateFavBtn() {
+  const btn = document.getElementById('fav-btn');
+  if (btn) btn.textContent = favorites.size > 0 ? `★ 收藏 ${favorites.size}` : '☆ 收藏';
+}
 
 // getSection defined below with 'all' support
 
@@ -1192,6 +1241,7 @@ function renderCard(card, section) {
     </div>
     <div class="card-summary-inline">${card.summary}</div>
     <div class="card-right">
+      <button class="card-star${favorites.has(card.id)?' starred':''}" onclick="toggleStar('${card.id}',event)" title="加入收藏">★</button>
       <span class="card-difficulty ${diffClass}">${card.diff}</span>
       <span class="card-chevron">›</span>
     </div>
@@ -1221,6 +1271,11 @@ function renderCard(card, section) {
 }
 
 function getSection(id) {
+  if (id === 'favorites') {
+    const all = DATA.reduce((acc,s) => acc.concat(s.cards.map(c=>({...c,_sec:s}))), []);
+    return { id:'favorites', title:'收藏', icon:'★', accent:'#f59e0b', kpBg:'rgba(245,158,11,.06)', kpBorder:'rgba(245,158,11,.18)',
+      cards: all.filter(c => favorites.has(c.id)) };
+  }
   if (id === 'all') {
     return { id:'all', title:'全部', icon:'🗂', accent:'var(--accent)', kpBg:'rgba(59,130,246,.06)', kpBorder:'rgba(59,130,246,.18)',
       cards: DATA.reduce((acc,s) => acc.concat(s.cards.map(c=>({...c,_sec:s}))), []) };
@@ -1239,7 +1294,11 @@ function getSection(id) {
 function renderSection(sectionId) {
   const section = getSection(sectionId);
   const grid = document.getElementById('cards-grid');
-  if (sectionId === 'all') {
+  if (sectionId === 'favorites' && section.cards.length === 0) {
+    grid.innerHTML = `<div class="fav-empty"><div class="fav-empty-icon">☆</div><p>還沒有收藏的字卡<br>點擊任意字卡右側的 ★ 加入收藏</p></div>`;
+    applyFilters(); return;
+  }
+  if (sectionId === 'all' || sectionId === 'favorites') {
     grid.innerHTML = section.cards.map(c => renderCard(c, c._sec || section)).join('');
   } else {
     grid.innerHTML = section.cards.map(c => renderCard(c, section)).join('');
@@ -1260,6 +1319,7 @@ function switchTab(id) {
   document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.add('active');
   document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.remove('active');
   document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.remove('active');
+  document.getElementById('fav-btn').classList.remove('active');
   renderSection(id);
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1276,6 +1336,7 @@ function switchFutures(mkt) {
   document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.add('active');
   document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.remove('active');
   document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.remove('active');
+  document.getElementById('fav-btn').classList.remove('active');
   renderSection(id);
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1290,6 +1351,7 @@ function switchUSStocks(id) {
   document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.add('active');
   document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.remove('active');
   document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.remove('active');
+  document.getElementById('fav-btn').classList.remove('active');
   renderSection(id);
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1426,6 +1488,7 @@ document.getElementById('search-input').addEventListener('input', function() {
 
 document.addEventListener('DOMContentLoaded', () => {
   renderSection('technical');
+  updateFavBtn();
 });
 
 window.addEventListener('resize', updateTabIndicator);
