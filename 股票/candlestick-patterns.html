@@ -46,8 +46,9 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-primary);font-weight:800;font-family:var(--font-en);font-size:1.1rem;flex-shrink:0}
 .nav-logo svg{flex-shrink:0}
 .nav-logo span{color:var(--color-primary)}
-.nav-back{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-muted);font-size:.85rem;font-weight:500;padding:6px 12px;border:1px solid var(--border);border-radius:20px;transition:all .2s}
+.nav-back{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-muted);font-size:.85rem;font-weight:500;padding:6px 12px;border:1px solid var(--border);border-radius:20px;transition:all .2s;white-space:nowrap}
 .nav-back:hover{color:var(--color-primary);border-color:var(--accent-border);background:var(--accent-dim)}
+@media(max-width:520px){.nav-back{display:none}}
 .nav-spacer{flex:1}
 .nav-search{position:relative;display:flex;align-items:center}
 .nav-search input{border:1px solid var(--border);border-radius:20px;padding:8px 16px 8px 38px;font-size:.875rem;font-family:var(--font);background:var(--bg-raised);width:200px;transition:all .3s;outline:none;color:var(--text-primary)}
@@ -898,70 +899,81 @@ PATTERNS.push(...COMBOS);
 
 // ─── CONTEXT CHART DATA ───────────────────────────────────────────────
 // Base sequences: [open, high, low, close] on 0-100 scale
-const DT8=[[80,83,76,78],[78,81,73,75],[75,78,70,72],[72,75,67,69],[69,72,64,66],[66,69,61,63],[63,66,58,60],[60,63,55,57]];
-const UT8=[[32,35,29,34],[34,37,32,36],[36,40,34,39],[39,43,37,42],[42,46,40,45],[45,49,43,48],[48,52,46,51],[51,55,49,54]];
-const FL8=[[51,55,48,53],[53,57,50,52],[52,56,49,54],[54,57,51,53],[53,57,50,52],[52,55,49,53],[53,57,51,55],[55,58,52,54]];
-const UR4=[[58,62,56,61],[61,66,59,64],[64,68,62,67],[67,72,65,70]];
-const DR4=[[54,57,50,51],[51,54,48,49],[49,52,46,47],[47,50,44,45]];
-const UC4=[[57,61,55,60],[60,65,58,63],[63,68,61,66],[66,71,64,69]];
-const DC4=[[54,57,51,52],[52,55,49,50],[50,53,47,48],[48,51,45,46]];
+// Base trend arrays – 3 variants each for visual variety across patterns
+const DT8 =[[80,83,76,78],[78,81,73,75],[75,78,70,72],[72,75,67,69],[69,72,64,66],[66,69,61,63],[63,66,58,60],[60,63,55,57]];
+const DT8s=[[86,89,82,84],[83,86,79,81],[79,83,74,76],[74,78,69,71],[69,73,64,66],[64,68,58,60],[58,63,53,55],[52,57,47,49]]; // steep
+const DT8g=[[76,79,73,75],[74,78,72,76],[75,78,72,73],[72,75,70,73],[72,75,69,71],[70,73,67,69],[68,71,65,67],[66,69,63,65]]; // gradual
+const UT8 =[[32,35,29,34],[34,37,32,36],[36,40,34,39],[39,43,37,42],[42,46,40,45],[45,49,43,48],[48,52,46,51],[51,55,49,54]];
+const UT8s=[[24,27,22,26],[26,30,24,29],[29,33,27,32],[32,37,30,36],[36,41,34,40],[40,45,38,44],[44,49,42,48],[48,53,46,52]]; // steep
+const UT8g=[[41,44,39,43],[43,46,41,45],[44,47,42,46],[46,49,44,48],[47,51,45,49],[49,53,47,51],[51,55,49,53],[53,57,51,55]]; // gradual
+const FL8 =[[51,55,48,53],[53,57,50,52],[52,56,49,54],[54,57,51,53],[53,57,50,52],[52,55,49,53],[53,57,51,55],[55,58,52,54]];
+const UR4 =[[58,62,56,61],[61,66,59,64],[64,68,62,67],[67,72,65,70]];
+const UR4s=[[58,65,56,64],[64,71,62,70],[70,76,68,75],[75,80,73,79]]; // strong
+const UR4g=[[57,60,55,59],[59,62,57,61],[61,64,59,62],[62,65,60,64]]; // weak
+const DR4 =[[54,57,50,51],[51,54,48,49],[49,52,46,47],[47,50,44,45]];
+const DR4s=[[54,57,50,50],[50,53,44,45],[45,48,39,40],[40,44,35,36]]; // sharp
+const DR4g=[[54,56,52,53],[53,55,51,52],[52,54,50,51],[51,53,49,50]]; // gentle
+const UC4 =[[57,61,55,60],[60,65,58,63],[63,68,61,66],[66,71,64,69]];
+const UC4s=[[57,64,55,63],[63,70,61,68],[68,75,66,74],[74,80,72,79]]; // strong
+const DC4 =[[54,57,51,52],[52,55,49,50],[50,53,47,48],[48,51,45,46]];
+const DC4s=[[54,57,51,51],[51,54,46,47],[46,50,41,42],[41,45,36,37]]; // sharp
 
 const CTX={
   // ── Single K ──────────────────────────────────────────────────────
-  hammer:            {pre:DT8,pat:[[57,60,41,58]],post:UR4},
-  hanging_man:       {pre:UT8,pat:[[54,57,40,55]],post:DR4},
-  inverted_hammer:   {pre:DT8,pat:[[55,71,53,57]],post:UR4},
-  shooting_star:     {pre:UT8,pat:[[54,70,52,56]],post:DR4},
-  doji:              {pre:UT8,pat:[[54,60,48,54]],post:DR4},
-  long_legged_doji:  {pre:UT8,pat:[[54,65,43,54]],post:DR4},
-  dragonfly_doji:    {pre:DT8,pat:[[57,57,42,57]],post:UR4},
-  gravestone_doji:   {pre:UT8,pat:[[54,69,54,54]],post:DR4},
-  marubozu_bull:     {pre:DT8,pat:[[55,71,55,71]],post:UC4},
-  marubozu_bear:     {pre:UT8,pat:[[54,54,38,38]],post:DC4},
-  spinning_top:      {pre:UT8,pat:[[54,60,48,55]],post:DR4},
-  high_wave:         {pre:UT8,pat:[[54,67,41,53]],post:DR4},
-  upper_limit:       {pre:DT8,pat:[[56,74,55,74]],post:UC4},
-  lower_limit:       {pre:UT8,pat:[[54,55,37,37]],post:DC4},
-  bullish_lower_shadow:{pre:DT8,pat:[[55,70,43,69]],post:UR4},
-  four_price_doji:   {pre:FL8,pat:[[53,54,52,53]],post:UC4},
+  hammer:              {pre:DT8s, pat:[[57,60,41,58]],            post:UR4s},
+  hanging_man:         {pre:UT8s, pat:[[54,57,40,55]],            post:DR4s},
+  inverted_hammer:     {pre:DT8g, pat:[[55,71,53,57]],            post:UR4g},
+  shooting_star:       {pre:UT8g, pat:[[54,70,52,56]],            post:DR4g},
+  doji:                {pre:UT8,  pat:[[54,60,48,54]],            post:DR4},
+  long_legged_doji:    {pre:UT8s, pat:[[54,65,43,54]],            post:DR4s},
+  dragonfly_doji:      {pre:DT8s, pat:[[57,57,42,57]],            post:UR4s},
+  gravestone_doji:     {pre:UT8g, pat:[[54,69,54,54]],            post:DR4},
+  marubozu_bull:       {pre:DT8s, pat:[[55,71,55,71]],            post:UC4s},
+  marubozu_bear:       {pre:UT8s, pat:[[54,54,38,38]],            post:DC4s},
+  spinning_top:        {pre:UT8g, pat:[[54,60,48,55]],            post:DR4g},
+  high_wave:           {pre:UT8,  pat:[[54,67,41,53]],            post:DR4},
+  upper_limit:         {pre:DT8g, pat:[[56,74,55,74]],            post:UC4s},
+  lower_limit:         {pre:UT8,  pat:[[54,55,37,37]],            post:DC4s},
+  bullish_lower_shadow:{pre:DT8,  pat:[[55,70,43,69]],            post:UR4},
+  four_price_doji:     {pre:FL8,  pat:[[53,54,52,53]],            post:UC4},
   // ── Double K ──────────────────────────────────────────────────────
-  bullish_engulfing: {pre:DT8,pat:[[58,61,54,55],[54,58,51,62]],post:UR4},
-  bearish_engulfing: {pre:UT8,pat:[[53,57,51,55],[55,58,49,50]],post:DR4},
-  bullish_harami:    {pre:DT8,pat:[[58,61,53,54],[54,57,53,56]],post:UR4},
-  bearish_harami:    {pre:UT8,pat:[[52,56,49,55],[55,57,52,53]],post:DR4},
-  dark_cloud_cover:  {pre:UT8,pat:[[52,56,50,55],[58,60,48,51]],post:DR4},
-  piercing_line:     {pre:DT8,pat:[[58,61,53,54],[51,57,49,59]],post:UR4},
-  tweezer_top:       {pre:UT8,pat:[[51,57,49,55],[52,57,50,51]],post:DR4},
-  tweezer_bottom:    {pre:DT8,pat:[[58,61,54,55],[54,58,54,59]],post:UR4},
+  bullish_engulfing:   {pre:DT8s, pat:[[58,61,54,55],[54,58,51,62]],          post:UR4s},
+  bearish_engulfing:   {pre:UT8s, pat:[[53,57,51,55],[55,58,49,50]],          post:DR4s},
+  bullish_harami:      {pre:DT8g, pat:[[58,61,53,54],[54,57,53,56]],          post:UR4g},
+  bearish_harami:      {pre:UT8g, pat:[[52,56,49,55],[55,57,52,53]],          post:DR4g},
+  dark_cloud_cover:    {pre:UT8,  pat:[[52,56,50,55],[58,60,48,51]],          post:DR4},
+  piercing_line:       {pre:DT8,  pat:[[58,61,53,54],[51,57,49,59]],          post:UR4},
+  tweezer_top:         {pre:UT8s, pat:[[51,57,49,55],[52,57,50,51]],          post:DR4},
+  tweezer_bottom:      {pre:DT8,  pat:[[58,61,54,55],[54,58,54,59]],          post:UR4g},
   // ── Triple K ──────────────────────────────────────────────────────
-  morning_star:      {pre:DT8,pat:[[58,61,53,54],[51,54,49,51],[51,59,49,61]],post:UR4},
-  evening_star:      {pre:UT8,pat:[[52,55,50,54],[54,58,53,56],[56,58,48,50]],post:DR4},
-  morning_doji_star: {pre:DT8,pat:[[58,61,53,54],[50,54,48,50],[51,60,49,62]],post:UR4},
-  three_white_soldiers:{pre:DT8,pat:[[55,58,53,58],[58,64,57,63],[63,68,61,67]],post:UC4},
-  three_black_crows: {pre:UT8,pat:[[54,57,50,51],[51,54,47,48],[48,51,44,45]],post:DC4},
-  abandoned_baby_bull:{pre:DT8,pat:[[58,61,54,55],[49,52,47,49],[55,63,53,63]],post:UR4},
-  abandoned_baby_bear:{pre:UT8,pat:[[51,55,49,54],[57,60,56,57],[52,55,48,49]],post:DR4},
-  three_inside_up:   {pre:DT8,pat:[[58,61,53,54],[54,57,53,56],[56,63,54,63]],post:UR4},
-  three_inside_down: {pre:UT8,pat:[[51,56,49,55],[55,57,52,53],[53,56,47,48]],post:DR4},
-  upside_gap_two_crows:{pre:UT8,pat:[[51,55,49,54],[58,61,55,57],[57,60,52,53]],post:DR4},
+  morning_star:        {pre:DT8s, pat:[[58,61,53,54],[51,54,49,51],[51,59,49,61]],            post:UR4s},
+  evening_star:        {pre:UT8s, pat:[[52,55,50,54],[54,58,53,56],[56,58,48,50]],            post:DR4s},
+  morning_doji_star:   {pre:DT8g, pat:[[58,61,53,54],[50,54,48,50],[51,60,49,62]],            post:UR4},
+  three_white_soldiers:{pre:DT8s, pat:[[55,58,53,58],[58,64,57,63],[63,68,61,67]],            post:UC4s},
+  three_black_crows:   {pre:UT8s, pat:[[54,57,50,51],[51,54,47,48],[48,51,44,45]],            post:DC4s},
+  abandoned_baby_bull: {pre:DT8g, pat:[[58,61,54,55],[49,52,47,49],[55,63,53,63]],            post:UR4g},
+  abandoned_baby_bear: {pre:UT8g, pat:[[51,55,49,54],[57,60,56,57],[52,55,48,49]],            post:DR4g},
+  three_inside_up:     {pre:DT8,  pat:[[58,61,53,54],[54,57,53,56],[56,63,54,63]],            post:UR4},
+  three_inside_down:   {pre:UT8,  pat:[[51,56,49,55],[55,57,52,53],[53,56,47,48]],            post:DR4},
+  upside_gap_two_crows:{pre:UT8g, pat:[[51,55,49,54],[58,61,55,57],[57,60,52,53]],            post:DR4g},
   // ── Special ───────────────────────────────────────────────────────
-  gap_up:            {pre:FL8,pat:[[53,57,51,56],[62,70,60,68]],post:UC4},
-  gap_down:          {pre:FL8,pat:[[53,57,51,56],[45,48,40,42]],post:DC4},
-  island_reversal_top:   {pre:UT8,pat:[[51,55,49,54],[58,63,56,61],[60,64,58,62],[58,62,56,59],[52,54,45,46]],post:DR4},
-  island_reversal_bottom:{pre:DT8,pat:[[58,61,54,55],[48,52,46,50],[50,54,47,52],[51,55,48,53],[58,63,56,61]],post:UR4},
-  rising_three_methods:  {pre:UT8,pat:[[50,55,48,54],[54,57,52,51],[51,55,50,52],[52,56,51,50],[50,57,49,56]],post:UC4},
-  falling_three_methods: {pre:DT8,pat:[[57,62,53,54],[54,57,52,56],[56,59,54,57],[57,60,55,56],[56,62,56,49]],post:DC4},
+  gap_up:                  {pre:FL8,  pat:[[53,57,51,56],[62,70,60,68]],                              post:UC4s},
+  gap_down:                {pre:FL8,  pat:[[53,57,51,56],[45,48,40,42]],                              post:DC4s},
+  island_reversal_top:     {pre:UT8s, pat:[[51,55,49,54],[58,63,56,61],[60,64,58,62],[58,62,56,59],[52,54,45,46]], post:DR4s},
+  island_reversal_bottom:  {pre:DT8s, pat:[[58,61,54,55],[48,52,46,50],[50,54,47,52],[51,55,48,53],[58,63,56,61]], post:UR4s},
+  rising_three_methods:    {pre:UT8g, pat:[[50,55,48,54],[54,57,52,51],[51,55,50,52],[52,56,51,50],[50,57,49,56]], post:UC4},
+  falling_three_methods:   {pre:DT8g, pat:[[57,62,53,54],[54,57,52,56],[56,59,54,57],[57,60,55,56],[56,62,56,49]], post:DC4},
   // ── Combo ─────────────────────────────────────────────────────────
-  morning_star_combo:         {pre:DT8,pat:[[58,61,53,54],[51,54,49,51],[51,59,49,61]],post:UR4},
-  evening_star_combo:         {pre:UT8,pat:[[52,55,50,54],[54,58,53,56],[56,58,48,50]],post:DR4},
-  bullish_engulfing_combo:    {pre:DT8,pat:[[58,61,54,55],[54,58,51,62]],post:UR4},
-  bearish_engulfing_combo:    {pre:UT8,pat:[[53,57,51,55],[55,58,49,50]],post:DR4},
-  three_white_soldiers_combo: {pre:DT8,pat:[[55,58,53,58],[58,64,57,63],[63,68,61,67]],post:UC4},
-  three_black_crows_combo:    {pre:UT8,pat:[[54,57,50,51],[51,54,47,48],[48,51,44,45]],post:DC4},
-  bullish_harami_combo:       {pre:DT8,pat:[[58,61,53,54],[54,57,53,56]],post:UR4},
-  dark_cloud_cover_combo:     {pre:UT8,pat:[[52,56,50,55],[58,60,48,51]],post:DR4},
-  piercing_pattern_combo:     {pre:DT8,pat:[[58,61,53,54],[51,57,49,59]],post:UR4},
-  bullish_kicker_combo:       {pre:DT8,pat:[[58,61,54,55],[63,71,61,70]],post:UC4},
+  morning_star_combo:          {pre:DT8g, pat:[[58,61,53,54],[51,54,49,51],[51,59,49,61]],  post:UR4s},
+  evening_star_combo:          {pre:UT8g, pat:[[52,55,50,54],[54,58,53,56],[56,58,48,50]],  post:DR4s},
+  bullish_engulfing_combo:     {pre:DT8,  pat:[[58,61,54,55],[54,58,51,62]],                post:UR4g},
+  bearish_engulfing_combo:     {pre:UT8,  pat:[[53,57,51,55],[55,58,49,50]],                post:DR4g},
+  three_white_soldiers_combo:  {pre:DT8g, pat:[[55,58,53,58],[58,64,57,63],[63,68,61,67]], post:UC4},
+  three_black_crows_combo:     {pre:UT8g, pat:[[54,57,50,51],[51,54,47,48],[48,51,44,45]], post:DC4},
+  bullish_harami_combo:        {pre:DT8s, pat:[[58,61,53,54],[54,57,53,56]],                post:UR4},
+  dark_cloud_cover_combo:      {pre:UT8s, pat:[[52,56,50,55],[58,60,48,51]],                post:DR4},
+  piercing_pattern_combo:      {pre:DT8,  pat:[[58,61,53,54],[51,57,49,59]],                post:UR4s},
+  bullish_kicker_combo:        {pre:DT8g, pat:[[58,61,54,55],[63,71,61,70]],                post:UC4s},
 };
 
 // ─── CONTEXT CHART SVG RENDERER ───────────────────────────────────────

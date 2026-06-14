@@ -18,18 +18,18 @@ a{color:inherit;text-decoration:none}
 .progress-wrap{padding:12px 16px;border-bottom:1px solid #21262d}
 .progress-label{display:flex;justify-content:space-between;font-size:11px;color:#484f58;margin-bottom:6px}
 .progress-bar{height:4px;background:#21262d;border-radius:2px}
-.progress-fill{height:4px;background:#3fb950;border-radius:2px;transition:width .4s}
+.progress-fill{height:4px;background:#3b82f6;border-radius:2px;transition:width .4s}
 #chList{flex:1;overflow-y:auto;padding:8px 0}
 .ch-label{font-size:10px;font-weight:700;color:#30363d;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px 4px}
 .ls-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .15s;border-left:3px solid transparent}
 .ls-item:hover{background:rgba(255,255,255,.04)}
-.ls-item.active{background:rgba(35,134,54,.1);border-left-color:#238636}
+.ls-item.active{background:rgba(29,78,216,.1);border-left-color:#1d4ed8}
 .ls-item.done{opacity:.65}
-.ls-item.done .ls-num{background:#238636;color:#fff}
+.ls-item.done .ls-num{background:#1d4ed8;color:#fff}
 .ls-num{width:28px;height:28px;border-radius:6px;background:#21262d;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#484f58;flex-shrink:0}
 .ls-item span{font-size:12px;color:#8b949e;flex:1;line-height:1.35}
-.ls-item.active span{color:#3fb950}
-.ls-check{color:#3fb950;font-size:12px}
+.ls-item.active span{color:#60a5fa}
+.ls-check{color:#60a5fa;font-size:12px}
 .sb-footer{padding:14px 16px;border-top:1px solid #21262d;display:flex;flex-direction:column;gap:6px}
 .sb-footer a{font-size:11px;color:#484f58;padding:4px 0;transition:color .15s}
 .sb-footer a:hover{color:#8b949e}
@@ -38,8 +38,8 @@ a{color:inherit;text-decoration:none}
 .topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:#0d1117;border-bottom:1px solid #21262d;position:sticky;top:0;z-index:50}
 .menu-btn{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:#8b949e}
 .topbar-title{font-size:14px;font-weight:600;color:#e6edf3;flex:1}
-.topbar-home{font-size:12px;color:#3fb950;font-weight:600;padding:5px 12px;border:1px solid #238636;border-radius:6px;background:rgba(35,134,54,.1);transition:all .15s}
-.topbar-home:hover{background:rgba(35,134,54,.2)}
+.topbar-home{font-size:12px;color:#60a5fa;font-weight:600;padding:5px 12px;border:1px solid #1d4ed8;border-radius:6px;background:rgba(29,78,216,.1);transition:all .15s}
+.topbar-home:hover{background:rgba(29,78,216,.2)}
 #lw{padding:28px 32px;max-width:860px}
 /* Lesson card */
 .lc{background:#21262d;border-radius:12px;overflow:hidden;margin-bottom:24px;border:1px solid #30363d}
@@ -47,22 +47,22 @@ a{color:inherit;text-decoration:none}
 .lc-cap img,.lc-cap svg{width:100%;display:block}
 .lc-body{padding:28px 32px}
 .lc-meta{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.lc-ch{font-size:11px;color:#3fb950;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.lc-ch{font-size:11px;color:#60a5fa;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .lc-rt{font-size:11px;color:#484f58}
 .lc-title{font-size:22px;font-weight:800;color:#e6edf3;line-height:1.25}
 .lc-sub{font-size:13px;color:#8b949e;margin-top:4px}
 .lc-content{margin-top:22px;font-size:14px;line-height:1.8;color:#c9d1d9}
-.lc-content h3{font-size:15px;font-weight:700;color:#e6edf3;margin:20px 0 10px;padding-left:10px;border-left:3px solid #238636}
+.lc-content h3{font-size:15px;font-weight:700;color:#e6edf3;margin:20px 0 10px;padding-left:10px;border-left:3px solid #3b82f6}
 .lc-content p{margin-bottom:10px}
 .lc-content ul,.lc-content ol{padding-left:20px;margin-bottom:10px}
 .lc-content li{margin-bottom:5px}
 .lc-content strong{color:#e6edf3}
-.hl{background:rgba(35,134,54,.1);border:1px solid rgba(35,134,54,.25);border-left:3px solid #238636;padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13px;line-height:1.65;color:#7ee787}
+.hl{background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.22);border-left:3px solid #d97706;padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13px;line-height:1.65;color:#fde68a}
 .eg{background:rgba(31,111,235,.1);border:1px solid rgba(31,111,235,.25);border-left:3px solid #1f6feb;padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13px;line-height:1.65;color:#a5c8ff}
 .warn{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.25);border-left:3px solid #d29922;padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13px;line-height:1.65;color:#e3b341}
-.formula{background:#0d1117;color:#e6edf3;padding:14px 18px;border-radius:6px;margin:12px 0;font-size:12.5px;line-height:1.8;white-space:pre-wrap;font-family:"Consolas","Courier New",monospace;border:1px solid #30363d;border-left:3px solid #238636}
-.kp-box{background:#0d1117;border:1px solid #30363d;border-left:4px solid #238636;border-radius:8px;padding:14px 18px;margin:10px 0;font-size:13px;line-height:1.65;color:#c9d1d9}
-.kp-box b,.kp-box strong{color:#3fb950}
+.formula{background:#0d1117;color:#e6edf3;padding:14px 18px;border-radius:6px;margin:12px 0;font-size:12.5px;line-height:1.8;white-space:pre-wrap;font-family:"Consolas","Courier New",monospace;border:1px solid #30363d;border-left:3px solid #3b82f6}
+.kp-box{background:#0d1117;border:1px solid #30363d;border-left:4px solid #3b82f6;border-radius:8px;padding:14px 18px;margin:10px 0;font-size:13px;line-height:1.65;color:#c9d1d9}
+.kp-box b,.kp-box strong{color:#60a5fa}
 .cmp-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
 .cmp-table th{background:#0d1117;color:#e6edf3;padding:9px 12px;text-align:left;font-size:12px;font-weight:700;border-bottom:2px solid #30363d}
 .cmp-table td{padding:9px 12px;border-bottom:1px solid #21262d;color:#c9d1d9;vertical-align:top}
@@ -77,13 +77,13 @@ a{color:inherit;text-decoration:none}
 .lc-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;border-top:1px solid #21262d;background:#21262d}
 .nav-btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #30363d;background:transparent;color:#c9d1d9;transition:all .15s}
 .nav-btn:hover{background:#30363d;border-color:#484f58}
-.nav-btn.primary{background:#238636;color:#fff;border-color:#238636}
-.nav-btn.primary:hover{background:#2ea043}
-.done-btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #238636;color:#3fb950;background:transparent;transition:all .15s}
-.done-btn.marked{background:#238636;color:#fff}
+.nav-btn.primary{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.nav-btn.primary:hover{background:#2563eb}
+.done-btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #1d4ed8;color:#60a5fa;background:transparent;transition:all .15s}
+.done-btn.marked{background:#1d4ed8;color:#fff}
 .overlay{display:none;position:fixed;inset:0;background:rgba(1,4,9,.7);z-index:90}
 /* Responsive */
-.fab-toc{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#238636;color:#fff;border:none;border-radius:50px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;z-index:200;box-shadow:0 4px 20px rgba(35,134,54,.4);align-items:center;gap:8px;white-space:nowrap;letter-spacing:.02em}
+.fab-toc{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1d4ed8;color:#fff;border:none;border-radius:50px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;z-index:200;box-shadow:0 4px 20px rgba(29,78,216,.4);align-items:center;gap:8px;white-space:nowrap;letter-spacing:.02em}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -152,8 +152,8 @@ svg:`<svg viewBox="0 0 580 170" xmlns="http://www.w3.org/2000/svg" style="font-f
 <text x="145" y="123" text-anchor="middle" fill="#94a3b8" font-size="9">標的：台灣加權指數</text>
 <text x="145" y="140" text-anchor="middle" fill="#fbbf24" font-size="9">主要參與者：外資、散戶</text>
 <text x="145" y="153" text-anchor="middle" fill="#94a3b8" font-size="8">日均成交量：約20萬口</text>
-<rect x="300" y="28" width="270" height="130" fill="#052e16" rx="6" stroke="#10b981" stroke-width="0.8"/>
-<text x="435" y="46" text-anchor="middle" fill="#34d399" font-size="11" font-weight="700">ES / NQ（美股期貨）</text>
+<rect x="300" y="28" width="270" height="130" fill="#0a1c3a" rx="6" stroke="#3b82f6" stroke-width="0.8"/>
+<text x="435" y="46" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="700">ES / NQ（美股期貨）</text>
 <text x="435" y="63" text-anchor="middle" fill="#94a3b8" font-size="9">ES點值：$50/點；NQ：$20/點</text>
 <text x="435" y="78" text-anchor="middle" fill="#94a3b8" font-size="9">保證金：約 US$11,000–17,000</text>
 <text x="435" y="93" text-anchor="middle" fill="#94a3b8" font-size="9">交易時段：幾乎24小時（週日-週五）</text>

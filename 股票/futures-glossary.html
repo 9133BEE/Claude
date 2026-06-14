@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>期貨術語字典 — 股學筆記</title>
+<title>期貨相關名詞 — 股學筆記</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:#161b22;color:#e6edf3;min-height:100vh;font-size:15px}
@@ -63,15 +63,15 @@ a{color:inherit;text-decoration:none}
 
 <div class="topbar">
   <span class="tb-back" onclick="location.href='index.html'">← 股學筆記</span>
-  <span class="tb-title">期貨術語字典</span>
+  <span class="tb-title">期貨相關名詞</span>
   <span class="tb-sub">共 <span id="total">0</span> 個詞條</span>
 </div>
 
 <div class="hero">
-  <h1>📖 期貨術語字典</h1>
+  <h1>期貨相關名詞</h1>
   <p>台指期 · 保證金 · 交易術語 · 美股期貨 — 完整解說不漏掉</p>
   <div class="search-wrap">
-    <span class="search-icon">🔍</span>
+    <span class="search-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
     <input type="text" id="q" placeholder="搜尋術語、英文、定義..." oninput="filter()">
   </div>
   <div class="count">顯示 <span id="showing">0</span> 個詞條</div>
@@ -79,11 +79,11 @@ a{color:inherit;text-decoration:none}
 
 <div class="cats" id="cats">
   <button class="cat-btn active" data-cat="all" onclick="setCat('all',this)">全部</button>
-  <button class="cat-btn" data-cat="contract" onclick="setCat('contract',this)">📄 合約基礎</button>
-  <button class="cat-btn" data-cat="margin" onclick="setCat('margin',this)">💰 保證金制度</button>
-  <button class="cat-btn" data-cat="trading" onclick="setCat('trading',this)">⚡ 交易術語</button>
-  <button class="cat-btn" data-cat="risk" onclick="setCat('risk',this)">🛡 風險管理</button>
-  <button class="cat-btn" data-cat="us" onclick="setCat('us',this)">🇺🇸 美股期貨</button>
+  <button class="cat-btn" data-cat="contract" onclick="setCat('contract',this)">合約基礎</button>
+  <button class="cat-btn" data-cat="margin" onclick="setCat('margin',this)">保證金制度</button>
+  <button class="cat-btn" data-cat="trading" onclick="setCat('trading',this)">交易術語</button>
+  <button class="cat-btn" data-cat="risk" onclick="setCat('risk',this)">風險管理</button>
+  <button class="cat-btn" data-cat="us" onclick="setCat('us',this)">美股期貨</button>
 </div>
 
 <div class="glossary" id="glossary"></div>
