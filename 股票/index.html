@@ -184,9 +184,11 @@ a { color: inherit; text-decoration: none; }
   position: sticky; top: var(--nav-h); z-index: 200;
   background: #fff;
   border-bottom: 1px solid var(--border-default);
+}
+.gnav-wrap {
   overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
 }
-.tab-nav::-webkit-scrollbar { display: none; }
+.gnav-wrap::-webkit-scrollbar { display: none; }
 .gnav {
   display: flex; gap: 8px; align-items: center;
   max-width: 1200px; margin: 0 auto;
@@ -204,8 +206,6 @@ a { color: inherit; text-decoration: none; }
 }
 .gnav-btn:hover { border-color: var(--accent); color: var(--accent); }
 .gnav-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.gnav-sub { font-size: 10px; color: rgba(255,255,255,.75); font-weight: 400; }
-.gnav-btn:not(.active) .gnav-sub { color: #94a3b8; }
 .gnav-arrow { font-size: 9px; opacity: .6; transition: transform .2s; }
 .gnav-group.open .gnav-arrow { transform: rotate(180deg); }
 .gnav-drop {
@@ -491,11 +491,12 @@ a { color: inherit; text-decoration: none; }
 
 <!-- TABS -->
 <div class="tab-nav" id="tab-nav">
+ <div class="gnav-wrap">
   <div class="gnav">
     <!-- 台股 -->
     <div class="gnav-group" id="gnav-stocks">
       <button class="gnav-btn active" onclick="toggleDrop('stocks')">
-        台股 <span class="gnav-sub" id="sub-stocks">技術</span> <span class="gnav-arrow">▾</span>
+        台股 <span class="gnav-arrow">▾</span>
       </button>
       <div class="gnav-drop">
         <button class="gnav-item cur" onclick="switchTab('technical');closeDrop('stocks')">技術</button>
@@ -507,7 +508,7 @@ a { color: inherit; text-decoration: none; }
     <!-- 期貨 -->
     <div class="gnav-group" id="gnav-futures">
       <button class="gnav-btn" onclick="toggleDrop('futures-nav')">
-        期貨 <span class="gnav-sub" id="sub-futures">台股</span> <span class="gnav-arrow">▾</span>
+        期貨 <span class="gnav-arrow">▾</span>
       </button>
       <div class="gnav-drop">
         <button class="gnav-item cur" onclick="switchFutures('tw');closeDrop('futures-nav')">台股期貨</button>
@@ -552,6 +553,7 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
   </div>
+ </div>
 </div>
 
 <!-- FILTER BAR -->
