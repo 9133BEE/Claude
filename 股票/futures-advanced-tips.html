@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>期貨進階技巧 | 股市學習</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+a{color:#58a6ff;text-decoration:none}
+a:hover{text-decoration:underline}
+.topbar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar-title{font-size:1.1rem;font-weight:700;color:#e6edf3}
+.topbar a{font-size:.85rem;color:#8b949e;padding:4px 10px;border-radius:6px;border:1px solid #30363d;transition:all .2s}
+.topbar a:hover{color:#58a6ff;border-color:#58a6ff;text-decoration:none}
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#1a1f2e 100%);padding:48px 20px 32px;text-align:center;border-bottom:1px solid #30363d}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#f59e0b,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:#8b949e;font-size:1rem;max-width:600px;margin:0 auto 8px}
+.hero-badge{display:inline-block;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);color:#8b5cf6;font-size:.78rem;padding:4px 12px;border-radius:20px;margin-top:8px}
+.tab-bar{display:flex;gap:0;padding:20px 20px 0;justify-content:center}
+.tab-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:10px 32px;cursor:pointer;font-size:.95rem;font-weight:600;transition:all .2s}
+.tab-btn:first-child{border-radius:8px 0 0 8px}
+.tab-btn:last-child{border-radius:0 8px 8px 0}
+.tab-btn.active{background:rgba(139,92,246,.15);border-color:#8b5cf6;color:#8b5cf6}
+.tab-section{display:none}
+.tab-section.active{display:block}
+.filters{display:flex;gap:8px;padding:16px 20px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
+.filter-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:6px 16px;border-radius:20px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.filter-btn:hover{border-color:#58a6ff;color:#58a6ff}
+.filter-btn.active{background:rgba(88,166,255,.15);border-color:#58a6ff;color:#58a6ff}
+.filter-btn.cat-vol.active{background:rgba(239,68,68,.15);border-color:#ef4444;color:#ef4444}
+.filter-btn.cat-chip.active{background:rgba(245,158,11,.15);border-color:#f59e0b;color:#f59e0b}
+.filter-btn.cat-timing.active{background:rgba(34,197,94,.15);border-color:#22c55e;color:#22c55e}
+.filter-btn.cat-wave.active{background:rgba(139,92,246,.15);border-color:#8b5cf6;color:#8b5cf6}
+.filter-btn.cat-strategy.active{background:rgba(236,72,153,.15);border-color:#ec4899;color:#ec4899}
+.tips-grid{max-width:1100px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:24px}
+@media(max-width:580px){.tips-grid{grid-template-columns:1fr;padding:16px 12px}}
+.tip-card{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.tip-card:hover{border-color:#58a6ff;box-shadow:0 4px 20px rgba(88,166,255,.1)}
+.tip-card.cat-vol{border-top:3px solid #ef4444}
+.tip-card.cat-chip{border-top:3px solid #f59e0b}
+.tip-card.cat-timing{border-top:3px solid #22c55e}
+.tip-card.cat-wave{border-top:3px solid #8b5cf6}
+.tip-card.cat-strategy{border-top:3px solid #ec4899}
+.tip-header{padding:20px 20px 0;display:flex;align-items:flex-start;gap:12px}
+.tip-num{background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:.75rem;font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.tip-meta{flex:1}
+.tip-cat-tag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.cat-vol .tip-cat-tag{background:rgba(239,68,68,.15);color:#ef4444}
+.cat-chip .tip-cat-tag{background:rgba(245,158,11,.15);color:#f59e0b}
+.cat-timing .tip-cat-tag{background:rgba(34,197,94,.15);color:#22c55e}
+.cat-wave .tip-cat-tag{background:rgba(139,92,246,.15);color:#8b5cf6}
+.cat-strategy .tip-cat-tag{background:rgba(236,72,153,.15);color:#ec4899}
+.tip-title{font-size:1.05rem;font-weight:700;color:#e6edf3;line-height:1.3}
+.tip-subtitle{font-size:.82rem;color:#8b949e;margin-top:3px}
+.tip-diagram{padding:16px 20px 0}
+.tip-diagram svg{width:100%;height:auto;display:block;border-radius:8px;background:#0d1117;border:1px solid #21262d}
+.tip-content{padding:16px 20px 20px}
+.signal-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-left:3px solid #ef4444;border-radius:8px;padding:12px 14px;margin:10px 0}
+.signal-box h4{color:#ef4444;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.gold-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-left:3px solid #f59e0b;border-radius:8px;padding:12px 14px;margin:10px 0}
+.gold-box h4{color:#f59e0b;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.blue-box{background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.25);border-left:3px solid #58a6ff;border-radius:8px;padding:12px 14px;margin:10px 0}
+.blue-box h4{color:#58a6ff;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.green-box{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-left:3px solid #22c55e;border-radius:8px;padding:12px 14px;margin:10px 0}
+.green-box h4{color:#22c55e;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.purple-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-left:3px solid #8b5cf6;border-radius:8px;padding:12px 14px;margin:10px 0}
+.purple-box h4{color:#8b5cf6;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.tip-content p{font-size:.88rem;color:#8b949e;line-height:1.65;margin-bottom:6px}
+.tip-content ul{padding-left:18px;margin:4px 0}
+.tip-content li{font-size:.86rem;color:#8b949e;line-height:1.6;margin-bottom:3px}
+.tip-content strong{color:#e6edf3}
+.formula-box{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 14px;margin:10px 0;font-family:monospace;font-size:.85rem;color:#58a6ff;text-align:center}
+.case-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.82rem}
+.case-table th{background:#21262d;color:#8b949e;padding:7px 10px;text-align:left;font-weight:600;border-bottom:1px solid #30363d}
+.case-table td{padding:7px 10px;border-bottom:1px solid #21262d;color:#c9d1d9}
+.case-table tr:hover td{background:#1a1f2e}
+.val-up{color:#22c55e;font-weight:600}
+.val-down{color:#ef4444;font-weight:600}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-title">期貨進階技巧</span>
+  <a href="index.html">首頁</a>
+  <a href="futures-glossary.html">期貨名詞</a>
+  <a href="advanced-tips.html">股票進階</a>
+</div>
+<div class="hero">
+  <h1>期貨進階交易技巧</h1>
+  <p>台指期與美股期深度策略，掌握法人籌碼、時機節點與跨市場聯動</p>
+  <span class="hero-badge">台指期 15 招 + 美股期 15 招</span>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('tw')">台指期</button>
+  <button class="tab-btn" onclick="switchTab('us')">美股期</button>
+</div>
+
+<!-- 台指期 -->
+<div id="tab-tw" class="tab-section active">
+<div class="filters" id="filters-tw">
+  <button class="filter-btn active" onclick="filterTips('all','tw')">全部</button>
+  <button class="filter-btn cat-vol" onclick="filterTips('vol','tw')">量能</button>
+  <button class="filter-btn cat-chip" onclick="filterTips('chip','tw')">籌碼</button>
+  <button class="filter-btn cat-timing" onclick="filterTips('timing','tw')">時機</button>
+  <button class="filter-btn cat-wave" onclick="filterTips('wave','tw')">波動</button>
+  <button class="filter-btn cat-strategy" onclick="filterTips('strategy','tw')">策略</button>
+</div>
+<div class="tips-grid" id="grid-tw">
+
+<!-- TW TIP 1 -->
+<div class="tip-card cat-vol" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">1</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">量能</span>
+    <div class="tip-title">早盤爆量判斷開盤方向</div>
+    <div class="tip-subtitle">8:45–9:15 前15分鐘量能決定全天趨勢</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <text x="8" y="14" fill="#8b949e" font-size="9">量(口)</text>
+  <text x="8" y="26" fill="#8b949e" font-size="8">15000</text>
+  <text x="8" y="62" fill="#8b949e" font-size="8">8000</text>
+  <text x="8" y="98" fill="#8b949e" font-size="8">2000</text>
+  <line x1="35" y1="10" x2="35" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="35" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <rect x="42" y="70" width="20" height="40" fill="#22c55e" rx="2"/>
+  <rect x="68" y="30" width="20" height="80" fill="#22c55e" rx="2"/>
+  <rect x="94" y="58" width="20" height="52" fill="#22c55e" rx="2"/>
+  <rect x="120" y="75" width="20" height="35" fill="#8b949e" rx="2" opacity=".5"/>
+  <rect x="146" y="80" width="20" height="30" fill="#8b949e" rx="2" opacity=".5"/>
+  <line x1="35" y1="40" x2="272" y2="40" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="240" y="37" fill="#f59e0b" font-size="8">均量線</text>
+  <text x="50" y="125" fill="#22c55e" font-size="8">爆量區</text>
+  <text x="130" y="125" fill="#8b949e" font-size="8">正常量</text>
+  <text x="42" y="20" fill="#22c55e" font-size="8">↑多方控盤</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="signal-box"><h4>核心訊號</h4><p>開盤前15分鐘成交量 <strong>超過均量1.5倍</strong>，且價格持續走高 → 多方力道強烈，可順勢偏多操作。</p></div>
+  <div class="gold-box"><h4>量價關係</h4>
+    <ul>
+      <li>早盤爆量<strong>價漲</strong>：法人積極買進，追多信號</li>
+      <li>早盤爆量<strong>價跌</strong>：多殺多/法人出貨，偏空操作</li>
+      <li>早盤<strong>縮量</strong>橫盤：觀望等量能放大後進場</li>
+    </ul>
+  </div>
+  <div class="formula-box">早盤強度 = 前15分鐘量 ÷ 日均量 × 100%<br/>≥150% 視為爆量</div>
+</div>
+</div>
+
+<!-- TW TIP 2 -->
+<div class="tip-card cat-vol" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">2</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">量能</span>
+    <div class="tip-title">尾盤量縮量背離偵測</div>
+    <div class="tip-subtitle">13:00–13:30 最後30分鐘量能判斷隔日開盤</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="10" x2="30" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="30,80 60,65 90,55 130,45 160,42 200,44 240,50 270,48" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <rect x="235" y="60" width="12" height="50" fill="#8b949e" rx="2" opacity=".4"/>
+  <rect x="250" y="75" width="12" height="35" fill="#8b949e" rx="2" opacity=".3"/>
+  <rect x="265" y="82" width="8" height="28" fill="#8b949e" rx="2" opacity=".25"/>
+  <text x="230" y="20" fill="#ef4444" font-size="9">量縮但價未跌</text>
+  <text x="230" y="32" fill="#ef4444" font-size="8">→ 隔日偏空</text>
+  <line x1="200" y1="15" x2="248" y2="58" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="35" y="20" fill="#22c55e" font-size="8">台指期走勢</text>
+  <text x="35" y="125" fill="#8b949e" font-size="8">9:00</text>
+  <text x="120" y="125" fill="#8b949e" font-size="8">11:00</text>
+  <text x="230" y="125" fill="#8b949e" font-size="8">13:20</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="blue-box"><h4>尾盤訊號解讀</h4>
+    <ul>
+      <li><strong>量縮 + 高檔橫盤</strong>：多方無力護盤，隔日開低機率高</li>
+      <li><strong>尾盤急量</strong>：法人最後調倉，方向為隔日方向</li>
+      <li><strong>尾盤拉尾</strong>：軋空行情或拉抬作帳，須謹慎</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>操作建議</h4><p>尾盤縮量高檔時，<strong>不追多</strong>、可減倉。若有隔夜倉位，量縮背離是出場訊號。結算前一日特別注意尾盤異常量。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 3 -->
+<div class="tip-card cat-vol" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">3</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">量能</span>
+    <div class="tip-title">外資現貨與期貨量背離</div>
+    <div class="tip-subtitle">外資買超現貨卻放空期貨時的套利機會</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <text x="8" y="14" fill="#8b949e" font-size="9">外資動向</text>
+  <rect x="30" y="30" width="80" height="35" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1" rx="4"/>
+  <text x="70" y="48" fill="#22c55e" font-size="9" text-anchor="middle">現貨 買超</text>
+  <text x="70" y="60" fill="#22c55e" font-size="8" text-anchor="middle">+50億</text>
+  <rect x="140" y="60" width="80" height="35" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="1" rx="4"/>
+  <text x="180" y="78" fill="#ef4444" font-size="9" text-anchor="middle">期貨 放空</text>
+  <text x="180" y="90" fill="#ef4444" font-size="8" text-anchor="middle">-3000口</text>
+  <line x1="110" y1="47" x2="140" y2="77" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="100" y="100" fill="#f59e0b" font-size="8">背離訊號</text>
+  <text x="90" y="120" fill="#8b949e" font-size="8">意涵：現貨造多掩護，期貨對沖避險</text>
+</svg>
+</div>
+<div class="tip-content">
+  <p>外資同時在現貨大買、在期貨放空，通常是<strong>避險操作</strong>，代表外資對後市不確定性升高，此時台指期上攻力道有限。</p>
+  <div class="signal-box"><h4>關鍵判斷</h4>
+    <ul>
+      <li>現貨買超 > 50億 + 期貨放空 > 2000口 → 上漲力道弱</li>
+      <li>現貨賣超 + 期貨轉多 → 反彈訊號，做多機會</li>
+      <li>現貨 & 期貨同向多 → 真實多頭趨勢</li>
+    </ul>
+  </div>
+  <div class="formula-box">背離指數 = 現貨買超億 × 0.5 + 期貨淨多口<br/>＞0 偏多，＜0 偏空</div>
+</div>
+</div>
+
+<!-- TW TIP 4 -->
+<div class="tip-card cat-chip" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">4</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">籌碼</span>
+    <div class="tip-title">外資期貨淨部位追蹤</div>
+    <div class="tip-subtitle">台指期最強領先指標：外資多空淨口數</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="65" x2="272" y2="65" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="8" y="68" fill="#8b949e" font-size="8">0</text>
+  <line x1="30" y1="10" x2="30" y2="120" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="120" x2="272" y2="120" stroke="#30363d" stroke-width="1"/>
+  <polyline points="30,90 55,85 80,75 110,60 140,45 170,38 200,32 230,28 260,35" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+  <circle cx="260" cy="35" r="4" fill="#22c55e"/>
+  <text x="230" y="28" fill="#22c55e" font-size="8">多方擴大</text>
+  <text x="8" y="20" fill="#8b949e" font-size="8">+萬口</text>
+  <text x="8" y="100" fill="#8b949e" font-size="8">-萬口</text>
+  <text x="35" y="115" fill="#8b949e" font-size="8">週一</text>
+  <text x="230" y="115" fill="#8b949e" font-size="8">週五</text>
+  <text x="100" y="112" fill="#22c55e" font-size="8">外資持續加碼多單 → 趨勢向上</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="gold-box"><h4>部位解讀</h4>
+    <table class="case-table">
+      <tr><th>外資淨口</th><th>變化</th><th>意義</th></tr>
+      <tr><td>&gt;+3萬口</td><td class="val-up">大幅增多</td><td>強勢多頭趨勢</td></tr>
+      <tr><td>0~+3萬</td><td class="val-up">中性偏多</td><td>區間偏多震盪</td></tr>
+      <tr><td>0~-3萬</td><td class="val-down">偏空</td><td>謹慎、減倉</td></tr>
+      <tr><td>&lt;-3萬口</td><td class="val-down">大幅放空</td><td>強勢空頭趨勢</td></tr>
+    </table>
+  </div>
+  <div class="blue-box"><h4>操作建議</h4><p>每日14:30後查看台期所公告外資期貨淨部位。<strong>連續3日增多</strong>為強烈進場訊號；部位驟減需警覺反轉。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 5 -->
+<div class="tip-card cat-chip" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">5</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">籌碼</span>
+    <div class="tip-title">選擇權Put/Call Ratio</div>
+    <div class="tip-subtitle">PCR值反映市場恐懼貪婪，是極佳反向指標</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="10" x2="30" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="45" x2="272" y2="45" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="30" y1="80" x2="272" y2="80" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>
+  <polyline points="30,65 60,50 90,35 110,28 130,38 155,55 180,70 210,85 240,88 265,80" fill="none" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="240" y="40" fill="#f59e0b" font-size="8">PCR=1.5 超恐慌</text>
+  <text x="240" y="75" fill="#22c55e" font-size="8">PCR=0.7 超貪婪</text>
+  <text x="35" y="22" fill="#ef4444" font-size="8">市場極度恐懼 → 反彈機會</text>
+  <text x="165" y="103" fill="#22c55e" font-size="8">市場貪婪 → 警惕回落</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="formula-box">PCR = Put未平倉量 ÷ Call未平倉量</div>
+  <div class="purple-box"><h4>PCR解讀</h4>
+    <ul>
+      <li>PCR &gt; 1.3：市場極度恐懼，<strong>逆向做多</strong>訊號</li>
+      <li>PCR 0.9–1.1：市場中性，觀望</li>
+      <li>PCR &lt; 0.7：市場過度貪婪，<strong>逆向做空</strong>訊號</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>進階應用</h4><p>PCR要搭配<strong>歷史分位</strong>看。若PCR=1.5但過去1個月都在1.2以上，參考意義較低。須與VIX指數、台指期成交量同步確認。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 6 -->
+<div class="tip-card cat-chip" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">6</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">籌碼</span>
+    <div class="tip-title">十大交易人多空比</div>
+    <div class="tip-subtitle">看十大特法人未平倉比率判斷主力意圖</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="30" y="30" width="110" height="70" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1" rx="4"/>
+  <text x="85" y="50" fill="#22c55e" font-size="9" text-anchor="middle">多方持倉</text>
+  <rect x="35" y="60" width="95" height="30" fill="rgba(34,197,94,.3)" rx="3"/>
+  <text x="85" y="80" fill="#e6edf3" font-size="10" text-anchor="middle" font-weight="700">58%</text>
+  <rect x="155" y="30" width="110" height="70" fill="rgba(239,68,68,.1)" stroke="#ef4444" stroke-width="1" rx="4"/>
+  <text x="210" y="50" fill="#ef4444" font-size="9" text-anchor="middle">空方持倉</text>
+  <rect x="160" y="60" width="100" height="30" fill="rgba(239,68,68,.3)" rx="3"/>
+  <text x="210" y="80" fill="#e6edf3" font-size="10" text-anchor="middle" font-weight="700">42%</text>
+  <text x="140" y="118" fill="#f59e0b" font-size="8" text-anchor="middle">多空比 = 1.38 → 偏多</text>
+</svg>
+</div>
+<div class="tip-content">
+  <p>台期所每日公布十大交易人（含特法人）未平倉淨部位，是判斷主力動向的關鍵數據。</p>
+  <div class="blue-box"><h4>多空比計算</h4>
+    <ul>
+      <li>多空比 &gt; 1.5：主力大幅偏多，趨勢向上</li>
+      <li>多空比 1.0–1.5：偏多但力道不足</li>
+      <li>多空比 &lt; 0.8：主力大幅偏空，趨勢向下</li>
+    </ul>
+  </div>
+  <div class="gold-box"><h4>反向策略</h4><p>若十大交易人<strong>多空比極端</strong>（&gt;2.0或&lt;0.5），市場往往已過度傾向一側，易出現<strong>軋倉行情</strong>，此時應等待反轉訊號。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 7 -->
+<div class="tip-card cat-timing" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">7</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">時機</span>
+    <div class="tip-title">台指期結算日操作策略</div>
+    <div class="tip-subtitle">每月第三個週三結算，前後各有特殊行情</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="140" y1="10" x2="140" y2="120" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="110" y="22" fill="#ef4444" font-size="9">結算日</text>
+  <polyline points="30,70 60,65 90,58 120,52 140,60 160,55 190,48 220,45 260,42" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <text x="35" y="20" fill="#8b949e" font-size="8">結算前3-5天</text>
+  <text x="155" y="20" fill="#8b949e" font-size="8">結算後</text>
+  <rect x="35" y="85" width="100" height="20" fill="rgba(245,158,11,.15)" stroke="#f59e0b" stroke-width="1" rx="3"/>
+  <text x="85" y="99" fill="#f59e0b" font-size="8" text-anchor="middle">軋空/壓空結算區</text>
+  <rect x="150" y="85" width="110" height="20" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1" rx="3"/>
+  <text x="205" y="99" fill="#22c55e" font-size="8" text-anchor="middle">新合約方向確立</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="signal-box"><h4>結算前風險</h4>
+    <ul>
+      <li><strong>結算前3天</strong>：主力拉高/壓低結算價，波動加劇</li>
+      <li><strong>結算當天</strong>：9:00現貨開盤後30分鐘決定結算方向</li>
+      <li><strong>小台/選擇權</strong>：到期日時間價值歸零，不適合持倉</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>結算後機會</h4><p>結算後主力換月，新合約方向較乾淨。若結算後第一天<strong>爆量跳空</strong>，通常是新趨勢起點，可積極布局。</p></div>
+  <div class="formula-box">結算價 = 現貨9:00開盤後30分鐘成交均價</div>
+</div>
+</div>
+
+<!-- TW TIP 8 -->
+<div class="tip-card cat-timing" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">8</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">時機</span>
+    <div class="tip-title">夜盤美股聯動策略</div>
+    <div class="tip-subtitle">台指期夜盤與美股同步操作，掌握隔日開盤訊號</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="80" height="50" fill="rgba(88,166,255,.1)" stroke="#58a6ff" stroke-width="1" rx="4"/>
+  <text x="50" y="28" fill="#58a6ff" font-size="8" text-anchor="middle">台指期夜盤</text>
+  <text x="50" y="42" fill="#8b949e" font-size="7" text-anchor="middle">15:00–05:00</text>
+  <rect x="100" y="10" width="80" height="50" fill="rgba(245,158,11,.1)" stroke="#f59e0b" stroke-width="1" rx="4"/>
+  <text x="140" y="28" fill="#f59e0b" font-size="8" text-anchor="middle">美股開盤</text>
+  <text x="140" y="42" fill="#8b949e" font-size="7" text-anchor="middle">21:30 (夏令)</text>
+  <rect x="190" y="10" width="80" height="50" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1" rx="4"/>
+  <text x="230" y="28" fill="#22c55e" font-size="8" text-anchor="middle">隔日台指</text>
+  <text x="230" y="42" fill="#8b949e" font-size="7" text-anchor="middle">08:45 開盤</text>
+  <line x1="90" y1="35" x2="100" y2="35" stroke="#30363d" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="180" y1="35" x2="190" y2="35" stroke="#30363d" stroke-width="1"/>
+  <text x="30" y="80" fill="#8b949e" font-size="8">美股大跌</text>
+  <text x="110" y="80" fill="#ef4444" font-size="8">→ 夜盤台指跌</text>
+  <text x="185" y="80" fill="#ef4444" font-size="8">→ 隔日低開</text>
+  <text x="30" y="95" fill="#8b949e" font-size="8">美股大漲</text>
+  <text x="110" y="95" fill="#22c55e" font-size="8">→ 夜盤台指漲</text>
+  <text x="185" y="95" fill="#22c55e" font-size="8">→ 隔日高開</text>
+  <text x="8" y="120" fill="#f59e0b" font-size="8">夜盤幅度 × 0.8 ≈ 隔日開盤跳空幅度</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="blue-box"><h4>夜盤追蹤重點</h4>
+    <ul>
+      <li>美股費城半導體指數：台積電ADR連動</li>
+      <li>納斯達克期貨：科技權重影響台指</li>
+      <li>美元指數：強美元 → 外資撤退 → 台指偏空</li>
+    </ul>
+  </div>
+  <div class="purple-box"><h4>操作紀律</h4><p>夜盤台指期流動性較差，<strong>滑價大</strong>。建議夜盤僅做方向判斷，避免大倉位進出；重要數據公布前（如Fed）先減倉。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 9 -->
+<div class="tip-card cat-timing" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">9</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">時機</span>
+    <div class="tip-title">季線乖離率極值進場法</div>
+    <div class="tip-subtitle">台指期偏離240日均線過大時，均值回歸機會高</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="25,75 55,70 85,60 115,52 145,65 175,55 210,42 245,28 265,38" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <line x1="25" y1="68" x2="272" y2="68" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="240" y="65" fill="#f59e0b" font-size="8">240MA</text>
+  <line x1="25" y1="30" x2="272" y2="30" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2" opacity=".6"/>
+  <text x="200" y="27" fill="#ef4444" font-size="8">+15%乖離警戒</text>
+  <line x1="25" y1="95" x2="272" y2="95" stroke="#22c55e" stroke-width="1" stroke-dasharray="3,2" opacity=".6"/>
+  <text x="200" y="108" fill="#22c55e" font-size="8">-15%乖離機會</text>
+  <circle cx="245" cy="28" r="5" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <text x="220" y="22" fill="#ef4444" font-size="8">出場訊號</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="formula-box">乖離率 = (當前點位 - 240MA) ÷ 240MA × 100%</div>
+  <div class="gold-box"><h4>乖離率參考值（台指期）</h4>
+    <table class="case-table">
+      <tr><th>乖離率</th><th>操作意義</th></tr>
+      <tr><td class="val-up">+15%以上</td><td>超漲，逢高減碼多單</td></tr>
+      <tr><td>+5%~+15%</td><td>正常多頭，續持</td></tr>
+      <tr><td>-5%~+5%</td><td>均線附近，觀望</td></tr>
+      <tr><td class="val-down">-15%以下</td><td>超跌，逢低布局多單</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- TW TIP 10 -->
+<div class="tip-card cat-wave" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">10</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">波動</span>
+    <div class="tip-title">VIX與台指期負相關操作</div>
+    <div class="tip-subtitle">VIX恐慌指數飆升時是台指期逢低進場最佳時機</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="10" x2="30" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="30,40 70,45 110,50 150,75 180,90 200,95 220,70 250,50 270,45" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <polyline points="30,75 70,70 110,65 150,40 180,30 200,28 220,45 250,65 270,70" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="240" y="42" fill="#22c55e" font-size="8">台指期</text>
+  <text x="240" y="65" fill="#ef4444" font-size="8">VIX</text>
+  <circle cx="200" cy="28" r="5" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <text x="165" y="22" fill="#ef4444" font-size="8">VIX峰值 → 進多</text>
+  <line x1="200" y1="33" x2="200" y2="95" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2"/>
+  <circle cx="200" cy="95" r="5" fill="none" stroke="#22c55e" stroke-width="2"/>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="signal-box"><h4>VIX極值判斷</h4>
+    <ul>
+      <li>VIX &gt; 35：市場極度恐慌，通常是<strong>底部區域</strong>，逢低布多</li>
+      <li>VIX &lt; 15：市場過度平靜，<strong>反轉風險高</strong>，謹慎追多</li>
+      <li>VIX單日飆升15%以上：短線超跌反彈機率極高</li>
+    </ul>
+  </div>
+  <div class="purple-box"><h4>注意事項</h4><p>VIX高點難以精確判斷，建議<strong>分批進場</strong>而非一次梭哈。搭配台指期成交量確認，量縮時的VIX高點反彈信號更可靠。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 11 -->
+<div class="tip-card cat-wave" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">11</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">波動</span>
+    <div class="tip-title">台指期日內波動區間預測</div>
+    <div class="tip-subtitle">ATR預測單日震幅，設定合理停損停利</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="140" y1="20" x2="140" y2="110" stroke="#8b949e" stroke-width="2"/>
+  <rect x="50" y="55" width="180" height="30" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1" rx="4"/>
+  <text x="140" y="73" fill="#22c55e" font-size="9" text-anchor="middle">預期震幅區間 ±ATR</text>
+  <line x1="50" y1="35" x2="230" y2="35" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="50" y1="95" x2="230" y2="95" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="235" y="38" fill="#ef4444" font-size="8">高點</text>
+  <text x="235" y="98" fill="#22c55e" font-size="8">低點</text>
+  <circle cx="140" cy="20" r="4" fill="#f59e0b"/>
+  <text x="148" y="18" fill="#f59e0b" font-size="8">開盤點</text>
+  <text x="8" y="120" fill="#8b949e" font-size="8">ATR(14)預測當日上下震盪幅度</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="formula-box">日ATR(14) = 14日真實波幅平均<br/>預期區間：開盤 ± 0.8×ATR</div>
+  <div class="blue-box"><h4>實際應用</h4>
+    <ul>
+      <li>台指期ATR若為100點，設停損80點合理</li>
+      <li>ATR擴大（增幅&gt;20%）：震盪加劇，縮小部位</li>
+      <li>ATR收縮（縮幅&gt;30%）：盤整即將突破，準備方向單</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- TW TIP 12 -->
+<div class="tip-card cat-wave" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">12</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">波動</span>
+    <div class="tip-title">缺口填補率統計套利</div>
+    <div class="tip-subtitle">台指期跳空缺口有85%機率在5個交易日內填補</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="55" y1="60" x2="75" y2="60" stroke="#22c55e" stroke-width="2"/>
+  <line x1="75" y1="42" x2="95" y2="42" stroke="#22c55e" stroke-width="2"/>
+  <rect x="62" y="43" width="6" height="17" fill="rgba(245,158,11,.3)" stroke="#f59e0b" stroke-width="1"/>
+  <text x="55" y="38" fill="#f59e0b" font-size="8">跳空缺口</text>
+  <line x1="95" y1="42" x2="120" y2="42" stroke="#22c55e" stroke-width="2"/>
+  <line x1="120" y1="52" x2="145" y2="52" stroke="#22c55e" stroke-width="2"/>
+  <line x1="145" y1="52" x2="165" y2="52" stroke="#22c55e" stroke-width="2"/>
+  <line x1="165" y1="60" x2="185" y2="60" stroke="#22c55e" stroke-width="2"/>
+  <circle cx="185" cy="60" r="4" fill="#22c55e"/>
+  <line x1="185" y1="60" x2="185" y2="60" stroke="#22c55e"/>
+  <text x="165" y="72" fill="#22c55e" font-size="8">缺口填補</text>
+  <line x1="62" y1="60" x2="185" y2="60" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" opacity=".5"/>
+  <text x="8" y="95" fill="#8b949e" font-size="8">統計：台指期缺口填補率 ~85%</text>
+  <text x="8" y="107" fill="#8b949e" font-size="8">平均填補時間：3個交易日</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="signal-box"><h4>缺口分類</h4>
+    <table class="case-table">
+      <tr><th>缺口類型</th><th>填補機率</th><th>操作</th></tr>
+      <tr><td>普通跳空</td><td class="val-up">90%</td><td>反向布局</td></tr>
+      <tr><td>突破缺口</td><td class="val-down">40%</td><td>順勢跟進</td></tr>
+      <tr><td>竭盡缺口</td><td class="val-up">85%</td><td>反向布局</td></tr>
+    </table>
+  </div>
+  <div class="green-box"><h4>套利策略</h4><p>開盤跳空超過1%的普通缺口，在跳空方向<strong>反向進場</strong>等待回補，停損設在缺口幅度的1.5倍外，風險報酬比約1:2。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 13 -->
+<div class="tip-card cat-strategy" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">13</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">策略</span>
+    <div class="tip-title">均線多空排列轉換捕捉</div>
+    <div class="tip-subtitle">5/10/20日均線黃金/死亡交叉是趨勢轉換關鍵</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="25,90 65,80 105,65 145,50 185,38 225,30 265,25" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+  <polyline points="25,95 65,88 105,75 145,62 185,50 225,42 265,38" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <polyline points="25,100 65,95 105,88 145,78 185,68 225,58 265,52" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <circle cx="145" cy="50" r="5" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <text x="148" y="45" fill="#22c55e" font-size="8">黃金交叉</text>
+  <text x="220" y="18" fill="#22c55e" font-size="8">5MA</text>
+  <text x="220" y="30" fill="#f59e0b" font-size="8">10MA</text>
+  <text x="220" y="44" fill="#ef4444" font-size="8">20MA</text>
+  <text x="35" y="20" fill="#8b949e" font-size="8">多頭排列 5&gt;10&gt;20MA</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="gold-box"><h4>多頭排列進場條件</h4>
+    <ul>
+      <li>5MA &gt; 10MA &gt; 20MA，三線向上 → <strong>積極做多</strong></li>
+      <li>回測10MA不破 → 加碼機會</li>
+      <li>跌破5MA警戒，跌破20MA出場</li>
+    </ul>
+  </div>
+  <div class="signal-box"><h4>空頭排列做空條件</h4>
+    <ul>
+      <li>5MA &lt; 10MA &lt; 20MA，三線向下 → 積極做空</li>
+      <li>反彈到10MA壓力 → 加碼空單</li>
+      <li>突破20MA回補，趨勢可能反轉</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- TW TIP 14 -->
+<div class="tip-card cat-strategy" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">14</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">策略</span>
+    <div class="tip-title">整數關卡心理價位策略</div>
+    <div class="tip-subtitle">台指期每500點是主要心理關卡，突破後快速移動</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="40" x2="272" y2="40" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="25" y1="70" x2="272" y2="70" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="236" y="37" fill="#f59e0b" font-size="8">22000點</text>
+  <text x="236" y="67" fill="#8b5cf6" font-size="8">21500點</text>
+  <polyline points="25,85 60,80 90,73 120,71 145,68 155,60 175,50 200,44 230,38 260,32" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <circle cx="155" cy="60" r="4" fill="#22c55e"/>
+  <text x="120" y="55" fill="#22c55e" font-size="8">突破關卡</text>
+  <text x="8" y="22" fill="#8b949e" font-size="8">上檔阻力</text>
+  <text x="8" y="52" fill="#8b949e" font-size="8">下檔支撐</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="blue-box"><h4>整數關卡操作</h4>
+    <ul>
+      <li>整數下方100點：逢低布多（支撐前）</li>
+      <li>整數上方50點：突破確認，追多進場</li>
+      <li>整數附近震盪：觀望，等待方向確立</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>關卡層級</h4><p><strong>500點關卡</strong>：主要心理關卡（如20000、20500）<br/><strong>1000點關卡</strong>：超強支撐/阻力，突破後空間大<br/>突破千點整數若有爆量，通常是大行情起點。</p></div>
+</div>
+</div>
+
+<!-- TW TIP 15 -->
+<div class="tip-card cat-strategy" data-sec="tw">
+<div class="tip-header">
+  <div class="tip-num">15</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">策略</span>
+    <div class="tip-title">台指期資金管理黃金比例</div>
+    <div class="tip-subtitle">單口台指期保證金管理，控制最大虧損不超過5%</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="140" cy="65" r="55" fill="none" stroke="#30363d" stroke-width="2"/>
+  <path d="M140,65 L140,10 A55,55 0 0,1 188,93 Z" fill="rgba(34,197,94,.3)" stroke="#22c55e" stroke-width="1"/>
+  <path d="M140,65 L188,93 A55,55 0 0,1 92,93 Z" fill="rgba(245,158,11,.3)" stroke="#f59e0b" stroke-width="1"/>
+  <path d="M140,65 L92,93 A55,55 0 0,1 140,10 Z" fill="rgba(239,68,68,.3)" stroke="#ef4444" stroke-width="1"/>
+  <text x="165" y="55" fill="#22c55e" font-size="8">備用金</text>
+  <text x="163" y="67" fill="#22c55e" font-size="8">50%</text>
+  <text x="125" y="98" fill="#f59e0b" font-size="8">保證金</text>
+  <text x="128" y="108" fill="#f59e0b" font-size="7">30%</text>
+  <text x="82" y="60" fill="#ef4444" font-size="8">緊急備援</text>
+  <text x="90" y="72" fill="#ef4444" font-size="7">20%</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="formula-box">最大單筆虧損 = 總資金 × 2%<br/>台指每點200元 → 停損點數 = 總資金×2%÷200</div>
+  <div class="gold-box"><h4>資金分配原則</h4>
+    <ul>
+      <li><strong>50% 備用金</strong>：不動，用於行情不好時保本</li>
+      <li><strong>30% 保證金</strong>：實際操作台指期的資金</li>
+      <li><strong>20% 緊急備援</strong>：補繳保證金或加倉用</li>
+    </ul>
+  </div>
+  <div class="signal-box"><h4>停損紀律</h4><p>單次虧損超過<strong>帳戶2%</strong>立即停損。連續虧損3次（共-6%）強制停止操作休息一天，避免情緒交易擴大虧損。</p></div>
+</div>
+</div>
+
+</div><!-- end grid-tw -->
+</div><!-- end tab-tw -->
+
+<!-- 美股期 -->
+<div id="tab-us" class="tab-section">
+<div class="filters" id="filters-us">
+  <button class="filter-btn active" onclick="filterTips('all','us')">全部</button>
+  <button class="filter-btn cat-vol" onclick="filterTips('vol','us')">量能</button>
+  <button class="filter-btn cat-chip" onclick="filterTips('chip','us')">籌碼</button>
+  <button class="filter-btn cat-timing" onclick="filterTips('timing','us')">時機</button>
+  <button class="filter-btn cat-wave" onclick="filterTips('wave','us')">波動</button>
+  <button class="filter-btn cat-strategy" onclick="filterTips('strategy','us')">策略</button>
+</div>
+<div class="tips-grid" id="grid-us">
+
+<!-- US TIP 1 -->
+<div class="tip-card cat-vol" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">1</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">量能</span>
+    <div class="tip-title">CME成交量分析判斷主力意圖</div>
+    <div class="tip-subtitle">ES/NQ期貨量能結構解讀，找出主力進出時機</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <text x="8" y="14" fill="#8b949e" font-size="9">ES量(萬口)</text>
+  <line x1="35" y1="10" x2="35" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="35" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <rect x="42" y="60" width="18" height="50" fill="#8b949e" rx="2" opacity=".5"/>
+  <rect x="66" y="75" width="18" height="35" fill="#8b949e" rx="2" opacity=".4"/>
+  <rect x="90" y="80" width="18" height="30" fill="#8b949e" rx="2" opacity=".4"/>
+  <rect x="114" y="30" width="18" height="80" fill="#22c55e" rx="2"/>
+  <rect x="138" y="50" width="18" height="60" fill="#22c55e" rx="2" opacity=".8"/>
+  <rect x="162" y="70" width="18" height="40" fill="#8b949e" rx="2" opacity=".4"/>
+  <rect x="186" y="20" width="18" height="90" fill="#ef4444" rx="2"/>
+  <rect x="210" y="65" width="18" height="45" fill="#8b949e" rx="2" opacity=".4"/>
+  <line x1="35" y1="55" x2="272" y2="55" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="238" y="52" fill="#f59e0b" font-size="8">均量</text>
+  <text x="110" y="20" fill="#22c55e" font-size="8">主力進場</text>
+  <text x="183" y="15" fill="#ef4444" font-size="8">主力出場</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="gold-box"><h4>CME量能解讀</h4>
+    <ul>
+      <li>日成交量超均量<strong>2倍+價漲</strong>：機構主力積極買進</li>
+      <li>日成交量超均量<strong>2倍+價跌</strong>：機構主力出貨，跟空</li>
+      <li>Globex夜盤量超過日盤量：海外機構大動作</li>
+    </ul>
+  </div>
+  <div class="blue-box"><h4>ES vs NQ背離</h4><p>若ES（標普期貨）量縮、NQ（那斯達克期貨）爆量，代表<strong>科技股主導</strong>；反之若ES爆量NQ縮量，代表<strong>價值股輪動</strong>，兩者背離時謹慎操作。</p></div>
+</div>
+</div>
+
+<!-- US TIP 2 -->
+<div class="tip-card cat-vol" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">2</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">量能</span>
+    <div class="tip-title">Globex夜盤量能提前布局</div>
+    <div class="tip-subtitle">美股期夜盤成交量分布預判隔日開盤強弱</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <text x="8" y="14" fill="#8b949e" font-size="8">美東時間</text>
+  <line x1="35" y1="10" x2="35" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="35" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <rect x="40" y="85" width="12" height="25" fill="#8b949e" rx="1" opacity=".3"/>
+  <rect x="56" y="80" width="12" height="30" fill="#8b949e" rx="1" opacity=".3"/>
+  <rect x="72" y="75" width="12" height="35" fill="#8b949e" rx="1" opacity=".4"/>
+  <rect x="88" y="40" width="12" height="70" fill="#22c55e" rx="1"/>
+  <rect x="104" y="88" width="12" height="22" fill="#8b949e" rx="1" opacity=".3"/>
+  <rect x="180" y="30" width="12" height="80" fill="#ef4444" rx="1"/>
+  <rect x="196" y="55" width="12" height="55" fill="#ef4444" rx="1" opacity=".7"/>
+  <rect x="212" y="65" width="12" height="45" fill="#8b949e" rx="1" opacity=".5"/>
+  <text x="78" y="25" fill="#22c55e" font-size="8">歐市開盤</text>
+  <text x="168" y="22" fill="#ef4444" font-size="8">美股開盤</text>
+  <line x1="88" y1="10" x2="88" y2="108" stroke="#22c55e" stroke-width="1" stroke-dasharray="3,2" opacity=".5"/>
+  <line x1="180" y1="10" x2="180" y2="108" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2" opacity=".5"/>
+  <text x="35" y="125" fill="#8b949e" font-size="7">02:00</text>
+  <text x="82" y="125" fill="#8b949e" font-size="7">08:00</text>
+  <text x="165" y="125" fill="#8b949e" font-size="7">09:30</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="signal-box"><h4>夜盤量分析</h4>
+    <ul>
+      <li>歐市開盤（台灣時間14:30）量增：歐洲機構動向，先行指標</li>
+      <li>美股開盤前30分鐘（台灣22:00）：最關鍵量能，決定日盤方向</li>
+      <li>夜盤量縮於日盤量30%以下：趨勢不明，不宜大倉</li>
+    </ul>
+  </div>
+  <div class="formula-box">夜盤強度比 = Globex量 ÷ 前日日盤量<br/>&gt;50%：夜盤行情延續機率高</div>
+</div>
+</div>
+
+<!-- US TIP 3 -->
+<div class="tip-card cat-vol" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">3</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">量能</span>
+    <div class="tip-title">重大數據日前量能萎縮策略</div>
+    <div class="tip-subtitle">Fed會議/CPI/非農前市場觀望，量縮後爆量方向為真</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="140" y1="10" x2="140" y2="115" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="105" y="22" fill="#ef4444" font-size="9">重大數據日</text>
+  <rect x="55" y="65" width="15" height="45" fill="#8b949e" rx="2" opacity=".5"/>
+  <rect x="75" y="72" width="15" height="38" fill="#8b949e" rx="2" opacity=".4"/>
+  <rect x="95" y="80" width="15" height="30" fill="#8b949e" rx="2" opacity=".3"/>
+  <rect x="115" y="85" width="15" height="25" fill="#8b949e" rx="2" opacity=".25"/>
+  <rect x="155" y="20" width="15" height="90" fill="#22c55e" rx="2"/>
+  <rect x="175" y="35" width="15" height="75" fill="#22c55e" rx="2" opacity=".8"/>
+  <rect x="195" y="55" width="15" height="55" fill="#22c55e" rx="2" opacity=".6"/>
+  <text x="35" y="55" fill="#8b949e" font-size="8">數據前量縮觀望</text>
+  <text x="150" y="15" fill="#22c55e" font-size="8">數據後爆量方向</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="purple-box"><h4>重大數據操作原則</h4>
+    <ul>
+      <li><strong>CPI/PCE前</strong>：數據前1小時量縮，勿追單</li>
+      <li><strong>數據公布後</strong>：等初始波動平息（5–10分鐘），爆量方向確立後進場</li>
+      <li><strong>FOMC前後</strong>：聲明前平倉，聲明後方向才是真實趨勢</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>非農(NFP)策略</h4><p>非農公布後ES期貨若在10分鐘內<strong>單邊走勢量能持續</strong>（不反覆），可跟單；若高低震盪量大，觀望等方向確立。</p></div>
+</div>
+</div>
+
+<!-- US TIP 4 -->
+<div class="tip-card cat-chip" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">4</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">籌碼</span>
+    <div class="tip-title">COT報告解讀大型機構部位</div>
+    <div class="tip-subtitle">美CFTC每週五公布持倉報告，是最重要的籌碼指標</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="20" width="80" height="85" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1" rx="4"/>
+  <text x="50" y="38" fill="#22c55e" font-size="8" text-anchor="middle">商業交易商</text>
+  <text x="50" y="52" fill="#8b949e" font-size="7" text-anchor="middle">Commercial</text>
+  <text x="50" y="70" fill="#ef4444" font-size="10" text-anchor="middle" font-weight="700">大空頭</text>
+  <text x="50" y="85" fill="#8b949e" font-size="7" text-anchor="middle">天然避險</text>
+  <rect x="100" y="20" width="80" height="85" fill="rgba(245,158,11,.1)" stroke="#f59e0b" stroke-width="1" rx="4"/>
+  <text x="140" y="38" fill="#f59e0b" font-size="8" text-anchor="middle">大型投機商</text>
+  <text x="140" y="52" fill="#8b949e" font-size="7" text-anchor="middle">Large Spec</text>
+  <text x="140" y="70" fill="#22c55e" font-size="10" text-anchor="middle" font-weight="700">大多頭</text>
+  <text x="140" y="85" fill="#8b949e" font-size="7" text-anchor="middle">趨勢追隨</text>
+  <rect x="190" y="20" width="82" height="85" fill="rgba(88,166,255,.1)" stroke="#58a6ff" stroke-width="1" rx="4"/>
+  <text x="231" y="38" fill="#58a6ff" font-size="8" text-anchor="middle">散戶投機商</text>
+  <text x="231" y="52" fill="#8b949e" font-size="7" text-anchor="middle">Small Spec</text>
+  <text x="231" y="70" fill="#8b949e" font-size="10" text-anchor="middle">觀察</text>
+  <text x="231" y="85" fill="#8b949e" font-size="7" text-anchor="middle">反向指標</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="gold-box"><h4>COT策略解讀</h4>
+    <ul>
+      <li><strong>大型投機商</strong>多單創歷史新高 → 趨勢延續（順勢）</li>
+      <li><strong>商業交易商</strong>空單極大 → 商品市場超漲警訊</li>
+      <li><strong>散戶</strong>多單極端 → 反向做空機率高</li>
+    </ul>
+  </div>
+  <div class="blue-box"><h4>查詢方式</h4><p>CFTC官網每週五17:30公布，或使用 barchart.com 的 COT 可視化工具。重點看<strong>淨部位的歷史分位數</strong>，極端分位才具有參考意義。</p></div>
+</div>
+</div>
+
+<!-- US TIP 5 -->
+<div class="tip-card cat-chip" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">5</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">籌碼</span>
+    <div class="tip-title">大型機構選擇權布局偵測</div>
+    <div class="tip-subtitle">透過Unusual Options Activity找出機構押注方向</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="15" width="240" height="95" fill="rgba(88,166,255,.05)" stroke="#30363d" stroke-width="1" rx="6"/>
+  <text x="140" y="32" fill="#58a6ff" font-size="9" text-anchor="middle">異常選擇權活動 (UOA)</text>
+  <rect x="30" y="40" width="220" height="22" fill="rgba(34,197,94,.15)" rx="3"/>
+  <text x="40" y="55" fill="#22c55e" font-size="8">SPY Call 500 Δ=0.3, 成交10000口 (均量3倍)</text>
+  <rect x="30" y="66" width="220" height="22" fill="rgba(239,68,68,.15)" rx="3"/>
+  <text x="40" y="81" fill="#ef4444" font-size="8">QQQ Put 400 Δ=-0.2, 成交8000口 (均量5倍)</text>
+  <text x="30" y="105" fill="#f59e0b" font-size="8">→ 多SPY空QQQ，科技股避險訊號</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="purple-box"><h4>UOA判斷標準</h4>
+    <ul>
+      <li>成交量超過未平倉量：<strong>新增部位</strong>，方向性押注</li>
+      <li>超過均量5倍以上：機構級別的異常交易</li>
+      <li>Delta中等（0.2–0.4）：方向性賭注，非純避險</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>工具推薦</h4><p>使用 Unusual Whales、Market Chameleon 或 Barchart Options Flow 追蹤 UOA。重點觀察 ES、SPY、QQQ 的異常流量，作為<strong>3–5天短期方向</strong>參考。</p></div>
+</div>
+</div>
+
+<!-- US TIP 6 -->
+<div class="tip-card cat-chip" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">6</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">籌碼</span>
+    <div class="tip-title">Gamma Exposure壓制點分析</div>
+    <div class="tip-subtitle">市場造市商Gamma對沖決定ES短期價格磁鐵效應</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="140" y1="10" x2="140" y2="110" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="105" y="22" fill="#f59e0b" font-size="9">Gamma峰值 = 5200</text>
+  <rect x="100" y="25" width="80" height="80" fill="rgba(245,158,11,.08)" rx="3"/>
+  <polyline points="30,85 65,70 100,55 140,40 180,55 215,70 250,82" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <text x="30" y="100" fill="#22c55e" font-size="8">價格受Gamma吸引靠近峰值</text>
+  <circle cx="140" cy="40" r="5" fill="#f59e0b"/>
+</svg>
+</div>
+<div class="tip-content">
+  <p>市場造市商（Market Maker）為維持Delta中性需對沖，當大量選擇權集中在某行使價，造成<strong>Gamma壓制效應</strong>，價格容易回到該點附近。</p>
+  <div class="signal-box"><h4>應用策略</h4>
+    <ul>
+      <li>Gamma峰值 = 短期磁鐵價位，適合<strong>反向交易</strong></li>
+      <li>正Gamma環境：波動縮小，做short vega策略</li>
+      <li>負Gamma環境：波動放大，單邊追勢效果好</li>
+    </ul>
+  </div>
+  <div class="formula-box">查詢工具：SpotGamma、Squeeze Metrics GEX圖</div>
+</div>
+</div>
+
+<!-- US TIP 7 -->
+<div class="tip-card cat-timing" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">7</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">時機</span>
+    <div class="tip-title">美股黃金開盤30分鐘策略</div>
+    <div class="tip-subtitle">09:30–10:00是全天最重要的量能確認窗口</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="10" x2="30" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="90" y1="10" x2="90" y2="110" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="56" y="22" fill="#22c55e" font-size="8">開盤30分鐘</text>
+  <polyline points="30,80 45,65 60,55 75,50 90,52 110,48 140,42 180,38 220,35 260,32" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <rect x="30" y="85" width="60" height="18" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="1" rx="3"/>
+  <text x="60" y="97" fill="#ef4444" font-size="8" text-anchor="middle">危險區不追單</text>
+  <rect x="95" y="85" width="170" height="18" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width="1" rx="3"/>
+  <text x="180" y="97" fill="#22c55e" font-size="8" text-anchor="middle">方向確立可進場</text>
+  <text x="35" y="60" fill="#f59e0b" font-size="8">高開高走 → 方向確立</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="blue-box"><h4>開盤前30分鐘操作</h4>
+    <ul>
+      <li><strong>高開高走 + 量能放大</strong>：多頭確認，10:00後可追多</li>
+      <li><strong>高開低走</strong>：假突破，可布局空單等跌</li>
+      <li><strong>低開低走 + 放量</strong>：空頭力道強，方向確立</li>
+      <li><strong>開盤震盪不定</strong>：觀望，等方向確立</li>
+    </ul>
+  </div>
+  <div class="gold-box"><h4>時段重要性</h4><p>09:30–10:00決定全天趨勢方向；14:00–14:30是尾盤反轉或加速時段；15:45–16:00最後15分鐘機構調倉，波動大慎操作。</p></div>
+</div>
+</div>
+
+<!-- US TIP 8 -->
+<div class="tip-card cat-timing" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">8</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">時機</span>
+    <div class="tip-title">季度換倉效應（季末逼倉）</div>
+    <div class="tip-subtitle">每季末最後兩週，基金調倉引發特殊行情</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="100" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="100" x2="272" y2="100" stroke="#30363d" stroke-width="1"/>
+  <line x1="165" y1="10" x2="165" y2="100" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="130" y="20" fill="#ef4444" font-size="8">季末最後2週</text>
+  <polyline points="25,70 55,68 85,65 115,62 145,58 165,52 180,42 200,35 220,30 240,32 260,35" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <text x="200" y="22" fill="#22c55e" font-size="8">窗飾效應</text>
+  <text x="200" y="32" fill="#8b949e" font-size="7">基金拉抬績效</text>
+  <rect x="160" y="60" width="100" height="18" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1" rx="3"/>
+  <text x="210" y="72" fill="#22c55e" font-size="8" text-anchor="middle">多頭偏多季末</text>
+  <text x="8" y="118" fill="#8b949e" font-size="8">季末最後1週：基金Window Dressing拉抬強勢股</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="purple-box"><h4>季末窗飾效應</h4>
+    <ul>
+      <li>每年3/6/9/12月最後2週：基金為美化報告拉抬持倉股</li>
+      <li>ES期貨在多頭市場下，季末通常偏多</li>
+      <li>空頭市場季末則反之：基金減倉加速下跌</li>
+    </ul>
+  </div>
+  <div class="signal-box"><h4>季初效應</h4><p>季初第一週基金重新布局，資金流入新標的，常見<strong>板塊輪動</strong>。上季落後板塊在季初有補漲機會，可提前布局。</p></div>
+</div>
+</div>
+
+<!-- US TIP 9 -->
+<div class="tip-card cat-timing" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">9</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">時機</span>
+    <div class="tip-title">Fed決策週期操作框架</div>
+    <div class="tip-subtitle">升/降息週期中ES期貨的趨勢性機會</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="25,90 60,85 95,75 130,60 160,45 185,35 210,38 235,42 260,40" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <line x1="160" y1="10" x2="160" y2="110" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="100" y="22" fill="#ef4444" font-size="8">升息期（ES回落）</text>
+  <text x="165" y="22" fill="#22c55e" font-size="8">降息期（ES回升）</text>
+  <rect x="28" y="55" width="128" height="20" fill="rgba(239,68,68,.1)" rx="2"/>
+  <rect x="162" y="25" width="108" height="20" fill="rgba(34,197,94,.1)" rx="2"/>
+  <text x="92" y="69" fill="#ef4444" font-size="7" text-anchor="middle">聯邦基金利率↑ES受壓</text>
+  <text x="216" y="39" fill="#22c55e" font-size="7" text-anchor="middle">降息預期ES走強</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="green-box"><h4>Fed週期策略</h4>
+    <table class="case-table">
+      <tr><th>Fed動向</th><th>ES期貨操作</th></tr>
+      <tr><td>首次升息</td><td class="val-down">偏空，波動加大</td></tr>
+      <tr><td>升息末段</td><td>中性，等待轉折</td></tr>
+      <tr><td>首次降息</td><td class="val-up">偏多，長期布局</td></tr>
+      <tr><td>QE重啟</td><td class="val-up">強烈做多</td></tr>
+    </table>
+  </div>
+  <div class="blue-box"><h4>FOMC會議節奏</h4><p>FOMC每年開8次會（1/3/5/6/7/9/11/12月）。會議前一週<strong>保持謹慎</strong>；聲明後方向確立再進場，不要在聲明前預判方向。</p></div>
+</div>
+</div>
+
+<!-- US TIP 10 -->
+<div class="tip-card cat-wave" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">10</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">波動</span>
+    <div class="tip-title">VIX期貨期限結構分析</div>
+    <div class="tip-subtitle">近月vs遠月VIX結構判斷市場恐慌持續性</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="10" x2="30" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="30,40 80,45 130,52 180,58 230,62 265,65" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <polyline points="30,85 80,80 130,72 180,65 230,60 265,55" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="240" y="62" fill="#22c55e" font-size="8">正向期結</text>
+  <text x="240" y="52" fill="#ef4444" font-size="8">逆向期結</text>
+  <text x="35" y="22" fill="#22c55e" font-size="8">Contango (正常)</text>
+  <text x="35" y="75" fill="#ef4444" font-size="8">Backwardation (恐慌)</text>
+  <text x="35" y="122" fill="#8b949e" font-size="8">VX1</text>
+  <text x="125" y="122" fill="#8b949e" font-size="8">VX3</text>
+  <text x="215" y="122" fill="#8b949e" font-size="8">VX6</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="gold-box"><h4>期限結構解讀</h4>
+    <ul>
+      <li><strong>Contango（正斜率）</strong>：市場平靜，做空VIX收益穩定</li>
+      <li><strong>Backwardation（負斜率）</strong>：市場恐慌，不可做空VIX</li>
+      <li>VX1–VX2差值 &gt; 2：Contango陡峭，SVXY/XIV收益好</li>
+    </ul>
+  </div>
+  <div class="signal-box"><h4>實戰策略</h4><p>Backwardation出現時，通常是市場見底前後。持續Backwardation超過3天後，ES期貨反彈機率超過70%。可用VIX近遠月差值作為<strong>底部偵測指標</strong>。</p></div>
+</div>
+</div>
+
+<!-- US TIP 11 -->
+<div class="tip-card cat-wave" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">11</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">波動</span>
+    <div class="tip-title">ES/NQ溢價折價套利</div>
+    <div class="tip-subtitle">期貨溢價率反映市場情緒與套利空間</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="65" x2="272" y2="65" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="8" y="68" fill="#8b949e" font-size="8">公平</text>
+  <text x="8" y="61" fill="#8b949e" font-size="7">價值</text>
+  <line x1="30" y1="10" x2="30" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="30,50 60,45 85,35 110,42 135,55 160,60 185,75 210,80 240,70 265,65" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <line x1="30" y1="40" x2="272" y2="40" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2" opacity=".7"/>
+  <line x1="30" y1="85" x2="272" y2="85" stroke="#22c55e" stroke-width="1" stroke-dasharray="3,2" opacity=".7"/>
+  <text x="238" y="37" fill="#ef4444" font-size="7">溢價警戒線</text>
+  <text x="238" y="100" fill="#22c55e" font-size="7">折價機會線</text>
+  <text x="60" y="25" fill="#ef4444" font-size="8">溢價過高→回落</text>
+  <text x="180" y="92" fill="#22c55e" font-size="8">折價→反彈</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="formula-box">公平價值 = 現貨 × (1 + 無風險利率 - 股息率) × T<br/>溢價率 = (期貨 - 公平價值) ÷ 現貨 × 100%</div>
+  <div class="purple-box"><h4>溢/折價策略</h4>
+    <ul>
+      <li>溢價 &gt; 0.3%：期貨相對貴，偏空期貨或買ETF套利</li>
+      <li>折價 &gt; 0.3%：期貨相對便宜，逢低做多期貨</li>
+      <li>結算前溢價快速收斂：結算日做空溢價的保護性策略</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- US TIP 12 -->
+<div class="tip-card cat-wave" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">12</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">波動</span>
+    <div class="tip-title">Triple Witching三巫日策略</div>
+    <div class="tip-subtitle">每季第三個週五股票/指數/期貨三種衍生品同步到期</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="140" y1="10" x2="140" y2="115" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="100" y="22" fill="#ef4444" font-size="9">三巫日</text>
+  <polyline points="30,70 60,68 90,65 120,60 140,55 155,35 165,70 175,45 185,65 200,55 220,50 250,48 270,45" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <rect x="130" y="25" width="75" height="90" fill="rgba(245,158,11,.08)" rx="3"/>
+  <text x="167" y="115" fill="#f59e0b" font-size="8" text-anchor="middle">高波動窗口</text>
+  <text x="30" y="85" fill="#8b949e" font-size="8">前一週量溫和</text>
+  <text x="200" y="35" fill="#22c55e" font-size="8">後趨勢延續</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="signal-box"><h4>三巫日特殊行為</h4>
+    <ul>
+      <li>成交量是平日<strong>2–4倍</strong>，波動幅度加大</li>
+      <li>開盤前期貨溢價異常，現貨開盤即大幅跳空</li>
+      <li>15:00–16:00（美東）最後1小時：機構大量調倉，不追單</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>操作建議</h4><p>三巫日前一天：縮小部位，不建新倉。三巫日後：新的趨勢方向確立，可積極布局。歷史統計顯示三巫日後一週方向<strong>延續上週趨勢</strong>的機率約65%。</p></div>
+</div>
+</div>
+
+<!-- US TIP 13 -->
+<div class="tip-card cat-strategy" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">13</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">策略</span>
+    <div class="tip-title">多市場關聯交易（ES/NQ/YM）</div>
+    <div class="tip-subtitle">三大指數期貨背離時做強做空弱的輪動策略</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <text x="8" y="14" fill="#8b949e" font-size="9">指數強弱比較</text>
+  <line x1="30" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="30" y1="60" x2="272" y2="60" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3" opacity=".4"/>
+  <polyline points="30,80 70,65 110,50 150,38 190,30 230,25 265,20" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <polyline points="30,82 70,72 110,65 150,58 190,55 230,52 265,50" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <polyline points="30,85 70,80 110,78 150,76 190,78 230,80 265,82" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="240" y="18" fill="#22c55e" font-size="8">NQ(強)</text>
+  <text x="240" y="48" fill="#f59e0b" font-size="8">ES(中)</text>
+  <text x="240" y="80" fill="#ef4444" font-size="8">YM(弱)</text>
+  <text x="8" y="120" fill="#f59e0b" font-size="8">多NQ空YM = 中性對沖策略</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="blue-box"><h4>三大指數特性</h4>
+    <table class="case-table">
+      <tr><th>期貨</th><th>追蹤</th><th>特性</th></tr>
+      <tr><td>ES</td><td>S&P500</td><td>最流動，主趨勢指標</td></tr>
+      <tr><td>NQ</td><td>納斯達克</td><td>科技權重，波動較大</td></tr>
+      <tr><td>YM</td><td>道瓊</td><td>傳統產業，動量較慢</td></tr>
+    </table>
+  </div>
+  <div class="gold-box"><h4>配對交易策略</h4><p>科技股強勢時：<strong>多NQ空YM</strong>（Beta中性）<br/>經濟復甦時：<strong>多YM空NQ</strong>（防守性輪動）<br/>背離超過3%時，均值回歸機率達70%。</p></div>
+</div>
+</div>
+
+<!-- US TIP 14 -->
+<div class="tip-card cat-strategy" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">14</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">策略</span>
+    <div class="tip-title">技術面移動平均趨勢跟蹤</div>
+    <div class="tip-subtitle">ES期貨日線21/50/200MA系統性趨勢操作</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>
+  <line x1="25" y1="110" x2="272" y2="110" stroke="#30363d" stroke-width="1"/>
+  <polyline points="25,90 55,82 85,70 115,58 145,48 175,40 205,35 240,30 265,27" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+  <polyline points="25,92 55,87 85,78 115,68 145,60 175,52 205,47 240,42 265,40" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <polyline points="25,95 55,93 85,90 115,86 145,82 175,78 205,74 240,70 265,68" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="238" y="25" fill="#22c55e" font-size="8">21MA</text>
+  <text x="238" y="38" fill="#f59e0b" font-size="8">50MA</text>
+  <text x="238" y="66" fill="#ef4444" font-size="8">200MA</text>
+  <text x="35" y="22" fill="#8b949e" font-size="8">多頭：21&gt;50&gt;200MA 全部向上</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="purple-box"><h4>MA系統信號</h4>
+    <ul>
+      <li><strong>200MA以上</strong>：多頭市場，只做多不做空</li>
+      <li><strong>200MA以下</strong>：空頭市場，只做空不做多</li>
+      <li>21MA與50MA黃金交叉：趨勢確認，加碼進場</li>
+      <li>跌破50MA：多單轉謹慎，等反彈出場</li>
+    </ul>
+  </div>
+  <div class="green-box"><h4>ES操作規則</h4><p>日線在200MA以上時，每次回測50MA都是<strong>做多機會</strong>；回測200MA更是絕佳加碼點，停損設在200MA下方2%。</p></div>
+</div>
+</div>
+
+<!-- US TIP 15 -->
+<div class="tip-card cat-strategy" data-sec="us">
+<div class="tip-header">
+  <div class="tip-num">15</div>
+  <div class="tip-meta">
+    <span class="tip-cat-tag">策略</span>
+    <div class="tip-title">微型期貨（MES/MNQ）學習策略</div>
+    <div class="tip-subtitle">用微型合約控制風險，建立系統性交易紀錄</div>
+  </div>
+</div>
+<div class="tip-diagram">
+<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="20" width="110" height="85" fill="rgba(88,166,255,.1)" stroke="#58a6ff" stroke-width="1" rx="6"/>
+  <text x="75" y="40" fill="#58a6ff" font-size="9" text-anchor="middle">ES (大合約)</text>
+  <text x="75" y="58" fill="#8b949e" font-size="8" text-anchor="middle">每點 $50</text>
+  <text x="75" y="72" fill="#8b949e" font-size="8" text-anchor="middle">保證金 ~$15,000</text>
+  <text x="75" y="86" fill="#ef4444" font-size="8" text-anchor="middle">高風險</text>
+  <rect x="145" y="20" width="115" height="85" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1" rx="6"/>
+  <text x="202" y="40" fill="#22c55e" font-size="9" text-anchor="middle">MES (微型)</text>
+  <text x="202" y="58" fill="#8b949e" font-size="8" text-anchor="middle">每點 $5</text>
+  <text x="202" y="72" fill="#8b949e" font-size="8" text-anchor="middle">保證金 ~$1,500</text>
+  <text x="202" y="86" fill="#22c55e" font-size="8" text-anchor="middle">低風險入門</text>
+  <text x="8" y="120" fill="#f59e0b" font-size="8">ES=10×MES｜NQ=10×MNQ｜YM=10×MYM</text>
+</svg>
+</div>
+<div class="tip-content">
+  <div class="gold-box"><h4>微型期貨學習路徑</h4>
+    <ul>
+      <li><strong>第1階段</strong>：用MES/MNQ建立交易紀錄（3個月）</li>
+      <li><strong>第2階段</strong>：穩定獲利後升級標準合約（ES/NQ）</li>
+      <li><strong>第3階段</strong>：多口微型做組合策略</li>
+    </ul>
+  </div>
+  <div class="formula-box">MES每點$5：100點停損 = 虧損$500<br/>ES每點$50：100點停損 = 虧損$5,000</div>
+  <div class="blue-box"><h4>微型合約優勢</h4><p>保證金僅大合約的1/10，適合<strong>資金&lt;5萬美元</strong>的交易者入門。可同時操作多口微型合約學習組合管理，錯誤成本極低。</p></div>
+</div>
+</div>
+
+</div><!-- end grid-us -->
+</div><!-- end tab-us -->
+
+<script>
+function switchTab(sec){
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+sec).classList.add('active');
+  event.target.classList.add('active');
+  // reset filters
+  filterTips('all', sec);
+  document.querySelectorAll('#filters-'+sec+' .filter-btn').forEach(b=>{
+    b.classList.remove('active');
+    if(b.textContent==='全部') b.classList.add('active');
+  });
+}
+
+function filterTips(cat, sec){
+  const grid = document.getElementById('grid-'+sec);
+  const cards = grid.querySelectorAll('.tip-card');
+  cards.forEach(c=>{
+    if(cat==='all'||c.classList.contains('cat-'+cat)) c.style.display='';
+    else c.style.display='none';
+  });
+  const filters = document.getElementById('filters-'+sec);
+  filters.querySelectorAll('.filter-btn').forEach(b=>{
+    b.classList.remove('active');
+    const bCat = b.className.match(/cat-(\w+)/);
+    if((!bCat&&cat==='all')||(bCat&&bCat[1]===cat)) b.classList.add('active');
+    if(cat==='all'&&b.textContent==='全部') b.classList.add('active');
+  });
+}
+</script>
+</body>
+</html>

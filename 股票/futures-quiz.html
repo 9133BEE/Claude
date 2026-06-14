@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>期貨考題 | 股市學習</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+a{color:#58a6ff;text-decoration:none}
+.topbar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar-title{font-size:1.1rem;font-weight:700}
+.topbar a{font-size:.85rem;color:#8b949e;padding:4px 10px;border-radius:6px;border:1px solid #30363d}
+.topbar a:hover{color:#58a6ff;border-color:#58a6ff}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#1a1f2e);padding:40px 20px 28px;text-align:center;border-bottom:1px solid #30363d}
+.hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#f59e0b,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.hero p{color:#8b949e;font-size:.95rem}
+.score-bar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center}
+.score-item{font-size:.9rem;color:#8b949e}
+.score-item span{font-weight:700;font-size:1.1rem}
+#s-correct span{color:#22c55e}#s-wrong span{color:#ef4444}#s-total span{color:#58a6ff}
+.reset-btn{background:rgba(88,166,255,.15);border:1px solid #58a6ff;color:#58a6ff;padding:5px 16px;border-radius:6px;cursor:pointer;font-size:.85rem}
+.reset-btn:hover{background:rgba(88,166,255,.25)}
+.filters{display:flex;gap:8px;padding:14px 20px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
+.fb{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:5px 14px;border-radius:18px;cursor:pointer;font-size:.82rem;transition:all .2s}
+.fb:hover,.fb.on{background:rgba(88,166,255,.15);border-color:#58a6ff;color:#58a6ff}
+.fb.cfb.on{background:rgba(245,158,11,.15);border-color:#f59e0b;color:#f59e0b}
+.fb.ctw.on{background:rgba(34,197,94,.15);border-color:#22c55e;color:#22c55e}
+.fb.cus.on{background:rgba(139,92,246,.15);border-color:#8b5cf6;color:#8b5cf6}
+.fb.cck.on{background:rgba(236,72,153,.15);border-color:#ec4899;color:#ec4899}
+.fb.cvp.on{background:rgba(249,115,22,.15);border-color:#f97316;color:#f97316}
+.fb.cth.on{background:rgba(20,184,166,.15);border-color:#14b8a6;color:#14b8a6}
+.grid{max-width:1100px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:20px}
+@media(max-width:560px){.grid{grid-template-columns:1fr;padding:14px 12px}}
+.qcard{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;transition:border-color .2s}
+.qcard.cfb{border-top:3px solid #f59e0b}
+.qcard.ctw{border-top:3px solid #22c55e}
+.qcard.cus{border-top:3px solid #8b5cf6}
+.qcard.cck{border-top:3px solid #ec4899}
+.qcard.cvp{border-top:3px solid #f97316}
+.qcard.cth{border-top:3px solid #14b8a6}
+.qhead{padding:16px 18px 0;display:flex;gap:10px;align-items:flex-start}
+.qnum{background:#21262d;color:#8b949e;font-size:.72rem;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.qmeta{flex:1}
+.qtag{font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:5px}
+.cfb .qtag{background:rgba(245,158,11,.15);color:#f59e0b}
+.ctw .qtag{background:rgba(34,197,94,.15);color:#22c55e}
+.cus .qtag{background:rgba(139,92,246,.15);color:#8b5cf6}
+.cck .qtag{background:rgba(236,72,153,.15);color:#ec4899}
+.cvp .qtag{background:rgba(249,115,22,.15);color:#f97316}
+.cth .qtag{background:rgba(20,184,166,.15);color:#14b8a6}
+.qtext{font-size:.92rem;color:#e6edf3;line-height:1.5;font-weight:600}
+.qsvg{padding:12px 18px 0}
+.qsvg svg{width:100%;height:auto;display:block;border-radius:6px;background:#0d1117;border:1px solid #21262d}
+.opts{padding:12px 18px}
+.opt{display:block;width:100%;background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:.87rem;text-align:left;margin-bottom:6px;transition:all .15s}
+.opt:hover{border-color:#58a6ff;color:#e6edf3}
+.opt.correct{background:rgba(34,197,94,.2);border-color:#22c55e;color:#22c55e;font-weight:700}
+.opt.wrong{background:rgba(239,68,68,.18);border-color:#ef4444;color:#ef4444}
+.opt.show-correct{background:rgba(34,197,94,.1);border-color:#22c55e;color:#22c55e}
+.explain{display:none;margin:0 18px 16px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-left:3px solid #f59e0b;border-radius:8px;padding:12px 14px;font-size:.85rem;color:#8b949e;line-height:1.65}
+.explain strong{color:#e6edf3}
+.explain.show{display:block}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-title">期貨考題</span>
+  <a href="index.html">首頁</a>
+  <a href="futures-course.html">台指期課程</a>
+  <a href="futures-advanced-tips.html">期貨進階技巧</a>
+  <a href="stock-quiz.html">股票考題</a>
+</div>
+<div class="hero">
+  <h1>期貨實戰考題</h1>
+  <p>100 題 — 台指期 · 美股期 · 籌碼 · K棒 · 理論 — 每題附詳解</p>
+</div>
+<div class="score-bar">
+  <div class="score-item" id="s-correct">答對 <span id="nc">0</span></div>
+  <div class="score-item" id="s-wrong">答錯 <span id="nw">0</span></div>
+  <div class="score-item" id="s-total">完成 <span id="nt">0</span>/100</div>
+  <button class="reset-btn" onclick="resetAll()">重置</button>
+</div>
+<div class="filters">
+  <button class="fb on" onclick="filt('all',this)">全部(100)</button>
+  <button class="fb cfb" onclick="filt('cfb',this)">期貨基礎(20)</button>
+  <button class="fb ctw" onclick="filt('ctw',this)">台指期實務(20)</button>
+  <button class="fb cus" onclick="filt('cus',this)">美股期實務(20)</button>
+  <button class="fb cck" onclick="filt('cck',this)">K棒量價(20)</button>
+  <button class="fb cth" onclick="filt('cth',this)">策略理論(20)</button>
+</div>
+<div class="grid" id="grid"></div>
+
+<script>
+const CAT={cfb:'期貨基礎',ctw:'台指期實務',cus:'美股期實務',cck:'K棒量價',cth:'策略理論'};
+const S='<svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">';
+const E='</svg>';
+
+const Q=[
+// 期貨基礎 1-20
+{c:'cfb',q:'期貨合約的最大特點是？',
+o:['只能做多','可以做多也可以做空（雙向交易）','不需要保證金','到期自動變成股票'],a:1,
+e:'<strong>期貨雙向交易</strong>：看漲可做多（買入合約），看跌可做空（賣出合約），這是期貨與股票最大的不同，使期貨在多空市場都能獲利。'},
+
+{c:'cfb',q:'圖中期貨保證金制度：原始保證金10萬，維持保證金7萬，虧損後帳戶剩6萬，需補多少錢？',
+s:S+`<rect x="20" y="20" width="60" height="80" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1" rx="3"/>`+
+`<text x="50" y="42" fill="#22c55e" font-size="8" text-anchor="middle">原始</text>`+
+`<text x="50" y="56" fill="#22c55e" font-size="8" text-anchor="middle">保證金</text>`+
+`<text x="50" y="70" fill="#22c55e" font-size="9" text-anchor="middle" font-weight="700">10萬</text>`+
+`<rect x="100" y="42" width="60" height="58" fill="rgba(245,158,11,.15)" stroke="#f59e0b" stroke-width="1" rx="3"/>`+
+`<text x="130" y="62" fill="#f59e0b" font-size="8" text-anchor="middle">維持</text>`+
+`<text x="130" y="76" fill="#f59e0b" font-size="9" text-anchor="middle" font-weight="700">7萬</text>`+
+`<rect x="175" y="58" width="55" height="42" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="1" rx="3"/>`+
+`<text x="202" y="74" fill="#ef4444" font-size="8" text-anchor="middle">帳戶剩</text>`+
+`<text x="202" y="88" fill="#ef4444" font-size="9" text-anchor="middle" font-weight="700">6萬</text>`+E,
+o:['補1萬（到維持保證金）','補4萬（到原始保證金10萬）','不需要補','補3萬'],a:1,
+e:'收到追繳通知（Margin Call）時，必須補回至<strong>原始保證金</strong>水準（10萬），而非只補到維持保證金（7萬）。需補：10萬 - 6萬 = <strong>4萬元</strong>。'},
+
+{c:'cfb',q:'台指期貨（大台）每點價值多少元新台幣？',
+o:['50元','100元','200元','500元'],a:2,
+e:'台指期（大台）<strong>每點200元新台幣</strong>。台指漲100點獲利20,000元；小台（MXF）每點50元，為大台的1/4。'},
+
+{c:'cfb',q:'圖示：期貨合約「正向市場（Contango）」的期限結構是？',
+s:S+`<line x1="25" y1="10" x2="25" y2="110" stroke="#30363d" stroke-width="1"/>`+
+`<line x1="25" y1="110" x2="220" y2="110" stroke="#30363d" stroke-width="1"/>`+
+`<polyline points="30,80 80,70 130,58 180,45 220,35" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<text x="168" y="28" fill="#22c55e" font-size="8">近低遠高</text>`+
+`<text x="30" y="100" fill="#8b949e" font-size="8">近月</text>`+
+`<text x="185" y="100" fill="#8b949e" font-size="8">遠月</text>`+E,
+o:['近月價格高於遠月（逆向市場）','遠月價格高於近月（正向期限結構）','各月份價格相同','無法判斷'],a:1,
+e:'<strong>正向市場（Contango）</strong>：遠月合約價格高於近月，是多數商品和指數期貨的正常狀態，反映持倉成本（利率、倉儲費）。VIX期貨處於Contango時，做空VIX策略較有利。'},
+
+{c:'cfb',q:'期貨「逐日盯市（Mark to Market）」制度的意義是？',
+o:['只在到期日結算損益','每個交易日結束時結算損益，直接從帳戶中扣除或增加','每週結算一次','每月結算一次'],a:1,
+e:'<strong>逐日盯市</strong>：每天收盤後依結算價結算當日損益，直接從帳戶餘額中扣除或增加，這是期貨與股票最重要的差異之一，也是保證金制度能運作的基礎。'},
+
+{c:'cfb',q:'圖示：做多期貨，買入價17,000，若現在17,500，獲利為多少？（大台）',
+s:S+`<line x1="30" y1="70" x2="210" y2="70" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<text x="215" y="74" fill="#f59e0b" font-size="8">17,000</text>`+
+`<line x1="30" y1="30" x2="210" y2="30" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<text x="215" y="34" fill="#22c55e" font-size="8">17,500</text>`+
+`<line x1="120" y1="30" x2="120" y2="70" stroke="#22c55e" stroke-width="2"/>`+
+`<text x="100" y="52" fill="#22c55e" font-size="9">+500點</text>`+E,
+o:['獲利5,000元','獲利50,000元（500點×100元）','獲利100,000元（500點×200元）','獲利10,000元'],a:2,
+e:'大台每點200元，漲500點獲利 = 500 × 200 = <strong>100,000元（10萬元）</strong>。這也展示了期貨槓桿的威力（保證金約8萬，獲利10萬，報酬率逾100%）。'},
+
+{c:'cfb',q:'「空單」（賣出期貨合約）的獲利條件是？',
+o:['期貨指數上漲','期貨指數下跌','指數不動','成交量增加'],a:1,
+e:'空單（賣出期貨）= 做空：預期期貨指數<strong>下跌</strong>才獲利。賣出價格 > 買回價格 = 賺取差價。期貨的做空比股票融券更方便，無需借券成本。'},
+
+{c:'cfb',q:'台指期的結算方式是？',
+o:['實物交割（交割股票）','現金結算（依結算價差計算損益）','選擇實物或現金','到期自動平倉'],a:1,
+e:'台指期採<strong>現金結算</strong>：到期日（每月第三個週三）依結算價計算損益，以現金轉帳，不需要實際交割股票。結算價為當日現貨加權指數開盤後30分鐘均價。'},
+
+{c:'cfb',q:'期貨的「槓桿倍數」如何計算？',
+s:S+`<text x="20" y="30" fill="#f59e0b" font-size="10" font-weight="700">槓桿 = 合約價值 ÷ 保證金</text>`+
+`<text x="20" y="55" fill="#8b949e" font-size="9">台指期合約價值：</text>`+
+`<text x="20" y="72" fill="#22c55e" font-size="9">17,000點 × 200元 = 340萬</text>`+
+`<text x="20" y="90" fill="#8b949e" font-size="9">原始保證金約 84,000元</text>`+
+`<text x="20" y="108" fill="#ef4444" font-size="9">槓桿 ≈ 340萬 ÷ 8.4萬 ≈ 40倍</text>`+E,
+o:['固定10倍','槓桿 = 合約總價值 ÷ 保證金，台指期約30-50倍','固定5倍','不計算槓桿'],a:1,
+e:'期貨槓桿 = 合約總價值 ÷ 保證金。台指期大台合約價值約340萬，保證金約8.4萬，<strong>槓桿約40倍</strong>。槓桿越大，風險越高，指數每動1%帳戶就波動40%。'},
+
+{c:'cfb',q:'期貨「換月（Rollover）」的操作是？',
+o:['賣出遠月合約、買入近月合約','平掉即將到期的近月合約、買入下一個月份的遠月合約','同時做多和做空','選擇更高流動性的合約'],a:1,
+e:'<strong>換月</strong>：將即將到期的合約平倉，同時在遠月（下個月份）重新建立相同方向的部位，讓持倉延續。換月時需注意近遠月價差（正價差/逆價差）對成本的影響。'},
+
+{c:'cfb',q:'「正價差」（期貨價格 > 現貨價格）的含義通常是？',
+s:S+`<rect x="20" y="30" width="80" height="50" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1" rx="4"/>`+
+`<text x="60" y="52" fill="#22c55e" font-size="9" text-anchor="middle">現貨</text>`+
+`<text x="60" y="67" fill="#22c55e" font-size="9" text-anchor="middle" font-weight="700">18,000</text>`+
+`<rect x="140" y="15" width="80" height="65" fill="rgba(245,158,11,.1)" stroke="#f59e0b" stroke-width="1" rx="4"/>`+
+`<text x="180" y="40" fill="#f59e0b" font-size="9" text-anchor="middle">期貨</text>`+
+`<text x="180" y="55" fill="#f59e0b" font-size="9" text-anchor="middle" font-weight="700">18,120</text>`+
+`<text x="60" y="105" fill="#f59e0b" font-size="8" text-anchor="middle">期貨 > 現貨 = 正價差</text>`+E,
+o:['市場看空','正價差 — 市場偏多，資金願意為未來支付溢價','空頭訊號','利率為零'],a:1,
+e:'期貨正價差（期貨 > 現貨）代表市場<strong>偏多</strong>：投資人願意為未來的現貨支付溢價。正價差的幅度反映持倉成本（資金成本 + 股息）。正價差越大，代表市場越樂觀。'},
+
+{c:'cfb',q:'期貨「逆價差」（期貨 < 現貨）通常代表什麼市場訊號？',
+o:['市場非常樂觀','逆價差（Backwardation）— 市場悲觀或商品供給短缺','利率上升','外資做多'],a:1,
+e:'<strong>逆價差</strong>：期貨 < 現貨，代表市場對未來預期悲觀（股指）或當前商品供給短缺（大宗商品）。在股指期貨中，逆價差通常出現在市場恐慌或空頭格局時。'},
+
+{c:'cfb',q:'「小台指（MXF）」相對於「大台（TX）」的主要差異是？',
+o:['追蹤不同指數','小台每點50元，大台每點200元，小台適合資金較少者','小台只能做多','小台無法選擇交割月份'],a:1,
+e:'小台（MXF）與大台（TX）追蹤相同的加權指數，但<strong>小台每點50元</strong>（大台的1/4），保證金也相應降低，適合初學者或資金較少的投資人，風控更靈活。'},
+
+{c:'cfb',q:'台灣期交所的期貨交易時間（日盤）是？',
+o:['8:00–16:00','8:45–13:45','9:00–15:00','8:30–14:30'],a:1,
+e:'台指期日盤交易時間：<strong>8:45–13:45</strong>（現貨開盤前15分鐘至現貨收盤後15分鐘）。夜盤時間：15:00–05:00（隔日凌晨）。'},
+
+{c:'cfb',q:'「停損單（Stop Loss Order）」在期貨中的作用是？',
+o:['鎖定最大獲利','當虧損達到設定點位時自動平倉，限制損失','增加保證金','取消持倉'],a:1,
+e:'停損單：預先設定虧損上限，<strong>當期貨價格觸及設定價位時自動平倉</strong>，防止虧損擴大。期貨槓桿高，沒有停損可能在短時間內造成重大損失。'},
+
+{c:'cfb',q:'做多1口大台，若指數下跌100點，虧損多少？',
+o:['虧損5,000元','虧損10,000元','虧損20,000元（100×200）','虧損50,000元'],a:2,
+e:'大台每點200元，跌100點虧損 = 100 × 200 = <strong>20,000元（2萬元）</strong>。這就是設定停損的重要性：若不停損，跌500點即虧損10萬元。'},
+
+{c:'cfb',q:'期貨合約中的「未平倉量（Open Interest）」代表什麼？',
+o:['當日成交量','市場上所有未平倉合約的總口數，反映市場資金投入程度','本週最大成交量','外資持倉口數'],a:1,
+e:'<strong>未平倉量（OI）</strong>：目前仍未平倉的合約總數（一多一空算一口）。OI增加代表新資金進場，趨勢延續可能性高；OI減少代表資金撤出，趨勢可能轉弱。'},
+
+{c:'cfb',q:'台指期貨的到期結算日是每月第幾個週幾？',
+o:['第一個週一','第二個週五','第三個週三','第四個週四'],a:2,
+e:'台指期結算日為<strong>每月第三個週三</strong>。結算價為當日現貨開盤後30分鐘（9:00–9:30）的加權指數均價。結算前後通常波動較大。'},
+
+{c:'cfb',q:'「期貨多空比」如何計算？代表什麼？',
+s:S+`<rect x="20" y="30" width="90" height="60" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1" rx="4"/>`+
+`<text x="65" y="55" fill="#22c55e" font-size="9" text-anchor="middle">多方未平倉</text>`+
+`<text x="65" y="72" fill="#22c55e" font-size="10" text-anchor="middle" font-weight="700">60%</text>`+
+`<rect x="130" y="30" width="90" height="60" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="1" rx="4"/>`+
+`<text x="175" y="55" fill="#ef4444" font-size="9" text-anchor="middle">空方未平倉</text>`+
+`<text x="175" y="72" fill="#ef4444" font-size="10" text-anchor="middle" font-weight="700">40%</text>`+E,
+o:['成交量多方÷空方','多方未平倉口數÷空方未平倉口數，>1偏多、<1偏空','不計算，只看K棒','無法判斷'],a:1,
+e:'多空比 = 多方未平倉 ÷ 空方未平倉。>1.2偏多、<0.8偏空。圖中多空比 = 60%÷40% = 1.5，代表<strong>明顯偏多</strong>。這是台期所每日公布的重要籌碼數據。'},
+
+{c:'cfb',q:'在期貨交易中，「平倉」是指什麼操作？',
+o:['建立新的部位','以相反方向的交易抵銷原有部位，結束持倉','增加保證金','換到下一個月合約'],a:1,
+e:'<strong>平倉</strong>：建立與原持倉方向相反的交易，將合約歸零：①做多口→賣出平倉 ②做空口→買入回補平倉。平倉後損益確定，帳戶回到無倉位狀態。'},
+
+// 台指期實務 21-40
+{c:'ctw',q:'圖示：外資期貨淨部位從+5,000口增加到+20,000口，代表什麼操作訊號？',
+s:S+`<line x1="30" y1="65" x2="220" y2="65" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>`+
+`<text x="8" y="68" fill="#8b949e" font-size="8">0</text>`+
+`<polyline points="30,82 60,76 90,68 120,55 150,42 180,30 210,22" fill="none" stroke="#22c55e" stroke-width="2.5"/>`+
+`<circle cx="210" cy="22" r="4" fill="#22c55e"/>`+
+`<text x="165" y="18" fill="#22c55e" font-size="8">+20,000口</text>`+E,
+o:['外資大量做空台指','外資大幅增加多單，是強烈偏多訊號','外資換月','外資平倉'],a:1,
+e:'外資期貨淨多口大幅增加，代表<strong>外資機構看多台灣市場</strong>，是最重要的台指期多頭籌碼訊號。連續增加多單時，台指通常跟漲，可順勢做多。'},
+
+{c:'ctw',q:'台指期「選擇權Put/Call比（PCR）」居於歷史高位（>1.5），代表？',
+s:S+`<line x1="30" y1="30" x2="220" y2="30" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="190" y="27" fill="#ef4444" font-size="8">PCR=1.5</text>`+
+`<line x1="30" y1="75" x2="220" y2="75" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="190" y="72" fill="#22c55e" font-size="8">PCR=0.7</text>`+
+`<polyline points="30,55 70,40 100,28 130,35 160,60 190,80 210,85" fill="none" stroke="#8b5cf6" stroke-width="2"/>`+
+`<circle cx="100" cy="28" r="4" fill="#ef4444"/>`+E,
+o:['市場極度樂觀，做空訊號','市場極度恐慌，反向做多的機會','趨勢明確，順勢操作','量縮整理'],a:1,
+e:'PCR（Put買權量÷Call買權量）> 1.5代表大量投資人買Put（防跌），市場極度恐慌。<strong>逆向指標：極端恐慌往往是底部</strong>，可考慮逆向做多。'},
+
+{c:'ctw',q:'圖示：台指期日線K棒在結算日前三天出現連續長黑，結算日當天低開，應如何判斷？',
+s:S+`<line x1="160" y1="10" x2="160" y2="112" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>`+
+`<text x="125" y="18" fill="#ef4444" font-size="8">結算日</text>`+
+`<rect x="50" y="25" width="16" height="55" fill="#ef4444" rx="1"/>`+
+`<rect x="75" y="35" width="16" height="60" fill="#ef4444" rx="1"/>`+
+`<rect x="100" y="45" width="16" height="55" fill="#ef4444" rx="1"/>`+
+`<rect x="125" y="55" width="16" height="45" fill="#ef4444" rx="1" opacity=".7"/>`+
+`<rect x="165" y="70" width="16" height="42" fill="#ef4444" rx="1"/>`+E,
+o:['結算日低開代表空頭確認，繼續做空','結算日後應觀察：新合約方向是否延續，不能單看舊合約判斷','立刻做多逢低買進','停止交易等下個月'],a:1,
+e:'結算日前後是轉折關鍵：結算後主力換月，<strong>新合約方向需重新判斷</strong>。不能用舊合約的跌勢直接推論下個月仍下跌，應觀察結算後第一天的量能方向。'},
+
+{c:'ctw',q:'台指期夜盤時間段，若美股道瓊下跌500點，台指期夜盤通常如何反應？',
+o:['台指期上漲，負相關','台指期下跌（與美股正相關）','台指期不動，等隔日再看','台指期漲跌由日本市場決定'],a:1,
+e:'台灣與美國股市高度正相關，美股大跌時<strong>台指期夜盤通常跟跌</strong>，且隔日開盤也偏低開。美股（特別是納斯達克）是台指期最重要的外部影響因子。'},
+
+{c:'ctw',q:'「十大交易人多空比」是由哪個機構公布的？',
+o:['金融監督管理委員會（金管會）','台灣期貨交易所（台期所）','證券交易所（證交所）','中央銀行'],a:1,
+e:'台灣期交所（TAIFEX）每日收盤後公布期貨市場各類別交易人的未平倉部位數據，包括<strong>外資、投信、自營商、十大交易人</strong>等，是最重要的台指期籌碼來源。'},
+
+{c:'ctw',q:'圖示：台指期5分鐘K棒，在前高附近出現長黑K棒，量能放大，代表？',
+s:S+`<rect x="40" y="40" width="14" height="65" fill="#22c55e" rx="1"/>`+
+`<rect x="62" y="32" width="14" height="72" fill="#22c55e" rx="1"/>`+
+`<rect x="84" y="28" width="14" height="70" fill="#22c55e" rx="1"/>`+
+`<line x1="30" y1="28" x2="210" y2="28" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="165" y="25" fill="#f59e0b" font-size="8">前高壓力</text>`+
+`<rect x="106" y="20" width="14" height="80" fill="#ef4444" rx="1"/>`+
+`<text x="98" y="15" fill="#ef4444" font-size="8">壓力放量長黑</text>`+E,
+o:['突破前高，積極做多','前高放量長黑，代表賣壓沉重，偏空操作','量縮整理','底部確認'],a:1,
+e:'前高附近出現放量長黑K棒，代表<strong>賣壓在此強力介入</strong>，多方無力突破，是空方進場訊號或多方出場訊號，偏空操作，停損設前高以上。'},
+
+{c:'ctw',q:'台指期早盤（8:45–9:15）若開盤即爆量走高，且持續不回頭，操作方向？',
+o:['等待量縮再做多','順勢做多，量能確認方向','做空等反轉','不操作'],a:1,
+e:'早盤爆量持續走高代表<strong>多方積極進場且無惜售</strong>，是強勢多頭訊號。此時應<strong>順勢做多</strong>，不要逆勢等反轉。停損設早盤低點，目標抱波段。'},
+
+{c:'ctw',q:'台指期15分鐘K棒，均線多頭排列後，股價回測5MA縮量不破，代表？',
+s:S+`<polyline points="30,85 70,75 110,62 145,50 175,42 200,38 220,35" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<polyline points="30,90 70,82 110,72 145,62 175,55 200,50 220,48" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<polyline points="178,55 195,53 205,50 212,46" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="3,2"/>`+
+`<circle cx="200" cy="50" r="4" fill="#22c55e"/>`+
+`<text x="155" y="42" fill="#22c55e" font-size="8">縮量回測</text>`+E,
+o:['趨勢反轉做空','回測均線縮量支撐 — 低風險加碼做多機會','量縮整理等待','停止操作'],a:1,
+e:'多頭排列後回測短期均線且<strong>量能萎縮</strong>（賣壓少），代表支撐有效，是<strong>低風險的加碼做多機會</strong>，停損設均線下方，風險報酬比良好。'},
+
+{c:'ctw',q:'台指期「轉倉效益」：若近月合約溢價20點（期貨>現貨），換到遠月時需如何換算？',
+o:['直接換，無需調整','換遠月後要多付20點的價差成本','換遠月後會便宜20點','溢價越高越有利'],a:1,
+e:'近月合約正價差20點，換到平價或逆價差的遠月時，<strong>需額外付出20點的換倉成本</strong>（約4,000元/口大台）。換月前要評估持倉方向的確定性是否值得換月成本。'},
+
+{c:'ctw',q:'觀察台指期日線出現「量縮收小紅K」三天後，若第四天出現爆量長紅，代表？',
+s:S+`<rect x="45" y="62" width="14" height="25" fill="#22c55e" rx="1"/>`+
+`<rect x="70" y="60" width="14" height="22" fill="#22c55e" rx="1"/>`+
+`<rect x="95" y="58" width="14" height="20" fill="#22c55e" rx="1"/>`+
+`<rect x="120" y="25" width="14" height="72" fill="#22c55e" rx="1"/>`+
+`<rect x="40" y="95" width="12" height="8" fill="#22c55e" rx="1" opacity=".3"/>`+
+`<rect x="65" y="96" width="12" height="7" fill="#22c55e" rx="1" opacity=".25"/>`+
+`<rect x="90" y="97" width="12" height="6" fill="#22c55e" rx="1" opacity=".2"/>`+
+`<rect x="115" y="70" width="12" height="33" fill="#22c55e" rx="1"/>`+
+`<text x="115" y="18" fill="#22c55e" font-size="8">爆量突破</text>`+E,
+o:['誘多陷阱，做空','量縮蓄積能量後爆量突破 — 強烈做多訊號，新一波上漲啟動','量能回升整理','換月效應'],a:1,
+e:'量縮整理（能量蓄積）→ 爆量突破（能量釋放），這是<strong>技術分析中最可靠的買入形態之一</strong>。爆量確認方向後積極進場，停損設整理區間低點。'},
+
+{c:'ctw',q:'台指期5分鐘K棒，上午出現「量大價平」（成交量大但指數不動），代表？',
+o:['趨勢明確，繼續持有','多空大量換手但無法決出勝負，謹慎觀望，等待方向','量縮整理','突破訊號'],a:1,
+e:'量大價平代表多空雙方在關鍵位置大量交鋒，但無法分出高下。這通常是<strong>重要關卡攻防</strong>，若最終向上突破放量，做多；若跌破放量，做空。'},
+
+{c:'ctw',q:'台指期下跌趨勢中，反彈量能明顯縮小，代表？',
+s:S+`<polyline points="30,20 60,28 90,42 120,38 145,52 160,46 185,65 210,72 228,82" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<rect x="35" y="90" width="12" height="22" fill="#ef4444" rx="1"/>`+
+`<rect x="60" y="88" width="12" height="24" fill="#ef4444" rx="1"/>`+
+`<rect x="85" y="92" width="12" height="20" fill="#8b949e" rx="1" opacity=".5"/>`+
+`<rect x="110" y="96" width="12" height="16" fill="#8b949e" rx="1" opacity=".4"/>`+
+`<rect x="135" y="98" width="12" height="14" fill="#ef4444" rx="1" opacity=".8"/>`+E,
+o:['反彈即將成功轉多','反彈縮量說明多頭力道不足，下跌趨勢可能延續，逢彈做空','底部確認做多','換月訊號'],a:1,
+e:'空頭趨勢中，反彈若量能萎縮，說明<strong>多方力道不足</strong>，此反彈是曇花一現，做空方可在反彈縮量時加碼空單，停損設反彈高點以上。'},
+
+{c:'ctw',q:'台指期日線，5MA、10MA、20MA全面向下排列，且下跌有量，建議操作方向？',
+o:['逆勢做多','做空為主，反彈至均線壓力逢高放空','中性觀望','停止交易'],a:1,
+e:'三均線空頭排列+下跌放量代表<strong>強烈空頭趨勢</strong>，策略是<strong>做空為主</strong>。每次反彈到短期均線壓力附近量縮時，是加碼空單的好機會，不要逆勢做多。'},
+
+{c:'ctw',q:'台指期開盤「跳空高開」但隨後快速回落收長黑，稱為？',
+s:S+`<line x1="80" y1="80" x2="105" y2="80" stroke="#22c55e" stroke-width="1.5"/>`+
+`<line x1="105" y1="40" x2="120" y2="40" stroke="#ef4444" stroke-width="1.5"/>`+
+`<rect x="120" y="32" width="16" height="75" fill="#ef4444" rx="1"/>`+
+`<line x1="128" y1="20" x2="128" y2="32" stroke="#ef4444" stroke-width="1.5"/>`+
+`<text x="110" y="18" fill="#ef4444" font-size="8">跳空長黑</text>`+
+`<text x="88" y="100" fill="#22c55e" font-size="8">前日</text>`+
+`<text x="118" y="100" fill="#ef4444" font-size="8">今日</text>`+E,
+o:['跳空長紅多頭突破','跳空長黑 — 多頭陷阱，偏空操作，缺口可能填補','底部反轉','量縮整理'],a:1,
+e:'跳空高開後快速回落收長黑，是<strong>多頭陷阱</strong>：主力在高位出貨，散戶追多被套。操作上偏空，等待回補缺口，停損設當日高點以上。'},
+
+{c:'ctw',q:'外資現貨買超50億元，同時期貨淨空單增加2000口，這代表？',
+o:['強烈多頭，做多','外資現貨買超但期貨避險放空，代表對後市不確定，上漲力道有限','強烈空頭','籌碼中性'],a:1,
+e:'外資「現貨買、期貨空」是<strong>避險操作</strong>：買現貨獲取股息或指數上漲，但用期貨空單對沖下跌風險。這代表外資不確定後市，台指上攻力道受限。'},
+
+{c:'ctw',q:'台指期周線K棒出現「下影線很長、收小紅K」在重要支撐附近，代表？',
+s:S+`<line x1="120" y1="108" x2="120" y2="20" stroke="#22c55e" stroke-width="1.5"/>`+
+`<rect x="113" y="38" width="14" height="20" fill="#22c55e" rx="1"/>`+
+`<line x1="30" y1="38" x2="220" y2="38" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="165" y="35" fill="#f59e0b" font-size="8">重要支撐</text>`+
+`<text x="115" y="14" fill="#22c55e" font-size="8">長下影</text>`+E,
+o:['繼續下跌訊號','周線下影線守住支撐 — 強力買盤介入，短期反彈可期','量縮整理','頂部訊號'],a:1,
+e:'周線在重要支撐出現長下影線+收小紅K，代表<strong>買盤在支撐處強力介入</strong>，下方承接力道強。這是相對可靠的短期反彈訊號，可考慮分批布多。'},
+
+{c:'ctw',q:'台指期操作中，「抱波段」最適合的進場條件是？',
+o:['短線過熱時進場','均線多頭排列+量能配合+技術指標未超買時，第一波起漲後的回測','任何時候都可進場','只看日線K棒'],a:1,
+e:'最佳波段進場：均線多頭排列、量能健康、技術指標未超買，且在<strong>第一波上漲後的正常回測（縮量）</strong>進場，此時風險最低、持倉最舒適，停損清晰。'},
+
+{c:'ctw',q:'台指期連續三根跳空缺口後急漲，稱為什麼現象？如何操作？',
+o:['趨勢確立，持續做多','「竭盡缺口」— 漲幅過大過快，即將見頂反轉，謹慎減碼','黃金交叉確認','量縮整理前兆'],a:1,
+e:'連續缺口後急漲是<strong>竭盡缺口（Exhaustion Gap）</strong>：主升段末期的最後衝刺，通常代表多頭力竭即將見頂。此時應<strong>逐步減碼</strong>而非追多，並緊盯量能是否萎縮。'},
+
+// 美股期實務 41-60
+{c:'cus',q:'圖示：ES（標普500期貨）每點價值多少美元？MES（微型ES）每點多少？',
+s:S+`<rect x="15" y="20" width="100" height="80" fill="rgba(88,166,255,.1)" stroke="#58a6ff" stroke-width="1" rx="4"/>`+
+`<text x="65" y="48" fill="#58a6ff" font-size="9" text-anchor="middle">ES</text>`+
+`<text x="65" y="65" fill="#e6edf3" font-size="10" text-anchor="middle" font-weight="700">$50/點</text>`+
+`<rect x="125" y="20" width="100" height="80" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1" rx="4"/>`+
+`<text x="175" y="48" fill="#22c55e" font-size="9" text-anchor="middle">MES</text>`+
+`<text x="175" y="65" fill="#e6edf3" font-size="10" text-anchor="middle" font-weight="700">$5/點</text>`+E,
+o:['ES $5/點，MES $50/點','ES $50/點，MES $5/點','ES $100/點，MES $10/點','ES $25/點，MES $2.5/點'],a:1,
+e:'ES每點<strong>$50美元</strong>；MES（微型ES）每點<strong>$5美元</strong>，為ES的1/10。ES漲10點ES獲利$500；MES漲10點獲利$50。初學者建議從MES開始。'},
+
+{c:'cus',q:'美股期貨的COT報告由哪個機構發布？多久更新一次？',
+o:['美聯儲（Fed），每天','美國商品期貨交易委員會（CFTC），每週五','紐約證交所（NYSE），每月','高盛，每季'],a:1,
+e:'COT（Commitment of Traders）報告由<strong>美國CFTC每週五發布</strong>，公布截至週二的持倉數據。分三類：商業交易商、大型投機商、散戶投機商，是最重要的機構籌碼指標。'},
+
+{c:'cus',q:'美股三大期貨指數中，哪個追蹤科技股最多且波動最大？',
+o:['ES（追蹤S&P500）','NQ（追蹤納斯達克100，科技股比例最高）','YM（追蹤道瓊30）','RTY（追蹤Russell 2000）'],a:1,
+e:'<strong>NQ（納斯達克100期貨）</strong>成分股高度集中於科技大型股（蘋果、微軟、輝達等），波動性最大，Alpha程度高。科技股強勢時NQ表現優於ES，弱勢時跌幅也更大。'},
+
+{c:'cus',q:'美股期貨「Triple Witching（三巫日）」每年發生幾次？在哪一天？',
+o:['每月一次，每月第一個週五','每季一次（3/6/9/12月），第三個週五','每年一次，12月第三個週五','每半年一次'],a:1,
+e:'三巫日（Triple Witching）：每季的<strong>3、6、9、12月第三個週五</strong>，股票期權、指數期權、指數期貨同時到期，成交量通常為平日2-4倍，波動極大。'},
+
+{c:'cus',q:'圖示：NQ期貨在前高附近出現長上影線K棒，成交量大，代表什麼？',
+s:S+`<line x1="120" y1="8" x2="120" y2="45" stroke="#ef4444" stroke-width="1.5"/>`+
+`<rect x="113" y="45" width="14" height="45" fill="#22c55e" rx="1"/>`+
+`<line x1="120" y1="90" x2="120" y2="108" stroke="#22c55e" stroke-width="1.5"/>`+
+`<line x1="30" y1="8" x2="210" y2="8" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="30" y="5" fill="#ef4444" font-size="8">前高阻力</text>`+
+`<rect x="108" y="98" width="12" height="14" fill="#22c55e" rx="1"/>`+E,
+o:['突破前高，做多','長上影線觸及前高後被賣壓打回，放量代表拋售力道強，偏空','底部確認','量縮整理'],a:1,
+e:'前高放量長上影線：多方嘗試突破失敗，大量賣單在此等待，<strong>賣壓沉重訊號</strong>，應謹慎不追多，甚至考慮在此附近做空，停損設上影線高點。'},
+
+{c:'cus',q:'FOMC會議聲明發布時，美股期貨的操作建議是？',
+o:['聲明前大倉位押注方向','聲明前縮小或平掉部位，等聲明後方向確立再進場','聲明後不要操作','做多美元期貨'],a:1,
+e:'FOMC聲明含不確定性極高，聲明前任何方向都可能損失慘重（雙向閃崩常見）。最佳策略：<strong>聲明前縮倉或平倉</strong>，等聲明後市場方向確立（通常5-15分鐘後）再進場。'},
+
+{c:'cus',q:'美國非農就業報告（NFP）每月幾號公布？通常在美東時間幾點？',
+o:['每月第一個週五，美東08:30','每月第一個週三，美東10:00','每月1號，美東09:30','每月最後一個週五，08:30'],a:0,
+e:'美國非農就業報告（Non-Farm Payrolls）於<strong>每月第一個週五美東08:30（台灣夏令20:30，冬令21:30）</strong>公布，是最重要的月度經濟數據，對ES/NQ影響極大。'},
+
+{c:'cus',q:'圖示：ES期貨（S&P500）在200日均線附近放量收長紅，代表什麼長期訊號？',
+s:S+`<line x1="30" y1="65" x2="220" y2="65" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="6,3"/>`+
+`<text x="165" y="62" fill="#8b5cf6" font-size="8">200MA年線</text>`+
+`<polyline points="30,80 80,75 130,72 160,68 185,62 200,45 215,32" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<rect x="185" y="35" width="14" height="27" fill="#22c55e" rx="1"/>`+
+`<rect x="182" y="95" width="12" height="16" fill="#22c55e" rx="1"/>`+E,
+o:['短期超買賣出','站穩年線放量長紅 — 多頭格局確立，積極做多，年線為支撐','空頭訊號','無法判斷'],a:1,
+e:'ES突破200MA（年線）且放量收長紅，是最重要的長期多頭訊號：<strong>年線成為關鍵支撐</strong>。歷史上ES在年線以上時，長期持多的勝率極高。'},
+
+{c:'cus',q:'美股期貨的「Gamma Squeeze」效應通常如何發生？',
+o:['美聯儲降息時自動觸發','大量Call選擇權的Delta對沖引發正向回饋循環，短時間大漲','成交量突然縮小','外資集中買進'],a:1,
+e:'Gamma Squeeze：大量Call選擇權購買 → 造市商賣出Call被迫買入股票對沖Delta → 股票上漲 → Delta增加 → 造市商買更多股票 → <strong>正向回饋造成短時間急漲</strong>，常見於GME等軋空行情。'},
+
+{c:'cus',q:'ES期貨在日線均線空頭排列下，反彈到50MA被賣壓壓回，應如何操作？',
+s:S+`<polyline points="30,28 80,38 130,52 180,48 200,55 220,65" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<polyline points="30,22 80,30 130,40 180,45 200,48 220,55" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<polyline points="30,18 80,22 130,28 180,35 200,40 220,48" fill="none" stroke="#8b5cf6" stroke-width="1.5"/>`+
+`<text x="165" y="30" fill="#8b5cf6" font-size="8">50MA壓</text>`+E,
+o:['突破均線積極做多','均線空頭排列，50MA形成壓力，反彈被壓回是加碼空單機會','量縮整理等待','換月重新判斷'],a:1,
+e:'空頭排列中，50MA是主要壓力線，反彈至此被賣壓打回代表<strong>空頭趨勢確認</strong>。這是加碼空單的最佳機會，停損設50MA之上，目標前低或更低。'},
+
+{c:'cus',q:'VIX期貨當前處於Backwardation（逆向期限結構，近月>遠月），代表？',
+o:['市場平靜，做空VIX獲利','市場極度恐慌，近期風險高，不宜做空VIX','趨勢延續','利率上升訊號'],a:1,
+e:'VIX Backwardation：近月VIX期貨>遠月，代表市場對<strong>近期風險的擔憂遠超長期</strong>，市場處於恐慌狀態。此時做空VIX（如SVXY）風險極高，應持現金等待恐慌消退。'},
+
+{c:'cus',q:'美股期貨「大型投機商」在COT報告中創下歷史最高淨多頭，通常代表？',
+o:['100%的做多訊號','大型投機商已過度傾向多頭，可能是頂部警訊（反向指標）','持續多頭可加倉','無法判斷'],a:1,
+e:'COT大型投機商（趨勢追隨者）淨多倉達歷史極值時，反而可能是<strong>頂部警訊</strong>：市場已過度樂觀，軋空風險下降，獲利了結的空間更大。COT極端值是經典的反向指標。'},
+
+{c:'cus',q:'ES期貨做多1口，入場5,000點，止損4,950點，目標5,100點，風險報酬比是？',
+o:['1:1','1:2','2:1','1:0.5'],a:1,
+e:'風險 = 5,000 - 4,950 = 50點；回報 = 5,100 - 5,000 = 100點。<strong>風險報酬比 = 1:2</strong>（每冒1單位風險，預期賺2單位回報）。一般要求至少1:2才是良好的交易設置。'},
+
+{c:'cus',q:'「季節性效應」中，美股通常哪個季節表現最強？',
+o:['夏季（7-8月）','秋季（9-10月），稱為Halloween效應','11月到4月（秋冬春）整體表現優於5-10月','1月效應最強，1月最強'],a:2,
+e:'統計上美股「<strong>11月到4月</strong>」整體表現優於5月到10月（「5月賣股離場」的由來）。但此規律非絕對，近年隨AI浪潮季節性效應有所弱化。'},
+
+{c:'cus',q:'美股開盤後（9:30-10:00）「高開低走」的形態，通常代表什麼短線訊號？',
+s:S+`<polyline points="30,40 55,35 80,45 110,55 145,68 180,75 210,82" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<line x1="30" y1="40" x2="60" y2="40" stroke="#22c55e" stroke-width="1.5"/>`+
+`<text x="65" y="38" fill="#22c55e" font-size="8">開盤跳高</text>`+
+`<text x="160" y="92" fill="#ef4444" font-size="8">走低 = 假突破</text>`+E,
+o:['開盤走強，繼續做多','高開低走 = 假突破，多頭陷阱，偏空短線操作','震盪整理後再漲','底部確認'],a:1,
+e:'美股高開低走（開盤強勢但隨後回落）是<strong>多頭陷阱</strong>訊號：開盤吸引散戶追多後主力出貨。若在重要阻力位附近出現，做空訊號更強，停損設開盤高點以上。'},
+
+{c:'cus',q:'「ES/NQ背離」：若ES持平但NQ大漲，代表什麼市場訊號？',
+o:['整體市場強勁，做多所有期貨','科技股獨強，其他板塊落後，行情廣度不佳，注意風險','空頭格局','市場均衡'],a:1,
+e:'ES代表整體市場（500檔股），NQ代表科技股（100檔），若<strong>NQ獨漲而ES不跟</strong>，代表行情集中在科技股、其他板塊落後，行情廣度不佳，這種「窄幅上漲」往往不可持續。'},
+
+{c:'cus',q:'美股期貨在美東15:45-16:00最後15分鐘，成交量激增代表？',
+o:['長線投資者買入','機構基金進行收盤前調倉，波動劇烈，散戶應謹慎','趨勢最強時段','換月效應'],a:1,
+e:'美股收盤前15分鐘是<strong>機構基金收盤調倉</strong>的高峰，大量指數型ETF和基金按收盤價調整持倉，成交量激增且方向難以預測。散戶應避免在此時段進出，以免被波動掃出。'},
+
+{c:'cus',q:'美國CPI通膨數據超預期偏高，對ES期貨的短期影響通常是？',
+o:['ES上漲，通膨代表經濟好','ES下跌（市場預期Fed維持高利率甚至加息）','ES不受影響','隔日才有影響'],a:1,
+e:'CPI超預期偏高 → 市場預期Fed<strong>不降息甚至加息</strong> → 資金成本上升 → 高估值股票受壓 → ES（特別是NQ）<strong>通常下跌</strong>。反之，CPI低於預期 → 降息預期升溫 → ES上漲。'},
+
+// K棒量價應用期貨 61-80
+{c:'cck',q:'台指期日線出現「三烏鴉（三根連續長黑K）」且均放量，代表？',
+s:S+`<rect x="45" y="22" width="16" height="60" fill="#ef4444" rx="1"/>`+
+`<line x1="53" y1="12" x2="53" y2="22" stroke="#ef4444" stroke-width="1.5"/>`+
+`<line x1="53" y1="82" x2="53" y2="95" stroke="#ef4444" stroke-width="1.5"/>`+
+`<rect x="75" y="42" width="16" height="58" fill="#ef4444" rx="1"/>`+
+`<line x1="83" y1="32" x2="83" y2="42" stroke="#ef4444" stroke-width="1.5"/>`+
+`<line x1="83" y1="100" x2="83" y2="112" stroke="#ef4444" stroke-width="1.5"/>`+
+`<rect x="105" y="62" width="16" height="52" fill="#ef4444" rx="1"/>`+
+`<line x1="113" y1="52" x2="113" y2="62" stroke="#ef4444" stroke-width="1.5"/>`+E,
+o:['底部反轉，做多','三烏鴉放量 — 強烈空頭延續，持空或空單加碼','觀望','量縮整理後突破'],a:1,
+e:'三烏鴉（Three Black Crows）+ 放量：三根連續長黑且量能放大，是最強烈的<strong>空頭延續訊號</strong>。持有空單者加碼，多單者立即平倉，不要逢低抄底。'},
+
+{c:'cck',q:'NQ期貨日線在高點出現「黃昏之星（Evening Star）」，代表？',
+s:S+`<rect x="55" y="25" width="16" height="62" fill="#22c55e" rx="1"/>`+
+`<line x1="63" y1="15" x2="63" y2="25" stroke="#22c55e" stroke-width="1.5"/>`+
+`<rect x="88" y="20" width="14" height="12" fill="#f59e0b" rx="1"/>`+
+`<line x1="95" y1="10" x2="95" y2="20" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<line x1="95" y1="32" x2="95" y2="40" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<rect x="115" y="28" width="16" height="68" fill="#ef4444" rx="1"/>`+
+`<line x1="123" y1="15" x2="123" y2="28" stroke="#ef4444" stroke-width="1.5"/>`+E,
+o:['繼續做多，上漲確認','黃昏之星 — 頂部反轉訊號，減多或做空','量縮整理','缺口即將填補'],a:1,
+e:'黃昏之星在高點出現：大陽線 → 小星 → 大陰線，代表<strong>多頭力竭、空頭接手</strong>。NQ期貨出現此形態，應立即平掉多單甚至做空，停損設小星高點以上。'},
+
+{c:'cck',q:'ES期貨日線低點出現「早晨之星（Morning Star）」且第三根陽線放量，代表？',
+o:['繼續做空','早晨之星放量確認 — 底部反轉強力訊號，積極做多','量縮整理','缺口陷阱'],a:1,
+e:'早晨之星（大陰線+小星+大陽線）在低點出現，若第三根<strong>陽線放量</strong>，反轉訊號更可靠。此時積極做多，停損設小星低點以下，目標前一波高點。'},
+
+{c:'cck',q:'台指期5分鐘K棒，連續「量縮小紅」三根後，出現「放量長紅突破前高」，此為？',
+s:S+`<rect x="35" y="70" width="12" height="22" fill="#22c55e" rx="1"/>`+
+`<rect x="55" y="68" width="12" height="20" fill="#22c55e" rx="1"/>`+
+`<rect x="75" y="66" width="12" height="18" fill="#22c55e" rx="1"/>`+
+`<rect x="95" y="32" width="14" height="55" fill="#22c55e" rx="1"/>`+
+`<line x1="30" y1="65" x2="210" y2="65" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="155" y="62" fill="#f59e0b" font-size="8">前高</text>`+
+`<circle cx="102" cy="32" r="4" fill="#22c55e"/>`+E,
+o:['量縮整理將轉弱','量縮蓄積後放量突破 — 強勢進場訊號，做多','偽突破，等回落','換月操作'],a:1,
+e:'量縮整理（能量蓄積）→ 放量突破前高（能量釋放）：這是<strong>期貨操作最可靠的買入形態</strong>。突破後可積極做多，停損設整理區間低點，目標量測突破幅度。'},
+
+{c:'cck',q:'圖示K棒分析：台指期形成「高位孕線」（大陽線後小陰線在其中），代表？',
+s:S+`<rect x="65" y="20" width="16" height="75" fill="#22c55e" rx="1"/>`+
+`<line x1="73" y1="10" x2="73" y2="20" stroke="#22c55e" stroke-width="1.5"/>`+
+`<line x1="73" y1="95" x2="73" y2="108" stroke="#22c55e" stroke-width="1.5"/>`+
+`<rect x="98" y="38" width="14" height="30" fill="#ef4444" rx="1"/>`+
+`<text x="115" y="55" fill="#ef4444" font-size="8">孕線</text>`+E,
+o:['強烈多頭確認','高位孕線 — 上漲動能減緩，可能轉折，謹慎多單，等確認','超買信號做空','量縮整理'],a:1,
+e:'高位孕線（前陽包住後小陰）：前一根大陽線顯示多頭強勢，但後一根收小陰在其中代表<strong>多頭動能初步減緩</strong>，是預警訊號。若隔日再收黑且放量，確認轉折。'},
+
+{c:'cck',q:'ES期貨小時線，出現「量增價跌」且跌破重要支撐，操作建議？',
+o:['逢低做多，等反彈','量增價跌破支撐 — 強烈空頭確認，果斷做空，停損設支撐以上','量縮整理','觀望中性'],a:1,
+e:'量增價跌破支撐是最強烈的空頭訊號：<strong>大量賣盤突破關鍵支撐</strong>，代表多方潰敗。果斷做空，停損設剛跌破的支撐以上（此位置轉為壓力），目標前低。'},
+
+{c:'cck',q:'台指期日線K棒，低點附近出現「錘子線（Hammer）」且成交量大，代表？',
+s:S+`<line x1="120" y1="20" x2="120" y2="100" stroke="#22c55e" stroke-width="1.5"/>`+
+`<rect x="113" y="20" width="14" height="18" fill="#22c55e" rx="1"/>`+
+`<rect x="110" y="95" width="12" height="18" fill="#22c55e" rx="1"/>`+
+`<text x="138" y="70" fill="#22c55e" font-size="8">長下影線</text>`+
+`<text x="138" y="85" fill="#22c55e" font-size="8">放量</text>`+E,
+o:['繼續下跌，做空','錘子線放量 — 底部支撐強，買盤積極介入，反彈做多','量縮整理','頂部訊號'],a:1,
+e:'錘子線（下影線≥實體2倍）在低點出現 + 放量 = <strong>最強的底部反轉訊號</strong>：大量買盤在低點接貨，賣方力量被吸收。可積極做多，停損設錘子線低點以下。'},
+
+{c:'cck',q:'NQ期貨日線K棒出現「流星線（Shooting Star）」在前高附近，量能放大，代表？',
+s:S+`<line x1="120" y1="8" x2="120" y2="45" stroke="#ef4444" stroke-width="1.5"/>`+
+`<rect x="113" y="45" width="14" height="22" fill="#ef4444" rx="1"/>`+
+`<line x1="120" y1="67" x2="120" y2="75" stroke="#ef4444" stroke-width="1.5"/>`+
+`<text x="138" y="25" fill="#ef4444" font-size="8">長上影線</text>`+E,
+o:['突破創新高，做多','流星線放量在前高 — 強烈頂部訊號，賣出多單或做空','量縮整理','底部反彈'],a:1,
+e:'流星線（上影線≥實體2倍）在高點出現 + 放量 = <strong>強烈的頂部反轉訊號</strong>：多方嘗試突破失敗，大量賣盤在高點傾出。應立即平多單，甚至做空，停損設上影線高點以上。'},
+
+{c:'cck',q:'「價跌量縮」在下跌趨勢的第3-5天出現，對期貨操作的意義是？',
+s:S+`<polyline points="30,20 70,35 110,52 155,62 190,70 220,76" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<rect x="38" y="88" width="12" height="22" fill="#ef4444" rx="1" opacity=".8"/>`+
+`<rect x="62" y="92" width="12" height="18" fill="#ef4444" rx="1" opacity=".7"/>`+
+`<rect x="86" y="96" width="12" height="14" fill="#ef4444" rx="1" opacity=".5"/>`+
+`<rect x="110" y="99" width="12" height="11" fill="#ef4444" rx="1" opacity=".4"/>`+
+`<rect x="134" y="101" width="12" height="9" fill="#ef4444" rx="1" opacity=".3"/>`+E,
+o:['繼續做空，量縮是好兆頭','量縮說明賣壓減輕，下跌動能不足，空單適度減倉，等待新方向','加碼空單','趨勢確認'],a:1,
+e:'下跌趨勢中量縮說明<strong>賣壓在減輕</strong>，空頭動能不足，後續可能進入整理或反彈。空單持有者可適度減倉鎖利，等量能再度放大後再決定下一步方向。'},
+
+{c:'cck',q:'台指期5分鐘K棒，開盤爆量後縮量整理，午盤再度放量突破盤整區上緣，代表？',
+o:['換月現象','午盤放量突破 — 行情再啟動，可追多操作','量縮整理危機','指數即將反轉'],a:1,
+e:'早盤爆量後縮量整理是正常「換手」過程；午盤再度放量突破整理區高點代表<strong>多頭再度主導</strong>，行情重新啟動，是追多的好機會，停損設整理區間低點。'},
+
+// 策略理論 81-100
+{c:'cth',q:'期貨「對沖（Hedge）」策略的目的是？',
+o:['追求最大獲利','降低已有部位的風險，以相反方向的期貨對沖','套利期現差','增加槓桿'],a:1,
+e:'<strong>對沖策略</strong>：持有股票多頭的投資者，同時賣出等值期貨空單，鎖定下跌風險，保護持股價值。雖然犧牲部分上漲獲利，但大幅降低市場下跌時的損失。'},
+
+{c:'cth',q:'「期貨套利」的基本原理是？',
+o:['預測市場方向','利用市場定價失效（如期現差、月間價差），在兩個市場同時做相反方向操作獲利','利用槓桿放大獲利','只做多不做空'],a:1,
+e:'期貨套利：當<strong>期貨定價出現偏差</strong>（相對於現貨或其他月份合約），同時在兩個市場建立相反部位，等價差回歸時獲利，理論上是「無風險套利」（但實際有執行風險）。'},
+
+{c:'cth',q:'「日內交易（Day Trading）」與「波段交易（Swing Trading）」的主要差異是？',
+o:['盈虧計算方式不同','日內交易當天平倉（無隔夜倉），波段交易持倉數天至數週','使用不同的期貨合約','保證金要求不同'],a:1,
+e:'<strong>日內交易</strong>：當天建倉、當天平倉，不持有隔夜倉位，規避隔夜風險但成本高、精力消耗大。<strong>波段交易</strong>：持倉數天到數週，捕捉中期趨勢，但承擔隔夜風險。'},
+
+{c:'cth',q:'「風險報酬比（Risk/Reward Ratio）」1:3的含義是？',
+o:['每賺3元需要3元風險','每冒1元風險，目標獲利3元','固定每筆獲利3%','停損3%停利1%'],a:1,
+e:'風險報酬比1:3：<strong>每冒1單位風險，期望獲得3單位回報</strong>。即使勝率只有40%，只要報酬比維持1:3，長期下來仍能獲利（40%×3 - 60%×1 = 0.6，期望值正值）。'},
+
+{c:'cth',q:'「倉位管理（Position Sizing）」中，凱利公式的用途是？',
+o:['計算最佳停損點','根據勝率和賠率計算最優倉位比例，最大化長期資金成長','計算期貨保證金','確定交易時機'],a:1,
+e:'凱利公式（Kelly Criterion）：<strong>最佳倉位% = 勝率 - (1-勝率)/賠率</strong>。在已知勝率和賠率的情況下，給出使長期資金成長最大化的最優倉位比例，但實際建議使用半凱利（更保守）。'},
+
+{c:'cth',q:'「趨勢跟蹤策略（Trend Following）」的核心原則是？',
+o:['在頂部做空、底部做多','跟隨已確立的趨勢方向操作，不預測趨勢頂底','根據基本面操作','使用高頻算法'],a:1,
+e:'趨勢跟蹤：<strong>「趨勢是你的朋友」</strong>，確立上升趨勢後只做多、下降趨勢後只做空。不預測頂底，而是等趨勢確立後進場，趨勢反轉時出場，適合中長線操作。'},
+
+{c:'cth',q:'「均值回歸策略（Mean Reversion）」在期貨中的應用是？',
+o:['跟隨趨勢做多或做空','當期貨偏離均線或合理定價過大時，押注回歸均值','只操作結算日','根據COT操作'],a:1,
+e:'均值回歸：<strong>期貨偏離合理價值過大時反向布局</strong>，如乖離率過大時做反向、PCR極端時逆向等。此策略在震盪市中效果好，但在強趨勢市場容易被消滅。'},
+
+{c:'cth',q:'期貨交易的「交易日誌」最重要的是記錄什麼？',
+o:['每日獲利金額','進出場時機、理由、事後評估（對錯在哪）和情緒狀態，用以改進交易系統','只記錄獲利的交易','記錄新聞事件'],a:1,
+e:'<strong>交易日誌</strong>不只是記錄損益，最重要的是記錄<strong>進出場理由</strong>（是否符合系統）、事後評估和情緒狀態，從中找出決策偏誤，持續優化交易系統。'},
+
+{c:'cth',q:'台指期貨「自動化交易（程式交易）」的主要優點是？',
+o:['絕對不會虧損','排除情緒影響，嚴格執行交易規則，可同時監控多個訊號','可以預測市場','槓桿更高'],a:1,
+e:'程式交易優點：①<strong>排除情緒（恐懼/貪婪）</strong> ②嚴格執行停損 ③可同時監控多個策略或品種 ④可24小時運行（夜盤）。缺點是過度擬合歷史、參數失效等風險。'},
+
+{c:'cth',q:'「回測（Backtesting）」策略時，「過度擬合（Overfitting）」的問題是？',
+o:['回測速度太慢','策略過度優化歷史數據，看起來完美但實際交易表現差','缺乏歷史數據','技術指標不足'],a:1,
+e:'過度擬合：策略參數被過度優化到符合歷史數據，<strong>但未來實際表現通常遠差於回測</strong>。解決方法：使用樣本外數據驗證（Walk Forward Testing）、保持策略簡單、使用統計顯著的規則。'},
+
+{c:'cth',q:'「最大回撤（Maximum Drawdown, MDD）」衡量什麼？',
+o:['最大單筆獲利','從最高點到最低點的最大虧損幅度，衡量策略最壞情況','平均獲利','夏普比率'],a:1,
+e:'MDD（最大回撤）= 從資金最高峰到最低谷的最大跌幅比例。若MDD=30%，代表策略曾出現資金縮水30%。<strong>MDD是衡量策略風險最重要的指標</strong>，應保持在可承受範圍內。'},
+
+{c:'cth',q:'台指期的「選擇權（Options）」中，買入Call（買權）的獲利條件是？',
+o:['指數下跌','指數上漲（超過行使價+權利金）','指數不動','成交量增加'],a:1,
+e:'<strong>買Call（做多方向）</strong>：當台指期上漲超過（行使價 + 付出的權利金），開始獲利。最大損失 = 付出的權利金；最大獲利 = 理論上無上限。適合看多但不確定幅度時使用。'},
+
+{c:'cth',q:'「夏普比率（Sharpe Ratio）」在評估交易策略時代表什麼？',
+o:['只看總報酬率','報酬率÷標準差，衡量每單位風險的回報，越高越好','最大回撤','勝率'],a:1,
+e:'<strong>夏普比率 = (策略報酬 - 無風險利率) ÷ 報酬標準差</strong>。衡量每承擔一單位波動風險能獲得多少超額報酬，>1良好，>2優秀。同等報酬下夏普比率越高越穩定。'},
+
+{c:'cth',q:'期貨操作中「不要和趨勢作對（Don\'t fight the trend）」的實際含義是？',
+o:['永遠不做空','當大趨勢向上時以做多為主，大趨勢向下時以做空為主，不逆勢操作','只做短線','永遠持倉'],a:1,
+e:'最重要的操作原則：在多頭趨勢中<strong>做多勝率更高</strong>，在空頭趨勢中<strong>做空勝率更高</strong>。逆勢操作不是不可為，但需要更嚴格的進場標準和更緊的停損。'},
+
+{c:'cth',q:'「情緒交易（Emotional Trading）」最常見的危害是？',
+o:['操作時間太長','恐懼導致不執行停損、貪婪導致不獲利了結，最終虧損加劇','過度分散投資','交易頻率太低'],a:1,
+e:'情緒交易是大多數交易者失敗的根本原因：<strong>虧損時希望反彈不停損（越套越深），獲利時急於了結（獲利過少）</strong>，形成「截利留損」的惡性循環，持續侵蝕帳戶。'},
+
+{c:'cth',q:'台指期貨操作中，「換月差（Calendar Spread）」策略是指？',
+o:['在同一合約月份做多空','同時做多近月、做空遠月（或相反），押注兩個月份價差的變化','只操作到期合約','不換月持倉到結算'],a:1,
+e:'<strong>月間價差交易（Calendar Spread）</strong>：同時買近月賣遠月（或反之），賺取兩合約間的價差變化。優點是絕對價格風險低（方向中性），只需判斷近遠月相對強弱，比純方向性操作風險更低。'},
+
+{c:'cth',q:'「帳戶最大風險」的業界通用標準是？',
+o:['單筆交易最多虧損50%','單筆交易虧損不超過帳戶的1-2%，月度最大虧損不超過6-10%','每筆交易固定金額','不設限制'],a:1,
+e:'業界通用風控標準：<strong>單筆虧損 ≤ 帳戶2%</strong>（即使連虧10筆也只損20%）；月度最大回撤≤10%，超過則停止交易本月。這是職業交易員的基本守則，業餘者更應嚴格遵守。'},
+
+{c:'cth',q:'進入交易前，「交易計畫（Trading Plan）」應包含哪些要素？',
+o:['只記錄目標價位','進場條件、停損價、目標獲利、倉位大小、預期風險報酬比','只設停損','隨機決定進出'],a:1,
+e:'完整的<strong>交易計畫</strong>應包含：①進場條件（哪些訊號觸發）②停損點（最大可接受虧損）③目標獲利（至少1:2報酬比）④倉位大小（根據風控計算）⑤市場條件（趨勢判斷）。進場前計劃好，執行時才不受情緒影響。'},
+
+{c:'cth',q:'「回調進場法（Pullback Entry）」的最大優點是？',
+o:['在最高點買入','在趨勢確立後的正常回測低點進場，停損清晰、風險報酬比好','不需要分析','只適合長線投資'],a:1,
+e:'回調進場法優點：①<strong>在趨勢確立後進場</strong>（不需預測頂底）②在回調低點買入<strong>停損清晰</strong>（設在回調低點以下）③風險報酬比更好（買低而非買高）。是最穩健的進場策略之一。'},
+
+{c:'cth',q:'台指期貨操作，若當日行情完全不在你的預期內，最佳選擇是？',
+o:['加大倉位對抗市場','立即出場等待，「不確定時不操作」是最高原則','加碼攤平','換方向操作'],a:1,
+e:'<strong>「不確定時，不操作」</strong>是期貨最重要的守則之一。當行情不在預期方向、市場邏輯不清楚時，<strong>空倉等待是正確選擇</strong>。保住資金、等待清晰機會，比強迫交易更重要。'}
+];
+
+let correct=0,wrong=0,answered=new Set();
+function upScore(){
+  document.getElementById('nc').textContent=correct;
+  document.getElementById('nw').textContent=wrong;
+  document.getElementById('nt').textContent=answered.size;
+}
+function resetAll(){
+  correct=0;wrong=0;answered.clear();upScore();
+  document.querySelectorAll('.opt').forEach(b=>{b.className='opt';b.disabled=false});
+  document.querySelectorAll('.explain').forEach(e=>e.classList.remove('show'));
+}
+function answer(btn,qid,isCorrect){
+  if(answered.has(qid))return;
+  answered.add(qid);
+  const card=btn.closest('.qcard');
+  card.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===Q[qid].a) b.classList.add(isCorrect?'correct':'show-correct');
+  });
+  if(!isCorrect) btn.classList.add('wrong');
+  if(isCorrect)correct++;else wrong++;
+  upScore();
+  card.querySelector('.explain').classList.add('show');
+}
+function filt(cat,btn){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.qcard').forEach(c=>{
+    c.style.display=(cat==='all'||c.classList.contains(cat))?'':'none';
+  });
+}
+function render(){
+  const g=document.getElementById('grid');
+  Q.forEach((q,i)=>{
+    const d=document.createElement('div');
+    d.className='qcard '+q.c;
+    const opts=q.o.map((o,j)=>`<button class="opt" onclick="answer(this,${i},${j===q.a})">${String.fromCharCode(65+j)}. ${o}</button>`).join('');
+    d.innerHTML=`<div class="qhead"><div class="qnum">${i+1}</div><div class="qmeta"><span class="qtag">${CAT[q.c]}</span><div class="qtext">${q.q}</div></div></div>`+
+      (q.s?`<div class="qsvg">${q.s}</div>`:'')+
+      `<div class="opts">${opts}</div><div class="explain">${q.e}</div>`;
+    g.appendChild(d);
+  });
+}
+render();
+</script>
+</body>
+</html>

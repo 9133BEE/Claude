@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股票考題 | 股市學習</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+a{color:#58a6ff;text-decoration:none}
+.topbar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar-title{font-size:1.1rem;font-weight:700}
+.topbar a{font-size:.85rem;color:#8b949e;padding:4px 10px;border-radius:6px;border:1px solid #30363d}
+.topbar a:hover{color:#58a6ff;border-color:#58a6ff}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#1a1f2e);padding:40px 20px 28px;text-align:center;border-bottom:1px solid #30363d}
+.hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#58a6ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.hero p{color:#8b949e;font-size:.95rem}
+.score-bar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center}
+.score-item{font-size:.9rem;color:#8b949e}
+.score-item span{font-weight:700;font-size:1.1rem}
+#s-correct span{color:#22c55e}
+#s-wrong span{color:#ef4444}
+#s-total span{color:#58a6ff}
+.reset-btn{background:rgba(88,166,255,.15);border:1px solid #58a6ff;color:#58a6ff;padding:5px 16px;border-radius:6px;cursor:pointer;font-size:.85rem}
+.reset-btn:hover{background:rgba(88,166,255,.25)}
+.filters{display:flex;gap:8px;padding:14px 20px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
+.fb{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:5px 14px;border-radius:18px;cursor:pointer;font-size:.82rem;transition:all .2s}
+.fb:hover,.fb.on{background:rgba(88,166,255,.15);border-color:#58a6ff;color:#58a6ff}
+.fb.ck1.on{background:rgba(34,197,94,.15);border-color:#22c55e;color:#22c55e}
+.fb.ck2.on{background:rgba(245,158,11,.15);border-color:#f59e0b;color:#f59e0b}
+.fb.cma.on{background:rgba(88,166,255,.15);border-color:#58a6ff;color:#58a6ff}
+.fb.cvp.on{background:rgba(139,92,246,.15);border-color:#8b5cf6;color:#8b5cf6}
+.fb.cti.on{background:rgba(236,72,153,.15);border-color:#ec4899;color:#ec4899}
+.fb.csr.on{background:rgba(249,115,22,.15);border-color:#f97316;color:#f97316}
+.fb.cth.on{background:rgba(20,184,166,.15);border-color:#14b8a6;color:#14b8a6}
+.grid{max-width:1100px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:20px}
+@media(max-width:560px){.grid{grid-template-columns:1fr;padding:14px 12px}}
+.qcard{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;transition:border-color .2s}
+.qcard.ck1{border-top:3px solid #22c55e}
+.qcard.ck2{border-top:3px solid #f59e0b}
+.qcard.cma{border-top:3px solid #58a6ff}
+.qcard.cvp{border-top:3px solid #8b5cf6}
+.qcard.cti{border-top:3px solid #ec4899}
+.qcard.csr{border-top:3px solid #f97316}
+.qcard.cth{border-top:3px solid #14b8a6}
+.qhead{padding:16px 18px 0;display:flex;gap:10px;align-items:flex-start}
+.qnum{background:#21262d;color:#8b949e;font-size:.72rem;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.qmeta{flex:1}
+.qtag{font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:5px}
+.ck1 .qtag{background:rgba(34,197,94,.15);color:#22c55e}
+.ck2 .qtag{background:rgba(245,158,11,.15);color:#f59e0b}
+.cma .qtag{background:rgba(88,166,255,.15);color:#58a6ff}
+.cvp .qtag{background:rgba(139,92,246,.15);color:#8b5cf6}
+.cti .qtag{background:rgba(236,72,153,.15);color:#ec4899}
+.csr .qtag{background:rgba(249,115,22,.15);color:#f97316}
+.cth .qtag{background:rgba(20,184,166,.15);color:#14b8a6}
+.qtext{font-size:.92rem;color:#e6edf3;line-height:1.5;font-weight:600}
+.qsvg{padding:12px 18px 0}
+.qsvg svg{width:100%;height:auto;display:block;border-radius:6px;background:#0d1117;border:1px solid #21262d}
+.opts{padding:12px 18px}
+.opt{display:block;width:100%;background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:.87rem;text-align:left;margin-bottom:6px;transition:all .15s}
+.opt:hover{border-color:#58a6ff;color:#e6edf3}
+.opt.correct{background:rgba(34,197,94,.2);border-color:#22c55e;color:#22c55e;font-weight:700}
+.opt.wrong{background:rgba(239,68,68,.18);border-color:#ef4444;color:#ef4444}
+.opt.show-correct{background:rgba(34,197,94,.1);border-color:#22c55e;color:#22c55e}
+.explain{display:none;margin:0 18px 16px;background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.2);border-left:3px solid #58a6ff;border-radius:8px;padding:12px 14px;font-size:.85rem;color:#8b949e;line-height:1.65}
+.explain strong{color:#e6edf3}
+.explain.show{display:block}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-title">股票考題</span>
+  <a href="index.html">首頁</a>
+  <a href="stock-course.html">台股課程</a>
+  <a href="candlestick-patterns.html">K棒圖鑑</a>
+  <a href="futures-quiz.html">期貨考題</a>
+</div>
+<div class="hero">
+  <h1>股票實戰考題</h1>
+  <p>100 題 — 70% 圖形判斷 · 30% 理論 · 每題附詳解</p>
+</div>
+<div class="score-bar">
+  <div class="score-item" id="s-correct">答對 <span id="nc">0</span></div>
+  <div class="score-item" id="s-wrong">答錯 <span id="nw">0</span></div>
+  <div class="score-item" id="s-total">完成 <span id="nt">0</span>/100</div>
+  <button class="reset-btn" onclick="resetAll()">重置</button>
+</div>
+<div class="filters">
+  <button class="fb on" onclick="filt('all',this)">全部(100)</button>
+  <button class="fb ck1" onclick="filt('ck1',this)">K棒單根(15)</button>
+  <button class="fb ck2" onclick="filt('ck2',this)">K棒組合(15)</button>
+  <button class="fb cma" onclick="filt('cma',this)">趨勢均線(12)</button>
+  <button class="fb cvp" onclick="filt('cvp',this)">量價關係(12)</button>
+  <button class="fb cti" onclick="filt('cti',this)">技術指標(8)</button>
+  <button class="fb csr" onclick="filt('csr',this)">支撐阻力(8)</button>
+  <button class="fb cth" onclick="filt('cth',this)">理論知識(30)</button>
+</div>
+<div class="grid" id="grid"></div>
+
+<script>
+const CAT={'ck1':'K棒單根','ck2':'K棒組合','cma':'趨勢均線','cvp':'量價關係','cti':'技術指標','csr':'支撐阻力','cth':'理論知識'};
+const S='<svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">';
+const E='</svg>';
+function c(x,y,t,b,col){const top=Math.min(t,b),h=Math.abs(b-t)||2;return`<rect x="${x-4}" y="${top}" width="8" height="${h}" fill="${col}" rx="1"/>`;}
+function w(x,high,low,col){return`<line x1="${x}" y1="${high}" x2="${x}" y2="${low}" stroke="${col}" stroke-width="1.5"/>`;}
+function cd(x,o,c2,high,low){const col=c2<o?'#ef4444':'#22c55e';return w(x,high,low,col)+c(x,o,c2,col);}
+
+const Q=[
+// K棒單根 1-15
+{c:'ck1',q:'圖中單根K棒型態稱為什麼？代表何種意義？',
+s:S+w(120,10,110,'#22c55e')+c(120,40,20,'#22c55e')+E,
+o:['長陽線 — 多方強勢','長陰線 — 空方強勢','十字星 — 多空平衡','紡錘線 — 方向不明'],a:0,
+e:'長陽線實體長、上下影線短，代表開盤到收盤多方持續買進，<strong>多頭強勢訊號</strong>。'},
+
+{c:'ck1',q:'圖中K棒型態稱為什麼？',
+s:S+w(120,10,110,'#ef4444')+c(120,20,90,'#ef4444')+E,
+o:['長陽線','長陰線 — 空方控盤','錘子線','上吊線'],a:1,
+e:'長陰線開高走低，收盤遠低於開盤，代表<strong>空方控盤</strong>，後市偏空。'},
+
+{c:'ck1',q:'圖中K棒實體極小、上下影線長，稱為？',
+s:S+w(120,15,105,'#8b949e')+c(120,55,60,'#8b949e')+E,
+o:['流星線','錘子線','十字星 — 多空平衡','紡錘線'],a:3,
+e:'紡錘線實體小、上下影線均長，代表多空雙方激烈拉鋸但無勝負，<strong>方向不明，等待確認</strong>。'},
+
+{c:'ck1',q:'圖中K棒下影線長、實體小且位於頂端，出現在下跌末端代表？',
+s:S+w(120,20,110,'#22c55e')+c(120,20,30,'#22c55e')+E,
+o:['上吊線 — 頂部反轉','錘子線 — 底部反轉訊號','流星線 — 頂部反轉','十字錘'],a:1,
+e:'錘子線（Hammer）下影線長度≥實體2倍，實體在頂端，出現在<strong>下跌末端</strong>是強烈底部反轉訊號。'},
+
+{c:'ck1',q:'圖中K棒上影線長、實體小位於底端，出現在上漲末端代表？',
+s:S+w(120,15,105,'#ef4444')+c(120,90,100,'#ef4444')+E,
+o:['倒錘子線','上吊線','流星線 — 頂部反轉訊號','捨子線'],a:2,
+e:'流星線（Shooting Star）上影線長度≥實體2倍，實體在底端，出現在<strong>上漲末端</strong>是強烈頂部反轉訊號。'},
+
+{c:'ck1',q:'開盤=最低價，收盤=最高價，無影線的大陽線稱為？',
+s:S+`<rect x="112" y="15" width="16" height="90" fill="#22c55e" rx="1"/>`+E,
+o:['光頭光腳陽線 — 最強多頭','長陽線','禿棒','紅三兵'],a:0,
+e:'光頭光腳陽線（禿棒）無上下影線，開盤即最低、收盤即最高，代表<strong>全程多方控盤，最強多頭訊號</strong>。'},
+
+{c:'ck1',q:'圖中K棒形狀像十字架，稱為？',
+s:S+w(120,15,105,'#8b949e')+`<line x1="108" y1="60" x2="132" y2="60" stroke="#8b949e" stroke-width="2"/>`+E,
+o:['紡錘線','十字星 — 多空勢均力敵','捨子線','T字線'],a:1,
+e:'十字星開盤價=收盤價，實體幾乎為零，代表<strong>多空完全平衡，趨勢可能轉折</strong>。出現在高點/低點意義更重大。'},
+
+{c:'ck1',q:'下影線極長、上影線幾乎沒有、實體小的陽線，出現在上漲趨勢高點代表？',
+s:S+w(120,25,110,'#22c55e')+c(120,25,33,'#22c55e')+E,
+o:['錘子線 — 做多','上吊線 — 頂部警訊','流星線','倒錘子線'],a:1,
+e:'上吊線與錘子線外型相同，但出現在<strong>上漲趨勢的高點</strong>，代表賣壓出現，是<strong>頂部反轉警訊</strong>。'},
+
+{c:'ck1',q:'圖中上影線長、無下影線的陰線，代表什麼？',
+s:S+w(120,15,60,'#ef4444')+c(120,40,80,'#ef4444')+E,
+o:['長上影陰線 — 上方賣壓重','流星線','長陽線','錘子線'],a:0,
+e:'長上影線陰線代表盤中曾大幅拉高但被賣壓打回，<strong>上方賣壓沉重</strong>，後市偏空。'},
+
+{c:'ck1',q:'T字線（倒T）的特徵是什麼？',
+s:S+w(120,15,80,'#22c55e')+`<line x1="108" y1="80" x2="132" y2="80" stroke="#22c55e" stroke-width="2"/>`+E,
+o:['上影線長下影線無，實體在底端','開盤=收盤=最低點，上影線長','實體在中間，無影線','開盤=最高=最低'],a:1,
+e:'T字線又稱倒十字或Dragonfly Doji，<strong>開盤=收盤=最低點</strong>，上影線長，代表下方支撐強，出現在底部是做多訊號。'},
+
+{c:'ck1',q:'倒T字線（T字）出現在高點代表什麼？',
+s:S+w(120,15,80,'#ef4444')+`<line x1="108" y1="15" x2="132" y2="15" stroke="#ef4444" stroke-width="2"/>`+E,
+o:['底部反轉 — 做多','頂部反轉訊號 — 賣壓重','橫盤整理','量縮整理'],a:1,
+e:'Gravestone Doji（墓碑十字）：開盤=收盤=最高點，下影線極短，代表<strong>上方賣壓極重</strong>，出現在高點是強烈賣出訊號。'},
+
+{c:'ck1',q:'連續三根逐漸縮小的陰線出現在下跌中，代表？',
+s:S+cd(90,30,60,20,70)+cd(120,45,65,38,75)+cd(150,55,68,50,80)+E,
+o:['空頭確認','多空平衡，觀望','底部反轉訊號','三烏鴉，空頭延續'],a:3,
+e:'三根連續收黑實體K棒稱為<strong>三烏鴉（Three Black Crows）</strong>，是強烈空頭延續訊號。'},
+
+{c:'ck1',q:'圖中陽線實體長但上影線很長，代表什麼風險？',
+s:S+w(120,5,110,'#22c55e')+c(120,35,80,'#22c55e')+E,
+o:['多方完全控盤','上方仍有大量賣壓，追多要小心','底部確認訊號','最強多頭'],a:1,
+e:'長上影線代表盤中曾拉到高點但受賣壓壓回，雖收陽但<strong>上方賣壓不輕</strong>，不宜盲目追多。'},
+
+{c:'ck1',q:'開盤高跳後收長陽線，且有量能配合，稱為？',
+s:S+`<line x1="80" y1="90" x2="100" y2="90" stroke="#8b949e"/>`+
+`<line x1="100" y1="72" x2="108" y2="72" stroke="#22c55e" stroke-width="1"/>` +
+w(120,30,105,'#22c55e')+c(120,50,32,'#22c55e')+E,
+o:['跳空陽線 — 突破確認','填補缺口陽線','錘子線','長陽線普通'],a:0,
+e:'開盤跳空且收長陽代表<strong>多頭積極突破</strong>，若有放量更為可信，缺口為支撐，是強勢買入訊號。'},
+
+{c:'ck1',q:'實體極小，上下影線近乎相等的K棒稱為？',
+s:S+w(120,15,105,'#22c55e')+c(120,56,64,'#22c55e')+E,
+o:['十字星','蜻蜓十字','小實體紡錘線 — 多空均衡','長陽線'],a:2,
+e:'小實體紡錘線（Short Spinning Top）上下影線相當、實體極小，表示<strong>多空勢均力敵</strong>，趨勢可能轉換，需觀察下一根K棒方向。'},
+
+// K棒組合 16-30
+{c:'ck2',q:'圖中三根K棒：陰線→小星→陽線，出現在低點代表？',
+s:S+cd(80,25,60,18,68)+cd(120,63,67,55,75)+w(160,15,110,'#22c55e')+c(160,55,20,'#22c55e')+E,
+o:['黃昏之星 — 頂部反轉','早晨之星 — 底部反轉訊號','三烏鴉','啟明星'],a:1,
+e:'早晨之星（Morning Star）：大陰線+小星+大陽線，出現在<strong>下跌末端低點</strong>，是強烈底部反轉訊號，陽線須收回陰線實體一半以上。'},
+
+{c:'ck2',q:'圖中三根K棒：陽線→小星→陰線，出現在高點代表？',
+s:S+w(80,15,110,'#22c55e')+c(80,55,20,'#22c55e')+cd(120,56,60,48,68)+cd(160,28,75,18,82)+E,
+o:['早晨之星 — 做多','黃昏之星 — 頂部反轉訊號','三白兵','吞噬形態'],a:1,
+e:'黃昏之星（Evening Star）：大陽線+小星+大陰線，出現在<strong>上漲末端高點</strong>，是強烈頂部反轉訊號。'},
+
+{c:'ck2',q:'陽線後出現大陰線，陰線開盤在陽線實體之上、收盤在陽線實體之下，稱為？',
+s:S+w(90,25,100,'#22c55e')+c(90,60,30,'#22c55e')+cd(150,20,85,15,90)+E,
+o:['穿刺形態','烏雲蓋頂 — 頂部反轉訊號','吞噬形態','孕線'],a:1,
+e:'烏雲蓋頂（Dark Cloud Cover）：陰線開盤在前陽線高點以上，收盤穿入陽線實體一半以下，代表<strong>多頭力竭、空頭反撲</strong>。'},
+
+{c:'ck2',q:'陰線後出現陽線，陽線開盤在陰線實體之下、收盤在陰線實體之上，稱為？',
+s:S+cd(90,25,75,18,82)+w(150,15,105,'#22c55e')+c(150,80,22,'#22c55e')+E,
+o:['烏雲蓋頂','穿刺形態 — 底部反轉訊號','孕線','晨星'],a:1,
+e:'穿刺形態（Piercing Line）：陽線開盤在前陰線低點以下，收盤穿入陰線實體一半以上，代表<strong>空頭力竭、多頭反攻</strong>。'},
+
+{c:'ck2',q:'圖中前一根K棒實體完全包含後一根，稱為？',
+s:S+w(90,15,105,'#22c55e')+c(90,55,22,'#22c55e')+cd(150,65,42,62,45)+E,
+o:['吞噬形態','孕線（Harami） — 趨勢可能轉折','烏雲蓋頂','捨子線'],a:1,
+e:'孕線（Harami）：第一根K棒的實體完全包住第二根小K棒，代表<strong>趨勢力道減弱、可能轉折</strong>，需等後續確認。'},
+
+{c:'ck2',q:'大陰線後出現完全吞噬陰線實體的大陽線，稱為？',
+s:S+cd(90,25,78,18,85)+w(150,15,108,'#22c55e')+c(150,85,18,'#22c55e')+E,
+o:['多頭吞噬（看漲吞噬） — 強烈底部反轉','穿刺形態','孕線','早晨之星'],a:0,
+e:'看漲吞噬（Bullish Engulfing）：陽線完全吞噬前根陰線實體，代表<strong>多方強力反攻</strong>，是底部強烈買入訊號。'},
+
+{c:'ck2',q:'連續三根陽線，每根開盤在前一根實體內，收盤逐步走高，稱為？',
+s:S+w(80,58,105,'#22c55e')+c(80,80,60,'#22c55e')+w(120,42,88,'#22c55e')+c(120,65,44,'#22c55e')+w(160,25,72,'#22c55e')+c(160,50,28,'#22c55e')+E,
+o:['三白兵 — 強勢上漲確認','三烏鴉','紅三兵','早晨之星'],a:0,
+e:'三白兵（Three White Soldiers）：三根連續陽線逐步走高，影線短，代表<strong>多頭強勢連續攻擊</strong>，是上漲趨勢有力確認。'},
+
+{c:'ck2',q:'圖示兩根K棒：第一根陽線，第二根陰線完全覆蓋（收盤低於陽線開盤），稱為？',
+s:S+w(90,30,100,'#22c55e')+c(90,62,32,'#22c55e')+cd(150,20,88,15,95)+E,
+o:['孕線','烏雲蓋頂','看跌吞噬（Bearish Engulfing） — 頂部反轉','捨子線'],a:2,
+e:'看跌吞噬：陰線完全吞噬前陽線實體，出現在上漲末端，代表<strong>空方強力壓制</strong>，是頂部強烈賣出訊號。'},
+
+{c:'ck2',q:'跳空陽線後，出現與前陽線等長且向下跳空的陰線，稱為？',
+s:S+w(90,25,100,'#22c55e')+c(90,60,28,'#22c55e')+cd(150,30,95,25,100)+E,
+o:['捨子線 — 強烈反轉訊號','烏雲蓋頂','孕線','黃昏之星'],a:0,
+e:'捨子線（Abandoned Baby）：第二根K棒跳空形成缺口，代表<strong>主力棄守</strong>，是最強烈的反轉訊號之一。'},
+
+{c:'ck2',q:'上升趨勢中出現五根K棒：大陽→三根小陰→大陽突破，稱為？',
+s:S+w(60,55,105,'#22c55e')+c(60,80,58,'#22c55e')+cd(90,58,65,55,68)+cd(115,62,68,58,72)+cd(140,65,70,62,75)+w(170,25,105,'#22c55e')+c(170,68,28,'#22c55e')+E,
+o:['下降三法','上升三法 — 多頭繼續','三白兵','旗形'],a:1,
+e:'上升三法（Rising Three Methods）：上升中，小幅回調三根小陰後再度突破，代表<strong>多頭休息後繼續上攻</strong>，是持多的訊號。'},
+
+{c:'ck2',q:'下跌趨勢中的五根K棒：大陰→三根小陽→再大陰，稱為？',
+s:S+cd(60,22,80,15,88)+w(90,75,105,'#22c55e')+c(90,95,78,'#22c55e')+w(115,72,100,'#22c55e')+c(115,92,75,'#22c55e')+w(140,68,95,'#22c55e')+c(140,88,70,'#22c55e')+cd(170,52,100,45,108)+E,
+o:['上升三法','下降三法 — 空頭繼續','三烏鴉','旗形下跌'],a:1,
+e:'下降三法（Falling Three Methods）：下跌中小幅反彈三根小陽後再大陰，代表<strong>空頭主力休息後再打壓</strong>，是持空訊號。'},
+
+{c:'ck2',q:'高點出現兩根相鄰的陽線，第二根開盤跳空在第一根以上但收黑，稱為？',
+s:S+w(90,28,105,'#22c55e')+c(90,62,30,'#22c55e')+cd(140,18,55,12,62)+E,
+o:['兩烏鴉 — 看跌訊號','早晨之星','捨子線','孕線'],a:0,
+e:'兩烏鴉（Two Crows）：第二根跳空開高但收陰且吃回部分陽線，代表多頭無力繼續，<strong>空方開始控制</strong>，是高點預警訊號。'},
+
+{c:'ck2',q:'底部整理後出現連續三根小實體陽線，縮量盤升，稱為？',
+s:S+w(80,65,108,'#22c55e')+c(80,85,68,'#22c55e')+w(110,55,98,'#22c55e')+c(110,75,58,'#22c55e')+w(140,45,88,'#22c55e')+c(140,65,48,'#22c55e')+E,
+o:['三白兵（爆量）','紅三兵 — 穩健上漲訊號','上升三法','三星型態'],a:1,
+e:'紅三兵與三白兵相似，但<strong>量能相對溫和</strong>，代表穩健上漲，不像三白兵那樣爆量，持續性較好。'},
+
+{c:'ck2',q:'圖中陽線後緊接出現完全在陽線實體內的小陰線（孕線變化），後續若再收陽，稱為？',
+s:S+w(90,25,108,'#22c55e')+c(90,62,28,'#22c55e')+cd(140,40,55,36,58)+w(185,22,110,'#22c55e')+c(185,55,24,'#22c55e')+E,
+o:['孕線後做多 — 三根確認突破','捨子線後反轉','黃昏之星','三烏鴉'],a:0,
+e:'孕線出現後若第三根K棒確認收陽突破，形成三根確認的<strong>多頭反轉形態</strong>，是相對可靠的進場訊號。'},
+
+{c:'ck2',q:'下跌後出現大陽線，隔日跳空開高但收小陰在大陽實體之內，稱為？',
+s:S+w(80,25,110,'#22c55e')+c(80,78,28,'#22c55e')+cd(140,20,38,15,42)+E,
+o:['看漲孕線 — 多頭轉折可能','看跌孕線','捨子線','三白兵'],a:0,
+e:'看漲孕線（Bullish Harami）：在下跌末端出現大陽線，次日小陰線在其實體內，代表<strong>下跌趨緩、多頭蓄力</strong>，需等後續確認。'},
+
+// 趨勢均線 31-42
+{c:'cma',q:'圖中短期均線向上穿越長期均線，稱為？',
+s:S+`<polyline points="30,90 80,75 130,55 180,35 220,25" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<polyline points="30,80 80,72 130,65 180,58 220,52" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<circle cx="145" cy="62" r="5" fill="none" stroke="#22c55e" stroke-width="2"/>`+E,
+o:['死亡交叉 — 賣出訊號','黃金交叉 — 買入訊號','均線糾結','乖離過大'],a:1,
+e:'黃金交叉（Golden Cross）：短期均線（如5日/10日）<strong>向上穿越</strong>長期均線（如20日/60日），是<strong>多頭趨勢確認的買入訊號</strong>。'},
+
+{c:'cma',q:'圖中短期均線向下穿越長期均線，稱為？',
+s:S+`<polyline points="30,30 80,45 130,62 180,80 220,92" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<polyline points="30,35 80,42 130,50 180,58 220,65" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<circle cx="145" cy="56" r="5" fill="none" stroke="#ef4444" stroke-width="2"/>`+E,
+o:['黃金交叉 — 買入','死亡交叉 — 賣出訊號','均線支撐','反彈機會'],a:1,
+e:'死亡交叉（Death Cross）：短期均線<strong>向下穿越</strong>長期均線，是<strong>空頭趨勢確認的賣出訊號</strong>，常與放量同時出現。'},
+
+{c:'cma',q:'葛蘭碧法則：股價跌破20MA後反彈至20MA下方被壓回，是什麼訊號？',
+s:S+`<polyline points="30,70 90,65 150,62 210,60" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>`+
+`<polyline points="30,40 80,50 120,68 155,75 175,62 200,80" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<text x="155" y="57" fill="#ef4444" font-size="9">壓力</text>`+E,
+o:['葛蘭碧買訊2 — 加碼做多','葛蘭碧賣訊2 — 反彈賣出','黃金交叉','底部確認'],a:1,
+e:'葛蘭碧賣訊2：股價跌破均線後反彈至均線下方受壓回落，均線此時為<strong>壓力線</strong>，是<strong>反彈賣出的訊號</strong>。'},
+
+{c:'cma',q:'葛蘭碧法則：20MA走平或上揚，股價從下方突破MA，是什麼訊號？',
+s:S+`<polyline points="30,80 90,75 150,68 210,62" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>`+
+`<polyline points="30,90 80,88 120,75 155,65 180,48 210,38" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<circle cx="148" cy="68" r="4" fill="#22c55e"/>`+E,
+o:['葛蘭碧賣訊','葛蘭碧買訊1 — 突破均線做多','死亡交叉','乖離過大賣出'],a:1,
+e:'葛蘭碧買訊1：20MA走平或向上，股價從下方突破，是<strong>最強的買入訊號</strong>，代表趨勢由空轉多。'},
+
+{c:'cma',q:'均線扣抵：當前一段時間的股價相對較低，均線下週期的扣抵值低，均線將如何變化？',
+s:S+`<text x="20" y="30" fill="#8b949e" font-size="9">過去低點扣出：</text>`+
+`<text x="20" y="50" fill="#22c55e" font-size="9">均線數值變大 → 上揚</text>`+
+`<text x="20" y="70" fill="#8b949e" font-size="9">過去高點扣出：</text>`+
+`<text x="20" y="90" fill="#ef4444" font-size="9">均線數值變小 → 下彎</text>`+E,
+o:['均線扣抵低點 → 均線下彎','均線扣抵低點 → 均線上揚（助漲）','均線維持不變','均線糾結'],a:1,
+e:'均線扣抵：新增高價、扣除低點 → 均線<strong>上揚</strong>；新增低價、扣除高點 → 均線<strong>下彎</strong>。這是預測均線方向的重要工具。'},
+
+{c:'cma',q:'月線（20MA）持續上揚，股價在月線上方，代表什麼操作原則？',
+s:S+`<polyline points="30,90 80,78 140,60 200,42 230,35" fill="none" stroke="#f59e0b" stroke-width="2"/>`+
+`<polyline points="30,82 80,68 140,50 200,32 230,25" fill="none" stroke="#22c55e" stroke-width="1.5"/>`+
+`<text x="30" y="20" fill="#22c55e" font-size="9">多頭格局 → 只做多</text>`+E,
+o:['空頭格局，做空','中性格局，觀望','多頭格局，以做多為主，回測月線是買點','無法判斷'],a:2,
+e:'月線（20MA）上揚且股價站上月線代表<strong>多頭主趨勢</strong>，操作原則是<strong>只做多</strong>，每次回測月線支撐都是加碼機會。'},
+
+{c:'cma',q:'5MA>10MA>20MA>60MA，四條均線皆向上，稱為？',
+s:S+`<polyline points="30,92 220,28" fill="none" stroke="#22c55e" stroke-width="3" opacity=".9"/>`+
+`<polyline points="30,96 220,38" fill="none" stroke="#22c55e" stroke-width="2" opacity=".7"/>`+
+`<polyline points="30,100 220,50" fill="none" stroke="#22c55e" stroke-width="1.5" opacity=".5"/>`+
+`<polyline points="30,104 220,62" fill="none" stroke="#22c55e" stroke-width="1" opacity=".35"/>`+
+`<text x="35" y="20" fill="#22c55e" font-size="9">多頭排列 — 最強多頭格局</text>`+E,
+o:['空頭排列','多頭排列 — 最強多頭，逢低做多','均線糾結','趨勢轉折'],a:1,
+e:'均線多頭排列（5>10>20>60MA全部向上）是<strong>最強多頭格局</strong>，此時買任何回調都會在某根均線獲得支撐。'},
+
+{c:'cma',q:'5MA<10MA<20MA<60MA，四條均線皆向下，稱為？',
+s:S+`<polyline points="30,28 220,92" fill="none" stroke="#ef4444" stroke-width="3" opacity=".9"/>`+
+`<polyline points="30,22 220,82" fill="none" stroke="#ef4444" stroke-width="2" opacity=".7"/>`+
+`<polyline points="30,18 220,70" fill="none" stroke="#ef4444" stroke-width="1.5" opacity=".5"/>`+
+`<polyline points="30,12 220,58" fill="none" stroke="#ef4444" stroke-width="1" opacity=".35"/>`+
+`<text x="35" y="108" fill="#ef4444" font-size="9">空頭排列 — 最強空頭格局</text>`+E,
+o:['多頭排列','空頭排列 — 最強空頭，逢高做空','均線扭轉','趨勢確認'],a:1,
+e:'均線空頭排列（5<10<20<60MA全部向下）是<strong>最強空頭格局</strong>，每次反彈到均線壓力都是做空機會。'},
+
+{c:'cma',q:'股價遠高於均線（乖離率>+15%），代表什麼操作提示？',
+s:S+`<polyline points="30,80 80,72 130,68 175,62" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>`+
+`<polyline points="30,75 80,62 130,45 175,20" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="175" y1="20" x2="175" y2="62" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>`+
+`<text x="178" y="40" fill="#ef4444" font-size="8">乖離過大</text>`+E,
+o:['繼續積極追多','乖離過大逢高減碼，均值回歸風險高','加速上漲','買入訊號'],a:1,
+e:'乖離率 = (股價 - 均線) ÷ 均線 × 100%，超過 +15% 代表<strong>超漲</strong>，均值回歸風險高，應<strong>逢高減碼</strong>而非追多。'},
+
+{c:'cma',q:'年線（240MA）在股價下方且持續走平/上揚，代表什麼？',
+s:S+`<polyline points="30,78 220,68" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,3"/>`+
+`<polyline points="30,55 80,48 140,38 200,28 230,22" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<text x="30" y="100" fill="#8b5cf6" font-size="8">240MA (年線)</text>`+
+`<text x="30" y="20" fill="#22c55e" font-size="8">股價 > 年線 = 多頭市場</text>`+E,
+o:['空頭市場，做空','多頭市場，下跌都是機會','趨勢不明','超買警訊'],a:1,
+e:'股價站上年線（240MA）代表整體市場偏多頭，年線是<strong>牛熊分界線</strong>，站上做多、跌破做空是最簡單的策略框架。'},
+
+{c:'cma',q:'三條均線纏繞在一起（糾結），代表什麼行情即將發生？',
+s:S+`<polyline points="30,60 80,58 130,62 180,58 230,60" fill="none" stroke="#22c55e" stroke-width="1.5"/>`+
+`<polyline points="30,63 80,60 130,58 180,62 230,59" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<polyline points="30,61 80,62 130,60 180,60 230,61" fill="none" stroke="#ef4444" stroke-width="1.5"/>`+
+`<text x="30" y="20" fill="#f59e0b" font-size="9">均線糾結 → 即將大幅波動</text>`+E,
+o:['趨勢強勁延續','多空平衡，持續盤整','均線糾結後必有大行情，等待突破方向','立即做空'],a:2,
+e:'均線糾結代表多空力量均衡，市場積累能量，<strong>突破方向即是下一個趨勢方向</strong>，可在突破點順勢進場，停損設在糾結區另一側。'},
+
+// 量價關係 43-54
+{c:'cvp',q:'圖示：股價上漲同時成交量增加，稱為？',
+s:S+`<polyline points="30,90 80,75 130,55 180,38 220,25" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<rect x="40" y="102" width="12" height="8" fill="#22c55e" rx="1"/>`+
+`<rect x="78" y="98" width="12" height="12" fill="#22c55e" rx="1"/>`+
+`<rect x="118" y="93" width="12" height="17" fill="#22c55e" rx="1"/>`+
+`<rect x="158" y="87" width="12" height="23" fill="#22c55e" rx="1"/>`+
+`<rect x="198" y="80" width="12" height="30" fill="#22c55e" rx="1"/>`+
+`<line x1="30" y1="110" x2="220" y2="110" stroke="#30363d" stroke-width="1"/>`+E,
+o:['價漲量增 — 健康的多頭走勢','價漲量縮 — 背離警訊','量大壓力區','無法判斷'],a:0,
+e:'價漲量增是<strong>最健康的多頭走勢</strong>：上漲有量能配合，代表市場認同且積極買進，趨勢延續機率高。'},
+
+{c:'cvp',q:'下跌時成交量持續萎縮，代表什麼？',
+s:S+`<polyline points="30,25 80,38 130,55 180,72 220,88" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<rect x="40" y="100" width="12" height="18" fill="#ef4444" rx="1" opacity=".8"/>`+
+`<rect x="78" y="104" width="12" height="14" fill="#ef4444" rx="1" opacity=".6"/>`+
+`<rect x="118" y="107" width="12" height="11" fill="#ef4444" rx="1" opacity=".5"/>`+
+`<rect x="158" y="108" width="12" height="10" fill="#ef4444" rx="1" opacity=".4"/>`+
+`<rect x="198" y="109" width="12" height="9" fill="#ef4444" rx="1" opacity=".3"/>`+
+`<line x1="30" y1="118" x2="220" y2="118" stroke="#30363d" stroke-width="1"/>`+E,
+o:['下跌加速，危險','價跌量縮 — 賣壓減輕，底部可能接近','量能收斂破底','趨勢延續'],a:1,
+e:'價跌量縮代表<strong>賣壓在減輕</strong>，雖然股價在跌，但量能萎縮表示賣方力道不足，底部可能漸近，但須等量縮止跌後量增再確認。'},
+
+{c:'cvp',q:'股價上漲但成交量持續縮小，稱為？代表什麼風險？',
+s:S+`<polyline points="30,90 80,72 130,52 180,35 220,22" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<rect x="40" y="100" width="12" height="18" fill="#22c55e" rx="1" opacity=".8"/>`+
+`<rect x="78" y="104" width="12" height="14" fill="#22c55e" rx="1" opacity=".5"/>`+
+`<rect x="118" y="107" width="12" height="11" fill="#22c55e" rx="1" opacity=".4"/>`+
+`<rect x="158" y="109" width="12" height="9" fill="#22c55e" rx="1" opacity=".3"/>`+
+`<rect x="198" y="110" width="12" height="8" fill="#22c55e" rx="1" opacity=".2"/>`+
+`<line x1="30" y1="118" x2="220" y2="118" stroke="#30363d" stroke-width="1"/>`+E,
+o:['最強多頭確認','價漲量縮背離 — 多頭力道不足，反轉風險高','底部突破','量先價行'],a:1,
+e:'<strong>價漲量縮是危險的背離訊號</strong>：上漲缺乏量能支撐，代表買盤力道不足、主力出貨可能，高點後回落機率高，應逢高減倉。'},
+
+{c:'cvp',q:'股價下跌但成交量大幅增加，稱為？',
+s:S+`<polyline points="30,25 80,38 130,55 180,72 220,88" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<rect x="40" y="95" width="12" height="13" fill="#ef4444" rx="1" opacity=".5"/>`+
+`<rect x="78" y="90" width="12" height="18" fill="#ef4444" rx="1" opacity=".6"/>`+
+`<rect x="118" y="83" width="12" height="25" fill="#ef4444" rx="1" opacity=".7"/>`+
+`<rect x="158" y="75" width="12" height="33" fill="#ef4444" rx="1" opacity=".85"/>`+
+`<rect x="198" y="65" width="12" height="43" fill="#ef4444" rx="1"/>`+
+`<line x1="30" y1="108" x2="220" y2="108" stroke="#30363d" stroke-width="1"/>`+E,
+o:['底部確認 — 做多','價跌量增 — 恐慌性殺盤或主力出貨，危險','量縮整理','均值回歸'],a:1,
+e:'<strong>價跌量增</strong>：下跌且放量代表<strong>恐慌性殺盤或主力出貨</strong>，是危險訊號。若出現在長期低點且量極大，偶爾也是「最後的瘋狂」底部訊號，但風險極高。'},
+
+{c:'cvp',q:'圖示：爆量（超過均量3倍）後出現長紅K棒，代表什麼？',
+s:S+`<rect x="100" y="30" width="18" height="75" fill="#22c55e" rx="1"/>`+
+`<line x1="109" y1="15" x2="109" y2="30" stroke="#22c55e" stroke-width="1.5"/>`+
+`<line x1="109" y1="105" x2="109" y2="115" stroke="#22c55e" stroke-width="1.5"/>`+
+`<rect x="40" y="102" width="10" height="8" fill="#8b949e" rx="1" opacity=".4"/>`+
+`<rect x="60" y="100" width="10" height="10" fill="#8b949e" rx="1" opacity=".4"/>`+
+`<rect x="80" y="98" width="10" height="12" fill="#8b949e" rx="1" opacity=".4"/>`+
+`<rect x="100" y="65" width="10" height="45" fill="#22c55e" rx="1"/>`+
+`<rect x="120" y="92" width="10" height="18" fill="#8b949e" rx="1" opacity=".5"/>`+
+`<line x1="30" y1="110" x2="220" y2="110" stroke="#30363d" stroke-width="1"/>`+E,
+o:['即將大跌','爆量長紅 — 主力積極進場，強烈買入訊號','量縮整理後突破','缺口填補'],a:1,
+e:'爆量長紅代表<strong>主力機構積極買進</strong>，大量資金湧入，是強烈的買入訊號。後市通常繼續上漲，爆量K棒的最低點是重要支撐。'},
+
+{c:'cvp',q:'爆量長黑K棒後，股價暫時反彈，操作建議為？',
+s:S+`<rect x="90" y="22" width="18" height="82" fill="#ef4444" rx="1"/>`+
+`<line x1="99" y1="10" x2="99" y2="22" stroke="#ef4444" stroke-width="1.5"/>`+
+`<rect x="90" y="50" width="10" height="60" fill="#ef4444" rx="1"/>`+
+`<rect x="120" y="75" width="10" height="35" fill="#22c55e" rx="1" opacity=".6"/>`+
+`<text x="135" y="70" fill="#f59e0b" font-size="9">反彈賣出</text>`+E,
+o:['反彈加碼做多','爆量長黑後反彈是出場機會，偏空操作','底部確認做多','量縮整理'],a:1,
+e:'爆量長黑代表<strong>主力大量出貨</strong>，後續即使反彈也是出場機會，不可逆勢做多。爆量長黑的最高點為重要壓力位。'},
+
+{c:'cvp',q:'回測支撐時成交量明顯縮小，代表什麼？',
+s:S+`<polyline points="30,35 80,32 130,55 165,60 200,42 225,35" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="30" y1="60" x2="225" y2="60" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="170" y="57" fill="#f59e0b" font-size="8">支撐線</text>`+
+`<rect x="152" y="100" width="10" height="12" fill="#8b949e" rx="1" opacity=".3"/>`+
+`<rect x="168" y="102" width="10" height="10" fill="#8b949e" rx="1" opacity=".25"/>`+
+`<line x1="30" y1="112" x2="225" y2="112" stroke="#30363d" stroke-width="1"/>`+E,
+o:['下跌突破支撐','回測縮量 — 賣壓不重，支撐有效，加碼機會','量縮底部','背離訊號'],a:1,
+e:'回測支撐時<strong>成交量萎縮</strong>，代表下方賣盤稀少，支撐有效性高，是<strong>低風險的加碼買進機會</strong>。縮量回測後再度放量上攻更為確認。'},
+
+{c:'cvp',q:'「量先價行」的意思是？',
+s:S+`<text x="20" y="30" fill="#f59e0b" font-size="10">量先價行</text>`+
+`<text x="20" y="55" fill="#8b949e" font-size="9">成交量變化先於</text>`+
+`<text x="20" y="72" fill="#8b949e" font-size="9">股價趨勢改變</text>`+
+`<text x="20" y="95" fill="#22c55e" font-size="9">量增 → 後來價漲</text>`+
+`<text x="20" y="110" fill="#ef4444" font-size="9">量縮 → 後來價跌</text>`+E,
+o:['成交量與股價同步變化','股價先動、成交量後跟隨','成交量變化領先股價走向','成交量無法預測股價'],a:2,
+e:'<strong>量先價行</strong>：成交量是價格的領先指標。量能擴大往往預示股價將走強；量能持續萎縮往往預示股價即將走弱或趨勢轉換。'},
+
+{c:'cvp',q:'長期上漲末端，某日出現超大成交量但股價幾乎不動，稱為？',
+s:S+`<polyline points="30,90 70,75 110,55 155,42 180,40 195,42 205,40 215,43" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<rect x="168" y="52" width="12" height="56" fill="#22c55e" rx="1"/>`+
+`<text x="168" y="45" fill="#ef4444" font-size="9">爆量止漲</text>`+E,
+o:['主力積極買進','量滿價不動 — 最後的瘋狂，頂部警訊','底部確認','均量突破'],a:1,
+e:'量滿價不動（Volume Climax）：大量換手但股價不動代表<strong>多方力竭</strong>，空方大力供貨，是<strong>頂部訊號</strong>，主力出貨完成後股價將大幅回落。'},
+
+{c:'cvp',q:'整理盤整期間成交量持續萎縮至歷史低點，代表？',
+s:S+`<polyline points="30,55 80,52 130,58 180,55 225,53" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<rect x="40" y="90" width="10" height="18" fill="#8b949e" rx="1" opacity=".5"/>`+
+`<rect x="60" y="93" width="10" height="15" fill="#8b949e" rx="1" opacity=".4"/>`+
+`<rect x="80" y="96" width="10" height="12" fill="#8b949e" rx="1" opacity=".35"/>`+
+`<rect x="100" y="99" width="10" height="9" fill="#8b949e" rx="1" opacity=".3"/>`+
+`<rect x="120" y="101" width="10" height="7" fill="#8b949e" rx="1" opacity=".25"/>`+
+`<line x1="30" y1="108" x2="220" y2="108" stroke="#30363d" stroke-width="1"/>`+E,
+o:['趨勢加速下跌','量縮整理 — 能量積蓄，即將突破','頂部警訊','均量回歸'],a:1,
+e:'整理期間量能持續萎縮至歷史低點，代表市場<strong>能量積蓄中</strong>，突破時必有大行情。縮量整理後的放量突破是非常可靠的進場訊號。'},
+
+{c:'cvp',q:'外資連續10日買超且買超金額逐日增加，代表？',
+s:S+`<rect x="30" y="90" width="14" height="15" fill="#22c55e" rx="1" opacity=".4"/>`+
+`<rect x="52" y="86" width="14" height="19" fill="#22c55e" rx="1" opacity=".5"/>`+
+`<rect x="74" y="80" width="14" height="25" fill="#22c55e" rx="1" opacity=".6"/>`+
+`<rect x="96" y="73" width="14" height="32" fill="#22c55e" rx="1" opacity=".7"/>`+
+`<rect x="118" y="65" width="14" height="40" fill="#22c55e" rx="1" opacity=".8"/>`+
+`<rect x="140" y="55" width="14" height="50" fill="#22c55e" rx="1" opacity=".9"/>`+
+`<rect x="162" y="42" width="14" height="63" fill="#22c55e" rx="1"/>`+
+`<text x="25" y="20" fill="#22c55e" font-size="9">外資買超逐增 → 強烈做多</text>`+E,
+o:['外資即將反向','外資持續買超增量 — 機構認同、趨勢強，順勢做多','量過大需警惕','賣出訊號'],a:1,
+e:'外資連續且加速買超代表<strong>國際機構對該股票高度認同</strong>，是趨勢最強的確認訊號之一。通常後續可期待大行情，順勢做多為宜。'},
+
+{c:'cvp',q:'融資大量增加同時股價下跌，代表什麼風險？',
+s:S+`<polyline points="30,30 80,45 130,62 180,78 220,92" fill="none" stroke="#ef4444" stroke-width="2"/>`+
+`<rect x="40" y="92" width="12" height="12" fill="#f59e0b" rx="1" opacity=".6"/>`+
+`<rect x="78" y="88" width="12" height="16" fill="#f59e0b" rx="1" opacity=".7"/>`+
+`<rect x="118" y="82" width="12" height="22" fill="#f59e0b" rx="1" opacity=".85"/>`+
+`<rect x="158" y="74" width="12" height="30" fill="#f59e0b" rx="1"/>`+
+`<text x="25" y="20" fill="#ef4444" font-size="9">融資增 + 價跌 = 斷頭風險</text>`+E,
+o:['好的買進訊號','融資增量但股價下跌 — 散戶攤平，斷頭風險高','主力進場訊號','量縮底部'],a:1,
+e:'融資增加但股價下跌代表散戶不斷攤平，若股價繼續跌，<strong>融資斷頭（強制平倉）</strong>將引發踩踏式賣出，加速下跌，風險極高。'},
+
+// 技術指標 55-62
+{c:'cti',q:'RSI達到80以上，代表什麼操作提示？',
+s:S+`<line x1="30" y1="78" x2="220" y2="78" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<line x1="30" y1="38" x2="220" y2="38" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="200" y="75" fill="#ef4444" font-size="8">80</text>`+
+`<text x="200" y="35" fill="#22c55e" font-size="8">20</text>`+
+`<polyline points="30,65 70,50 110,32 140,22 170,30 200,58 220,72" fill="none" stroke="#58a6ff" stroke-width="2"/>`+
+`<circle cx="140" cy="22" r="4" fill="none" stroke="#ef4444" stroke-width="2"/>`+E,
+o:['超賣，積極買進','RSI超買(>80)，逢高減碼或準備賣出','趨勢確認','量縮整理'],a:1,
+e:'RSI(14) > 80 進入<strong>超買區</strong>，代表短期漲幅過大，股價可能休息或回檔。操作上逢高減碼或注意頂背離訊號，不宜此時追多。'},
+
+{c:'cti',q:'RSI跌至20以下，代表什麼？',
+s:S+`<line x1="30" y1="78" x2="220" y2="78" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<line x1="30" y1="38" x2="220" y2="38" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="200" y="75" fill="#ef4444" font-size="8">80</text>`+
+`<text x="200" y="35" fill="#22c55e" font-size="8">20</text>`+
+`<polyline points="30,50 70,65 110,78 140,95 160,92 190,68 220,52" fill="none" stroke="#58a6ff" stroke-width="2"/>`+
+`<circle cx="140" cy="95" r="4" fill="none" stroke="#22c55e" stroke-width="2"/>`+E,
+o:['超買，賣出','RSI超賣(<20)，逢低布局或準備買入','趨勢轉空','中性'],a:1,
+e:'RSI(14) < 20 進入<strong>超賣區</strong>，代表短期跌幅過大，反彈機率高。操作上可逢低分批布局，但超賣不代表立即反彈，仍需等K棒反轉確認。'},
+
+{c:'cti',q:'MACD：DIF線向上穿越Signal線（MACD），稱為？',
+s:S+`<line x1="30" y1="60" x2="220" y2="60" stroke="#30363d" stroke-width="1"/>`+
+`<polyline points="30,80 80,72 120,60 160,48 200,40 220,35" fill="none" stroke="#58a6ff" stroke-width="2"/>`+
+`<polyline points="30,85 80,78 120,68 160,58 200,50 220,46" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<circle cx="130" cy="62" r="4" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<text x="135" y="55" fill="#22c55e" font-size="8">黃金交叉</text>`+E,
+o:['MACD死亡交叉 — 賣出','MACD黃金交叉 — 買入訊號','均線背離','RSI超買'],a:1,
+e:'MACD黃金交叉：DIF（快線）上穿MACD（慢線），代表<strong>短期動能強化、多頭趨勢確認</strong>，是可靠的買入訊號，特別是在零軸以下發生時更具意義。'},
+
+{c:'cti',q:'KD指標：K線向下穿越D線，且在80以上高位，稱為？',
+s:S+`<line x1="30" y1="32" x2="220" y2="32" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="200" y="29" fill="#ef4444" font-size="8">80</text>`+
+`<polyline points="30,38 80,28 120,22 150,25 175,38 200,55 220,68" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<polyline points="30,42 80,33 120,28 150,30 175,42 200,60 220,75" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<circle cx="162" cy="36" r="4" fill="none" stroke="#ef4444" stroke-width="2"/>`+E,
+o:['KD黃金交叉 — 買入','KD高位死亡交叉 — 強烈賣出訊號','RSI超賣','均線支撐'],a:1,
+e:'KD高位（80以上）死亡交叉：K線下穿D線是<strong>最強的賣出訊號</strong>，代表動能轉弱且已在超買區，後市下跌機率高，應立即減倉或做空。'},
+
+{c:'cti',q:'布林通道（Bollinger Bands）上下軌收窄代表什麼？',
+s:S+`<polyline points="30,52 80,50 130,55 180,52 220,50" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<polyline points="30,62 80,60 130,65 180,62 220,60" fill="none" stroke="#8b949e" stroke-width="1.5"/>`+
+`<polyline points="30,72 80,70 130,75 180,72 220,70" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<text x="35" y="20" fill="#f59e0b" font-size="9">通道收窄 → 能量積蓄</text>`+E,
+o:['趨勢強勁延續','布林收縮 — 波動減小，即將大幅突破','超買警訊','均線壓力'],a:1,
+e:'布林通道收窄（Squeeze）代表<strong>市場波動率降低、能量積蓄</strong>，通常預示即將出現大幅突破行情。突破方向即是下一波趨勢方向，是重要的進場時機。'},
+
+{c:'cti',q:'股價創新高但RSI未能創新高，稱為？',
+s:S+`<polyline points="30,80 80,60 130,40 180,28 220,22" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="30" y1="60" x2="220" y2="60" stroke="#30363d" stroke-width="1"/>`+
+`<polyline points="30,80 80,65 130,52 180,48 220,52" fill="none" stroke="#58a6ff" stroke-width="2"/>`+
+`<line x1="180" y1="22" x2="220" y2="22" stroke="#22c55e" stroke-width="1" opacity=".5"/>`+
+`<line x1="180" y1="48" x2="220" y2="52" stroke="#ef4444" stroke-width="1.5"/>`+
+`<text x="120" y="18" fill="#ef4444" font-size="8">RSI頂背離</text>`+E,
+o:['強勢上漲訊號','RSI頂背離 — 動能衰退，頂部警訊','量縮整理後突破','超賣反彈'],a:1,
+e:'RSI頂背離：股價創新高但RSI未能同步創高，代表<strong>上漲動能衰退</strong>，是頂部重要的預警訊號。通常出現在主升段末端，後市下跌機率高。'},
+
+{c:'cti',q:'MACD柱狀圖（Histogram）由正轉負代表什麼？',
+s:S+`<line x1="30" y1="60" x2="220" y2="60" stroke="#30363d" stroke-width="1"/>`+
+`<rect x="40" y="35" width="12" height="25" fill="#22c55e" rx="1"/>`+
+`<rect x="60" y="40" width="12" height="20" fill="#22c55e" rx="1"/>`+
+`<rect x="80" y="47" width="12" height="13" fill="#22c55e" rx="1"/>`+
+`<rect x="100" y="55" width="12" height="5" fill="#22c55e" rx="1"/>`+
+`<rect x="120" y="60" width="12" height="8" fill="#ef4444" rx="1"/>`+
+`<rect x="140" y="60" width="12" height="15" fill="#ef4444" rx="1"/>`+
+`<rect x="160" y="60" width="12" height="22" fill="#ef4444" rx="1"/>`+
+`<text x="30" y="18" fill="#ef4444" font-size="9">柱狀由正轉負 → 空頭訊號</text>`+E,
+o:['多頭加速訊號','MACD柱由正轉負 — 多頭動能消退，偏空','超賣訊號','趨勢確認'],a:1,
+e:'MACD柱狀圖（DIF - Signal）由正轉負代表<strong>多頭動能快速消退</strong>，空方開始佔優勢，是減碼多單或準備做空的訊號。'},
+
+{c:'cti',q:'KD指標在20以下低位，K線向上穿越D線，稱為？',
+s:S+`<line x1="30" y1="88" x2="220" y2="88" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="200" y="85" fill="#22c55e" font-size="8">20</text>`+
+`<polyline points="30,92 70,96 110,95 140,88 165,75 190,60 220,48" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<polyline points="30,94 70,98 110,97 140,92 165,82 190,68 220,56" fill="none" stroke="#f59e0b" stroke-width="1.5"/>`+
+`<circle cx="148" cy="90" r="4" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<text x="110" y="75" fill="#22c55e" font-size="8">低位黃金交叉</text>`+E,
+o:['KD高位死亡交叉','KD低位黃金交叉 — 強烈買入訊號','MACD背離','RSI超買'],a:1,
+e:'KD低位（20以下）黃金交叉是<strong>最強的買入訊號</strong>：K線上穿D線且在超賣區發生，代表賣壓耗盡、多頭反撲，後市上漲機率極高。'},
+
+// 支撐阻力 63-70
+{c:'csr',q:'圖中出現頭部、左肩、右肩的型態，稱為？',
+s:S+`<polyline points="30,90 60,75 80,55 100,35 120,52 140,30 160,52 180,55 200,75 220,88" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="30" y1="55" x2="220" y2="55" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="35" y="28" fill="#8b949e" font-size="8">左肩</text>`+
+`<text x="115" y="22" fill="#8b949e" font-size="8">頭部</text>`+
+`<text x="185" y="42" fill="#8b949e" font-size="8">右肩</text>`+
+`<text x="172" y="52" fill="#ef4444" font-size="8">頸線</text>`+E,
+o:['雙頂M頭','頭肩頂 — 頸線跌破即賣出','三重頂','W底'],a:1,
+e:'<strong>頭肩頂</strong>：頭部高過左右肩，頸線為關鍵支撐。<strong>跌破頸線</strong>是明確賣出訊號，目標跌幅 = 頭部到頸線距離，反轉成空頭趨勢。'},
+
+{c:'csr',q:'圖中呈現兩個相近的低點，中間有明顯反彈，稱為？',
+s:S+`<polyline points="30,25 60,40 80,65 100,88 120,68 140,58 160,88 180,65 200,40 220,25" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="30" y1="60" x2="220" y2="60" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="95" y="105" fill="#22c55e" font-size="8">W</text>`+
+`<text x="155" y="105" fill="#22c55e" font-size="8">W</text>`+
+`<text x="155" y="56" fill="#22c55e" font-size="8">頸線突破做多</text>`+E,
+o:['雙頂M頭 — 頂部反轉','頭肩底 — 底部反轉','W底（雙底）— 頸線突破做多','旗形'],a:2,
+e:'<strong>W底（雙底）</strong>：兩個相近低點形成底部支撐，突破頸線是多頭訊號。<strong>目標漲幅 = W底到頸線距離</strong>，是強力底部反轉形態。'},
+
+{c:'csr',q:'圖中高點兩次碰到相同阻力後回落，稱為？',
+s:S+`<polyline points="30,90 60,70 90,42 115,28 140,42 160,55 180,42 205,28 220,45" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="30" y1="28" x2="220" y2="28" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="155" y="24" fill="#ef4444" font-size="8">阻力線</text>`+E,
+o:['W底 — 底部反轉','頭肩頂','M頭（雙頂） — 跌破頸線做空','三重頂'],a:2,
+e:'<strong>M頭（雙頂）</strong>：兩次碰觸相同高點阻力後回落，跌破兩個高點之間的低點（頸線）是明確空頭訊號。目標跌幅等同M頭高度。'},
+
+{c:'csr',q:'圖中高低點持續收縮，形成三角形，突破後代表什麼？',
+s:S+`<polyline points="30,28 80,38 130,48 180,52 210,55" fill="none" stroke="#ef4444" stroke-width="1.5"/>`+
+`<polyline points="30,88 80,78 130,68 180,62 210,58" fill="none" stroke="#22c55e" stroke-width="1.5"/>`+
+`<polyline points="215,55 240,30" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="3,2"/>`+
+`<text x="35" y="18" fill="#f59e0b" font-size="9">對稱三角收斂 → 等待突破</text>`+E,
+o:['趨勢結束','三角收斂 — 突破方向即是下一個趨勢方向','底部確認','量縮整理'],a:1,
+e:'對稱三角形（Symmetrical Triangle）：高低點持續收縮，能量積蓄。<strong>突破上軌做多、跌破下軌做空</strong>，突破時應有放量確認，目標幅度等同三角最寬處。'},
+
+{c:'csr',q:'前方的阻力位被突破後，該阻力位將轉變為？',
+s:S+`<polyline points="30,72 90,72 115,55 160,42 220,28" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="30" y1="72" x2="220" y2="72" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<text x="60" y="68" fill="#ef4444" font-size="8">原阻力</text>`+
+`<text x="135" y="80" fill="#22c55e" font-size="8">突破後成支撐</text>`+
+`<circle cx="112" cy="55" r="4" fill="#22c55e"/>`+E,
+o:['仍是阻力','阻力轉支撐 — 突破後回測可做多','變成更強阻力','趨勢反轉'],a:1,
+e:'<strong>阻力轉支撐</strong>（Support/Resistance Flip）：前方阻力被突破後，回測該位置時將成為有效支撐，是突破確認後的<strong>低風險加碼機會</strong>。'},
+
+{c:'csr',q:'圖示股價在一定範圍內上下震盪，稱為什麼操作型態？',
+s:S+`<line x1="30" y1="35" x2="220" y2="35" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<line x1="30" y1="85" x2="220" y2="85" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<polyline points="30,72 60,40 90,78 120,42 150,80 180,38 210,75" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<text x="155" y="32" fill="#ef4444" font-size="8">箱頂賣</text>`+
+`<text x="155" y="98" fill="#22c55e" font-size="8">箱底買</text>`+E,
+o:['頭肩頂即將反轉','箱型操作 — 在上下軌之間高賣低買','三角收斂突破','趨勢延續'],a:1,
+e:'<strong>箱型操作</strong>：股價在固定區間震盪，策略是<strong>近上軌賣出、近下軌買進</strong>，直到箱型被突破（確認後跟隨突破方向）。'},
+
+{c:'csr',q:'圖中出現三個相近高點，稱為？',
+s:S+`<polyline points="30,88 55,72 75,45 95,28 115,45 135,65 155,45 175,28 195,45 215,72 220,88" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<line x1="30" y1="28" x2="220" y2="28" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<line x1="30" y1="65" x2="220" y2="65" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>`+
+`<text x="35" y="25" fill="#ef4444" font-size="8">三重頂阻力</text>`+
+`<text x="155" y="62" fill="#f59e0b" font-size="8">頸線</text>`+E,
+o:['三白兵 — 多頭','頭肩頂','三重頂 — 跌破頸線強烈賣出','W底'],a:2,
+e:'<strong>三重頂</strong>：三次衝擊同一高點均失敗，是比雙頂更強烈的頂部訊號。跌破頸線後下跌幅度通常更大，目標跌幅約等同頂部到頸線距離的1.5–2倍。'},
+
+{c:'csr',q:'矩形盤整後，股價向上突破壓力線並放量，操作建議？',
+s:S+`<line x1="30" y1="38" x2="165" y2="38" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<line x1="30" y1="78" x2="165" y2="78" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5,3"/>`+
+`<polyline points="30,65 60,42 90,72 120,38 148,62 165,40 185,25 220,15" fill="none" stroke="#22c55e" stroke-width="2"/>`+
+`<circle cx="168" cy="38" r="4" fill="#22c55e"/>`+
+`<text x="172" y="25" fill="#22c55e" font-size="8">突破買進</text>`+E,
+o:['賣出，已到壓力','矩形突破 — 確認方向後進場做多，停損設壓力線下方','觀望等待','下跌訊號'],a:1,
+e:'矩形盤整突破：股價向上突破阻力線並伴隨放量，是<strong>確認性買入訊號</strong>。停損設在突破線下方，目標幅度等同矩形高度。'},
+
+// 理論知識 71-100
+{c:'cth',q:'股市中「多頭市場（Bull Market）」的定義通常是？',o:['股價下跌超過20%','股價從低點上漲超過20%','股價在一年內上漲超過5%','成交量增加超過20%'],a:1,
+e:'<strong>多頭市場（牛市）</strong>定義：從前期低點上漲20%以上。通常伴隨經濟好轉、企業獲利增加、投資人信心提升。'},
+
+{c:'cth',q:'道氏理論中，市場趨勢分為三種，其中「主要趨勢」的持續時間通常為？',o:['數小時到數天','數週到數月','一年以上','5年以上'],a:2,
+e:'道氏理論三種趨勢：主要趨勢（Primary Trend）持續<strong>1年以上</strong>；次要趨勢（Secondary Trend）數週到數月；小趨勢（Minor Trend）數小時到數天。'},
+
+{c:'cth',q:'波浪理論中，一個完整的主升波浪結構包含幾個推動波和回調波？',o:['3個推動波+2個回調波','5個推動波+3個回調波','3個推動波+3個回調波','5個推動波+2個回調波'],a:1,
+e:'艾略特波浪理論：一個完整週期包含<strong>5波推動（1-2-3-4-5）+ 3波修正（A-B-C）</strong>，共8個波浪，其中奇數波為主趨勢、偶數波為回調。'},
+
+{c:'cth',q:'斐波那契回調中，最常用的支撐/阻力回調比率是？',o:['23.6%、38.2%、50%、61.8%','10%、20%、30%、40%','25%、50%、75%','33%、66%'],a:0,
+e:'斐波那契數列產生的黃金比例：<strong>38.2%、50%、61.8%</strong> 是最重要的回調支撐/阻力位，其中61.8%（黃金分割）為最強支撐/阻力。'},
+
+{c:'cth',q:'「本益比（P/E Ratio）」的計算公式是？',o:['股價 ÷ 每股盈餘(EPS)','市值 ÷ 淨資產','股價 × 股數','股息 ÷ 股價'],a:0,
+e:'本益比 P/E = 股價 ÷ EPS（每股盈餘）。P/E 越高代表市場願意為每元獲利支付更高溢價，通常成長股P/E高、價值股P/E低。'},
+
+{c:'cth',q:'「融資」的意思是？',o:['向券商借錢買股票（槓桿做多）','向券商借股票賣出','買入選擇權','做空期貨'],a:0,
+e:'<strong>融資</strong>：向券商借款買股票，等於用槓桿做多。融資成數通常為股價的40-60%（即可以借40-60%），放大獲利也放大虧損。'},
+
+{c:'cth',q:'「融券」的操作目的是？',o:['借錢買股票','借股票賣出後，低價買回還券獲利（做空）','增加股息收益','降低持股成本'],a:1,
+e:'<strong>融券</strong>：向券商借股票賣出，等於做空。預期股價下跌時，先賣出借來的股票，等股價下跌後再低價買回還給券商，賺取差價。'},
+
+{c:'cth',q:'除息日前一天買入、除息日賣出的策略，通常稱為？',o:['套利交易','除息套利（存股策略）','填息交易','搶帽子策略'],a:2,
+e:'搶在除息前買入、除息後立即賣出的策略俗稱<strong>「搶填息」</strong>。但除息當天股價會開低（除息缺口），填息時間不確定，此策略有相當風險。'},
+
+{c:'cth',q:'「護城河（Economic Moat）」在股票投資中代表什麼？',o:['公司的現金儲備','企業持久競爭優勢（難以被競爭對手複製的競爭壁壘）','股票的波動率','公司的負債比例'],a:1,
+e:'護城河（Warren Buffett提出）：企業具備的<strong>持久競爭優勢</strong>，如品牌、專利、網絡效應、成本優勢、轉換成本等，使競爭對手難以取代。'},
+
+{c:'cth',q:'「股票分割（Stock Split）」2:1代表什麼？',o:['股價加倍，股數不變','股數加倍，股價減半，市值不變','股數減半，股價加倍','配發股息加倍'],a:1,
+e:'股票分割（2:1）：每股變兩股，股價減半，總市值不變。目的是降低每股股價，增加市場流動性，對公司基本面沒有影響。'},
+
+{c:'cth',q:'「ROE（股東權益報酬率）」代表什麼？越高越好嗎？',o:['公司資產效益，越高越好','股東投入資本的獲利效率，一般而言越高越好（但需留意是否靠高槓桿推升）','公司負債狀況','市值與帳面價值比較'],a:1,
+e:'<strong>ROE = 淨利 ÷ 股東權益</strong>。代表公司用股東資金創造獲利的效率，一般ROE>15%視為優良。但需注意高ROE若來自高槓桿（高負債）則風險也高。'},
+
+{c:'cth',q:'「EPS」是什麼的縮寫？計算公式？',o:['每股股息 = 總股息 ÷ 股數','每股盈餘 = 稅後淨利 ÷ 股數','每股資產 = 總資產 ÷ 股數','每股現金 = 現金 ÷ 股數'],a:1,
+e:'<strong>EPS（Earnings Per Share）= 稅後淨利 ÷ 流通在外股數</strong>。代表每一股能分到多少獲利，是評估公司獲利能力最重要的指標之一。'},
+
+{c:'cth',q:'技術分析的基本假設，不包含以下哪項？',o:['市場行為反映一切資訊','價格以趨勢方式移動','歷史會重演','基本面分析比技術分析更重要'],a:3,
+e:'技術分析三大假設：①<strong>市場行為反映一切資訊</strong>（包含基本面）②<strong>價格以趨勢移動</strong>③<strong>歷史會重演</strong>。它不認為基本面分析更重要。'},
+
+{c:'cth',q:'「停損」的主要目的是？',o:['最大化獲利','限制單次虧損，保護資本','增加持股數量','降低稅率'],a:1,
+e:'<strong>停損</strong>是風險管理最重要的工具：預先設定虧損上限，當股價跌至停損點時立即賣出，<strong>防止小虧損擴大為致命虧損</strong>。「保住本金」是交易第一原則。'},
+
+{c:'cth',q:'「動能投資策略」的核心邏輯是？',o:['買入近期表現最差的股票','買入近期表現最強的股票，預期趨勢延續','根據基本面選股','只買低本益比股票'],a:1,
+e:'<strong>動能投資</strong>（Momentum Investing）：買入近期表現最強的股票，認為強者恆強。學術研究證明動能效應在多個市場長期有效，但在趨勢反轉時風險很大。'},
+
+{c:'cth',q:'大盤（指數）大跌時，大多數個股的相關性如何？',o:['完全不相關，機會更多','正相關性增加，大多數股票同步下跌','負相關，部分股票反而上漲','無法預測'],a:1,
+e:'市場危機時，股票間的<strong>相關性大幅提高</strong>，幾乎所有股票同步下跌，分散化的保護效果大幅減弱。這也是為什麼需要準備現金或對沖工具。'},
+
+{c:'cth',q:'「均值回歸（Mean Reversion）」在股市中的意義是？',o:['股價永遠保持上漲','股價偏離平均後有回到平均的傾向','股市只有單邊趨勢','成交量趨於零'],a:1,
+e:'<strong>均值回歸</strong>：股價偏離長期均值後，往往會回歸均值附近。這是反向操作策略（如超漲賣、超跌買）的理論基礎，也是布林通道等指標的設計原理。'},
+
+{c:'cth',q:'「自由現金流（FCF）」相較於EPS，為何有時被認為更能反映企業真實獲利？',o:['FCF計算更簡單','EPS可以被會計操縱，FCF較難造假因為是實際現金流出入','FCF包含借款','FCF等於總利潤'],a:1,
+e:'<strong>自由現金流 FCF = 營業現金流 - 資本支出</strong>。相比EPS，FCF較難被會計手法操縱（如折舊政策），反映公司<strong>實際可動用的現金</strong>，是巴菲特最重視的指標之一。'},
+
+{c:'cth',q:'「空頭陷阱（Bear Trap）」是指什麼情況？',o:['股價真正進入下跌趨勢','股價短暫跌破支撐後快速反彈，讓做空者被軋空','多方被套牢','成交量消失'],a:1,
+e:'<strong>空頭陷阱（Bear Trap）</strong>：股價短暫跌破關鍵支撐誘使空單進場，隨後快速反彈，導致做空者被迫高價回補（軋空），是主力誘空的常見手法。'},
+
+{c:'cth',q:'「多頭陷阱（Bull Trap）」是指什麼情況？',o:['股價真正突破創新高','股價短暫突破阻力後快速回落，讓追多者被套','空頭被軋空','成交量爆增'],a:1,
+e:'<strong>多頭陷阱（Bull Trap）</strong>：股價短暫突破關鍵阻力誘使多單追進，隨後快速回落，導致追多者被套牢，是主力出貨的常見手法，突破需搭配放量確認。'},
+
+{c:'cth',q:'「黑天鵝事件（Black Swan）」在金融市場中指？',o:['每季財報','無法預測、罕見但影響極大的事件（如金融危機、疫情）','成交量暴增','股息超預期'],a:1,
+e:'黑天鵝（Nassim Taleb提出）：<strong>極度罕見、難以預測，但一旦發生影響巨大的事件</strong>，如2008年金融海嘯、COVID-19等。投資人應保持現金準備和風險控管以應對。'},
+
+{c:'cth',q:'「價值投資」的核心策略是？',o:['追買最熱門股票','以低於內在價值的價格買入被低估的股票，等待市場修正','頻繁短線交易','只看技術分析'],a:1,
+e:'<strong>價值投資</strong>（Buffett/Graham）：估算企業的內在價值，在市場價格低於內在價值時買入，獲取<strong>安全邊際</strong>，長期持有等待市場修正。'},
+
+{c:'cth',q:'「Beta值」在股票分析中代表？Beta=1.5代表什麼？',o:['公司獲利能力','股票相對大盤的波動敏感度，β=1.5代表大盤漲1%該股漲約1.5%','股票流動性','本益比'],a:1,
+e:'<strong>Beta（β）= 股票相對大盤的波動係數</strong>。β=1.5代表大盤漲1%時該股漲約1.5%（漲跌皆然），高Beta股票波動大，適合積極型投資人。'},
+
+{c:'cth',q:'「配息後股價」除息當天會如何變動？',o:['不變','上漲配息金額','下跌配息金額（除息缺口）','完全隨機'],a:2,
+e:'除息當天，股價會<strong>下調配息金額</strong>（形成除息缺口）。例如配息2元，除息當天開盤價 = 前日收盤 - 2元。後續是否填息（回到原價）取決於公司基本面。'},
+
+{c:'cth',q:'「量化寬鬆（QE）」對股市通常的影響是？',o:['股市下跌，資金緊縮','增加市場流動性，推升股市上漲','對股市無影響','提高利率'],a:1,
+e:'量化寬鬆（央行購買債券注入資金）→<strong>市場資金充裕、利率下降</strong>→資金流入股市→股市通常上漲。QE期間「別和央行作對」是著名投資格言。'},
+
+{c:'cth',q:'短線交易最重要的風險控管原則是？',o:['每次全押一個標的','單次損失不超過帳戶的1-2%，控制最大回撤','不設停損等待反彈','追熱門股票'],a:1,
+e:'短線交易風控黃金法則：<strong>單次損失 ≤ 帳戶2%</strong>。即使連虧10次也只損失20%，保留翻盤能力。違反此原則是大多數散戶爆倉的主因。'},
+
+{c:'cth',q:'「填息」的定義是？',o:['股價跌到最低點','除息後股價回漲，回到除息前的價格','配息金額增加','股票分割'],a:1,
+e:'<strong>填息</strong>：股票除息後，股價從除息缺口處回漲至除息前的水準。填息代表投資人不僅拿到股息，且資本利得也回復，是存股族最期待的結果。'},
+
+{c:'cth',q:'「分散投資」的主要目的是？',o:['追求最高報酬','降低非系統性風險（個別股票風險）','集中資源在最強標的','提高流動性'],a:1,
+e:'<strong>分散投資</strong>可降低<strong>非系統性風險</strong>（個別公司風險如破產、醜聞），但無法消除系統性風險（整體市場風險如金融危機）。現代投資組合理論的核心。'},
+
+{c:'cth',q:'「空頭市場（Bear Market）」的傳統定義是？',o:['股價下跌超過5%','股價從高點下跌超過20%','成交量減少超過50%','利率上升'],a:1,
+e:'<strong>空頭市場（熊市）</strong>定義：主要指數從前期高點下跌<strong>20%以上</strong>。通常伴隨經濟衰退預期、企業獲利下滑、投資人悲觀情緒。'},
+
+{c:'cth',q:'「K線」（Candlestick）圖最初起源於哪個國家？',o:['美國','英國','日本','中國'],a:2,
+e:'K線圖（Candlestick Chart）起源於<strong>18世紀日本</strong>，由米商本間宗久發明，用於追蹤大阪米市的價格走勢。後由Steve Nison引介到西方，成為全球最廣泛使用的技術分析工具。'}
+];
+
+let correct=0,wrong=0,answered=new Set();
+function upScore(){
+  document.getElementById('nc').textContent=correct;
+  document.getElementById('nw').textContent=wrong;
+  document.getElementById('nt').textContent=answered.size;
+}
+function resetAll(){
+  correct=0;wrong=0;answered.clear();upScore();
+  document.querySelectorAll('.opt').forEach(b=>{b.className='opt';b.disabled=false});
+  document.querySelectorAll('.explain').forEach(e=>e.classList.remove('show'));
+}
+function answer(btn,qid,isCorrect){
+  if(answered.has(qid))return;
+  answered.add(qid);
+  const card=btn.closest('.qcard');
+  card.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===Q[qid].a) b.classList.add(isCorrect?'correct':'show-correct');
+  });
+  if(!isCorrect) btn.classList.add('wrong');
+  if(isCorrect)correct++;else wrong++;
+  upScore();
+  card.querySelector('.explain').classList.add('show');
+}
+function filt(cat,btn){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.qcard').forEach(c=>{
+    c.style.display=(cat==='all'||c.classList.contains(cat))?'':'none';
+  });
+}
+function render(){
+  const g=document.getElementById('grid');
+  Q.forEach((q,i)=>{
+    const d=document.createElement('div');
+    d.className='qcard '+q.c;
+    const opts=q.o.map((o,j)=>`<button class="opt" onclick="answer(this,${i},${j===q.a})">${String.fromCharCode(65+j)}. ${o}</button>`).join('');
+    d.innerHTML=`<div class="qhead"><div class="qnum">${i+1}</div><div class="qmeta"><span class="qtag">${CAT[q.c]}</span><div class="qtext">${q.q}</div></div></div>`+
+      (q.s?`<div class="qsvg">${q.s}</div>`:'')+
+      `<div class="opts">${opts}</div><div class="explain">${q.e}</div>`;
+    g.appendChild(d);
+  });
+}
+render();
+</script>
+</body>
+</html>
