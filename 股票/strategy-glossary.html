@@ -108,6 +108,17 @@ a{color:inherit;text-decoration:none}
 .toggle-arrow{transition:transform .2s;display:inline-block}
 .sc.open .toggle-arrow{transform:rotate(90deg)}
 
+/* STAR */
+.star-btn{background:none;border:none;cursor:pointer;font-size:1.2rem;line-height:1;color:var(--text4);padding:4px 6px;flex-shrink:0;transition:color .15s,transform .15s;user-select:none;-webkit-tap-highlight-color:transparent}
+.star-btn:hover{color:var(--accent2);transform:scale(1.2)}
+.star-btn.starred{color:#f59e0b}
+
+/* JUMP SELECT */
+.jump-wrap{max-width:460px;margin:10px auto 0;position:relative}
+.jump-wrap select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 36px 10px 16px;color:var(--text3);font-size:1rem;font-family:inherit;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color .15s}
+.jump-wrap select:focus{border-color:var(--accent);color:var(--text)}
+.jump-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text4);pointer-events:none;font-size:.9rem}
+
 @media(max-width:640px){
   .sc-head{padding:18px 14px 0}
   .sc-short{padding-left:14px;padding-right:14px}
@@ -142,6 +153,11 @@ a{color:inherit;text-decoration:none}
     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input type="text" id="searchInput" placeholder="搜尋策略、指標、型態…" autocomplete="off">
   </div>
+  <div class="jump-wrap">
+    <select id="jumpSelect">
+      <option value="">⚡ 快速跳到某個策略…</option>
+    </select>
+  </div>
 </div>
 
 <div class="filter-bar">
@@ -151,6 +167,7 @@ a{color:inherit;text-decoration:none}
   <button class="flt-btn" onclick="filter('pattern',this)">型態辨識</button>
   <button class="flt-btn" onclick="filter('foundation',this)">基礎工具</button>
   <button class="flt-btn" onclick="filter('chip',this)">籌碼分析</button>
+  <button class="flt-btn" id="starFltBtn" onclick="filter('starred',this)">★ 我的收藏</button>
 </div>
 
 <div class="container">
@@ -1170,7 +1187,37 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
 
 <script>
 let currentCat = 'all';
+let showStarred = false;
 
+/* ── 星號收藏（localStorage） ── */
+function getStarred() {
+  try { return JSON.parse(localStorage.getItem('sg-stars') || '[]'); } catch(e) { return []; }
+}
+function saveStarred(arr) {
+  try { localStorage.setItem('sg-stars', JSON.stringify(arr)); } catch(e) {}
+}
+function isStarred(id) { return getStarred().includes(String(id)); }
+
+function toggleStar(e, btn) {
+  e.stopPropagation();
+  const sc = btn.closest('.sc');
+  const id = String(sc.dataset.id);
+  const arr = getStarred();
+  const idx = arr.indexOf(id);
+  if (idx === -1) arr.push(id);
+  else arr.splice(idx, 1);
+  saveStarred(arr);
+  updateStarBtn(btn, idx === -1);
+  applyAll();
+}
+
+function updateStarBtn(btn, starred) {
+  btn.textContent = starred ? '★' : '☆';
+  btn.classList.toggle('starred', starred);
+  btn.title = starred ? '取消收藏' : '加入收藏';
+}
+
+/* ── 展開/收合 ── */
 function toggle(headEl) {
   let sc = headEl;
   while(sc && !sc.classList.contains('sc')) sc = sc.parentElement;
@@ -1189,32 +1236,110 @@ function toggle(headEl) {
   }
 }
 
+/* ── 類別篩選 ── */
 function filter(cat, btn) {
-  currentCat = cat;
-  document.querySelectorAll('.flt-btn').forEach(b => b.classList.toggle('active', b === btn));
+  if (cat === 'starred') {
+    showStarred = !showStarred;
+    btn.classList.toggle('active', showStarred);
+    /* 切收藏模式時不改 currentCat，只加一層過濾 */
+  } else {
+    showStarred = false;
+    document.getElementById('starFltBtn').classList.remove('active');
+    currentCat = cat;
+    document.querySelectorAll('.flt-btn').forEach(b => {
+      if (b.id !== 'starFltBtn') b.classList.toggle('active', b === btn);
+    });
+  }
   applyAll();
 }
 
-document.getElementById('searchInput').addEventListener('input', function(){
-  applyAll();
-});
+/* ── 搜尋 ── */
+document.getElementById('searchInput').addEventListener('input', function(){ applyAll(); });
 
+/* ── 套用全部篩選 ── */
 function applyAll() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const starred = getStarred();
   let count = 0;
   document.querySelectorAll('.sc').forEach(sc => {
     const catMatch = currentCat === 'all' || sc.dataset.cat === currentCat;
-    const kwMatch = !q || (sc.dataset.keywords||'').includes(q) ||
+    const starMatch = !showStarred || starred.includes(sc.dataset.id);
+    const kwMatch = !q ||
+      (sc.dataset.keywords||'').includes(q) ||
       (sc.querySelector('.sc-name')||{textContent:''}).textContent.toLowerCase().includes(q) ||
       (sc.querySelector('.sc-short')||{textContent:''}).textContent.toLowerCase().includes(q);
-    const hide = !catMatch || !kwMatch;
+    const hide = !catMatch || !kwMatch || !starMatch;
     sc.classList.toggle('hidden', hide);
     if(!hide) count++;
   });
   document.getElementById('countLabel').textContent = `顯示 ${count} 個策略`;
 }
 
-applyAll();
+/* ── 初始化：注入星號按鈕 + 建立跳轉選單 ── */
+(function init() {
+  const catLabel = {theory:'核心理論',indicator:'技術指標',pattern:'型態辨識',foundation:'基礎工具',chip:'籌碼分析'};
+  const groups = {};
+
+  document.querySelectorAll('.sc').forEach((sc, i) => {
+    sc.dataset.id = String(i);
+
+    /* 注入星號按鈕 */
+    const head = sc.querySelector('.sc-head');
+    const arrow = head.querySelector('.toggle-arrow');
+    const btn = document.createElement('button');
+    btn.className = 'star-btn';
+    btn.setAttribute('aria-label', '收藏');
+    btn.setAttribute('type', 'button');
+    btn.onclick = function(e) { toggleStar(e, this); };
+    head.insertBefore(btn, arrow);
+    updateStarBtn(btn, isStarred(i));
+
+    /* 收集跳轉選單選項（依分類分組） */
+    const cat = sc.dataset.cat || 'other';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push({ idx: i, name: (sc.querySelector('.sc-name')||{textContent:''}).textContent });
+  });
+
+  /* 建立分組下拉選單 */
+  const sel = document.getElementById('jumpSelect');
+  const catOrder = ['theory','indicator','pattern','foundation','chip'];
+  catOrder.forEach(cat => {
+    if (!groups[cat]) return;
+    const og = document.createElement('optgroup');
+    og.label = catLabel[cat] || cat;
+    groups[cat].forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.idx;
+      opt.textContent = item.name;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+
+  sel.addEventListener('change', function() {
+    const val = this.value;
+    if (val === '') return;
+    this.value = '';
+    const sc = document.querySelectorAll('.sc')[parseInt(val)];
+    if (!sc) return;
+    /* 確保卡片可見（移除篩選隱藏） */
+    sc.classList.remove('hidden');
+    /* 展開內容 */
+    const body = sc.querySelector('.sc-body');
+    if (body && body.classList.contains('collapsed')) {
+      body.classList.remove('collapsed');
+      sc.classList.add('open');
+      const btnSpan = sc.querySelector('.toggle-btn span:last-child');
+      if (btnSpan) btnSpan.textContent = '收合';
+    }
+    /* 捲動到卡片 */
+    setTimeout(function() {
+      sc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  });
+
+  applyAll();
+})();
 </script>
 </body>
 </html>
