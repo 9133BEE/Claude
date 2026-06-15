@@ -52,6 +52,7 @@ a{color:inherit;text-decoration:none}
 .badge-pattern{background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.25)}
 .badge-foundation{background:rgba(245,158,11,.12);color:var(--accent2);border:1px solid rgba(245,158,11,.25)}
 .badge-hot{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25);animation:pulse 2s infinite}
+.badge-chip{background:rgba(20,184,166,.12);color:#2dd4bf;border:1px solid rgba(20,184,166,.25)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 .sc-name{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:3px}
 .sc-en{color:var(--text3);font-size:.8rem}
@@ -149,6 +150,7 @@ a{color:inherit;text-decoration:none}
   <button class="flt-btn" onclick="filter('indicator',this)">技術指標</button>
   <button class="flt-btn" onclick="filter('pattern',this)">型態辨識</button>
   <button class="flt-btn" onclick="filter('foundation',this)">基礎工具</button>
+  <button class="flt-btn" onclick="filter('chip',this)">籌碼分析</button>
 </div>
 
 <div class="container">
@@ -872,6 +874,292 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
       </ul>
       <div class="hl"><b>📌 趨勢線突破的確認</b>收盤突破趨勢線（不是盤中），且突破時量能放大。突破後回測趨勢線（原來的支撐變壓力，或原壓力變支撐）= 確認進場點。</div>
     </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 外資買賣張數背離訊號 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="chip" data-keywords="外資 買賣超 買張 賣張 背離 籌碼 法人 隱藏低點 進場訊號 掩護建倉 出貨型買超">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🔍</div>
+    <div class="sc-meta">
+      <div class="sc-badges">
+        <span class="badge badge-chip">籌碼分析</span>
+        <span class="badge badge-hot">實戰策略</span>
+      </div>
+      <div class="sc-name">外資買賣張數背離訊號</div>
+      <div class="sc-en">Foreign Investor Volume Divergence Signal</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">「淨超」告訴你結果，「買張與賣張的絕對值」告訴你過程。當外資整體賣超但買張大增，代表主力正悄悄建倉；反之，買超但賣張大增，是出貨型行情的警訊。</div>
+  <div class="sc-body collapsed">
+
+    <!-- ── DIAGRAM 1：兩種訊號示意 ── -->
+    <div class="diag">
+      <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="600" height="180" fill="#f8fafc" rx="8"/>
+
+        <!-- 左半：訊號一 -->
+        <text x="140" y="16" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="700">訊號一：賣超 + 買張大增（隱藏低點）</text>
+        <!-- D-1 bars -->
+        <text x="55" y="34" text-anchor="middle" fill="#64748b" font-size="8">D-1（前日）</text>
+        <rect x="28" y="36" width="18" height="60" fill="#3b82f6" opacity=".7" rx="2"/>
+        <text x="37" y="102" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張</text>
+        <text x="37" y="111" text-anchor="middle" fill="#3b82f6" font-size="7.5">5000</text>
+        <rect x="54" y="26" width="18" height="70" fill="#dc2626" opacity=".6" rx="2"/>
+        <text x="63" y="102" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張</text>
+        <text x="63" y="111" text-anchor="middle" fill="#dc2626" font-size="7.5">7000</text>
+        <!-- D+0 bars -->
+        <text x="125" y="34" text-anchor="middle" fill="#64748b" font-size="8">D+0（訊號日）</text>
+        <rect x="98" y="16" width="18" height="80" fill="#3b82f6" rx="2"/>
+        <text x="107" y="102" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張</text>
+        <text x="107" y="111" text-anchor="middle" fill="#3b82f6" font-size="7.5">8000↑</text>
+        <rect x="124" y="24" width="18" height="72" fill="#dc2626" opacity=".6" rx="2"/>
+        <text x="133" y="102" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張</text>
+        <text x="133" y="111" text-anchor="middle" fill="#dc2626" font-size="7.5">9500</text>
+        <!-- signal arrow -->
+        <text x="163" y="58" fill="#166534" font-size="10" font-weight="700">→</text>
+        <text x="178" y="50" fill="#166534" font-size="9" font-weight="700">淨超仍賣超</text>
+        <text x="178" y="63" fill="#166534" font-size="9">但買張+60%</text>
+        <text x="178" y="76" fill="#3b82f6" font-size="9" font-weight="700">✔ 外資偷買中</text>
+        <!-- bottom label -->
+        <text x="110" y="130" text-anchor="middle" fill="#64748b" font-size="8">外資賣超縮小 + 買張大增 = 掩護建倉訊號</text>
+        <rect x="28" y="135" width="200" height="24" fill="#dcfce7" rx="4"/>
+        <text x="128" y="150" text-anchor="middle" fill="#166534" font-size="8.5" font-weight="700">隔日進場，往往買在低點 ✔</text>
+
+        <!-- 分隔線 -->
+        <line x1="290" y1="10" x2="290" y2="170" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+        <!-- 右半：訊號二 -->
+        <text x="445" y="16" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="700">訊號二：買超 + 賣張大增（隱藏高點）</text>
+        <!-- D-1 bars -->
+        <text x="335" y="34" text-anchor="middle" fill="#64748b" font-size="8">D-1（前日）</text>
+        <rect x="308" y="26" width="18" height="70" fill="#3b82f6" opacity=".7" rx="2"/>
+        <text x="317" y="102" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張</text>
+        <text x="317" y="111" text-anchor="middle" fill="#3b82f6" font-size="7.5">7000</text>
+        <rect x="334" y="46" width="18" height="50" fill="#dc2626" opacity=".6" rx="2"/>
+        <text x="343" y="102" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張</text>
+        <text x="343" y="111" text-anchor="middle" fill="#dc2626" font-size="7.5">5000</text>
+        <!-- D+0 bars -->
+        <text x="405" y="34" text-anchor="middle" fill="#64748b" font-size="8">D+0（訊號日）</text>
+        <rect x="378" y="26" width="18" height="70" fill="#3b82f6" opacity=".7" rx="2"/>
+        <text x="387" y="102" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張</text>
+        <text x="387" y="111" text-anchor="middle" fill="#3b82f6" font-size="7.5">7500</text>
+        <rect x="404" y="16" width="18" height="80" fill="#dc2626" rx="2"/>
+        <text x="413" y="102" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張</text>
+        <text x="413" y="111" text-anchor="middle" fill="#dc2626" font-size="7.5">8000↑↑</text>
+        <!-- signal arrow -->
+        <text x="438" y="58" fill="#dc2626" font-size="10" font-weight="700">→</text>
+        <text x="452" y="50" fill="#dc2626" font-size="9" font-weight="700">淨超仍買超</text>
+        <text x="452" y="63" fill="#dc2626" font-size="9">但賣張+60%</text>
+        <text x="452" y="76" fill="#dc2626" font-size="9" font-weight="700">⚠ 出貨型買超</text>
+        <!-- bottom label -->
+        <text x="400" y="130" text-anchor="middle" fill="#64748b" font-size="8">表面買超，但賣張大增 = 邊拉邊出訊號</text>
+        <rect x="305" y="135" width="200" height="24" fill="#fee2e2" rx="4"/>
+        <text x="405" y="150" text-anchor="middle" fill="#dc2626" font-size="8.5" font-weight="700">隔日追買，往往買在高點 ✗</text>
+      </svg>
+      <div class="diag-cap">左：外資「賣超但買張大增」= 掩護建倉，隱藏低點。右：外資「買超但賣張大增」= 出貨型買超，隱藏高點。</div>
+    </div>
+
+    <!-- ── 核心邏輯 ── -->
+    <div class="blk">
+      <div class="blk-title">為什麼這個訊號有效</div>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>淨超 vs 買賣張數的差異</h4>
+          <p>「淨超」= 買張 − 賣張，只是最終結果。<br>「買賣張數」= 外資行動的強度，是過程。<br><br>外資的意圖藏在過程裡，不在結果裡。大型機構建倉時，不會讓淨超數字提早曝光，但買張的增加卻很難完全掩蓋。</p>
+        </div>
+        <div class="mini-card">
+          <h4>掩護建倉的機制</h4>
+          <p>外資若想低位買進又不推高價格，會同時進行：<br>① 持續賣出部分舊部位（維持賣超外觀）<br>② 悄悄增加新買進張數<br><br>結果：淨超仍為負，但買張在快速增加。當散戶仍悲觀時，外資已在積累籌碼。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 量化門檻 ── -->
+    <div class="blk">
+      <div class="blk-title">訊號強度量化表</div>
+      <table class="tbl">
+        <thead>
+          <tr><th>等級</th><th>買張增幅（賣超場景）/ 賣張增幅（買超場景）</th><th>訊號強度</th><th>建議倉位</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>觀察（雜訊）</td><td>20% – 35%</td><td>弱，可能是日常波動</td><td>不進場，持續追蹤</td></tr>
+          <tr><td>有效訊號</td><td>35% – 60%</td><td>中，具參考價值</td><td>輕倉試水（2–3成）</td></tr>
+          <tr><td>強力訊號</td><td>60% – 100%</td><td>強，具操作意義</td><td>正常倉位（4–5成）</td></tr>
+          <tr><td>極強訊號</td><td>&gt; 100%（買張翻倍以上）</td><td>極強，罕見但可靠</td><td>積極進場（6–8成）</td></tr>
+        </tbody>
+      </table>
+      <div class="hl"><b>📌 核心條件（賣超場景）</b>買張增幅 ≥ 35%，且賣張增幅 &lt; 買張增幅的 50%。兩條件同時成立才算有效。賣張也跟著大增，代表外資只是交易量放大，不是主動建倉。</div>
+    </div>
+
+    <!-- ── 買賣比例法 ── -->
+    <div class="blk">
+      <div class="blk-title">買賣比例法（最直觀的計算方式）</div>
+      <table class="tbl">
+        <thead>
+          <tr><th>項目</th><th>D-1（前日）</th><th>D+0（訊號日）</th><th>判斷</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>外資買張</td><td>5,500 張</td><td>8,000 張</td><td>+45.5%</td></tr>
+          <tr><td>外資賣張</td><td>10,000 張</td><td>10,000 張</td><td>持平</td></tr>
+          <tr><td>淨超</td><td>賣超 4,500 張</td><td>賣超 2,000 張</td><td>賣超縮小</td></tr>
+          <tr><td>買賣比（買/賣）</td><td>0.55</td><td>0.80</td><td style="color:#2dd4bf;font-weight:700">提升 45% ✔ 強力訊號</td></tr>
+        </tbody>
+      </table>
+      <div class="eg"><b>✅ 公式</b>買賣比 = 外資當日買張 ÷ 外資當日賣張。買賣比提升幅度 ≥ 35% = 有效訊號。比值越接近 1.0（甚至超過），代表外資買意越強烈。</div>
+    </div>
+
+    <!-- ── 三層過濾 ── -->
+    <div class="blk">
+      <div class="blk-title">三層過濾法（提高勝率的核心架構）</div>
+      <div class="blk">
+        <p style="margin-bottom:6px;color:var(--text3);font-size:.82rem;">只有三層同時過關，才進場。少一層就降一個等級執行。</p>
+      </div>
+      <table class="tbl">
+        <thead>
+          <tr><th>過濾層</th><th>確認項目</th><th>標準</th><th>失敗時的處理</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#2dd4bf;font-weight:700">第一層<br>訊號確認</td>
+            <td>買賣張數比較</td>
+            <td>買張增幅 ≥ 35%<br>賣張增幅 &lt; 買張增幅 ×50%<br>淨賣超縮小（賣超場景）<br>訊號連續 2 日</td>
+            <td>觀察，下一日再評估</td>
+          </tr>
+          <tr>
+            <td style="color:#a78bfa;font-weight:700">第二層<br>籌碼確認</td>
+            <td>其他法人動向</td>
+            <td>投信同向（買超或持平）<br>大股東無申報轉讓<br>融券增加加分（軋空潛力）</td>
+            <td>降倉位一個等級（如5成→3成）</td>
+          </tr>
+          <tr>
+            <td style="color:#f59e0b;font-weight:700">第三層<br>技術確認</td>
+            <td>K棒 / 均線 / 指標</td>
+            <td>股價在季線（60MA）以上或支撐附近<br>RSI(14) 介於 40–60<br>當日 K 棒有下影線（多頭吸收賣壓）<br>成交量 &gt; 20日均量 80%</td>
+            <td>掛限價單在今收盤附近，等市場來找你</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 搭配指標 ── -->
+    <div class="blk">
+      <div class="blk-title">建議搭配的輔助指標</div>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>① 投信買賣超（最強加乘）</h4>
+          <p>外資 + 投信雙買超 = 法人共識，訊號可信度大幅提升。投信偏好中小型成長股，外資偏好大型藍籌，兩者同向出現在同一檔股票時，代表「全光譜法人認可」。</p>
+        </div>
+        <div class="mini-card">
+          <h4>② 融券餘額（軋空加速器）</h4>
+          <p>若融券餘額偏高（流通股數 ≥ 3%）且外資開始偷買，空頭回補壓力加上外資買盤，可能形成「雙重燃料」的快速拉升。這種行情漲速往往超過預期。</p>
+        </div>
+        <div class="mini-card">
+          <h4>③ MACD（趨勢確認）</h4>
+          <p>日 K MACD 出現金叉，或 DIF 線翻正，配合外資買張訊號，代表動能與籌碼同時確認。若 MACD 仍在死叉，訊號強度打七折。</p>
+        </div>
+        <div class="mini-card">
+          <h4>④ 布林通道（位置確認）</h4>
+          <p>股價在布林下軌附近（超賣區域）出現外資買張訊號，平均反彈幅度最大。股價在布林上軌附近出現買張訊號，效果相對有限，需謹慎。</p>
+        </div>
+        <div class="mini-card">
+          <h4>⑤ 大盤外資未平倉（方向過濾）</h4>
+          <p>查台指期外資多空淨部位：若外資整體偏多（期貨多單 &gt; 2萬口），個股的外資買張訊號可信度更高。若外資在期貨偏空，個股訊號可能只是局部操作。</p>
+        </div>
+        <div class="mini-card">
+          <h4>⑥ K棒型態（時機精準化）</h4>
+          <p>訊號日或隔日出現「鎚子線」（長下影）或「吞噬型態」（大陽線吞掉前日陰線），代表市場賣壓被完全吸收。技術面 + 籌碼面雙確認，進場勝率最高。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DIAGRAM 2：進場 SOP 流程圖 ── -->
+    <div class="diag">
+      <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="600" height="200" fill="#f8fafc" rx="8"/>
+        <text x="300" y="16" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="700">外資買張背離訊號 — 隔日進場 SOP 流程</text>
+        <!-- boxes -->
+        <rect x="20" y="26" width="110" height="38" rx="6" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+        <text x="75" y="41" text-anchor="middle" fill="#1e40af" font-size="8.5" font-weight="700">盤後蒐集數據</text>
+        <text x="75" y="55" text-anchor="middle" fill="#1e40af" font-size="7.5">外資買/賣張、淨超</text>
+        <line x1="130" y1="45" x2="155" y2="45" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <rect x="155" y="26" width="110" height="38" rx="6" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+        <text x="210" y="41" text-anchor="middle" fill="#166534" font-size="8.5" font-weight="700">第一層過濾</text>
+        <text x="210" y="55" text-anchor="middle" fill="#166534" font-size="7.5">買張增幅 ≥ 35%？</text>
+        <line x1="265" y1="45" x2="290" y2="45" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <rect x="290" y="26" width="110" height="38" rx="6" fill="#f3e8ff" stroke="#c4b5fd" stroke-width="1"/>
+        <text x="345" y="41" text-anchor="middle" fill="#6d28d9" font-size="8.5" font-weight="700">第二層過濾</text>
+        <text x="345" y="55" text-anchor="middle" fill="#6d28d9" font-size="7.5">投信/大股東確認</text>
+        <line x1="400" y1="45" x2="425" y2="45" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <rect x="425" y="26" width="110" height="38" rx="6" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+        <text x="480" y="41" text-anchor="middle" fill="#92400e" font-size="8.5" font-weight="700">第三層過濾</text>
+        <text x="480" y="55" text-anchor="middle" fill="#92400e" font-size="7.5">K棒/RSI/季線位置</text>
+        <!-- fail paths -->
+        <line x1="210" y1="64" x2="210" y2="90" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <rect x="155" y="90" width="110" height="28" rx="5" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
+        <text x="210" y="108" text-anchor="middle" fill="#dc2626" font-size="8">觀察，不進場</text>
+        <line x1="345" y1="64" x2="345" y2="90" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <rect x="290" y="90" width="110" height="28" rx="5" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+        <text x="345" y="108" text-anchor="middle" fill="#92400e" font-size="8">降低倉位一個等級</text>
+        <!-- pass path -->
+        <line x1="480" y1="64" x2="480" y2="90" stroke="#166534" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <rect x="425" y="90" width="110" height="38" rx="6" fill="#dcfce7" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="480" y="107" text-anchor="middle" fill="#166534" font-size="8.5" font-weight="700">三層全過✔</text>
+        <text x="480" y="120" text-anchor="middle" fill="#166534" font-size="7.5">隔日開盤15min後進場</text>
+        <!-- bottom row -->
+        <rect x="20" y="148" width="560" height="42" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+        <text x="300" y="163" text-anchor="middle" fill="#166534" font-size="8.5" font-weight="700">持倉管理（每日盤後追蹤）</text>
+        <text x="150" y="180" text-anchor="middle" fill="#166534" font-size="8">加碼：外資連續轉買超</text>
+        <text x="300" y="180" text-anchor="middle" fill="#92400e" font-size="8">減碼：賣張再度大增（訊號二觸發）</text>
+        <text x="470" y="180" text-anchor="middle" fill="#dc2626" font-size="8">停損：破訊號日最低 -1.5%</text>
+        <defs>
+          <marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5" fill="#94a3b8"/></marker>
+          <marker id="arr2" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5" fill="#166534"/></marker>
+        </defs>
+      </svg>
+      <div class="diag-cap">三層過濾全過才進場。第一層失敗 = 觀察；第二層失敗 = 降倉；第三層通過 = 隔日開盤15分鐘後進場，不追跳空高開。</div>
+    </div>
+
+    <!-- ── 完整 SOP ── -->
+    <div class="blk">
+      <div class="blk-title">完整進場 SOP（訊號一：賣超但買張大增）</div>
+      <ul class="checklist">
+        <li><strong>Day 0 盤後 Step 1</strong>：從台灣證交所公布的三大法人資料，記錄今日外資買張、賣張、淨超，與前日比較計算增幅</li>
+        <li><strong>Day 0 盤後 Step 2</strong>：確認「買張增幅 ≥ 35%」且「賣張增幅 &lt; 買張增幅的 50%」，同時確認賣超金額較前日縮小</li>
+        <li><strong>Day 0 盤後 Step 3</strong>：查投信動向（買超或持平為佳），查大股東有無申報轉讓（有則放棄），查融券是否增加（加分）</li>
+        <li><strong>Day 0 盤後 Step 4</strong>：確認股價在季線以上或重要支撐附近；RSI(14) 在 40–60；今日 K 棒是否有下影線</li>
+        <li><strong>Day 1 盤中 Step 5</strong>：等開盤後第一個 15 分鐘過後再進場（避免追開盤情緒）。若開盤跳空高開 3%+，本次放棄，不追</li>
+        <li><strong>Day 1 盤中 Step 6</strong>：初始倉位 30–50%。若當日收盤仍強，隔日視外資持續動向加碼；若收盤轉弱，縮倉</li>
+        <li><strong>停損設置</strong>：低於訊號日最低點 1–2% 無條件出場，不看任何理由，情緒不得插手</li>
+        <li><strong>加碼條件（任一）</strong>：外資連續 2 日轉為買超；投信加入買超行列；融券加速增加（軋空燃料）</li>
+        <li><strong>出場訊號</strong>：外資賣張重新大增（訊號二觸發）；股價跌破 5 日均線且量增；訊號日最低點被跌破</li>
+      </ul>
+    </div>
+
+    <!-- ── 訊號失效條件 ── -->
+    <div class="blk">
+      <div class="blk-title">訊號失效的五個地雷</div>
+      <div class="warn"><b>⚠️ 地雷一：大盤系統性崩跌</b>聯準會急升息、地緣衝突、美股崩跌期間，外資買張增加可能只是程式交易或對沖操作，與個股看法無關。先確認大盤環境。</div>
+      <div class="warn"><b>⚠️ 地雷二：衍生品到期日前後（每月第三週三）</b>期貨/選擇權結算日附近，外資現貨異動往往是衍生品對沖，不反映真實看法。結算日前後三天的訊號可信度打折。</div>
+      <div class="warn"><b>⚠️ 地雷三：外資換股操作（基金再平衡）</b>外資基金月底或季底再平衡，可能同日大量買 A 股、賣 B 股。若僅看單一個股，會誤判為建倉訊號，但只是配置調整。</div>
+      <div class="warn"><b>⚠️ 地雷四：財報地雷期</b>若公司即將公告季報或有重大消息，外資可能已掌握非公開資訊，買張增加是出清前的掩護，不是建倉。財報公告前 1 週信號可信度降低。</div>
+      <div class="warn"><b>⚠️ 地雷五：成交量過低（日均量 &lt; 500 張）</b>流動性不足時，幾十張的差異就能製造「大幅增加」的假象。外資影響力小的低流動性股票，此訊號幾乎無效。</div>
+    </div>
+
+    <!-- ── 核心認知 ── -->
+    <div class="blk">
+      <div class="blk-title">資深交易者的核心認知</div>
+      <div class="pro"><b>💡 最重要的一句話</b>「淨超」告訴你結果，「買張和賣張的絕對值」告訴你過程。外資的真實意圖藏在過程裡，不在結果裡。這個洞察本身就比九成散戶深了一個層次。</div>
+      <div class="hl"><b>📌 訊號自我失效警告</b>當越來越多人知道這個訊號，外資若意識到市場在觀察他們的買張數字，操作模式可能改變。市場訊號的有效性往往隨知名度提高而下降——這是所有技術訊號的宿命。</div>
+      <div class="eg"><b>✅ 倉位紀律比訊號更重要</b>即使勝率 70%，如果每次虧損重倉、每次獲利輕倉，帳戶仍然虧損。這套 SOP 的核心不是「找到低點」，而是「在可以驗證的位置用正確的倉位進場，然後用紀律管理持倉」。</div>
+    </div>
+
   </div>
   <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
     <span class="toggle-arrow">›</span><span>展開詳細</span>
