@@ -90,18 +90,18 @@ a:hover{text-decoration:underline}
 </div>
 
 <div class="hero">
-  <h1>進階交易技巧 15 講</h1>
+  <h1>進階交易技巧 30 講</h1>
   <p>資深分析師經驗談 — 量能、籌碼、時機、跨市場、心理層面的非教科書知識</p>
   <span class="hero-badge">僅限有實戰經驗者參考 · 非投資建議</span>
 </div>
 
 <div class="filters">
-  <button class="filter-btn active" onclick="filterTips('all')">全部 15</button>
-  <button class="filter-btn cat-vol" onclick="filterTips('vol')">量能分析 3</button>
-  <button class="filter-btn cat-chip" onclick="filterTips('chip')">籌碼追蹤 3</button>
-  <button class="filter-btn cat-timing" onclick="filterTips('timing')">進出時機 3</button>
-  <button class="filter-btn cat-cross" onclick="filterTips('cross')">跨市場訊號 3</button>
-  <button class="filter-btn cat-psych" onclick="filterTips('psych')">市場心理 3</button>
+  <button class="filter-btn active" onclick="filterTips('all')">全部 30</button>
+  <button class="filter-btn cat-vol" onclick="filterTips('vol')">量能分析 6</button>
+  <button class="filter-btn cat-chip" onclick="filterTips('chip')">籌碼追蹤 6</button>
+  <button class="filter-btn cat-timing" onclick="filterTips('timing')">進出時機 6</button>
+  <button class="filter-btn cat-cross" onclick="filterTips('cross')">跨市場訊號 6</button>
+  <button class="filter-btn cat-psych" onclick="filterTips('psych')">市場心理 6</button>
 </div>
 
 <div class="tips-grid" id="tipsGrid">
@@ -867,6 +867,820 @@ a:hover{text-decoration:underline}
       <h4>老手口訣</h4>
       <p>「上了雜誌封面就該賣，上了電視新聞就全出清。」當行情大到普羅大眾都知道，它離結束就不遠了。</p>
     </div>
+  </div>
+</div>
+
+<!-- VOL 16 -->
+<div class="tip-card cat-vol" data-cat="vol">
+  <div class="tip-header">
+    <div class="tip-num">16</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">量能分析</span>
+      <div class="tip-title">開高走低爆大量——隔日沖主力的倒貨指紋</div>
+      <div class="tip-subtitle">早盤跳空高開卻盤中反轉，大量收黑</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="170" fill="#0d1117"/>
+      <!-- price line -->
+      <polyline points="40,80 80,55 160,55 240,90 320,110 400,120" fill="none" stroke="#30363d" stroke-width="1"/>
+      <!-- gap up open -->
+      <text x="75" y="48" fill="#22c55e" font-size="9" text-anchor="middle">跳空高開</text>
+      <line x1="75" y1="52" x2="75" y2="62" stroke="#22c55e" stroke-width="1.5" marker-end="url(#av1)"/>
+      <!-- reversal candle -->
+      <rect x="148" y="55" width="16" height="52" fill="#ef4444" rx="2"/>
+      <line x1="156" y1="46" x2="156" y2="55" stroke="#ef4444" stroke-width="1.5"/>
+      <line x1="156" y1="107" x2="156" y2="118" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="156" y="36" fill="#ef4444" font-size="9" text-anchor="middle">大陰線</text>
+      <!-- volume bars -->
+      <text x="20" y="158" fill="#8b949e" font-size="8">量</text>
+      <rect x="40" y="148" width="16" height="14" fill="#22c55e" opacity=".6" rx="1"/>
+      <rect x="65" y="146" width="16" height="16" fill="#22c55e" opacity=".6" rx="1"/>
+      <rect x="90" y="144" width="16" height="18" fill="#22c55e" opacity=".6" rx="1"/>
+      <rect x="140" y="122" width="20" height="40" fill="#ef4444" opacity=".85" rx="1"/>
+      <text x="150" y="118" fill="#ef4444" font-size="8" text-anchor="middle">爆量</text>
+      <rect x="170" y="144" width="16" height="18" fill="#ef4444" opacity=".5" rx="1"/>
+      <rect x="195" y="146" width="16" height="16" fill="#ef4444" opacity=".4" rx="1"/>
+      <text x="290" y="100" fill="#f59e0b" font-size="9">主力晚上拉抬→</text>
+      <text x="290" y="114" fill="#f59e0b" font-size="9">早盤出貨給散戶</text>
+      <defs>
+        <marker id="av1" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5" fill="none" stroke="#22c55e" stroke-width="1"/></marker>
+      </defs>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="signal-box">
+      <h4>倒貨型態辨識</h4>
+      <p>股價跳空高開 2% 以上，但盤中由高點反轉，<strong>收盤跌回前日收盤附近或以下</strong>，且成交量是近期最大——這是法人或主力利用散戶追高情緒出貨的經典手法。</p>
+    </div>
+    <div class="gold-box">
+      <h4>資深操作原則</h4>
+      <ul>
+        <li>當日出現此型態，<strong>隔日開盤前掛市價賣出</strong>，不要等反彈</li>
+        <li>若股票有<strong>漲停後隔日開高走低</strong>，代表鎖籌碼的人正在出貨</li>
+        <li>觀察「內外盤比」：外盤比例突然低於 40% 即為賣壓轉強訊號</li>
+      </ul>
+    </div>
+    <div class="formula-box">倒貨訊號 = 跳空高開 + 收盤跌回 + 成交量 ≥ 近20日最大量</div>
+    <table class="case-table">
+      <tr><th>型態</th><th>隔日走勢</th><th>勝率（實戰統計）</th></tr>
+      <tr><td>跳空+大量+收黑</td><td class="val-down">繼續下跌</td><td class="val-down">約 72%</td></tr>
+      <tr><td>跳空+大量+收紅</td><td>中性偏多</td><td>需觀察</td></tr>
+      <tr><td>跳空+縮量+收黑</td><td class="val-down">容易下跌</td><td class="val-down">約 60%</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- VOL 17 -->
+<div class="tip-card cat-vol" data-cat="vol">
+  <div class="tip-header">
+    <div class="tip-num">17</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">量能分析</span>
+      <div class="tip-title">連跌停後的「量能再起」——抄底唯一有效訊號</div>
+      <div class="tip-subtitle">沒有量就沒有底，有量才能確認主力進場</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="170" fill="#0d1117"/>
+      <!-- falling candles -->
+      <rect x="40" y="40" width="16" height="30" fill="#ef4444" rx="2"/><line x1="48" y1="36" x2="48" y2="40" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="70" y="68" width="16" height="28" fill="#ef4444" rx="2"/><line x1="78" y1="63" x2="78" y2="68" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="100" y="94" width="16" height="26" fill="#ef4444" rx="2"/><line x1="108" y1="90" x2="108" y2="94" stroke="#ef4444" stroke-width="1.5"/>
+      <!-- limit-down -->
+      <rect x="130" y="118" width="16" height="12" fill="#ef4444" rx="2"/>
+      <text x="138" y="142" fill="#ef4444" font-size="7.5" text-anchor="middle">跌停</text>
+      <!-- signal candle — big volume -->
+      <rect x="168" y="116" width="18" height="14" fill="#22c55e" rx="2"/>
+      <line x1="177" y1="108" x2="177" y2="116" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="177" y="102" fill="#22c55e" font-size="8.5" text-anchor="middle" font-weight="700">量能再起</text>
+      <!-- recovery -->
+      <rect x="198" y="100" width="16" height="30" fill="#22c55e" rx="2"/>
+      <rect x="228" y="82" width="16" height="48" fill="#22c55e" rx="2"/>
+      <!-- volume bars -->
+      <text x="22" y="162" fill="#8b949e" font-size="8">量</text>
+      <rect x="40" y="154" width="16" height="8" fill="#ef4444" opacity=".5" rx="1"/>
+      <rect x="70" y="152" width="16" height="10" fill="#ef4444" opacity=".5" rx="1"/>
+      <rect x="100" y="150" width="16" height="12" fill="#ef4444" opacity=".4" rx="1"/>
+      <rect x="130" y="152" width="16" height="10" fill="#ef4444" opacity=".35" rx="1"/>
+      <rect x="165" y="130" width="22" height="32" fill="#22c55e" opacity=".85" rx="1"/>
+      <text x="176" y="126" fill="#22c55e" font-size="7.5" text-anchor="middle">↑大量</text>
+      <rect x="198" y="150" width="16" height="12" fill="#22c55e" opacity=".6" rx="1"/>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="signal-box">
+      <h4>散戶常犯的錯</h4>
+      <p>看到股票跌很多就急著「越跌越買」，忽略了<strong>沒有量的反彈只是死貓跳</strong>。真正的底部一定伴隨大量——主力低接才有量，散戶自己買不出量。</p>
+    </div>
+    <div class="green-box">
+      <h4>有效底部的量能條件</h4>
+      <ul>
+        <li>底部當日成交量必須<strong>大於前三日平均量的 2 倍以上</strong></li>
+        <li>底部K棒為「十字線」或「長下影線」，代表多空在此激烈交戰</li>
+        <li>隔日開盤價<strong>站穩底部K棒收盤價以上</strong>才是確認</li>
+        <li>若三日內未出現量能，繼續等待，不要猜底</li>
+      </ul>
+    </div>
+    <div class="blue-box">
+      <h4>老手口訣</h4>
+      <p>「跌停不買，量大再看，量縮不動。」三次跌停後出現的大量反彈K，才值得用 30% 資金試單，確認後再加碼。</p>
+    </div>
+  </div>
+</div>
+
+<!-- VOL 18 -->
+<div class="tip-card cat-vol" data-cat="vol">
+  <div class="tip-header">
+    <div class="tip-num">18</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">量能分析</span>
+      <div class="tip-title">早盤前 15 分鐘成交量——當日多空方向的早鳥指標</div>
+      <div class="tip-subtitle">9:00–9:15 的量能決定全天基調</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- timeline -->
+      <line x1="40" y1="130" x2="430" y2="130" stroke="#30363d" stroke-width="1.5"/>
+      <text x="40" y="145" fill="#8b949e" font-size="8.5" text-anchor="middle">9:00</text>
+      <text x="130" y="145" fill="#f59e0b" font-size="8.5" text-anchor="middle">9:15</text>
+      <text x="270" y="145" fill="#8b949e" font-size="8.5" text-anchor="middle">12:00</text>
+      <text x="430" y="145" fill="#8b949e" font-size="8.5" text-anchor="middle">13:30</text>
+      <!-- first 15 min highlight -->
+      <rect x="40" y="100" width="90" height="30" fill="rgba(245,158,11,.08)" rx="4"/>
+      <text x="85" y="88" fill="#f59e0b" font-size="9" text-anchor="middle" font-weight="700">關鍵視窗</text>
+      <!-- volume bars early -->
+      <rect x="50" y="72" width="12" height="58" fill="#22c55e" opacity=".9" rx="1"/>
+      <rect x="66" y="80" width="12" height="50" fill="#22c55e" opacity=".85" rx="1"/>
+      <rect x="82" y="90" width="12" height="40" fill="#22c55e" opacity=".8" rx="1"/>
+      <rect x="98" y="95" width="12" height="35" fill="#22c55e" opacity=".7" rx="1"/>
+      <!-- rest of day smaller -->
+      <rect x="140" y="110" width="10" height="20" fill="#30363d" opacity=".8" rx="1"/>
+      <rect x="155" y="108" width="10" height="22" fill="#30363d" opacity=".8" rx="1"/>
+      <rect x="170" y="112" width="10" height="18" fill="#30363d" opacity=".8" rx="1"/>
+      <rect x="185" y="109" width="10" height="21" fill="#30363d" opacity=".8" rx="1"/>
+      <rect x="200" y="111" width="10" height="19" fill="#30363d" opacity=".8" rx="1"/>
+      <rect x="215" y="107" width="10" height="23" fill="#30363d" opacity=".8" rx="1"/>
+      <!-- annotation -->
+      <text x="310" y="40" fill="#22c55e" font-size="9">前15分鐘量 ≥ 昨日全日10%</text>
+      <text x="310" y="56" fill="#22c55e" font-size="9">→ 當日為強勢多頭格局</text>
+      <text x="310" y="80" fill="#ef4444" font-size="9">前15分鐘量 &lt; 昨日全日5%</text>
+      <text x="310" y="96" fill="#ef4444" font-size="9">→ 量能不足，觀望為主</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="gold-box">
+      <h4>為什麼前15分鐘最重要</h4>
+      <p>台股 9:00 開盤後前 15 分鐘，是<strong>隔夜訂單、法人盤前規劃、外資根據美股走勢的調整</strong>同步釋放的時間。這段時間的量能高度，直接反映當日主力是否積極操作。</p>
+    </div>
+    <div class="signal-box">
+      <h4>實戰訊號判讀</h4>
+      <ul>
+        <li>前15分鐘量 ≥ 昨日全日量 <strong>10%</strong>：當日為強勢格局，追多訊號</li>
+        <li>前15分鐘量 ≥ 昨日全日量 <strong>15%</strong>：主力極度積極，可能有消息面</li>
+        <li>前15分鐘量 &lt; 昨日全日量 <strong>5%</strong>：市場觀望，不適合交易</li>
+        <li>9:00–9:05 若出現<strong>跌停板大量</strong>：主力在砍，不要接刀</li>
+      </ul>
+    </div>
+    <div class="blue-box">
+      <h4>搭配使用方法</h4>
+      <p>開盤後只看第一根 5 分 K 的量和方向。量大收紅 → 往多方規劃。量大收黑 → 往空方規劃。量小 → 不做當日交易。這一個習慣能過濾掉 60% 的雜訊交易。</p>
+    </div>
+  </div>
+</div>
+
+<!-- CHIP 19 -->
+<div class="tip-card cat-chip" data-cat="chip">
+  <div class="tip-header">
+    <div class="tip-num">19</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">籌碼追蹤</span>
+      <div class="tip-title">散戶集中度過高——地雷股的預警訊號</div>
+      <div class="tip-subtitle">散戶持股超過80%的股票，主力隨時可以殺</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- safe stock pie -->
+      <text x="115" y="22" fill="#8b949e" font-size="9" text-anchor="middle">安全股</text>
+      <circle cx="115" cy="85" r="58" fill="none" stroke="#30363d" stroke-width="1"/>
+      <path d="M115,85 L115,27 A58,58 0 0,1 165,112 Z" fill="#22c55e" opacity=".7"/>
+      <path d="M115,85 L165,112 A58,58 0 0,1 65,112 Z" fill="#58a6ff" opacity=".7"/>
+      <path d="M115,85 L65,112 A58,58 0 0,1 115,27 Z" fill="#30363d" opacity=".9"/>
+      <text x="135" y="65" fill="#22c55e" font-size="8">外資 30%</text>
+      <text x="115" y="128" fill="#58a6ff" font-size="8" text-anchor="middle">投信 20%</text>
+      <text x="78" y="65" fill="#8b949e" font-size="8">散戶 50%</text>
+      <!-- danger stock pie -->
+      <text x="340" y="22" fill="#ef4444" font-size="9" text-anchor="middle">地雷股</text>
+      <circle cx="340" cy="85" r="58" fill="none" stroke="#ef4444" stroke-width="1"/>
+      <path d="M340,85 L340,27 A58,58 0 1,1 339.9,27 Z" fill="#ef4444" opacity=".6"/>
+      <path d="M340,85 L386,112 A58,58 0 0,1 340,143 Z" fill="#22c55e" opacity=".4"/>
+      <text x="340" y="78" fill="#ef4444" font-size="8.5" text-anchor="middle" font-weight="700">散戶 85%</text>
+      <text x="358" y="130" fill="#22c55e" font-size="7.5">法人 15%</text>
+      <text x="340" y="155" fill="#ef4444" font-size="8" text-anchor="middle">← 危險！隨時可倒貨</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="signal-box">
+      <h4>為何散戶集中是地雷</h4>
+      <p>主力（法人）的成本通常遠低於現價。當散戶持股比例過高，代表主力<strong>已成功出貨給散戶</strong>，後續無人接手。一旦主力決定壓低出清剩餘部位，散戶毫無抵抗力。</p>
+    </div>
+    <div class="gold-box">
+      <h4>實戰篩選標準</h4>
+      <ul>
+        <li>查券商分點資料：前十大分點若全為散戶分點（永豐、富邦中南部分點），高度警戒</li>
+        <li>外資持股 &lt; 5%、投信持股 &lt; 1%、董監持股穩定：這類股票風險最高</li>
+        <li><strong>股東人數持續增加而股價下跌</strong>：散戶在攤平，主力在出貨——這是最危險的訊號</li>
+        <li>反向操作：找外資 + 投信雙買超的股票，跟法人而非散戶</li>
+      </ul>
+    </div>
+    <div class="formula-box">安全標準：外資持股 ≥ 15% 且投信持續買超</div>
+  </div>
+</div>
+
+<!-- CHIP 20 -->
+<div class="tip-card cat-chip" data-cat="chip">
+  <div class="tip-header">
+    <div class="tip-num">20</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">籌碼追蹤</span>
+      <div class="tip-title">庫藏股宣布後的最佳買進窗口</div>
+      <div class="tip-subtitle">不是宣布當天買，而是執行第一天才是訊號</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- price timeline -->
+      <polyline points="40,110 100,108 140,90 180,85 220,88 260,75 320,72 380,65 420,60" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <!-- announcement marker -->
+      <line x1="140" y1="20" x2="140" y2="145" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="140" y="16" fill="#f59e0b" font-size="8.5" text-anchor="middle">宣布日</text>
+      <!-- spike and dip -->
+      <polyline points="140,90 148,65 158,82 180,85" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <text x="152" y="56" fill="#22c55e" font-size="8" text-anchor="middle">急漲</text>
+      <!-- buyback execution start -->
+      <line x1="220" y1="20" x2="220" y2="145" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="220" y="16" fill="#58a6ff" font-size="8" text-anchor="middle">執行日</text>
+      <!-- buy zone -->
+      <rect x="220" y="75" width="60" height="20" fill="rgba(34,197,94,.12)" rx="3"/>
+      <text x="250" y="86" fill="#22c55e" font-size="8" text-anchor="middle">最佳買區</text>
+      <!-- annotations -->
+      <text x="55" y="145" fill="#8b949e" font-size="8">宣布前</text>
+      <text x="155" y="145" fill="#f59e0b" font-size="8">消化期</text>
+      <text x="255" y="145" fill="#22c55e" font-size="8">持續拉抬</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="gold-box">
+      <h4>資深的庫藏股操作邏輯</h4>
+      <p>公司宣布買庫藏股當天通常急漲，但主力不在此時追。聰明錢等的是：宣布後<strong>市場情緒冷卻、股價小幅回測</strong>，公司開始實際執行買回時的第一天——那才是有公司背書的買盤訊號。</p>
+    </div>
+    <div class="signal-box">
+      <h4>關鍵注意事項</h4>
+      <ul>
+        <li>查庫藏股<strong>執行進度</strong>：若公司宣布買10億但只買了500萬，代表意願不強</li>
+        <li>執行區間越接近結束，公司買盤即將消失，股價支撐減弱</li>
+        <li>最危險訊號：<strong>庫藏股執行完畢後股價反而下跌</strong>，代表市場對公司沒信心</li>
+        <li>最佳訊號：庫藏股執行期間 + 外資同步買超 = 雙重支撐</li>
+      </ul>
+    </div>
+    <div class="formula-box">最佳買點 = 執行期開始後 3 日內 + 股價仍在宣布日收盤價以下</div>
+  </div>
+</div>
+
+<!-- CHIP 21 -->
+<div class="tip-card cat-chip" data-cat="chip">
+  <div class="tip-header">
+    <div class="tip-num">21</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">籌碼追蹤</span>
+      <div class="tip-title">週線「下跌縮量」——主力悄悄吃貨的暗語</div>
+      <div class="tip-subtitle">真正的低點，不會讓散戶感受到機會</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- weekly candles declining with shrinking volume -->
+      <rect x="40" y="40" width="24" height="60" fill="#ef4444" rx="2"/><line x1="52" y1="32" x2="52" y2="40" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="80" y="52" width="24" height="55" fill="#ef4444" rx="2"/><line x1="92" y1="46" x2="92" y2="52" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="120" y="62" width="24" height="50" fill="#ef4444" rx="2"/><line x1="132" y1="56" x2="132" y2="62" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="160" y="70" width="24" height="46" fill="#ef4444" rx="2" opacity=".8"/>
+      <rect x="200" y="76" width="24" height="40" fill="#ef4444" rx="2" opacity=".6"/>
+      <rect x="240" y="80" width="24" height="36" fill="#ef4444" rx="2" opacity=".4"/>
+      <!-- breakout candle -->
+      <rect x="285" y="55" width="24" height="60" fill="#22c55e" rx="2"/>
+      <line x1="297" y1="42" x2="297" y2="55" stroke="#22c55e" stroke-width="2"/>
+      <text x="297" y="36" fill="#22c55e" font-size="8.5" text-anchor="middle" font-weight="700">爆發</text>
+      <!-- volume bars -->
+      <text x="22" y="158" fill="#8b949e" font-size="8">週量</text>
+      <rect x="40" y="130" width="24" height="26" fill="#ef4444" opacity=".7" rx="1"/>
+      <rect x="80" y="135" width="24" height="21" fill="#ef4444" opacity=".65" rx="1"/>
+      <rect x="120" y="139" width="24" height="17" fill="#ef4444" opacity=".55" rx="1"/>
+      <rect x="160" y="143" width="24" height="13" fill="#ef4444" opacity=".45" rx="1"/>
+      <rect x="200" y="146" width="24" height="10" fill="#ef4444" opacity=".35" rx="1"/>
+      <rect x="240" y="148" width="24" height="8" fill="#ef4444" opacity=".25" rx="1"/>
+      <rect x="280" y="112" width="30" height="44" fill="#22c55e" opacity=".85" rx="1"/>
+      <text x="295" y="108" fill="#22c55e" font-size="7.5" text-anchor="middle">↑大量</text>
+      <!-- text annotation -->
+      <text x="370" y="60" fill="#8b949e" font-size="8.5">價跌量縮</text>
+      <text x="370" y="76" fill="#f59e0b" font-size="8.5">= 主力惜售</text>
+      <text x="370" y="96" fill="#8b949e" font-size="8.5">散戶恐慌賣出</text>
+      <text x="370" y="112" fill="#22c55e" font-size="8.5">= 主力低接</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="blue-box">
+      <h4>週線縮量下跌的邏輯</h4>
+      <p>當股價每週持續下跌，但成交量一週比一週萎縮，代表<strong>願意賣股票的人越來越少</strong>。能在此時維持價格不崩的關鍵是主力持續買入——賣壓被吸收了，只是沒有放量拉抬。</p>
+    </div>
+    <div class="gold-box">
+      <h4>確認主力吃貨的追蹤方式</h4>
+      <ul>
+        <li>看<strong>單一券商分點</strong>：若某家分點（如元大台北/永豐新竹）連續數週買超，且外部無法解釋，即為主力建倉</li>
+        <li>股東人數<strong>持續減少</strong>但股價跌幅收斂：籌碼集中化，主力在收</li>
+        <li>融資餘額同步下降：散戶不敢追買，籌碼無壓力</li>
+        <li>等待<strong>週線收紅爆大量</strong>才進場，不猜底部</li>
+      </ul>
+    </div>
+    <div class="formula-box">觀察條件：連續 4 週以上「每週量比前週縮 10%+」且價格跌幅收斂</div>
+  </div>
+</div>
+
+<!-- TIMING 22 -->
+<div class="tip-card cat-timing" data-cat="timing">
+  <div class="tip-header">
+    <div class="tip-num">22</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">進出時機</span>
+      <div class="tip-title">季報出爐前後的「財報行情」完整節奏</div>
+      <div class="tip-subtitle">買預期，賣確認——季報三階段操作法</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- price curve -->
+      <polyline points="30,120 80,115 130,90 170,68 200,55 230,62 260,80 300,85 340,78 400,72" fill="none" stroke="#58a6ff" stroke-width="2"/>
+      <!-- phase markers -->
+      <line x1="130" y1="18" x2="130" y2="145" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="230" y1="18" x2="230" y2="145" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="300" y1="18" x2="300" y2="145" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>
+      <!-- labels -->
+      <text x="80" y="14" fill="#22c55e" font-size="8.5" text-anchor="middle">法說前吃貨期</text>
+      <text x="80" y="24" fill="#8b949e" font-size="7.5" text-anchor="middle">法人悄悄建倉</text>
+      <text x="180" y="14" fill="#f59e0b" font-size="8.5" text-anchor="middle">預期拉抬期</text>
+      <text x="180" y="24" fill="#8b949e" font-size="7.5" text-anchor="middle">散戶追買</text>
+      <text x="258" y="14" fill="#ef4444" font-size="8.5" text-anchor="middle">財報日</text>
+      <text x="350" y="14" fill="#8b949e" font-size="8.5" text-anchor="middle">消化期</text>
+      <!-- sell zone -->
+      <rect x="215" y="48" width="50" height="30" fill="rgba(239,68,68,.12)" rx="3"/>
+      <text x="240" y="62" fill="#ef4444" font-size="8" text-anchor="middle">出場區</text>
+      <text x="240" y="72" fill="#ef4444" font-size="7" text-anchor="middle">財報前1-2天</text>
+      <!-- buy zone -->
+      <rect x="30" y="108" width="90" height="20" fill="rgba(34,197,94,.1)" rx="3"/>
+      <text x="75" y="121" fill="#22c55e" font-size="8" text-anchor="middle">建倉區</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="gold-box">
+      <h4>三階段節奏</h4>
+      <ul>
+        <li><strong>第一階段（法說前 30-60 天）</strong>：法人根據通路調查提前吃貨，股價溫和上漲但新聞面平靜</li>
+        <li><strong>第二階段（法說前 1-2 週）</strong>：消息外洩，券商報告密集出現，散戶追買，漲速加快</li>
+        <li><strong>財報公佈日</strong>：即使財報超預期，當日容易反高殺低——「利多出盡」</li>
+      </ul>
+    </div>
+    <div class="signal-box">
+      <h4>老手操作法則</h4>
+      <ul>
+        <li>聰明錢<strong>在法說前 30 天進場，財報前 2 天出清</strong>，完全不參與財報當天</li>
+        <li>判斷法說前有無法人吃貨：看外資連買天數是否在財報前加速</li>
+        <li>財報後若股價跌而外資仍在買：下一季再佈局的好時機</li>
+      </ul>
+    </div>
+    <div class="formula-box">最佳進場 = 法說日 - 30 天；最佳出場 = 法說日 - 2 天</div>
+  </div>
+</div>
+
+<!-- TIMING 23 -->
+<div class="tip-card cat-timing" data-cat="timing">
+  <div class="tip-header">
+    <div class="tip-num">23</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">進出時機</span>
+      <div class="tip-title">融券強制回補前的軋空機會</div>
+      <div class="tip-subtitle">被迫買回的籌碼，是最確定的漲勢燃料</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- calendar -->
+      <rect x="30" y="20" width="60" height="50" rx="6" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+      <text x="60" y="36" fill="#8b949e" font-size="8" text-anchor="middle">除權息日</text>
+      <text x="60" y="52" fill="#e6edf3" font-size="14" text-anchor="middle" font-weight="700">D</text>
+      <text x="60" y="64" fill="#8b949e" font-size="7.5" text-anchor="middle">基準日</text>
+      <!-- arrow -->
+      <text x="108" y="47" fill="#f59e0b" font-size="12">→</text>
+      <!-- mandatory cover window -->
+      <rect x="130" y="20" width="80" height="50" rx="6" fill="rgba(239,68,68,.1)" stroke="#ef4444" stroke-width="1"/>
+      <text x="170" y="36" fill="#ef4444" font-size="8" text-anchor="middle">強制回補</text>
+      <text x="170" y="50" fill="#ef4444" font-size="8" text-anchor="middle">窗口</text>
+      <text x="170" y="64" fill="#ef4444" font-size="7.5" text-anchor="middle">D-6 至 D-1</text>
+      <!-- price chart -->
+      <polyline points="240,130 270,125 290,112 310,90 330,72 350,68 370,76 390,80" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <text x="240" y="145" fill="#8b949e" font-size="8">D-8</text>
+      <text x="330" y="145" fill="#ef4444" font-size="8">D-3</text>
+      <text x="380" y="145" fill="#8b949e" font-size="8">D</text>
+      <rect x="288" y="65" width="66" height="70" fill="rgba(34,197,94,.06)" rx="3"/>
+      <text x="321" y="62" fill="#22c55e" font-size="8" text-anchor="middle">軋空漲勢</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="blue-box">
+      <h4>融券強制回補機制</h4>
+      <p>台股規定：股票除權息前，所有融券必須在「最後回補日」（通常為除權息日前 6 個交易日）前強制買回。<strong>賣空的人被迫買進</strong>，形成機械性買盤，股價往往在此區間上漲。</p>
+    </div>
+    <div class="signal-box">
+      <h4>操作前必查的條件</h4>
+      <ul>
+        <li><strong>融券餘額占流通股數 ≥ 3%</strong>：軋空力道才夠強</li>
+        <li>融券餘額越高（如10%以上），軋空力道越猛烈</li>
+        <li>進場時機：最後回補日前 <strong>7-8 個交易日</strong>進場，避免太晚追高</li>
+        <li>除權息後<strong>立即出清</strong>，不要戀棧——軋空行情結束即是賣點</li>
+      </ul>
+    </div>
+    <div class="formula-box">融券回補力道 = 融券餘額（張）÷ 日均量 × 100%（越高越強）</div>
+  </div>
+</div>
+
+<!-- TIMING 24 -->
+<div class="tip-card cat-timing" data-cat="timing">
+  <div class="tip-header">
+    <div class="tip-num">24</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">進出時機</span>
+      <div class="tip-title">尾盤最後 15 分鐘效應——法人真實立場的顯現</div>
+      <div class="tip-subtitle">1:15 之後的方向，比任何盤中指標都準</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- intraday price -->
+      <polyline points="30,80 80,75 130,85 180,90 220,82 260,88 290,84 320,80 345,74 380,65 420,60" fill="none" stroke="#58a6ff" stroke-width="2"/>
+      <!-- 1:15 marker -->
+      <line x1="345" y1="15" x2="345" y2="145" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="345" y="11" fill="#f59e0b" font-size="8.5" text-anchor="middle">1:15</text>
+      <!-- highlight last zone -->
+      <rect x="345" y="55" width="80" height="90" fill="rgba(245,158,11,.07)" rx="3"/>
+      <text x="385" y="50" fill="#f59e0b" font-size="8.5" text-anchor="middle">關鍵15分鐘</text>
+      <!-- time labels -->
+      <text x="30" y="155" fill="#8b949e" font-size="8">9:00</text>
+      <text x="185" y="155" fill="#8b949e" font-size="8">11:00</text>
+      <text x="295" y="155" fill="#8b949e" font-size="8">13:00</text>
+      <text x="415" y="155" fill="#8b949e" font-size="8">13:30</text>
+      <!-- up signal -->
+      <polyline points="345,74 380,65 420,60" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+      <text x="390" y="55" fill="#22c55e" font-size="8">尾盤急拉</text>
+      <text x="390" y="66" fill="#22c55e" font-size="7.5">= 法人護盤</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="gold-box">
+      <h4>為什麼尾盤最誠實</h4>
+      <p>法人的績效以<strong>收盤價</strong>計算，因此在 1:15 後，法人必須根據實際持倉意願決定是否「護盤」或「出清」。這 15 分鐘的量能和方向，是當日法人真實立場的顯現，無法假裝。</p>
+    </div>
+    <div class="signal-box">
+      <h4>尾盤四種型態解讀</h4>
+      <ul>
+        <li><strong>尾盤急拉 + 量放大</strong>：法人在收盤前拉高，隔日多方格局</li>
+        <li><strong>尾盤急殺 + 量放大</strong>：法人出清，隔日開低機率高</li>
+        <li><strong>尾盤緩漲 + 量縮</strong>：自然買盤收尾，中性偏多</li>
+        <li><strong>尾盤緩跌 + 量縮</strong>：觀望，隔日開盤看美股定方向</li>
+      </ul>
+    </div>
+    <div class="blue-box">
+      <h4>實戰應用</h4>
+      <p>每天 1:20 後觀察大盤（加權指數）的量能方向。若連續三日尾盤都放量上漲，隔日開盤可以偏多操作。此法在月底（法人作帳期）最為準確。</p>
+    </div>
+  </div>
+</div>
+
+<!-- CROSS 25 -->
+<div class="tip-card cat-cross" data-cat="cross">
+  <div class="tip-header">
+    <div class="tip-num">25</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">跨市場訊號</span>
+      <div class="tip-title">台積電 ADR 夜盤——隔日開盤的最強預測指標</div>
+      <div class="tip-subtitle">ADR 漲跌幅幾乎直接反映台積電次日開盤缺口</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- US night -->
+      <rect x="20" y="18" width="180" height="90" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+      <text x="110" y="36" fill="#8b949e" font-size="9" text-anchor="middle">美股夜盤 (TSM ADR)</text>
+      <text x="110" y="52" fill="#8b949e" font-size="8" text-anchor="middle">台灣時間 21:30–04:00</text>
+      <polyline points="35,90 60,80 90,65 130,58 165,52 190,48" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+      <text x="130" y="108" fill="#22c55e" font-size="10" text-anchor="middle" font-weight="700">ADR +3%</text>
+      <!-- arrow -->
+      <text x="218" y="70" fill="#f59e0b" font-size="18">→</text>
+      <!-- Taiwan morning -->
+      <rect x="250" y="18" width="190" height="90" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+      <text x="345" y="36" fill="#8b949e" font-size="9" text-anchor="middle">台積電隔日開盤</text>
+      <text x="345" y="52" fill="#8b949e" font-size="8" text-anchor="middle">台灣時間 09:00</text>
+      <polyline points="265,85 290,68 340,62 375,55" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+      <text x="345" y="108" fill="#22c55e" font-size="10" text-anchor="middle" font-weight="700">開盤 +2~3%</text>
+      <!-- correlation note -->
+      <text x="230" y="135" fill="#f59e0b" font-size="8.5" text-anchor="middle">相關係數 ≈ 0.87</text>
+      <text x="230" y="148" fill="#8b949e" font-size="8" text-anchor="middle">市值超過 30%，帶動大盤同向</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="blue-box">
+      <h4>ADR 與現股的連動機制</h4>
+      <p>台積電 ADR（美股代碼：TSM）在美國交易時間代表外資對台積電的即時定價。由於套利機制，<strong>ADR 的漲跌幾乎直接決定隔日台積電現股開盤缺口</strong>，誤差通常在 0.5% 以內。</p>
+    </div>
+    <div class="gold-box">
+      <h4>實戰應用（每日必看）</h4>
+      <ul>
+        <li>台灣時間早上 <strong>8:30</strong> 查看 TSM ADR 收盤價，與前一日台積電收盤價換算漲跌幅</li>
+        <li>ADR &gt; +2%：台積電開盤強，帶動電子類股正向</li>
+        <li>ADR &lt; -2%：台積電開低，大盤有壓，避免早盤追多</li>
+        <li>台積電占加權指數約 30%，ADR 訊號等於預告大盤開盤方向</li>
+      </ul>
+    </div>
+    <div class="formula-box">ADR 隱含開盤價 = 台積電昨收 × (1 + ADR 漲跌幅)</div>
+  </div>
+</div>
+
+<!-- CROSS 26 -->
+<div class="tip-card cat-cross" data-cat="cross">
+  <div class="tip-header">
+    <div class="tip-num">26</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">跨市場訊號</span>
+      <div class="tip-title">費城半導體指數（SOX）的 24 小時傳導</div>
+      <div class="tip-subtitle">SOX 昨夜漲跌，今日台灣科技股跟著走</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- SOX line -->
+      <text x="50" y="16" fill="#8b5cf6" font-size="9">美股 SOX 指數</text>
+      <polyline points="20,100 60,85 100,70 140,55 180,50 220,55" fill="none" stroke="#8b5cf6" stroke-width="2.5"/>
+      <!-- TWSE tech line -->
+      <text x="50" y="148" fill="#58a6ff" font-size="9">台股科技類股（隔日）</text>
+      <polyline points="20,140 60,128 100,115 140,100 180,95 220,100" fill="none" stroke="#58a6ff" stroke-width="2" stroke-dasharray="5,3"/>
+      <!-- correlation arrows -->
+      <line x1="120" y1="62" x2="120" y2="108" stroke="#30363d" stroke-width="1" stroke-dasharray="2,2"/>
+      <text x="128" y="88" fill="#f59e0b" font-size="8">~8hrs</text>
+      <!-- correlation label -->
+      <text x="300" y="60" fill="#8b5cf6" font-size="9">SOX 組成：</text>
+      <text x="300" y="75" fill="#8b949e" font-size="8">NVDA 輝達</text>
+      <text x="300" y="89" fill="#8b949e" font-size="8">AVGO 博通</text>
+      <text x="300" y="103" fill="#8b949e" font-size="8">QCOM 高通</text>
+      <text x="300" y="117" fill="#f59e0b" font-size="8">→ 台廠同類供應商</text>
+      <text x="300" y="131" fill="#f59e0b" font-size="8">  跟漲跟跌</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="purple-box">
+      <h4>SOX 傳導邏輯</h4>
+      <p>費城半導體指數（SOX）包含全球最大的半導體設計公司，而台灣的 IC 設計、晶圓代工、封測廠是這些公司的<strong>核心供應鏈</strong>。美股 SOX 的漲跌，通常在 8 小時後傳導至台灣同類股。</p>
+    </div>
+    <div class="gold-box">
+      <h4>每日必看的 SOX 應用</h4>
+      <ul>
+        <li>SOX 單日 &gt; +3%：聯發科、日月光、矽力-KY 等隔日強勢機率 &gt;75%</li>
+        <li>SOX 單日 &lt; -3%：台灣半導體族群開盤承壓，當日不追多</li>
+        <li>SOX 連跌 3 日且台灣科技股未跌：注意補跌風險</li>
+        <li><strong>SOX 創新高但台灣股未跟上</strong>：台廠有落後補漲空間</li>
+      </ul>
+    </div>
+    <div class="formula-box">關注台灣供應鏈族群：封測 / IC 設計 / 載板 / 被動元件</div>
+  </div>
+</div>
+
+<!-- CROSS 27 -->
+<div class="tip-card cat-cross" data-cat="cross">
+  <div class="tip-header">
+    <div class="tip-num">27</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">跨市場訊號</span>
+      <div class="tip-title">外資期貨未平倉量——現貨最強方向指標</div>
+      <div class="tip-subtitle">外資在期貨市場的暗語，往往比現貨早1-2天</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- futures OI chart -->
+      <text x="150" y="14" fill="#8b949e" font-size="9" text-anchor="middle">外資期貨未平倉（多-空）</text>
+      <!-- zero line -->
+      <line x1="20" y1="85" x2="290" y2="85" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="12" y="88" fill="#8b949e" font-size="7.5">0</text>
+      <!-- OI bars -->
+      <rect x="30" y="45" width="18" height="40" fill="#22c55e" opacity=".7" rx="1"/>
+      <rect x="56" y="35" width="18" height="50" fill="#22c55e" opacity=".75" rx="1"/>
+      <rect x="82" y="28" width="18" height="57" fill="#22c55e" opacity=".8" rx="1"/>
+      <rect x="108" y="30" width="18" height="55" fill="#22c55e" opacity=".75" rx="1"/>
+      <rect x="134" y="55" width="18" height="30" fill="#22c55e" opacity=".6" rx="1"/>
+      <rect x="160" y="85" width="18" height="25" fill="#ef4444" opacity=".6" rx="1"/>
+      <rect x="186" y="85" width="18" height="42" fill="#ef4444" opacity=".7" rx="1"/>
+      <rect x="212" y="85" width="18" height="55" fill="#ef4444" opacity=".75" rx="1"/>
+      <!-- spot price line -->
+      <text x="150" y="155" fill="#58a6ff" font-size="8" text-anchor="middle">→ 現貨指數（滯後）</text>
+      <polyline points="30,120 60,115 90,108 120,100 152,96 180,100 210,108 240,118 270,128" fill="none" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <!-- arrow annotation -->
+      <text x="350" y="40" fill="#22c55e" font-size="9">外資期貨多單</text>
+      <text x="350" y="54" fill="#22c55e" font-size="9">淨部位增加</text>
+      <text x="350" y="70" fill="#22c55e" font-size="9">→ 現貨 1-2 日後漲</text>
+      <text x="350" y="96" fill="#ef4444" font-size="9">外資期貨空單</text>
+      <text x="350" y="110" fill="#ef4444" font-size="9">淨部位增加</text>
+      <text x="350" y="126" fill="#ef4444" font-size="9">→ 現貨 1-2 日後跌</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="purple-box">
+      <h4>期貨未平倉的領先性</h4>
+      <p>外資在台指期的<strong>多空淨部位</strong>（多單-空單），反映外資對台股接下來 1-2 週的看法。由於期貨交易具有槓桿，外資不會輕易在期貨市場建立大部位——一旦建立，通常有明確方向預期。</p>
+    </div>
+    <div class="gold-box">
+      <h4>每日必看的解讀方式</h4>
+      <ul>
+        <li>台灣期交所每日下午 3:30 公布「三大法人未平倉」，外資多空淨口數是核心</li>
+        <li>外資淨多單 &gt; <strong>2 萬口</strong>：強多格局，現貨跟漲機率 &gt;80%</li>
+        <li>外資淨空單 &gt; <strong>2 萬口</strong>：強空格局，現貨跌機率 &gt;75%</li>
+        <li><strong>期現貨背離</strong>：外資期貨多單增加但現貨指數跌 → 逢低買入機會</li>
+      </ul>
+    </div>
+    <div class="formula-box">外資淨部位 = 外資多單未平倉 − 外資空單未平倉（單位：口）</div>
+  </div>
+</div>
+
+<!-- PSYCH 28 -->
+<div class="tip-card cat-psych" data-cat="psych">
+  <div class="tip-header">
+    <div class="tip-num">28</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">市場心理</span>
+      <div class="tip-title">「踏空恐懼」是最貴的情緒——反向利用它</div>
+      <div class="tip-subtitle">FOMO 製造的追高，就是聰明錢的出貨機會</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- emotion curve -->
+      <path d="M20,120 C80,118 120,90 160,60 C200,35 220,30 250,38 C280,46 300,80 340,110 C360,124 390,128 430,125" fill="none" stroke="#ec4899" stroke-width="2.5"/>
+      <!-- annotations -->
+      <text x="80" y="108" fill="#8b949e" font-size="8.5">散戶情緒</text>
+      <text x="170" y="24" fill="#ef4444" font-size="9" text-anchor="middle">「我要追！」</text>
+      <text x="170" y="36" fill="#ef4444" font-size="8" text-anchor="middle">FOMO 高峰</text>
+      <line x1="170" y1="38" x2="200" y2="46" stroke="#ef4444" stroke-width="1"/>
+      <!-- smart money zone -->
+      <text x="200" y="16" fill="#f59e0b" font-size="9" text-anchor="middle">↑ 聰明錢出貨</text>
+      <!-- retail buy zone -->
+      <rect x="140" y="25" width="120" height="20" fill="rgba(239,68,68,.1)" rx="3"/>
+      <text x="200" y="34" fill="#ef4444" font-size="7.5" text-anchor="middle">散戶追高區</text>
+      <!-- opportunity zone -->
+      <rect x="310" y="95" width="110" height="28" fill="rgba(34,197,94,.1)" rx="3"/>
+      <text x="365" y="106" fill="#22c55e" font-size="8" text-anchor="middle">踏空者絕望</text>
+      <text x="365" y="118" fill="#22c55e" font-size="8" text-anchor="middle">= 下一波進場點</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="signal-box">
+      <h4>FOMO 的危險與機會</h4>
+      <p>「踏空恐懼」（Fear of Missing Out）讓散戶在股價最高點瘋狂追買，而這正是聰明錢<strong>大量出貨的最佳時機</strong>。反過來：當所有人都說「沒機會了、早知道就買」時，下一波行情通常正在準備。</p>
+    </div>
+    <div class="purple-box">
+      <h4>識別 FOMO 高峰的市場訊號</h4>
+      <ul>
+        <li>股票話題出現在 PTT 股版首頁且留言 &gt; 200 條</li>
+        <li>開戶人數、融資餘額在短期內急速增加</li>
+        <li><strong>計程車司機、親戚都在討論的股票</strong>：FOMO 到達極限</li>
+        <li>券商報告目標價競相調高，且上調幅度 &gt; 30%</li>
+      </ul>
+    </div>
+    <div class="gold-box">
+      <h4>反向操作的紀律</h4>
+      <p>當你自己也出現「好怕買不到」的念頭時，這是<strong>停手的訊號，不是追買的訊號</strong>。記住：真正的好機會永遠讓你有充裕時間思考，不會逼你立刻決定。</p>
+    </div>
+  </div>
+</div>
+
+<!-- PSYCH 29 -->
+<div class="tip-card cat-psych" data-cat="psych">
+  <div class="tip-header">
+    <div class="tip-num">29</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">市場心理</span>
+      <div class="tip-title">法人報告集體升評——最可靠的落後指標</div>
+      <div class="tip-subtitle">分析師看多的時候，行情通常快到頂了</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- price line -->
+      <polyline points="20,130 60,120 100,100 140,78 180,58 220,50 260,55 300,70 340,90 400,115" fill="none" stroke="#58a6ff" stroke-width="2"/>
+      <!-- analyst reports appearing -->
+      <line x1="200" y1="15" x2="200" y2="145" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="200" y="11" fill="#f59e0b" font-size="8" text-anchor="middle">報告集中升評</text>
+      <!-- report icons -->
+      <rect x="165" y="18" width="14" height="16" rx="2" fill="#f59e0b" opacity=".7"/>
+      <rect x="184" y="22" width="14" height="16" rx="2" fill="#f59e0b" opacity=".7"/>
+      <rect x="203" y="18" width="14" height="16" rx="2" fill="#f59e0b" opacity=".7"/>
+      <text x="222" y="22" fill="#f59e0b" font-size="7.5">升評</text>
+      <text x="222" y="32" fill="#f59e0b" font-size="7.5">買進</text>
+      <!-- peak marker -->
+      <circle cx="220" cy="50" r="6" fill="none" stroke="#ef4444" stroke-width="2"/>
+      <text x="235" y="42" fill="#ef4444" font-size="8.5">高點在此</text>
+      <!-- down arrow after -->
+      <polyline points="260,55 300,70 340,90 400,115" fill="none" stroke="#ef4444" stroke-width="2"/>
+      <text x="340" y="140" fill="#ef4444" font-size="8.5">升評後下跌</text>
+      <!-- lead lag annotation -->
+      <text x="30" y="155" fill="#8b949e" font-size="8">→ 分析師通常「發現」得比主力晚 1-2 個月</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="signal-box">
+      <h4>為什麼升評是落後指標</h4>
+      <p>分析師的工作是<strong>事後解釋已發生的事</strong>，而非預測未來。當一個股票基本面真的很好，主力早在 3-6 個月前就已進場。等到報告集中升評，代表消息已完全公開，<strong>主力正在等散戶接手</strong>。</p>
+    </div>
+    <div class="gold-box">
+      <h4>升評後的標準走勢統計</h4>
+      <table class="case-table">
+        <tr><th>升評情境</th><th>升評後1個月</th><th>升評後3個月</th></tr>
+        <tr><td>單家升評</td><td class="val-up">+3~5%</td><td>中性</td></tr>
+        <tr><td>3家以上同週升評</td><td class="val-down">-2~8%</td><td class="val-down">跌多漲少</td></tr>
+        <tr><td>升評 + 目標價大幅調高</td><td class="val-down">-5%+ 機率高</td><td class="val-down">需謹慎</td></tr>
+      </table>
+    </div>
+    <div class="blue-box">
+      <h4>正確使用法人報告</h4>
+      <p>用法人報告了解<strong>產業趨勢和基本面</strong>，不要用來決定買賣時機。報告是地圖，不是 GPS；它告訴你方向，但不告訴你現在是否是好時機。</p>
+    </div>
+  </div>
+</div>
+
+<!-- PSYCH 30 -->
+<div class="tip-card cat-psych" data-cat="psych">
+  <div class="tip-header">
+    <div class="tip-num">30</div>
+    <div class="tip-meta">
+      <span class="tip-cat-tag">市場心理</span>
+      <div class="tip-title">下跌途中的「希望反彈」——最危險的操作情緒</div>
+      <div class="tip-subtitle">每次小漲都讓你以為底部到了，但其實只是誘多</div>
+    </div>
+  </div>
+  <div class="tip-diagram">
+    <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg">
+      <rect width="460" height="165" fill="#0d1117"/>
+      <!-- downtrend with bounces -->
+      <polyline points="30,30 60,40 75,32 90,50 110,60 130,48 150,70 175,82 190,70 215,90 240,105 260,92 280,115 305,128 325,115 345,138 380,148 420,155" fill="none" stroke="#ef4444" stroke-width="2"/>
+      <!-- bounce labels -->
+      <text x="75" y="26" fill="#22c55e" font-size="7.5" text-anchor="middle">「到底了！」</text>
+      <text x="130" y="42" fill="#22c55e" font-size="7.5" text-anchor="middle">「底了！」</text>
+      <text x="190" y="64" fill="#22c55e" font-size="7.5" text-anchor="middle">「這次真的底了」</text>
+      <text x="260" y="86" fill="#22c55e" font-size="7.5" text-anchor="middle">「再攤平」</text>
+      <text x="325" y="109" fill="#ef4444" font-size="7.5" text-anchor="middle">「撐不住了」</text>
+      <!-- real bottom indicator -->
+      <circle cx="380" cy="148" r="7" fill="none" stroke="#f59e0b" stroke-width="2"/>
+      <text x="400" y="148" fill="#f59e0b" font-size="8">真底？</text>
+      <text x="400" y="160" fill="#8b949e" font-size="7.5">仍需量能確認</text>
+    </svg>
+  </div>
+  <div class="tip-content">
+    <div class="signal-box">
+      <h4>「希望反彈」的心理機制</h4>
+      <p>股票下跌時，每次出現小幅反彈，大腦就會觸發「終於到底了」的希望感——這是人類大腦的<strong>確認偏誤</strong>在作怪，讓你只接受支持自己判斷的訊號，忽略下跌趨勢未改變的事實。</p>
+    </div>
+    <div class="purple-box">
+      <h4>如何識別「死貓跳」vs「真底部」</h4>
+      <ul>
+        <li><strong>死貓跳</strong>：反彈量能 &lt; 下跌日量能、反彈幅度 &lt; 前一波跌幅的 50%、反彈後股價在下降趨勢線以下</li>
+        <li><strong>真底部</strong>：反彈量能 &gt; 近期均量 2 倍、連續 2 日收盤價站上 5 日均線、外資當日轉為買超</li>
+      </ul>
+    </div>
+    <div class="gold-box">
+      <h4>資深操作的唯一解法</h4>
+      <p>設定<strong>明確的停損點，跌破就出場，不管心裡有多少希望</strong>。每個在跌停板前抱著「會反彈」念頭的人，最後都付出比停損更大的代價。記住：市場不在乎你的成本，也不關心你的希望。</p>
+    </div>
+    <div class="formula-box">停損紀律：跌破進場價 7% → 無條件出場，情緒不得插手</div>
   </div>
 </div>
 
