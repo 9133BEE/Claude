@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0d1117"/>
+  <!-- 趨勢線 -->
+  <polyline points="60,340 160,260 250,290 340,170 440,120"
+    fill="none" stroke="rgba(59,130,246,.25)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- K棒 1：紅（漲） -->
+  <line x1="118" y1="126" x2="118" y2="182" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/>
+  <rect x="88" y="182" width="60" height="136" rx="7" fill="#dc2626"/>
+  <line x1="118" y1="318" x2="118" y2="364" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/>
+  <!-- K棒 2：綠（跌） -->
+  <line x1="256" y1="96" x2="256" y2="150" stroke="#059669" stroke-width="7" stroke-linecap="round"/>
+  <rect x="226" y="150" width="60" height="192" rx="7" fill="#059669"/>
+  <line x1="256" y1="342" x2="256" y2="392" stroke="#059669" stroke-width="7" stroke-linecap="round"/>
+  <!-- K棒 3：紅（漲） -->
+  <line x1="394" y1="136" x2="394" y2="186" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/>
+  <rect x="364" y="186" width="60" height="156" rx="7" fill="#dc2626"/>
+  <line x1="394" y1="342" x2="394" y2="388" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/>
+</svg>

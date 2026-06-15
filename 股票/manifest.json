@@ -1,0 +1,44 @@
+{
+  "name": "股學筆記",
+  "short_name": "股學筆記",
+  "description": "台灣股票、期貨學習平台 — K棒圖鑑、進階技巧、模擬考題",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "lang": "zh-TW",
+  "categories": ["education", "finance"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "K棒圖鑑",
+      "url": "./candlestick-patterns.html",
+      "description": "60+ 種K棒型態解析"
+    },
+    {
+      "name": "股票考題",
+      "url": "./stock-quiz.html",
+      "description": "100題股票模擬測驗"
+    },
+    {
+      "name": "期貨考題",
+      "url": "./futures-quiz.html",
+      "description": "100題期貨模擬測驗"
+    }
+  ]
+}

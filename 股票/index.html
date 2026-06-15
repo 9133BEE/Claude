@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>股學筆記 — 台股知識精華庫</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="股學筆記">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
 /* ── DESIGN TOKENS ──────────────────────────────────────────────────── */
 :root {
@@ -1537,6 +1544,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('resize', updateTabIndicator);
+
+// PWA Service Worker 註冊
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
