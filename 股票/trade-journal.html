@@ -61,6 +61,7 @@ input,select,textarea,button{font-family:inherit}
 .kpi.k-pnl  .kpi-accent{background:linear-gradient(90deg,var(--paper),var(--blue));width:65%}
 .kpi.k-open .kpi-accent{background:linear-gradient(90deg,var(--blue),#82b8ff);width:45%}
 .kpi-val.pos{color:var(--green)}.kpi-val.neg{color:var(--red)}.kpi-val.neu{color:var(--text3)}
+.kpi-val.bull{color:var(--red)}.kpi-val.bear{color:var(--green)}
 .kpi-val.g{color:var(--accent2)}.kpi-val.b{color:var(--blue)}
 
 .wr-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px}
@@ -72,6 +73,7 @@ input,select,textarea,button{font-family:inherit}
   padding:18px 20px}
 .sec-val{font-size:1.6rem;font-weight:800;letter-spacing:-.025em;line-height:1;color:#fff}
 .sec-val.pos{color:var(--green)}.sec-val.neg{color:var(--red)}.sec-val.pu{color:var(--paper)}
+.sec-val.bull{color:var(--red)}.sec-val.bear{color:var(--green)}
 .sec-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:5px}
 
 /* chart */
@@ -82,6 +84,8 @@ input,select,textarea,button{font-family:inherit}
 .chart-badge{font-size:.7rem;padding:3px 10px;border-radius:20px;font-weight:700}
 .chart-badge.pos{background:var(--g-bg);color:var(--green);border:1px solid var(--g-bd)}
 .chart-badge.neg{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
+.chart-badge.bull{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
+.chart-badge.bear{background:var(--g-bg);color:var(--green);border:1px solid var(--g-bd)}
 .chart-badge.neu{background:rgba(255,255,255,.05);color:var(--text3)}
 canvas{display:block;width:100%}
 
@@ -153,6 +157,7 @@ canvas{display:block;width:100%}
 .tcr{text-align:right;flex-shrink:0}
 .tc-pnl{font-size:1.4rem;font-weight:900;letter-spacing:-.025em;line-height:1;margin-bottom:5px}
 .tc-pnl.pos{color:var(--green)}.tc-pnl.neg{color:var(--red)}.tc-pnl.neu{color:var(--text3)}
+.tc-pnl.bull{color:var(--red)}.tc-pnl.bear{color:var(--green)}
 .tc-badges{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}
 .badge{font-size:.63rem;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em;white-space:nowrap}
 .bw{background:var(--g-bg);color:var(--green);border:1px solid var(--g-bd)}
@@ -173,6 +178,7 @@ canvas{display:block;width:100%}
   color:var(--text2);margin-bottom:4px;font-weight:600}
 .pf .pv{font-size:.95rem;font-weight:700;color:#fff}
 .pf .pv.pos{color:var(--green)}.pf .pv.neg{color:var(--red)}.pf .pv.acc{color:var(--accent2)}
+.pf .pv.bull{color:var(--red)}.pf .pv.bear{color:var(--green)}
 
 .tc-notes{padding:16px;border-bottom:1px solid var(--border2);display:grid;gap:12px}
 .nc-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);
@@ -303,11 +309,11 @@ canvas{display:block;width:100%}
   </div>
   <div class="sec-grid">
     <div class="sec-card">
-      <div class="sec-val pos" id="sAvgW">—</div>
+      <div class="sec-val bull" id="sAvgW">—</div>
       <div class="sec-lbl">平均獲利幅度</div>
     </div>
     <div class="sec-card">
-      <div class="sec-val neg" id="sAvgL">—</div>
+      <div class="sec-val bear" id="sAvgL">—</div>
       <div class="sec-lbl">平均虧損幅度</div>
     </div>
     <div class="sec-card">
@@ -387,7 +393,9 @@ canvas{display:block;width:100%}
       <div class="fg"><label>目標價</label><input type="number" id="fTP" placeholder="960" step="0.1"></div>
     </div>
     <hr class="fdiv">
-    <div class="fsec">進場原因（可複選）</div>
+    <div class="fsec">進場 K棒型態（可複選）</div>
+    <div class="tpk" id="ekPk"></div>
+    <div class="fsec" style="margin-top:12px">進場原因（可複選）</div>
     <div class="tpk" id="rPk"></div>
     <div class="fg" style="margin-top:12px">
       <label>進場當下想法</label>
@@ -399,7 +407,9 @@ canvas{display:block;width:100%}
       <div class="fg"><label>出場日期</label><input type="date" id="fXD"></div>
       <div class="fg"><label>出場價格</label><input type="number" id="fXP" placeholder="留空 = 持倉中" step="0.1"></div>
     </div>
-    <div class="fsec" style="margin-top:4px">犯的錯誤（可複選）</div>
+    <div class="fsec" style="margin-top:4px">出場 K棒型態（可複選）</div>
+    <div class="tpk" id="xkPk"></div>
+    <div class="fsec" style="margin-top:12px">犯的錯誤（可複選）</div>
     <div class="tpk" id="mPk"></div>
     <div class="fg" style="margin-top:12px">
       <label>收盤後檢討</label>
@@ -448,6 +458,8 @@ const app = initializeApp({
 const db = getFirestore(app);
 const COL = 'trades';
 
+const KBARS = ['錘子線','倒錘子線','射擊之星','十字線','多頭吞噬','空頭吞噬',
+               '晨星','暮星','紅三兵','黑三兵','穿頭破腳','跳空缺口','母子型態','長紅K','長黑K','其他'];
 const REASONS  = ['外資買超','投信買超','法人雙買','突破壓力','支撐反彈','缺口突破',
                   '趨勢跟隨','週線訊號','籌碼背離','融券回補','量能放大','消息面',
                   '昨日外資賣超','其他'];
@@ -455,7 +467,7 @@ const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','�
                   '情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
 
 let trades=[], editId=null, closeId=null;
-let selR=[], selM=[], cSelM=[], curTT='actual';
+let selR=[], selM=[], cSelM=[], selEK=[], selXK=[], curTT='actual';
 let curType='all', curStat='all', curDate='all';
 let customFrom='', customTo='';
 
@@ -534,7 +546,7 @@ function renderAll(){
     wrEl.style.background='linear-gradient(90deg,var(--red),var(--red2))';
   }else{document.getElementById('kWR').textContent='—';document.getElementById('kWR').className='kpi-val neu';}
   document.getElementById('kPnl').textContent=netPnl?((netPnl>0?'+':'')+netPnl.toFixed(2)+'%'):'—';
-  document.getElementById('kPnl').className='kpi-val '+(netPnl>0?'pos':netPnl<0?'neg':'neu');
+  document.getElementById('kPnl').className='kpi-val '+(netPnl>0?'bull':netPnl<0?'bear':'neu');
   tx('kSub3', `${wins.length} 勝 / ${losses.length} 敗`);
   tx('kOpen', openN||'0');
   tx('kSub4', openN>0?'筆部位未平倉':'目前無持倉');
@@ -569,7 +581,7 @@ function drawChart(closed){
   const last=pts[pts.length-1];
   const badge=document.getElementById('chartBadge');
   badge.textContent=(last>=0?'+':'')+last.toFixed(2)+'%';
-  badge.className='chart-badge '+(last>0?'pos':last<0?'neg':'neu');
+  badge.className='chart-badge '+(last>0?'bull':last<0?'bear':'neu');
   document.getElementById('chartRange').textContent=`${sorted[0].exitDate||''}  →  ${sorted[sorted.length-1].exitDate||''}`;
 
   const cv=document.getElementById('eqCanvas');
@@ -641,7 +653,7 @@ function renderList(filtered){
 function cardHtml(t){
   const p2=pct(t);
   const pStr=t.status!=='open'?(p2>=0?'+':'')+p2.toFixed(2)+'%':'持倉中';
-  const pCls=p2>0?'pos':p2<0?'neg':'neu';
+  const pCls=p2>0?'bull':p2<0?'bear':'neu';
   const rV=t.exitPrice&&t.entryPrice&&t.stopLoss&&(t.entryPrice-t.stopLoss)!==0
     ?((t.exitPrice-t.entryPrice)/(t.entryPrice-t.stopLoss)).toFixed(2)+'R':'';
   const days=t.entryDate&&t.exitDate
@@ -656,21 +668,23 @@ function cardHtml(t){
   const typBadge=typ==='paper'?`<span class="badge bp">預估盤</span>`
                               :`<span class="badge ba">實際交易</span>`;
   const firstR=t.reasons?.length
-    ?`<span class="tc-mtag">${esc(t.reasons[0])}</span>${t.reasons.length>1?`<span class="tc-mtag">+${t.reasons.length-1}</span>`:''}` :'';
+    ?t.reasons.map(r=>`<span class="tc-mtag">${esc(r)}</span>`).join(''):'';
 
   const priceBlk=`<div class="tc-prices">
     <div class="pf"><label>進場價</label><span class="pv acc">${t.entryPrice||'—'}</span></div>
     ${t.stopLoss?`<div class="pf"><label>停損</label><span class="pv neg">${t.stopLoss}</span></div>`:''}
     ${t.target  ?`<div class="pf"><label>目標</label><span class="pv pos">${t.target}</span></div>`:''}
-    ${t.exitPrice?`<div class="pf"><label>出場價</label><span class="pv ${p2>=0?'pos':'neg'}">${t.exitPrice}</span></div>`:''}
-    ${rV?`<div class="pf"><label>R 值</label><span class="pv ${p2>=0?'pos':'neg'}">${rV}</span></div>`:''}
+    ${t.exitPrice?`<div class="pf"><label>出場價</label><span class="pv ${p2>=0?'bull':'bear'}">${t.exitPrice}</span></div>`:''}
+    ${rV?`<div class="pf"><label>R 值</label><span class="pv ${p2>=0?'bull':'bear'}">${rV}</span></div>`:''}
     ${days?`<div class="pf"><label>持有</label><span class="pv">${days}</span></div>`:''}
   </div>`;
 
-  const hasN=t.reasons?.length||t.entryNote||t.mistakes?.length||t.reviewNote;
+  const hasN=t.reasons?.length||t.entryKbar?.length||t.entryNote||t.exitKbar?.length||t.mistakes?.length||t.reviewNote;
   const notes=hasN?`<div class="tc-notes">
+    ${t.entryKbar?.length?`<div><div class="nc-lbl">進場 K棒型態</div><div class="tag-row">${t.entryKbar.map(k=>`<span class="rtag r">${esc(k)}</span>`).join('')}</div></div>`:''}
     ${t.reasons?.length?`<div><div class="nc-lbl">進場原因</div><div class="tag-row">${t.reasons.map(r=>`<span class="rtag r">${esc(r)}</span>`).join('')}</div></div>`:''}
     ${t.entryNote?`<div><div class="nc-lbl">進場想法</div><p class="nc-txt">${esc(t.entryNote)}</p></div>`:''}
+    ${t.exitKbar?.length?`<div><div class="nc-lbl">出場 K棒型態</div><div class="tag-row">${t.exitKbar.map(k=>`<span class="rtag m">${esc(k)}</span>`).join('')}</div></div>`:''}
     ${t.mistakes?.length?`<div><div class="nc-lbl">犯的錯誤</div><div class="tag-row">${t.mistakes.map(m=>`<span class="rtag m">${esc(m)}</span>`).join('')}</div></div>`:''}
     ${t.reviewNote?`<div><div class="nc-lbl">收盤後檢討</div><p class="nc-txt">${esc(t.reviewNote)}</p></div>`:''}
   </div>`:'';
@@ -735,6 +749,7 @@ window.save=async()=>{
   const data={ticker:t.toUpperCase(),name:v('fN'),type:curTT,entryDate:v('fED'),
     entryPrice:ep,stopLoss:parseFloat(v('fSL'))||null,target:parseFloat(v('fTP'))||null,
     exitDate:v('fXD')||null,exitPrice:xp,status,reasons:[...selR],mistakes:[...selM],
+    entryKbar:[...selEK],exitKbar:[...selXK],
     entryNote:v('fEN'),reviewNote:v('fRV'),createdAt:Timestamp.now()};
   const b=document.getElementById('btnSv');b.disabled=true;b.textContent='儲存中…';
   try{
@@ -789,23 +804,28 @@ function buildPk(cid,opts,arr,isErr){
 }
 
 window.openAdd=()=>{
-  editId=null;selR=[];selM=[];curTT='actual';
+  editId=null;selR=[];selM=[];selEK=[];selXK=[];curTT='actual';
   document.getElementById('mTitle').textContent='新增交易';
   ['fT','fN','fEP','fSL','fTP','fXD','fXP','fEN','fRV'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fED').value=new Date().toISOString().split('T')[0];
-  setTT('actual');buildPk('rPk',REASONS,selR,false);buildPk('mPk',MISTAKES,selM,true);
+  setTT('actual');
+  buildPk('ekPk',KBARS,selEK,false);buildPk('rPk',REASONS,selR,false);
+  buildPk('xkPk',KBARS,selXK,false);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('addOv').classList.add('open');
 };
 
 window.openEdit=id=>{
   const t=trades.find(x=>x.id===id);if(!t)return;
   editId=id;selR=[...(t.reasons||[])];selM=[...(t.mistakes||[])];
+  selEK=[...(t.entryKbar||[])];selXK=[...(t.exitKbar||[])];
   curTT=t.type||'actual';
   document.getElementById('mTitle').textContent='編輯交易';
   const fields={fT:t.ticker,fN:t.name,fED:t.entryDate,fEP:t.entryPrice,
     fSL:t.stopLoss,fTP:t.target,fXD:t.exitDate,fXP:t.exitPrice,fEN:t.entryNote,fRV:t.reviewNote};
   Object.entries(fields).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val??'';});
-  setTT(curTT);buildPk('rPk',REASONS,selR,false);buildPk('mPk',MISTAKES,selM,true);
+  setTT(curTT);
+  buildPk('ekPk',KBARS,selEK,false);buildPk('rPk',REASONS,selR,false);
+  buildPk('xkPk',KBARS,selXK,false);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('addOv').classList.add('open');
 };
 
