@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交易日誌 — 股學筆記</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--card:#21262d;--border:#30363d;--border2:#21262d;
+  --text:#e6edf3;--text2:#c9d1d9;--text3:#8b949e;--text4:#484f58;
+  --accent:#f59e0b;--accent2:#fbbf24;
+  --green:#3fb950;--green2:#238636;--red:#f85149;--blue:#58a6ff;--purple:#a78bfa;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+.topnav{background:var(--bg2);border-bottom:1px solid var(--border2);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.back-btn{color:var(--text3);font-size:.82rem;display:flex;align-items:center;gap:4px;transition:color .15s}
+.back-btn:hover{color:var(--text)}
+.nav-title{font-size:.95rem;font-weight:700}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,rgba(88,166,255,.06) 0%,transparent 60%);border-bottom:1px solid var(--border2);padding:28px 24px 24px;text-align:center}
+.hero h1{font-size:1.6rem;font-weight:800;margin-bottom:4px}
+.hero p{color:var(--text3);font-size:.88rem;margin-bottom:20px}
+
+/* STATS */
+.stats-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:760px;margin:0 auto}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;min-width:100px;text-align:center;flex:1}
+.stat-val{font-size:1.5rem;font-weight:800;color:var(--accent)}
+.stat-val.g{color:var(--green)}
+.stat-val.r{color:var(--red)}
+.stat-val.b{color:var(--blue)}
+.stat-label{font-size:.7rem;color:var(--text3);margin-top:2px}
+
+/* TOOLBAR */
+.toolbar{max-width:900px;margin:20px auto 0;padding:0 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-add{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:9px 20px;font-size:.88rem;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
+.btn-add:hover{background:var(--accent2)}
+.filter-tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.tab{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:7px 14px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.tab:hover{border-color:var(--accent);color:var(--accent2)}
+.tab.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:var(--accent2);font-weight:600}
+
+/* LIST */
+.container{max-width:900px;margin:16px auto 0;padding:0 20px 80px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text4)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.loading{text-align:center;padding:40px;color:var(--text4);font-size:.9rem}
+
+/* TRADE CARD */
+.tc{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.tc:hover{border-color:var(--text4)}
+.tc.win{border-left:3px solid var(--green)}
+.tc.loss{border-left:3px solid var(--red)}
+.tc.open{border-left:3px solid var(--blue)}
+.tc-head{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.tc-left{flex:1;min-width:0}
+.tc-ticker{font-size:1rem;font-weight:800}
+.tc-sub{font-size:.74rem;color:var(--text4);margin-top:1px}
+.tc-right{text-align:right;flex-shrink:0}
+.tc-pnl{font-size:1rem;font-weight:700}
+.tc-pnl.pos{color:var(--green)}
+.tc-pnl.neg{color:var(--red)}
+.tc-pnl.neu{color:var(--text3)}
+.tc-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.bw{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3)}
+.bl{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.3)}
+.bo{background:rgba(88,166,255,.15);color:var(--blue);border:1px solid rgba(88,166,255,.3)}
+.tc-r{font-size:.74rem;color:var(--text4);margin-top:2px}
+.tc-body{display:none;border-top:1px solid var(--border2);padding:14px 18px 16px}
+.tc-body.show{display:block}
+.tc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+.tc-field label{display:block;font-size:.66rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.tc-field span{font-size:.88rem;color:var(--text2)}
+.tc-note{margin-top:10px}
+.tc-note-title{font-size:.68rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.tc-note p{font-size:.86rem;color:var(--text2);line-height:1.65;white-space:pre-wrap}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.tag{font-size:.7rem;padding:2px 8px;border-radius:10px;background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.2)}
+.tag.err{background:rgba(248,81,73,.1);color:var(--red);border-color:rgba(248,81,73,.2)}
+.tc-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.btn-sm{background:none;border:1px solid var(--border);color:var(--text3);padding:5px 12px;border-radius:6px;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-sm.close-btn{background:rgba(63,185,80,.08);border-color:var(--green2);color:var(--green)}
+.btn-sm.del:hover{border-color:var(--red);color:var(--red)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:580px;margin:auto}
+.modal-head{padding:18px 22px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
+.modal-head h2{font-size:.95rem;font-weight:700}
+.modal-x{background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer;padding:2px 6px;line-height:1}
+.modal-x:hover{color:var(--text)}
+.modal-body{padding:18px 22px 22px}
+
+/* FORM */
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:.74rem;font-weight:600;color:var(--text3);margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;transition:border-color .15s}
+.fg input:focus,.fg textarea:focus{border-color:var(--accent)}
+.fg textarea{resize:vertical;min-height:68px;line-height:1.5}
+.fg select{cursor:pointer}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frow.full{grid-template-columns:1fr}
+.fdiv{border:none;border-top:1px solid var(--border2);margin:14px 0}
+.fsec{font-size:.7rem;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+
+/* TAG PICKER */
+.tag-picker{display:flex;flex-wrap:wrap;gap:6px}
+.topt{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:12px;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .15s;user-select:none}
+.topt:hover{border-color:var(--accent2);color:var(--accent2)}
+.topt.sel{background:rgba(88,166,255,.15);border-color:var(--blue);color:var(--blue)}
+.topt.sel.err{background:rgba(248,81,73,.15);border-color:var(--red);color:var(--red)}
+
+.btn-submit{width:100%;background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;font-size:.95rem;cursor:pointer;font-family:inherit;margin-top:14px;transition:background .15s}
+.btn-submit:hover{background:var(--accent2)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+
+@media(max-width:600px){
+  .frow{grid-template-columns:1fr}
+  .stats-row .stat-card{min-width:80px;padding:10px}
+  .stat-val{font-size:1.2rem}
+  .toolbar,.container{padding-left:14px;padding-right:14px}
+  .topnav{padding:12px 14px}
+  .hero{padding:20px 14px 18px}
+  .hero h1{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="back-btn" href="index.html">← 返回股學筆記</a>
+  <span class="nav-title">📒 交易日誌</span>
+</nav>
+
+<div class="hero">
+  <h1>交易日誌</h1>
+  <p>記錄每筆交易的判斷依據與檢討，持續提升勝率</p>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="sTotal">—</div><div class="stat-label">總筆數</div></div>
+    <div class="stat-card"><div class="stat-val" id="sWinRate">—</div><div class="stat-label">勝率</div></div>
+    <div class="stat-card"><div class="stat-val g" id="sAvgWin">—</div><div class="stat-label">平均獲利</div></div>
+    <div class="stat-card"><div class="stat-val r" id="sAvgLoss">—</div><div class="stat-label">平均虧損</div></div>
+    <div class="stat-card"><div class="stat-val" id="sPF">—</div><div class="stat-label">盈虧比</div></div>
+    <div class="stat-card"><div class="stat-val b" id="sOpen">—</div><div class="stat-label">持倉中</div></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button class="btn-add" onclick="openAdd()">＋ 新增交易</button>
+  <div class="filter-tabs">
+    <button class="tab active" onclick="setFilter('all',this)">全部</button>
+    <button class="tab" onclick="setFilter('open',this)">持倉中</button>
+    <button class="tab" onclick="setFilter('win',this)">獲利</button>
+    <button class="tab" onclick="setFilter('loss',this)">虧損</button>
+  </div>
+</div>
+
+<div class="container" id="list"><div class="loading">連線中…</div></div>
+
+<!-- ── 新增 / 編輯 Modal ── -->
+<div class="overlay" id="addOverlay" onclick="bgClick(event,'addOverlay')">
+<div class="modal">
+  <div class="modal-head">
+    <h2 id="modalTitle">新增交易</h2>
+    <button class="modal-x" onclick="closeAdd()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="frow">
+      <div class="fg"><label>股票代號 *</label><input id="fTicker" placeholder="2330" maxlength="6"></div>
+      <div class="fg"><label>股票名稱</label><input id="fName" placeholder="台積電"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>進場日期 *</label><input type="date" id="fEntryDate"></div>
+      <div class="fg"><label>進場價格 *</label><input type="number" id="fEntryPrice" placeholder="900" step="0.1"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>停損位</label><input type="number" id="fStop" placeholder="880" step="0.1"></div>
+      <div class="fg"><label>目標價</label><input type="number" id="fTarget" placeholder="950" step="0.1"></div>
+    </div>
+    <hr class="fdiv">
+    <div class="fsec">進場原因（可複選）</div>
+    <div class="tag-picker" id="reasonPicker"></div>
+    <div class="fg frow full" style="margin-top:12px">
+      <div class="fg"><label>進場當下想法</label><textarea id="fEntryNote" placeholder="為什麼進場？看到什麼訊號…"></textarea></div>
+    </div>
+    <hr class="fdiv">
+    <div class="fsec">出場資訊（結單後填）</div>
+    <div class="frow">
+      <div class="fg"><label>出場日期</label><input type="date" id="fExitDate"></div>
+      <div class="fg"><label>出場價格</label><input type="number" id="fExitPrice" placeholder="留空 = 持倉中" step="0.1"></div>
+    </div>
+    <div class="fsec" style="margin-top:4px">犯的錯誤（可複選）</div>
+    <div class="tag-picker" id="mistakePicker"></div>
+    <div class="fg frow full" style="margin-top:12px">
+      <div class="fg"><label>收盤後檢討</label><textarea id="fReview" placeholder="這筆交易學到什麼？下次怎麼改進…"></textarea></div>
+    </div>
+    <button class="btn-submit" id="btnSave" onclick="saveTrade()">儲存</button>
+  </div>
+</div>
+</div>
+
+<!-- ── 快速結單 Modal ── -->
+<div class="overlay" id="closeOverlay" onclick="bgClick(event,'closeOverlay')">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <h2 id="closeTitle">結單</h2>
+    <button class="modal-x" onclick="document.getElementById('closeOverlay').classList.remove('open')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="frow">
+      <div class="fg"><label>出場日期</label><input type="date" id="cExitDate"></div>
+      <div class="fg"><label>出場價格 *</label><input type="number" id="cExitPrice" step="0.1"></div>
+    </div>
+    <div class="fsec" style="margin-top:4px">犯的錯誤（可複選）</div>
+    <div class="tag-picker" id="closeMistakePicker"></div>
+    <div class="fg" style="margin-top:12px"><label>檢討</label><textarea id="cReview" placeholder="這筆交易學到什麼…"></textarea></div>
+    <button class="btn-submit" onclick="saveClose()">確認結單</button>
+  </div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc,
+  doc, query, orderBy, Timestamp
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+/* ── Firebase ── */
+const app = initializeApp({
+  apiKey: "AIzaSyDMpaJo2I0KN6OU7UVgvvNRPzNNJefJiC4",
+  authDomain: "transaction-log-fe0c3.firebaseapp.com",
+  projectId: "transaction-log-fe0c3",
+  storageBucket: "transaction-log-fe0c3.firebasestorage.app",
+  messagingSenderId: "762032844405",
+  appId: "1:762032844405:web:cbc466f21dd73ab80f523c"
+});
+const db = getFirestore(app);
+const COLL = 'trades';
+
+/* ── 常數 ── */
+const REASONS = ['外資買超','投信買超','法人雙買','突破壓力','支撐反彈','缺口突破',
+  '趨勢跟隨','週線訊號','籌碼背離','融券回補','量能放大','消息面','其他'];
+const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','過早出場','過晚出場',
+  '情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
+
+/* ── 狀態 ── */
+let trades = [];
+let curFilter = 'all';
+let editId = null;
+let closeId = null;
+let selReasons = [];
+let selMistakes = [];
+let closeSelMistakes = [];
+
+/* ── 載入 ── */
+async function load() {
+  try {
+    const q = query(collection(db, COLL), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    trades = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAll();
+  } catch(e) {
+    document.getElementById('list').innerHTML =
+      `<div class="loading" style="color:var(--red)">❌ 載入失敗：${e.message}<br><br>請確認 Firebase Firestore 已建立（選「以測試模式開始」）</div>`;
+  }
+}
+
+/* ── 統計 ── */
+function calcStats() {
+  const closed = trades.filter(t => t.status !== 'open');
+  const wins   = closed.filter(t => t.status === 'win');
+  const losses = closed.filter(t => t.status === 'loss');
+  const openN  = trades.filter(t => t.status === 'open').length;
+  const wr = closed.length ? Math.round(wins.length / closed.length * 100) : null;
+  const avgW = wins.length   ? avg(wins.map(pnl))   : null;
+  const avgL = losses.length ? avg(losses.map(pnl)) : null;
+  const pf   = avgW != null && avgL != null && avgL !== 0
+    ? (Math.abs(avgW) / Math.abs(avgL)).toFixed(2) : null;
+  return { total: trades.length, wr, avgW, avgL, pf, openN };
+}
+
+function avg(arr) { return arr.reduce((s,v) => s+v, 0) / arr.length; }
+
+function pnl(t) {
+  if (!t.exitPrice || !t.entryPrice) return 0;
+  return (t.exitPrice - t.entryPrice) / t.entryPrice * 100;
+}
+
+function renderAll() {
+  const s = calcStats();
+  set('sTotal',   s.total || '0');
+  set('sWinRate', s.wr != null ? s.wr + '%' : '—', s.wr >= 50 ? 'g' : s.wr != null ? 'r' : '');
+  set('sAvgWin',  s.avgW != null ? '+' + s.avgW.toFixed(1) + '%' : '—', 'g');
+  set('sAvgLoss', s.avgL != null ? s.avgL.toFixed(1) + '%' : '—', 'r');
+  set('sPF',      s.pf || '—', s.pf >= 1 ? 'g' : s.pf ? 'r' : '');
+  set('sOpen',    s.openN || '0', 'b');
+  renderList();
+}
+
+function set(id, val, cls='') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = val;
+  el.className = 'stat-val' + (cls ? ' ' + cls : '');
+}
+
+/* ── 渲染列表 ── */
+function renderList() {
+  const el = document.getElementById('list');
+  let items = curFilter === 'all' ? trades : trades.filter(t => t.status === curFilter);
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>${
+      curFilter === 'all' ? '還沒有交易記錄，點「＋ 新增交易」開始！' : '沒有符合的記錄'
+    }</p></div>`;
+    return;
+  }
+  el.innerHTML = items.map(tcHTML).join('');
+}
+
+function tcHTML(t) {
+  const p = pnl(t);
+  const pStr = t.status !== 'open'
+    ? (p >= 0 ? '+' : '') + p.toFixed(2) + '%'
+    : '持倉中';
+  const pCls = p > 0 ? 'pos' : p < 0 ? 'neg' : 'neu';
+  const badge = t.status === 'win'  ? '<span class="tc-badge bw">✓ 獲利</span>'
+              : t.status === 'loss' ? '<span class="tc-badge bl">✗ 虧損</span>'
+              : '<span class="tc-badge bo">⏳ 持倉</span>';
+  const rVal = t.exitPrice && t.entryPrice && t.stopLoss && (t.entryPrice - t.stopLoss) !== 0
+    ? ((t.exitPrice - t.entryPrice) / (t.entryPrice - t.stopLoss)).toFixed(2) + 'R' : '';
+
+  return `<div class="tc ${t.status}" id="tc-${t.id}">
+  <div class="tc-head" onclick="toggleBody('${t.id}')">
+    <div class="tc-left">
+      <div class="tc-ticker">${esc(t.ticker)} <span style="font-size:.8rem;font-weight:400;color:var(--text3)">${esc(t.name||'')}</span></div>
+      <div class="tc-sub">進場 ${t.entryDate||'—'}${t.exitDate ? '　出場 '+t.exitDate : ''}</div>
+    </div>
+    <div class="tc-right">
+      <div class="tc-pnl ${pCls}">${pStr}${badge}</div>
+      ${rVal ? `<div class="tc-r">${rVal}</div>` : ''}
+    </div>
+  </div>
+  <div class="tc-body" id="b-${t.id}">
+    <div class="tc-grid">
+      <div class="tc-field"><label>進場價</label><span>${t.entryPrice||'—'}</span></div>
+      ${t.stopLoss  ? `<div class="tc-field"><label>停損位</label><span>${t.stopLoss}</span></div>` : ''}
+      ${t.target    ? `<div class="tc-field"><label>目標價</label><span>${t.target}</span></div>` : ''}
+      ${t.exitPrice ? `<div class="tc-field"><label>出場價</label><span>${t.exitPrice}</span></div>` : ''}
+    </div>
+    ${t.reasons?.length  ? `<div class="tc-note"><div class="tc-note-title">進場原因</div><div class="tags">${t.reasons.map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div></div>` : ''}
+    ${t.entryNote        ? `<div class="tc-note"><div class="tc-note-title">進場想法</div><p>${esc(t.entryNote)}</p></div>` : ''}
+    ${t.mistakes?.length ? `<div class="tc-note"><div class="tc-note-title">犯的錯誤</div><div class="tags">${t.mistakes.map(m=>`<span class="tag err">${esc(m)}</span>`).join('')}</div></div>` : ''}
+    ${t.reviewNote       ? `<div class="tc-note"><div class="tc-note-title">收盤後檢討</div><p>${esc(t.reviewNote)}</p></div>` : ''}
+    <div class="tc-actions">
+      ${t.status==='open' ? `<button class="btn-sm close-btn" onclick="openClose('${t.id}')">結單</button>` : ''}
+      <button class="btn-sm" onclick="openEdit('${t.id}')">編輯</button>
+      <button class="btn-sm del" onclick="del('${t.id}')">刪除</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+/* ── Toggle ── */
+window.toggleBody = id => document.getElementById('b-'+id)?.classList.toggle('show');
+
+/* ── 篩選 ── */
+window.setFilter = (f, btn) => {
+  curFilter = f;
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b===btn));
+  renderList();
+};
+
+/* ── Tag Picker ── */
+function buildPicker(containerId, opts, selArr, isErr) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  opts.forEach(opt => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'topt' + (isErr?' err':'') + (selArr.includes(opt)?' sel':'');
+    b.textContent = opt;
+    b.onclick = () => {
+      const i = selArr.indexOf(opt);
+      i===-1 ? selArr.push(opt) : selArr.splice(i,1);
+      b.classList.toggle('sel', selArr.includes(opt));
+    };
+    el.appendChild(b);
+  });
+}
+
+/* ── 新增 Modal ── */
+window.openAdd = () => {
+  editId = null;
+  selReasons = []; selMistakes = [];
+  document.getElementById('modalTitle').textContent = '新增交易';
+  clearF();
+  buildPicker('reasonPicker',  REASONS,  selReasons,  false);
+  buildPicker('mistakePicker', MISTAKES, selMistakes, true);
+  document.getElementById('addOverlay').classList.add('open');
+};
+
+window.closeAdd = () => document.getElementById('addOverlay').classList.remove('open');
+
+window.bgClick = (e, id) => { if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); };
+
+function clearF() {
+  ['fTicker','fName','fEntryPrice','fStop','fTarget','fExitDate','fExitPrice','fEntryNote','fReview'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('fEntryDate').value = new Date().toISOString().split('T')[0];
+}
+
+function fillF(t) {
+  const s=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
+  s('fTicker',t.ticker); s('fName',t.name); s('fEntryDate',t.entryDate);
+  s('fEntryPrice',t.entryPrice); s('fStop',t.stopLoss); s('fTarget',t.target);
+  s('fExitDate',t.exitDate); s('fExitPrice',t.exitPrice);
+  s('fEntryNote',t.entryNote); s('fReview',t.reviewNote);
+}
+
+window.openEdit = id => {
+  const t = trades.find(x=>x.id===id);
+  if (!t) return;
+  editId = id;
+  selReasons  = [...(t.reasons  || [])];
+  selMistakes = [...(t.mistakes || [])];
+  document.getElementById('modalTitle').textContent = '編輯交易';
+  clearF(); fillF(t);
+  buildPicker('reasonPicker',  REASONS,  selReasons,  false);
+  buildPicker('mistakePicker', MISTAKES, selMistakes, true);
+  document.getElementById('addOverlay').classList.add('open');
+};
+
+/* ── 儲存 ── */
+window.saveTrade = async () => {
+  const ticker = document.getElementById('fTicker').value.trim();
+  const entryPrice = parseFloat(document.getElementById('fEntryPrice').value);
+  if (!ticker || !entryPrice) { alert('請填寫股票代號和進場價格'); return; }
+  const exitPrice = parseFloat(document.getElementById('fExitPrice').value) || null;
+  const status = exitPrice ? (exitPrice > entryPrice ? 'win' : 'loss') : 'open';
+  const data = {
+    ticker, status,
+    name:      document.getElementById('fName').value.trim(),
+    entryDate: document.getElementById('fEntryDate').value,
+    entryPrice,
+    stopLoss:  parseFloat(document.getElementById('fStop').value)   || null,
+    target:    parseFloat(document.getElementById('fTarget').value) || null,
+    exitDate:  document.getElementById('fExitDate').value || null,
+    exitPrice,
+    reasons:   [...selReasons],
+    mistakes:  [...selMistakes],
+    entryNote: document.getElementById('fEntryNote').value.trim(),
+    reviewNote:document.getElementById('fReview').value.trim(),
+    createdAt: Timestamp.now(),
+  };
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true; btn.textContent = '儲存中…';
+  try {
+    if (editId) await updateDoc(doc(db, COLL, editId), data);
+    else        await addDoc(collection(db, COLL), data);
+    closeAdd();
+    await load();
+  } catch(e) { alert('儲存失敗：'+e.message); }
+  finally { btn.disabled=false; btn.textContent='儲存'; }
+};
+
+/* ── 結單 Modal ── */
+window.openClose = id => {
+  const t = trades.find(x=>x.id===id);
+  if (!t) return;
+  closeId = id;
+  closeSelMistakes = [];
+  document.getElementById('closeTitle').textContent = `結單：${t.ticker} ${t.name||''}`;
+  document.getElementById('cExitDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('cExitPrice').value = '';
+  document.getElementById('cReview').value = '';
+  buildPicker('closeMistakePicker', MISTAKES, closeSelMistakes, true);
+  document.getElementById('closeOverlay').classList.add('open');
+};
+
+window.saveClose = async () => {
+  const exitPrice = parseFloat(document.getElementById('cExitPrice').value);
+  if (!exitPrice) { alert('請填寫出場價格'); return; }
+  const t = trades.find(x=>x.id===closeId);
+  if (!t) return;
+  const status = exitPrice > t.entryPrice ? 'win' : 'loss';
+  try {
+    await updateDoc(doc(db, COLL, closeId), {
+      exitDate:   document.getElementById('cExitDate').value,
+      exitPrice, status,
+      mistakes:   [...closeSelMistakes],
+      reviewNote: document.getElementById('cReview').value.trim(),
+    });
+    document.getElementById('closeOverlay').classList.remove('open');
+    await load();
+  } catch(e) { alert('儲存失敗：'+e.message); }
+};
+
+/* ── 刪除 ── */
+window.del = async id => {
+  if (!confirm('確定刪除這筆記錄？')) return;
+  try { await deleteDoc(doc(db, COLL, id)); await load(); }
+  catch(e) { alert('刪除失敗'); }
+};
+
+load();
+</script>
+</body>
+</html>
