@@ -188,6 +188,8 @@ canvas{display:block;width:100%}
 .rtag{font-size:.7rem;padding:3px 9px;border-radius:6px;font-weight:600}
 .rtag.r{background:var(--b-bg);color:var(--blue);border:1px solid var(--b-bd)}
 .rtag.m{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
+.rtag.kred{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
+.rtag.kgrn{background:var(--g-bg);color:var(--green);border:1px solid var(--g-bd)}
 
 .tc-foot{padding:10px 16px;display:flex;gap:7px;justify-content:flex-end}
 .btn-sm{background:none;border:1px solid var(--border);color:var(--text3);
@@ -200,7 +202,7 @@ canvas{display:block;width:100%}
 /* ══ MODALS ══ */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;
   display:none;align-items:flex-start;justify-content:center;
-  padding:20px;overflow-y:auto;backdrop-filter:blur(8px)}
+  padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;backdrop-filter:blur(8px)}
 .ov.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;
   width:100%;max-width:600px;margin:auto;box-shadow:0 40px 100px rgba(0,0,0,.7)}
@@ -238,12 +240,14 @@ canvas{display:block;width:100%}
   text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
 
 .tpk{display:flex;flex-wrap:wrap;gap:5px}
-.topt{background:var(--card2);border:1px solid var(--border);color:var(--text3);
+.topt{background:var(--card2);border:1px solid var(--border);color:var(--text);
   padding:5px 11px;border-radius:7px;font-size:.74rem;cursor:pointer;
   transition:all .14s;user-select:none;font-weight:500}
-.topt:hover{border-color:var(--text2);color:var(--text2)}
+.topt:hover{border-color:var(--text2);color:var(--text)}
 .topt.sel{background:var(--b-bg);border-color:var(--b-bd);color:var(--blue);font-weight:700}
 .topt.sel.err{background:var(--r-bg);border-color:var(--r-bd);color:var(--red)}
+.topt.sel-r{background:var(--r-bg);border-color:var(--r-bd);color:var(--red);font-weight:700}
+.topt.sel-g{background:var(--g-bg);border-color:var(--g-bd);color:var(--green);font-weight:700}
 
 .btn-sub{width:100%;background:var(--accent);color:#000;font-weight:800;border:none;
   border-radius:10px;padding:12px;font-size:.92rem;cursor:pointer;margin-top:16px;
@@ -760,10 +764,10 @@ function cardHtml(t){
 
   const hasN=t.reasons?.length||t.entryKbar?.length||t.entryNote||t.exitKbar?.length||t.mistakes?.length||t.reviewNote;
   const notes=hasN?`<div class="tc-notes">
-    ${t.entryKbar?.length?`<div><div class="nc-lbl">進場 K棒型態</div><div class="tag-row">${t.entryKbar.map(k=>`<span class="rtag r">${esc(k)}</span>`).join('')}</div></div>`:''}
+    ${t.entryKbar?.length?`<div><div class="nc-lbl">進場 K棒型態</div><div class="tag-row">${t.entryKbar.map(k=>{const[n,c]=k.split(':');return`<span class="rtag ${c==='red'?'kred':c==='green'?'kgrn':'r'}">${esc(n)}</span>`;}).join('')}</div></div>`:''}
     ${t.reasons?.length?`<div><div class="nc-lbl">進場原因</div><div class="tag-row">${t.reasons.map(r=>`<span class="rtag r">${esc(r)}</span>`).join('')}</div></div>`:''}
     ${t.entryNote?`<div><div class="nc-lbl">進場想法</div><p class="nc-txt">${esc(t.entryNote)}</p></div>`:''}
-    ${t.exitKbar?.length?`<div><div class="nc-lbl">出場 K棒型態</div><div class="tag-row">${t.exitKbar.map(k=>`<span class="rtag m">${esc(k)}</span>`).join('')}</div></div>`:''}
+    ${t.exitKbar?.length?`<div><div class="nc-lbl">出場 K棒型態</div><div class="tag-row">${t.exitKbar.map(k=>{const[n,c]=k.split(':');return`<span class="rtag ${c==='red'?'kred':c==='green'?'kgrn':'m'}">${esc(n)}</span>`;}).join('')}</div></div>`:''}
     ${t.mistakes?.length?`<div><div class="nc-lbl">犯的錯誤</div><div class="tag-row">${t.mistakes.map(m=>`<span class="rtag m">${esc(m)}</span>`).join('')}</div></div>`:''}
     ${t.reviewNote?`<div><div class="nc-lbl">收盤後檢討</div><p class="nc-txt">${esc(t.reviewNote)}</p></div>`:''}
     ${t.entryImgUrl?`<div><div class="nc-lbl">進場當日K線圖</div><img src="${t.entryImgUrl}" class="card-img" onclick="zoomImg(this)"></div>`:''}
@@ -889,6 +893,22 @@ function buildPk(cid,opts,arr,isErr){
     el.appendChild(b);
   });
 }
+function buildKPk(cid,arr){
+  const el=document.getElementById(cid);if(!el)return;el.innerHTML='';
+  KBARS.forEach(o=>{
+    const b=document.createElement('button');b.type='button';
+    const ir=arr.indexOf(o+':red'),ig=arr.indexOf(o+':green');
+    b.className='topt'+(ir!==-1?' sel-r':ig!==-1?' sel-g':'');
+    b.textContent=o;
+    b.onclick=()=>{
+      const ir2=arr.indexOf(o+':red'),ig2=arr.indexOf(o+':green');
+      if(ir2!==-1){arr.splice(ir2,1);arr.push(o+':green');b.className='topt sel-g';}
+      else if(ig2!==-1){arr.splice(ig2,1);b.className='topt';}
+      else{arr.push(o+':red');b.className='topt sel-r';}
+    };
+    el.appendChild(b);
+  });
+}
 
 window.openAdd=()=>{
   editId=null;selR=[];selM=[];selEK=[];selXK=[];curTT='actual';
@@ -899,8 +919,8 @@ window.openAdd=()=>{
   document.getElementById('fEImg').value='';document.getElementById('fXImg').value='';
   document.getElementById('fED').value=new Date().toISOString().split('T')[0];
   setTT('actual');
-  buildPk('ekPk',KBARS,selEK,false);buildPk('rPk',REASONS,selR,false);
-  buildPk('xkPk',KBARS,selXK,false);buildPk('mPk',MISTAKES,selM,true);
+  buildKPk('ekPk',selEK);buildPk('rPk',REASONS,selR,false);
+  buildKPk('xkPk',selXK);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('addOv').classList.add('open');
 };
 
@@ -916,8 +936,8 @@ window.openEdit=id=>{
     fSL:t.stopLoss,fTP:t.target,fXD:t.exitDate,fXP:t.exitPrice,fEN:t.entryNote,fRV:t.reviewNote};
   Object.entries(fields).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val??'';});
   setTT(curTT);
-  buildPk('ekPk',KBARS,selEK,false);buildPk('rPk',REASONS,selR,false);
-  buildPk('xkPk',KBARS,selXK,false);buildPk('mPk',MISTAKES,selM,true);
+  buildKPk('ekPk',selEK);buildPk('rPk',REASONS,selR,false);
+  buildKPk('xkPk',selXK);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('fEImg').value='';document.getElementById('fXImg').value='';
   const ep2=document.getElementById('ePrev'),xp2=document.getElementById('xPrev');
   ep2.innerHTML=existingEUrl?`<div class="img-prev-wrap"><img src="${existingEUrl}" class="img-prev"><button class="img-del" onclick="clearImg('entry','ePrev')">移除</button></div>`:'';
