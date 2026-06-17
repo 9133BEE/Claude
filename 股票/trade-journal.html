@@ -58,6 +58,9 @@ input,select,textarea,button{font-family:inherit}
 .kpi-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);
   font-weight:600;margin-bottom:10px}
 .kpi-val{font-size:2.6rem;font-weight:900;line-height:1;letter-spacing:-.04em;color:#fff;margin-bottom:6px}
+.kpi-split{display:flex;align-items:flex-end;gap:14px;margin-bottom:2px}
+.kpi-split .kpi-val{font-size:2rem;margin-bottom:3px}
+.kpi-split-div{width:1px;height:36px;background:var(--border);align-self:center;flex-shrink:0}
 .kpi-sub{font-size:.73rem;color:var(--text4)}
 .kpi-accent{position:absolute;bottom:0;left:0;height:3px}
 .kpi.k-total .kpi-accent{background:linear-gradient(90deg,var(--accent),var(--accent2));width:100%}
@@ -309,9 +312,12 @@ canvas{display:block;width:100%}
 <div class="dash">
   <div class="kpi-grid">
     <div class="kpi k-total">
-      <div class="kpi-lbl">總交易筆數</div>
-      <div class="kpi-val g" id="kTotal">—</div>
-      <div class="kpi-sub" id="kSub1">—</div>
+      <div class="kpi-lbl">交易統計</div>
+      <div class="kpi-split">
+        <div><div class="kpi-val g" id="kActual">—</div><div class="kpi-sub">實際交易</div></div>
+        <div class="kpi-split-div"></div>
+        <div><div class="kpi-val b" id="kPaper">—</div><div class="kpi-sub">預估盤</div></div>
+      </div>
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi k-rate">
@@ -625,8 +631,8 @@ function renderAll(){
   const netPnl= closed.reduce((s,t)=>s+pct(t),0);
 
   /* KPI */
-  tx('kTotal', all.length||'0');
-  tx('kSub1', `${closed.length} 筆已結單`);
+  tx('kActual', all.filter(t=>t.type!=='paper').length||'0');
+  tx('kPaper',  all.filter(t=>t.type==='paper').length||'0');
   const wrEl=document.getElementById('wrFill');
   if(wr!=null){
     document.getElementById('kWR').textContent=wr.toFixed(1)+'%';
