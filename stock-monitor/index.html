@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>外資籌碼篩選</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; }
+
+    .header { background: #161b22; border-bottom: 1px solid #30363d; padding: 14px 16px; }
+    .header h1 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+
+    .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .ctrl-label { font-size: 12px; color: #8b949e; white-space: nowrap; }
+    input[type=number] { width: 70px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 7px 10px; color: #e6edf3; font-size: 13px; text-align: center; }
+    .btn { background: #238636; border: none; border-radius: 6px; padding: 8px 20px; color: white; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .btn:active { opacity: .8; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .meta { padding: 10px 16px; font-size: 11px; color: #8b949e; border-bottom: 1px solid #21262d; min-height: 36px; }
+
+    .status { text-align: center; padding: 48px 16px; color: #8b949e; }
+    .status-icon { font-size: 32px; margin-bottom: 8px; }
+    .progress { margin-top: 8px; font-size: 12px; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead { position: sticky; top: 0; z-index: 2; }
+    th { background: #161b22; padding: 10px 8px; color: #8b949e; font-weight: 500; white-space: nowrap; border-bottom: 1px solid #30363d; cursor: pointer; user-select: none; }
+    th:hover { color: #e6edf3; }
+    th.sorted { color: #58a6ff; }
+    td { padding: 10px 8px; border-bottom: 1px solid #21262d; white-space: nowrap; }
+    tr:hover td { background: #1c2128; }
+
+    .text-right { text-align: right; }
+    .text-left  { text-align: left; }
+
+    .pos { color: #3fb950; }
+    .neg { color: #f85149; }
+    .highlight { color: #f0b90b; font-weight: 700; }
+
+    .stock-code { font-weight: 700; font-size: 13px; }
+    .stock-name { font-size: 11px; color: #8b949e; margin-top: 2px; }
+
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .badge-sell { background: rgba(248,81,73,.15); color: #f85149; border: 1px solid rgba(248,81,73,.3); }
+
+    .pct-bar { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .bar-bg { width: 40px; height: 6px; background: #21262d; border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; background: #f0b90b; border-radius: 3px; }
+
+    .result-count { padding: 10px 16px; font-size: 12px; color: #8b949e; border-bottom: 1px solid #21262d; }
+
+    /* Detail panel */
+    .detail { display: none; position: fixed; inset: 0; background: #0d1117; z-index: 100; overflow-y: auto; }
+    .detail.open { display: block; }
+    .detail-header { background: #161b22; border-bottom: 1px solid #30363d; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
+    .detail-title { font-weight: 700; font-size: 15px; }
+    .close-btn { background: #21262d; border: none; border-radius: 6px; padding: 6px 12px; color: #e6edf3; cursor: pointer; font-size: 13px; }
+    .detail-body { padding: 16px; }
+
+    .day-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #21262d; }
+    .day-date { font-size: 12px; color: #8b949e; }
+    .day-nums { display: flex; gap: 16px; text-align: right; }
+    .day-col { min-width: 60px; }
+    .day-col-label { font-size: 10px; color: #8b949e; }
+    .day-col-val { font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+    .info-box { background: #161b22; border-left: 3px solid #58a6ff; padding: 11px 13px; border-radius: 4px; margin-bottom: 14px; font-size: 12px; color: #8b949e; line-height: 1.7; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>外資籌碼篩選</h1>
+  <div class="controls">
+    <span class="ctrl-label">今日賣超 ＋ 買張高於5日均</span>
+    <span class="ctrl-label">增幅 ≥</span>
+    <input type="number" id="threshold" value="20" min="0" max="500">
+    <span class="ctrl-label">%</span>
+    <button class="btn" id="run-btn" onclick="runScreener()">執行篩選</button>
+  </div>
+</div>
+
+<div class="meta" id="meta">資料來源：台灣證交所 T86（每日收盤後 18:00 更新）</div>
+
+<div id="main-content">
+  <div class="status">
+    <div class="status-icon">📊</div>
+    <div>點擊執行篩選開始</div>
+    <div class="progress" style="color:#8b949e;font-size:11px;margin-top:8px">篩選條件：當日外資賣超，且今日買張 ÷ 5日均買張 ≥ 設定增幅</div>
+  </div>
+</div>
+
+<!-- 個股5日明細 panel -->
+<div class="detail" id="detail-panel">
+  <div class="detail-header">
+    <span class="detail-title" id="detail-title"></span>
+    <button class="close-btn" onclick="closeDetail()">✕ 關閉</button>
+  </div>
+  <div class="detail-body" id="detail-body"></div>
+</div>
+
+<script>
+const PROXY = 'https://corsproxy.io/?url=';
+let allData = {}; // { 'YYYYMMDD': { code: {name, buy, sell, net} } }
+let sortCol = 'pct', sortAsc = false;
+
+async function apiFetch(url) {
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error();
+    return await r.json();
+  } catch {
+    try {
+      const r = await fetch(PROXY + encodeURIComponent(url), { cache: 'no-store' });
+      const raw = await r.json();
+      return typeof raw === 'string' ? JSON.parse(raw) : (raw.contents ? JSON.parse(raw.contents) : raw);
+    } catch { return null; }
+  }
+}
+
+async function fetchT86(yyyymmdd) {
+  if (allData[yyyymmdd]) return allData[yyyymmdd];
+  const url = `https://www.twse.com.tw/fund/T86?response=json&date=${yyyymmdd}&selectType=ALL`;
+  const d = await apiFetch(url);
+  if (!d || d.stat !== 'OK' || !d.data) return null;
+  const map = {};
+  d.data.forEach(row => {
+    const code = row[0].trim();
+    // T86 unit is 股, divide by 1000 = 張
+    map[code] = {
+      name: row[1].trim(),
+      buy:  Math.round(parseInt(row[2].replace(/,/g,'')) / 1000) || 0,
+      sell: Math.round(parseInt(row[3].replace(/,/g,'')) / 1000) || 0,
+      net:  Math.round(parseInt(row[4].replace(/,/g,'')) / 1000) || 0,
+    };
+  });
+  allData[yyyymmdd] = map;
+  return map;
+}
+
+function tradingDates(n) {
+  const result = [];
+  const d = new Date();
+  while (result.length < n) {
+    d.setDate(d.getDate() - 1);
+    if (d.getDay() !== 0 && d.getDay() !== 6)
+      result.push(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
+  }
+  return result;
+}
+
+function fmt8(s) { return `${s.slice(0,4)}/${s.slice(4,6)}/${s.slice(6,8)}`; }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function runScreener() {
+  const btn = document.getElementById('run-btn');
+  const threshold = parseFloat(document.getElementById('threshold').value) || 20;
+  btn.disabled = true;
+  btn.textContent = '載入中…';
+  allData = {};
+
+  const dates = tradingDates(6); // 今日 + 過去5個交易日
+  const today = dates[0];
+  const prev5 = dates.slice(1, 6);
+
+  setStatus('取得今日外資資料…', 1, 6);
+  const d0 = await fetchT86(today);
+  if (!d0) {
+    setStatus('⚠️ 今日資料尚未更新（收盤後 18:00 才有），或遇到假日', 0, 0);
+    btn.disabled = false; btn.textContent = '執行篩選';
+    return;
+  }
+
+  const prevData = [];
+  for (let i = 0; i < prev5.length; i++) {
+    setStatus(`取得歷史資料 (${i+1}/5)…`, i+2, 6);
+    const d = await fetchT86(prev5[i]);
+    if (d) prevData.push({ date: prev5[i], data: d });
+    await sleep(300);
+  }
+
+  // Screen
+  const threshold_dec = threshold / 100;
+  const results = [];
+
+  Object.entries(d0).forEach(([code, today_row]) => {
+    if (today_row.net >= 0) return; // 只要賣超
+
+    // 計算前幾日買張均值
+    const prevBuys = prevData.map(p => p.data[code]?.buy || 0).filter(v => v > 0);
+    if (prevBuys.length < 3) return; // 資料不足
+    const avgBuy = prevBuys.reduce((a, b) => a + b, 0) / prevBuys.length;
+    if (avgBuy === 0) return;
+
+    const pct = (today_row.buy - avgBuy) / avgBuy;
+    if (pct < threshold_dec) return;
+
+    results.push({
+      code, name: today_row.name,
+      buy: today_row.buy, sell: today_row.sell, net: today_row.net,
+      avgBuy: Math.round(avgBuy), pct,
+      history: prevData.map(p => ({ date: p.date, ...( p.data[code] || {buy:0,sell:0,net:0}) }))
+    });
+  });
+
+  results.sort((a, b) => b.pct - a.pct);
+
+  document.getElementById('meta').textContent =
+    `比較區間：${fmt8(prev5[prev5.length-1])} – ${fmt8(prev5[0])}（5日均）vs 今日 ${fmt8(today)} ｜ 增幅門檻 ≥ ${threshold}%`;
+
+  renderTable(results, today);
+  btn.disabled = false; btn.textContent = '執行篩選';
+}
+
+function setStatus(msg, step, total) {
+  const pct = total ? Math.round(step/total*100) : 0;
+  document.getElementById('main-content').innerHTML = `
+    <div class="status">
+      <div class="status-icon">⏳</div>
+      <div>${msg}</div>
+      ${total ? `<div class="progress">${step} / ${total} — ${pct}%</div>` : ''}
+    </div>`;
+}
+
+let currentResults = [];
+
+function renderTable(results, today) {
+  currentResults = results;
+  const el = document.getElementById('main-content');
+  if (!results.length) {
+    el.innerHTML = '<div class="status"><div class="status-icon">🔍</div><div>今日無符合條件個股</div><div class="progress">試試降低增幅門檻</div></div>';
+    return;
+  }
+
+  const maxPct = Math.max(...results.map(r => r.pct));
+
+  el.innerHTML = `
+    <div class="result-count">共 <strong>${results.length}</strong> 檔符合｜點擊查看5日明細</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="text-left" onclick="sortBy('code')">股票</th>
+            <th class="text-right" onclick="sortBy('buy')">今日買張 ↕</th>
+            <th class="text-right" onclick="sortBy('sell')">今日賣張 ↕</th>
+            <th class="text-right" onclick="sortBy('net')">買賣超 ↕</th>
+            <th class="text-right" onclick="sortBy('avgBuy')">5日均買張 ↕</th>
+            <th class="text-right sorted" onclick="sortBy('pct')">增幅 ↕</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${results.map(r => {
+            const barW = Math.min(100, Math.round(r.pct / maxPct * 100));
+            return `<tr onclick="showDetail('${r.code}')">
+              <td class="text-left">
+                <div class="stock-code">${r.code}</div>
+                <div class="stock-name">${r.name}</div>
+              </td>
+              <td class="text-right pos">${r.buy.toLocaleString()}</td>
+              <td class="text-right neg">${r.sell.toLocaleString()}</td>
+              <td class="text-right"><span class="badge badge-sell">${r.net.toLocaleString()}</span></td>
+              <td class="text-right">${r.avgBuy.toLocaleString()}</td>
+              <td class="text-right">
+                <div class="pct-bar">
+                  <div class="bar-bg"><div class="bar-fill" style="width:${barW}%"></div></div>
+                  <span class="highlight">+${Math.round(r.pct*100)}%</span>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = col !== 'pct'; }
+  const sorted = [...currentResults].sort((a, b) => {
+    const va = a[col], vb = b[col];
+    return sortAsc ? va - vb : vb - va;
+  });
+  const today = document.getElementById('meta').textContent.match(/今日 ([\d\/]+)/)?.[1]?.replace(/\//g,'') || '';
+  renderTable(sorted, today);
+}
+
+function showDetail(code) {
+  const r = currentResults.find(x => x.code === code);
+  if (!r) return;
+  document.getElementById('detail-title').textContent = `${r.code} ${r.name} ｜ 5日外資明細`;
+  const today_d0 = allData[tradingDates(6)[0]];
+  const todayRow = today_d0?.[code] || { buy: r.buy, sell: r.sell, net: r.net };
+  const todayDate = tradingDates(6)[0];
+
+  const allDays = [
+    { date: todayDate, buy: todayRow.buy, sell: todayRow.sell, net: todayRow.net, isToday: true },
+    ...r.history.map(h => ({ ...h, isToday: false }))
+  ];
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="info-box">
+      今日買張 <strong class="pos">${r.buy.toLocaleString()}</strong> 張｜
+      5日均買張 <strong>${r.avgBuy.toLocaleString()}</strong> 張｜
+      增幅 <strong class="highlight">+${Math.round(r.pct*100)}%</strong>
+    </div>
+    <div style="font-size:11px;color:#8b949e;margin-bottom:8px;padding:0 2px">單位：張（1張 = 1,000股）</div>
+    ${allDays.map(d => `
+      <div class="day-row">
+        <div>
+          <div class="day-date">${fmt8(d.date)}${d.isToday ? ' <span style="color:#58a6ff;font-size:10px">今日</span>' : ''}</div>
+        </div>
+        <div class="day-nums">
+          <div class="day-col text-right">
+            <div class="day-col-label">買張</div>
+            <div class="day-col-val pos">${(d.buy||0).toLocaleString()}</div>
+          </div>
+          <div class="day-col text-right">
+            <div class="day-col-label">賣張</div>
+            <div class="day-col-val neg">${(d.sell||0).toLocaleString()}</div>
+          </div>
+          <div class="day-col text-right">
+            <div class="day-col-label">買賣超</div>
+            <div class="day-col-val ${(d.net||0)>=0?'pos':'neg'}">${(d.net||0).toLocaleString()}</div>
+          </div>
+        </div>
+      </div>`).join('')}`;
+
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+</script>
+</body>
+</html>

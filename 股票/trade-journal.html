@@ -256,6 +256,9 @@ canvas{display:block;width:100%}
   text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
 
 .tpk{display:flex;flex-wrap:wrap;gap:5px}
+.sig-grid{display:flex;flex-direction:column;gap:10px}
+.sig-row{display:flex;flex-direction:column;gap:5px}
+.sig-lbl{font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
 .topt{background:var(--card2);border:1px solid var(--border);color:var(--text);
   padding:5px 11px;border-radius:7px;font-size:.74rem;cursor:pointer;
   transition:all .14s;user-select:none;font-weight:500}
@@ -455,9 +458,17 @@ canvas{display:block;width:100%}
       <div class="fg"><label>目標價</label><input type="number" id="fTP" placeholder="960" step="0.1"></div>
     </div>
     <hr class="fdiv">
-    <div class="fsec">進場 K棒型態（可複選）</div>
-    <div class="tpk" id="ekPk"></div>
-    <div class="fsec" style="margin-top:12px">進場原因（可複選）</div>
+    <div class="fsec">技術分析訊號</div>
+    <div class="sig-grid">
+      <div class="sig-row"><span class="sig-lbl">K棒型態</span><div class="tpk" id="ekPk"></div></div>
+      <div class="sig-row"><span class="sig-lbl">均線</span><div class="tpk" id="maPk"></div></div>
+      <div class="sig-row"><span class="sig-lbl">布林通道</span><div class="tpk" id="bbPk"></div></div>
+      <div class="sig-row"><span class="sig-lbl">KD</span><div class="tpk" id="kdPk"></div></div>
+      <div class="sig-row"><span class="sig-lbl">RSI</span><div class="tpk" id="rsiPk"></div></div>
+      <div class="sig-row"><span class="sig-lbl">乖離</span><div class="tpk" id="biasPk"></div></div>
+      <div class="sig-row"><span class="sig-lbl">價量</span><div class="tpk" id="volPk"></div></div>
+    </div>
+    <div class="fsec" style="margin-top:14px">進場原因（可複選）</div>
     <div class="tpk" id="rPk"></div>
     <div class="fg" style="margin-top:12px">
       <label>進場當下想法</label>
@@ -544,9 +555,17 @@ const REASONS  = ['外資買超','投信買超','法人雙買','突破壓力','�
                   '昨日外資賣超','其他'];
 const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','過早出場','過晚出場',
                   '情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
+const MA_OPTS   = ['多頭排列','空頭排列','站上MA5','跌破MA5','站上MA20','跌破MA20',
+                   '站上MA60','跌破MA60','黃金交叉','死亡交叉','壓力反壓','支撐扣抵'];
+const BB_OPTS   = ['帶寬收窄','帶寬擴大','突破上軌','跌破下軌','回測中軌','壓縮待爆','上軌壓力','下軌支撐'];
+const KD_OPTS   = ['黃金交叉','死亡交叉','K>80超買','K<20超賣','K值鈍化','低檔背離','高檔背離','K穿越50'];
+const RSI_OPTS  = ['RSI>70超買','RSI<30超賣','頂背離','底背離','站上50','跌破50'];
+const BIAS_OPTS = ['正乖離過大','負乖離縮小','乖離收斂','乖離回歸','乖離擴大'];
+const VOL_OPTS  = ['價升量升','價升量縮','價跌量增','價跌量縮','爆大量','量能萎縮','量破均量'];
 
 let trades=[], editId=null, closeId=null;
 let selR=[], selM=[], cSelM=[], selEK=[], selXK=[], curTT='actual';
+let selMA=[], selBB=[], selKD=[], selRSI=[], selBias=[], selVol=[];
 let entryImgFile=null, exitImgFile=null, existingEUrl=null, existingXUrl=null;
 let curType='all', curStat='all', curDate='all';
 let customFrom='', customTo='';
@@ -815,9 +834,19 @@ function cardHtml(t){
     ${days?`<div class="pf"><label>持有</label><span class="pv">${days}</span></div>`:''}
   </div>`;
 
-  const hasN=t.reasons?.length||t.entryKbar?.length||t.entryNote||t.exitKbar?.length||t.mistakes?.length||t.reviewNote;
+  const hasTech=t.entryKbar?.length||t.entryMA?.length||t.entryBB?.length||t.entryKD?.length||t.entryRSI?.length||t.entryBias?.length||t.entryVol?.length;
+  const techTags=[
+    ...(t.entryKbar||[]).map(k=>{const[n,c]=k.split(':');return`<span class="rtag ${c==='red'?'kred':c==='green'?'kgrn':'r'}">${esc(n)}</span>`;}),
+    ...(t.entryMA||[]).map(s=>`<span class="rtag r">${esc(s)}</span>`),
+    ...(t.entryBB||[]).map(s=>`<span class="rtag r">${esc(s)}</span>`),
+    ...(t.entryKD||[]).map(s=>`<span class="rtag r">${esc(s)}</span>`),
+    ...(t.entryRSI||[]).map(s=>`<span class="rtag r">${esc(s)}</span>`),
+    ...(t.entryBias||[]).map(s=>`<span class="rtag r">${esc(s)}</span>`),
+    ...(t.entryVol||[]).map(s=>`<span class="rtag r">${esc(s)}</span>`),
+  ].join('');
+  const hasN=hasTech||t.reasons?.length||t.entryNote||t.exitKbar?.length||t.mistakes?.length||t.reviewNote;
   const notes=hasN?`<div class="tc-notes">
-    ${t.entryKbar?.length?`<div><div class="nc-lbl">進場 K棒型態</div><div class="tag-row">${t.entryKbar.map(k=>{const[n,c]=k.split(':');return`<span class="rtag ${c==='red'?'kred':c==='green'?'kgrn':'r'}">${esc(n)}</span>`;}).join('')}</div></div>`:''}
+    ${hasTech?`<div><div class="nc-lbl">技術分析訊號</div><div class="tag-row">${techTags}</div></div>`:''}
     ${t.reasons?.length?`<div><div class="nc-lbl">進場原因</div><div class="tag-row">${t.reasons.map(r=>`<span class="rtag r">${esc(r)}</span>`).join('')}</div></div>`:''}
     ${t.entryNote?`<div><div class="nc-lbl">進場想法</div><p class="nc-txt">${esc(t.entryNote)}</p></div>`:''}
     ${t.exitKbar?.length?`<div><div class="nc-lbl">出場 K棒型態</div><div class="tag-row">${t.exitKbar.map(k=>{const[n,c]=k.split(':');return`<span class="rtag ${c==='red'?'kred':c==='green'?'kgrn':'m'}">${esc(n)}</span>`;}).join('')}</div></div>`:''}
@@ -888,6 +917,8 @@ window.save=async()=>{
     entryPrice:ep,stopLoss:parseFloat(v('fSL'))||null,target:parseFloat(v('fTP'))||null,
     exitDate:v('fXD')||null,exitPrice:xp,status,reasons:[...selR],mistakes:[...selM],
     entryKbar:[...selEK],exitKbar:[...selXK],
+    entryMA:[...selMA],entryBB:[...selBB],entryKD:[...selKD],
+    entryRSI:[...selRSI],entryBias:[...selBias],entryVol:[...selVol],
     entryNote:v('fEN'),reviewNote:v('fRV'),createdAt:Timestamp.now()};
   const b=document.getElementById('btnSv');b.disabled=true;b.textContent='儲存中…';
   try{
@@ -966,6 +997,7 @@ function buildKPk(cid,arr){
 
 window.openAdd=()=>{
   editId=null;selR=[];selM=[];selEK=[];selXK=[];curTT='actual';
+  selMA=[];selBB=[];selKD=[];selRSI=[];selBias=[];selVol=[];
   entryImgFile=null;exitImgFile=null;existingEUrl=null;existingXUrl=null;
   document.getElementById('mTitle').textContent='新增交易';
   ['fT','fN','fEP','fSL','fTP','fXD','fXP','fEN','fRV'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -973,7 +1005,11 @@ window.openAdd=()=>{
   document.getElementById('fEImg').value='';document.getElementById('fXImg').value='';
   document.getElementById('fED').value=new Date().toISOString().split('T')[0];
   setTT('actual');
-  buildKPk('ekPk',selEK);buildPk('rPk',REASONS,selR,false);
+  buildKPk('ekPk',selEK);
+  buildPk('maPk',MA_OPTS,selMA,false);buildPk('bbPk',BB_OPTS,selBB,false);
+  buildPk('kdPk',KD_OPTS,selKD,false);buildPk('rsiPk',RSI_OPTS,selRSI,false);
+  buildPk('biasPk',BIAS_OPTS,selBias,false);buildPk('volPk',VOL_OPTS,selVol,false);
+  buildPk('rPk',REASONS,selR,false);
   buildKPk('xkPk',selXK);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('addOv').classList.add('open');
 };
@@ -982,6 +1018,8 @@ window.openEdit=id=>{
   const t=trades.find(x=>x.id===id);if(!t)return;
   editId=id;selR=[...(t.reasons||[])];selM=[...(t.mistakes||[])];
   selEK=[...(t.entryKbar||[])];selXK=[...(t.exitKbar||[])];
+  selMA=[...(t.entryMA||[])];selBB=[...(t.entryBB||[])];selKD=[...(t.entryKD||[])];
+  selRSI=[...(t.entryRSI||[])];selBias=[...(t.entryBias||[])];selVol=[...(t.entryVol||[])];
   entryImgFile=null;exitImgFile=null;
   existingEUrl=t.entryImgUrl||null;existingXUrl=t.exitImgUrl||null;
   curTT=t.type||'actual';
@@ -990,7 +1028,11 @@ window.openEdit=id=>{
     fSL:t.stopLoss,fTP:t.target,fXD:t.exitDate,fXP:t.exitPrice,fEN:t.entryNote,fRV:t.reviewNote};
   Object.entries(fields).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val??'';});
   setTT(curTT);
-  buildKPk('ekPk',selEK);buildPk('rPk',REASONS,selR,false);
+  buildKPk('ekPk',selEK);
+  buildPk('maPk',MA_OPTS,selMA,false);buildPk('bbPk',BB_OPTS,selBB,false);
+  buildPk('kdPk',KD_OPTS,selKD,false);buildPk('rsiPk',RSI_OPTS,selRSI,false);
+  buildPk('biasPk',BIAS_OPTS,selBias,false);buildPk('volPk',VOL_OPTS,selVol,false);
+  buildPk('rPk',REASONS,selR,false);
   buildKPk('xkPk',selXK);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('fEImg').value='';document.getElementById('fXImg').value='';
   const ep2=document.getElementById('ePrev'),xp2=document.getElementById('xPrev');
