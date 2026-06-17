@@ -7,277 +7,359 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080d13;--bg2:#0d1520;--card:#111927;--card2:#162030;
-  --border:#1a2840;--border2:#162030;
-  --text:#dde8f5;--text2:#9eb3cc;--text3:#5b7a99;--text4:#2e4a66;
-  --accent:#f5a623;--accent2:#ffc142;
-  --green:#00d4a0;--green2:#00b386;--green-dim:rgba(0,212,160,.1);
-  --red:#ff4f6e;--red2:#e03355;--red-dim:rgba(255,79,110,.1);
-  --blue:#4da6ff;--blue-dim:rgba(77,166,255,.1);
-  --purple:#b39dfa;--purple-dim:rgba(179,157,250,.1);
+  --bg:#0e1118;--bg2:#131720;
+  --card:#181d2c;--card2:#1e2438;
+  --border:#252c42;--border2:#1e2438;
+  --text:#f0f3fc;--text2:#8fa0c0;--text3:#506080;--text4:#2d3a55;
+  --accent:#e8a228;--accent2:#f5b840;
+  --green:#3ecf8e;--green2:#25b074;
+  --g-bg:rgba(62,207,142,.08);--g-bd:rgba(62,207,142,.22);
+  --red:#e05555;--red2:#c83333;
+  --r-bg:rgba(224,85,85,.08);--r-bd:rgba(224,85,85,.22);
+  --blue:#5b9bf5;--b-bg:rgba(91,155,245,.08);--b-bd:rgba(91,155,245,.22);
+  --paper:#a78bfa;--p-bg:rgba(167,139,250,.08);--p-bd:rgba(167,139,250,.22);
 }
 html{scroll-behavior:smooth}
-body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 input,select,textarea,button{font-family:inherit}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* NAV */
-.nav{background:rgba(13,21,32,.92);border-bottom:1px solid var(--border);padding:0 28px;height:54px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:200;backdrop-filter:blur(16px)}
-.nav-logo{font-size:1rem;font-weight:800;letter-spacing:-.01em}
-.nav-sync{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text3)}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.nav-open-pill{background:var(--blue-dim);border:1px solid rgba(77,166,255,.25);color:var(--blue);font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px;display:none;margin-left:auto}
+/* ══ NAV ══ */
+.nav{background:rgba(14,17,24,.95);border-bottom:1px solid var(--border);height:52px;
+  display:flex;align-items:center;padding:0 28px;gap:14px;position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(16px)}
+.nav-back{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--text3);
+  padding:6px 12px;border:1px solid var(--border);border-radius:7px;transition:all .15s;white-space:nowrap}
+.nav-back:hover{color:var(--text);border-color:var(--text3)}
+.nav-title{font-size:.95rem;font-weight:700;color:var(--text)}
+.nav-sync{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text3);margin-left:auto}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-pill{background:var(--b-bg);border:1px solid var(--b-bd);color:var(--blue);
+  font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;display:none}
 
-/* DASHBOARD */
-.dash{padding:32px 28px 0;max-width:1060px;margin:0 auto}
-.dash-top{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+/* ══ DASHBOARD ══ */
+.dash{max-width:1080px;margin:0 auto;padding:28px 28px 0}
 
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden;cursor:default;transition:border-color .2s,transform .2s}
-.kpi:hover{border-color:rgba(255,255,255,.07);transform:translateY(-2px)}
-.kpi-val{font-size:2.2rem;font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:4px}
-.kpi-lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600}
-.kpi-sub{font-size:.75rem;color:var(--text4);margin-top:4px}
-.kpi-bar{position:absolute;bottom:0;left:0;height:3px}
-.kpi.total  .kpi-bar{background:linear-gradient(90deg,var(--accent),var(--accent2));width:100%}
-.kpi.rate   .kpi-bar{background:linear-gradient(90deg,var(--green),var(--green2))}
-.kpi.profit .kpi-bar{background:linear-gradient(90deg,var(--purple),var(--blue));width:60%}
-.kpi.hold   .kpi-bar{background:linear-gradient(90deg,var(--blue),#60c3ff);width:40%}
-.kpi-glow{position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;filter:blur(30px);opacity:.1;pointer-events:none}
-.kpi.total  .kpi-glow{background:var(--accent)}
-.kpi.rate   .kpi-glow{background:var(--green)}
-.kpi.profit .kpi-glow{background:var(--purple)}
-.kpi.hold   .kpi-glow{background:var(--blue)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:22px 22px 18px;position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;cursor:default}
+.kpi:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.08)}
+.kpi-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);
+  font-weight:600;margin-bottom:10px}
+.kpi-val{font-size:2.6rem;font-weight:900;line-height:1;letter-spacing:-.04em;color:#fff;margin-bottom:6px}
+.kpi-sub{font-size:.73rem;color:var(--text4)}
+.kpi-accent{position:absolute;bottom:0;left:0;height:3px}
+.kpi.k-total .kpi-accent{background:linear-gradient(90deg,var(--accent),var(--accent2));width:100%}
+.kpi.k-rate  .kpi-accent{background:linear-gradient(90deg,var(--green),var(--green2))}
+.kpi.k-pnl  .kpi-accent{background:linear-gradient(90deg,var(--paper),var(--blue));width:65%}
+.kpi.k-open .kpi-accent{background:linear-gradient(90deg,var(--blue),#82b8ff);width:45%}
+.kpi-val.pos{color:var(--green)}.kpi-val.neg{color:var(--red)}.kpi-val.neu{color:var(--text3)}
+.kpi-val.g{color:var(--accent2)}.kpi-val.b{color:var(--blue)}
 
-.wr-bar-wrap{margin-top:8px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.wr-bar{height:100%;border-radius:2px;transition:width .8s ease;width:0%}
+.wr-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px}
+.wr-fill{height:100%;border-radius:3px;transition:width .9s ease;width:0}
 
-.dash-sec{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
-.sec-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
-.sec-val{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;line-height:1}
-.sec-lbl{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+/* secondary */
+.sec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.sec-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px}
+.sec-val{font-size:1.6rem;font-weight:800;letter-spacing:-.025em;line-height:1;color:#fff}
+.sec-val.pos{color:var(--green)}.sec-val.neg{color:var(--red)}.sec-val.pu{color:var(--paper)}
+.sec-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:5px}
 
-.cv-g{color:var(--green)}.cv-r{color:var(--red)}.cv-p{color:var(--purple)}
-.cv-b{color:var(--blue)}.cv-a{color:var(--accent2)}.cv-n{color:var(--text3)}
-
-/* CHART */
-.chart-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;display:none}
-.chart-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.chart-title{font-size:.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em}
-.chart-pill{font-size:.7rem;padding:3px 10px;border-radius:20px;font-weight:600}
-.chart-pill.pos{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,212,160,.2)}
-.chart-pill.neg{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,79,110,.2)}
-.chart-pill.neu{background:rgba(255,255,255,.04);color:var(--text3)}
+/* chart */
+.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:18px 20px;margin-bottom:20px;display:none}
+.chart-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.chart-ttl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2)}
+.chart-badge{font-size:.7rem;padding:3px 10px;border-radius:20px;font-weight:700}
+.chart-badge.pos{background:var(--g-bg);color:var(--green);border:1px solid var(--g-bd)}
+.chart-badge.neg{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
+.chart-badge.neu{background:rgba(255,255,255,.05);color:var(--text3)}
 canvas{display:block;width:100%}
 
-/* TOOLBAR */
-.toolbar{max-width:1060px;margin:0 auto 14px;padding:0 28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.btn-add{background:var(--accent);color:#000;font-weight:800;border:none;border-radius:10px;padding:10px 24px;font-size:.88rem;cursor:pointer;transition:all .18s;white-space:nowrap;letter-spacing:.01em;box-shadow:0 4px 14px rgba(245,166,35,.25)}
-.btn-add:hover{background:var(--accent2);box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px)}
+/* ══ FILTER BAR ══ */
+.fbar{max-width:1080px;margin:0 auto;padding:0 28px;margin-bottom:12px}
+.fbar-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0;
+  border-bottom:1px solid var(--border)}
+.fbar-row:last-child{border-bottom:none;padding-top:8px;padding-bottom:0}
+.fbar-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text4);white-space:nowrap;min-width:32px}
+.fpill{background:none;border:1px solid var(--border);color:var(--text3);
+  padding:5px 14px;border-radius:8px;font-size:.76rem;cursor:pointer;
+  transition:all .14s;font-weight:500;white-space:nowrap}
+.fpill:hover{border-color:var(--text2);color:var(--text2)}
+.fpill.on{background:rgba(232,162,40,.1);border-color:rgba(232,162,40,.4);
+  color:var(--accent2);font-weight:700}
+
+/* ══ TOOLBAR ══ */
+.tbar{max-width:1080px;margin:0 auto;padding:0 28px 12px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-add{background:var(--accent);color:#000;font-weight:800;border:none;
+  border-radius:10px;padding:10px 24px;font-size:.88rem;cursor:pointer;
+  letter-spacing:.01em;box-shadow:0 3px 12px rgba(232,162,40,.3);transition:all .16s;white-space:nowrap}
+.btn-add:hover{background:var(--accent2);box-shadow:0 5px 18px rgba(232,162,40,.45);transform:translateY(-1px)}
 .btn-add:active{transform:translateY(0)}
-.tcount{font-size:.78rem;color:var(--text4)}
-.filter-row{display:flex;gap:6px;margin-left:auto}
-.tab{background:none;border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .15s;white-space:nowrap;font-weight:500}
-.tab:hover{border-color:var(--text3);color:var(--text2)}
-.tab.active{background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.35);color:var(--accent2);font-weight:700}
+.tcount{font-size:.75rem;color:var(--text4);margin-left:auto}
 
-/* LIST */
-.list-wrap{max-width:1060px;margin:0 auto;padding:0 28px 100px}
-.empty{text-align:center;padding:80px 20px}
-.empty h3{font-size:1.1rem;color:var(--text2);margin-bottom:8px}
-.empty p{font-size:.85rem;color:var(--text3);line-height:1.8}
-.loading{text-align:center;padding:60px;color:var(--text3);font-size:.9rem}
+/* ══ LIST ══ */
+.lst{max-width:1080px;margin:0 auto;padding:0 28px 80px}
+.empty{text-align:center;padding:70px 20px}
+.empty h3{font-size:1rem;color:var(--text2);margin-bottom:6px}
+.empty p{font-size:.82rem;color:var(--text3);line-height:1.8}
+.loading{text-align:center;padding:60px;color:var(--text3)}
 
-/* TRADE CARD */
-.tc{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:all .2s}
-.tc:hover{border-color:rgba(255,255,255,.08);box-shadow:0 6px 24px rgba(0,0,0,.3)}
-.tc.win {border-left:3px solid var(--green)}
-.tc.loss{border-left:3px solid var(--red)}
-.tc.open{border-left:3px solid var(--blue)}
+/* ══ TRADE CARD ══ */
+.tc{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  margin-bottom:10px;overflow:hidden;transition:box-shadow .2s,border-color .2s}
+.tc:hover{border-color:rgba(255,255,255,.09);box-shadow:0 4px 20px rgba(0,0,0,.35)}
+.tc.win {border-left:4px solid var(--green)}
+.tc.loss{border-left:4px solid var(--red)}
+.tc.open{border-left:4px solid var(--blue)}
 
-.tc-head{padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;cursor:pointer;user-select:none}
-.tc-av{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;letter-spacing:.02em}
-.tc.win  .tc-av{background:rgba(0,212,160,.1);color:var(--green);border:1px solid rgba(0,212,160,.2)}
-.tc.loss .tc-av{background:rgba(255,79,110,.1);color:var(--red);border:1px solid rgba(255,79,110,.2)}
-.tc.open .tc-av{background:rgba(77,166,255,.1);color:var(--blue);border:1px solid rgba(77,166,255,.2)}
+/* card header */
+.tch{padding:16px 20px;display:grid;grid-template-columns:44px 1fr auto;
+  gap:14px;align-items:center;cursor:pointer;user-select:none}
+.tcav{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;
+  justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0;letter-spacing:.01em}
+.tc.win  .tcav{background:var(--g-bg);color:var(--green);border:1px solid var(--g-bd)}
+.tc.loss .tcav{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
+.tc.open .tcav{background:var(--b-bg);color:var(--blue);border:1px solid var(--b-bd)}
 
-.tc-mid{min-width:0}
-.tc-ticker-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
-.tc-ticker{font-size:1.05rem;font-weight:800;letter-spacing:-.01em}
-.tc-name{font-size:.8rem;color:var(--text3)}
-.tc-tags-row{display:flex;gap:5px;flex-wrap:wrap}
-.tc-mini-tag{font-size:.65rem;padding:2px 7px;border-radius:5px;background:rgba(77,166,255,.1);color:var(--blue);font-weight:600}
-.tc-date-row{font-size:.72rem;color:var(--text4);margin-top:3px}
+.tcm{min-width:0}
+.tcm-top{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+.tc-ticker{font-size:1rem;font-weight:800}
+.tc-name{font-size:.78rem;color:var(--text3)}
+.tc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.tc-mtag{font-size:.63rem;padding:2px 7px;border-radius:5px;
+  background:var(--b-bg);color:var(--blue);font-weight:600}
+.tc-date{font-size:.7rem;color:var(--text4);margin-top:3px}
 
-.tc-right{text-align:right;flex-shrink:0}
-.tc-pnl{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;line-height:1;margin-bottom:5px}
+.tcr{text-align:right;flex-shrink:0}
+.tc-pnl{font-size:1.4rem;font-weight:900;letter-spacing:-.025em;line-height:1;margin-bottom:5px}
 .tc-pnl.pos{color:var(--green)}.tc-pnl.neg{color:var(--red)}.tc-pnl.neu{color:var(--text3)}
-.tc-badge-row{display:flex;gap:6px;justify-content:flex-end;align-items:center}
-.tbadge{font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em}
-.tbw{background:rgba(0,212,160,.12);color:var(--green);border:1px solid rgba(0,212,160,.2)}
-.tbl{background:rgba(255,79,110,.12);color:var(--red);border:1px solid rgba(255,79,110,.2)}
-.tbo{background:rgba(77,166,255,.12);color:var(--blue);border:1px solid rgba(77,166,255,.2)}
-.tc-r{font-size:.72rem;color:var(--text4);margin-top:2px}
+.tc-badges{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}
+.badge{font-size:.63rem;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em;white-space:nowrap}
+.bw{background:var(--g-bg);color:var(--green);border:1px solid var(--g-bd)}
+.bl{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
+.bo{background:var(--b-bg);color:var(--blue);border:1px solid var(--b-bd)}
+.bp{background:var(--p-bg);color:var(--paper);border:1px solid var(--p-bd)}
+.ba{background:rgba(232,162,40,.08);color:var(--accent2);border:1px solid rgba(232,162,40,.22)}
 
-.tc-body{display:none;border-top:1px solid var(--border2)}
-.tc-body.open{display:block}
+/* card body */
+.tcb{display:none;border-top:1px solid var(--border2)}
+.tcb.open{display:block}
 
-.tc-prices{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));border-bottom:1px solid var(--border2)}
-.pf{padding:14px 18px;border-right:1px solid var(--border2)}
+.tc-prices{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+  border-bottom:1px solid var(--border2)}
+.pf{padding:13px 16px;border-right:1px solid var(--border2)}
 .pf:last-child{border-right:none}
-.pf label{display:block;font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);margin-bottom:4px;font-weight:600}
-.pf .pv{font-size:1rem;font-weight:700;color:var(--text2)}
+.pf label{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text4);margin-bottom:4px;font-weight:600}
+.pf .pv{font-size:.95rem;font-weight:700;color:var(--text2)}
 .pf .pv.pos{color:var(--green)}.pf .pv.neg{color:var(--red)}.pf .pv.acc{color:var(--accent2)}
 
-.tc-content{padding:16px 18px;border-bottom:1px solid var(--border2);display:grid;gap:14px}
-.nc-label{font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);font-weight:600;margin-bottom:5px}
-.nc-text{font-size:.85rem;color:var(--text2);line-height:1.75;white-space:pre-wrap}
+.tc-notes{padding:16px;border-bottom:1px solid var(--border2);display:grid;gap:12px}
+.nc-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);
+  font-weight:600;margin-bottom:4px}
+.nc-txt{font-size:.84rem;color:var(--text2);line-height:1.75;white-space:pre-wrap}
 .tag-row{display:flex;flex-wrap:wrap;gap:5px}
-.rtag{font-size:.72rem;padding:3px 9px;border-radius:6px;font-weight:600}
-.rtag.reason{background:rgba(77,166,255,.1);color:var(--blue);border:1px solid rgba(77,166,255,.18)}
-.rtag.mistake{background:rgba(255,79,110,.1);color:var(--red);border:1px solid rgba(255,79,110,.18)}
+.rtag{font-size:.7rem;padding:3px 9px;border-radius:6px;font-weight:600}
+.rtag.r{background:var(--b-bg);color:var(--blue);border:1px solid var(--b-bd)}
+.rtag.m{background:var(--r-bg);color:var(--red);border:1px solid var(--r-bd)}
 
-.tc-footer{padding:12px 18px;display:flex;gap:8px;justify-content:flex-end}
-.btn-s{background:none;border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .15s;font-weight:500}
-.btn-s:hover{border-color:rgba(255,255,255,.15);color:var(--text)}
-.btn-s.close-btn{background:rgba(0,212,160,.06);border-color:rgba(0,212,160,.25);color:var(--green)}
-.btn-s.close-btn:hover{background:rgba(0,212,160,.12)}
-.btn-s.del:hover{border-color:rgba(255,79,110,.4);color:var(--red)}
+.tc-foot{padding:10px 16px;display:flex;gap:7px;justify-content:flex-end}
+.btn-sm{background:none;border:1px solid var(--border);color:var(--text3);
+  padding:6px 14px;border-radius:7px;font-size:.76rem;cursor:pointer;transition:all .14s;font-weight:500}
+.btn-sm:hover{border-color:rgba(255,255,255,.15);color:var(--text)}
+.btn-sm.c{background:var(--g-bg);border-color:var(--g-bd);color:var(--green)}
+.btn-sm.c:hover{background:rgba(62,207,142,.14)}
+.btn-sm.d:hover{border-color:var(--r-bd);color:var(--red)}
 
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;backdrop-filter:blur(6px)}
-.overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:600px;margin:auto;box-shadow:0 32px 80px rgba(0,0,0,.6)}
-.mh{padding:22px 26px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
-.mh h2{font-size:1rem;font-weight:700}
-.mx{background:rgba(255,255,255,.05);border:none;color:var(--text3);font-size:1rem;cursor:pointer;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+/* ══ MODALS ══ */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;
+  display:none;align-items:flex-start;justify-content:center;
+  padding:20px;overflow-y:auto;backdrop-filter:blur(8px)}
+.ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;
+  width:100%;max-width:600px;margin:auto;box-shadow:0 40px 100px rgba(0,0,0,.7)}
+.mhd{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border2)}
+.mhd h2{font-size:.95rem;font-weight:700}
+.mx{background:rgba(255,255,255,.05);border:none;color:var(--text3);cursor:pointer;
+  width:28px;height:28px;border-radius:7px;font-size:.9rem;
+  display:flex;align-items:center;justify-content:center;transition:all .14s}
 .mx:hover{background:rgba(255,255,255,.1);color:var(--text)}
-.mb{padding:22px 26px 26px}
+.mbody{padding:20px 24px 24px}
 
-.fg{margin-bottom:14px}
-.fg label{display:block;font-size:.72rem;font-weight:600;color:var(--text3);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
-.fg input,.fg select,.fg textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-size:.95rem;outline:none;transition:border-color .15s}
-.fg input:focus,.fg textarea:focus{border-color:rgba(245,166,35,.5);box-shadow:0 0 0 3px rgba(245,166,35,.08)}
-.fg textarea{resize:vertical;min-height:76px;line-height:1.6}
+/* type toggle */
+.type-toggle{display:flex;gap:0;background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;margin-bottom:14px}
+.ttp{flex:1;border:none;padding:10px;font-size:.84rem;font-weight:600;cursor:pointer;
+  background:none;color:var(--text3);transition:all .15s}
+.ttp.on{background:var(--accent);color:#000;font-weight:800}
+.ttp:first-child.on{background:var(--accent)}
+.ttp:last-child.on{background:var(--paper);color:#fff}
+
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:.7rem;font-weight:600;color:var(--text3);
+  margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+.fg input,.fg textarea{width:100%;background:var(--card2);border:1px solid var(--border);
+  border-radius:9px;padding:10px 14px;color:var(--text);font-size:.92rem;outline:none;
+  transition:border-color .14s}
+.fg input:focus,.fg textarea:focus{
+  border-color:rgba(232,162,40,.55);box-shadow:0 0 0 3px rgba(232,162,40,.08)}
+.fg textarea{resize:vertical;min-height:72px;line-height:1.6}
 .fg input::placeholder,.fg textarea::placeholder{color:var(--text4)}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fdiv{border:none;border-top:1px solid var(--border2);margin:18px 0}
-.fsec{font-size:.68rem;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fdiv{border:none;border-top:1px solid var(--border2);margin:16px 0}
+.fsec{font-size:.65rem;font-weight:700;color:var(--text4);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
 
-.tpicker{display:flex;flex-wrap:wrap;gap:6px}
-.topt{background:var(--card2);border:1px solid var(--border);color:var(--text3);padding:6px 12px;border-radius:8px;font-size:.76rem;cursor:pointer;transition:all .15s;user-select:none;font-weight:500}
-.topt:hover{border-color:var(--text3);color:var(--text2)}
-.topt.sel{background:rgba(77,166,255,.12);border-color:rgba(77,166,255,.4);color:var(--blue);font-weight:700}
-.topt.sel.err{background:rgba(255,79,110,.12);border-color:rgba(255,79,110,.4);color:var(--red)}
+.tpk{display:flex;flex-wrap:wrap;gap:5px}
+.topt{background:var(--card2);border:1px solid var(--border);color:var(--text3);
+  padding:5px 11px;border-radius:7px;font-size:.74rem;cursor:pointer;
+  transition:all .14s;user-select:none;font-weight:500}
+.topt:hover{border-color:var(--text2);color:var(--text2)}
+.topt.sel{background:var(--b-bg);border-color:var(--b-bd);color:var(--blue);font-weight:700}
+.topt.sel.err{background:var(--r-bg);border-color:var(--r-bd);color:var(--red)}
 
-.btn-sub{width:100%;background:var(--accent);color:#000;font-weight:800;border:none;border-radius:10px;padding:13px;font-size:.95rem;cursor:pointer;margin-top:18px;transition:all .18s;letter-spacing:.01em;box-shadow:0 4px 14px rgba(245,166,35,.25)}
-.btn-sub:hover{background:var(--accent2);box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px)}
+.btn-sub{width:100%;background:var(--accent);color:#000;font-weight:800;border:none;
+  border-radius:10px;padding:12px;font-size:.92rem;cursor:pointer;margin-top:16px;
+  letter-spacing:.01em;box-shadow:0 3px 12px rgba(232,162,40,.3);transition:all .16s}
+.btn-sub:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 5px 18px rgba(232,162,40,.45)}
 .btn-sub:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 
-@media(max-width:860px){.dash-top{grid-template-columns:repeat(2,1fr)}.dash-sec{grid-template-columns:1fr 1fr}}
+/* ══ RESPONSIVE ══ */
+@media(max-width:860px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .sec-grid{grid-template-columns:1fr 1fr}
+}
 @media(max-width:640px){
-  .dash,.toolbar,.list-wrap{padding-left:16px;padding-right:16px}
-  .nav{padding:0 16px}
-  .dash-top{grid-template-columns:1fr 1fr}
-  .dash-sec{grid-template-columns:1fr}
-  .kpi-val{font-size:1.8rem}
+  .dash,.fbar,.tbar,.lst{padding-left:14px;padding-right:14px}
+  .nav{padding:0 14px}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .kpi-val{font-size:2rem}
+  .sec-grid{grid-template-columns:1fr;gap:8px}
   .frow{grid-template-columns:1fr}
 }
-@media(max-width:400px){.dash-top{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav class="nav">
-  <span class="nav-logo">交易日誌</span>
+  <a class="nav-back" href="index.html">← 股學筆記</a>
+  <span class="nav-title">交易日誌</span>
   <div class="nav-sync">
     <div class="sync-dot"></div>
     <span>即時同步</span>
   </div>
-  <span class="nav-open-pill" id="navPill"></span>
+  <span class="nav-pill" id="navPill"></span>
 </nav>
 
+<!-- DASHBOARD -->
 <div class="dash">
-  <div class="dash-top">
-    <div class="kpi total">
-      <div class="kpi-glow"></div>
-      <div class="kpi-val cv-a" id="kTotal">—</div>
+  <div class="kpi-grid">
+    <div class="kpi k-total">
       <div class="kpi-lbl">總交易筆數</div>
-      <div class="kpi-sub" id="kClosedSub">—</div>
-      <div class="kpi-bar"></div>
+      <div class="kpi-val g" id="kTotal">—</div>
+      <div class="kpi-sub" id="kSub1">—</div>
+      <div class="kpi-accent"></div>
     </div>
-    <div class="kpi rate">
-      <div class="kpi-glow"></div>
-      <div class="kpi-val" id="kWR">—</div>
+    <div class="kpi k-rate">
       <div class="kpi-lbl">勝率</div>
-      <div class="wr-bar-wrap"><div class="wr-bar" id="wrBar"></div></div>
-      <div class="kpi-bar"></div>
+      <div class="kpi-val" id="kWR">—</div>
+      <div class="wr-track"><div class="wr-fill" id="wrFill"></div></div>
+      <div class="kpi-accent"></div>
     </div>
-    <div class="kpi profit">
-      <div class="kpi-glow"></div>
-      <div class="kpi-val" id="kNetPnl">—</div>
+    <div class="kpi k-pnl">
       <div class="kpi-lbl">累積盈虧</div>
-      <div class="kpi-sub" id="kNetSub">—</div>
-      <div class="kpi-bar"></div>
+      <div class="kpi-val" id="kPnl">—</div>
+      <div class="kpi-sub" id="kSub3">—</div>
+      <div class="kpi-accent"></div>
     </div>
-    <div class="kpi hold">
-      <div class="kpi-glow"></div>
-      <div class="kpi-val cv-b" id="kOpen">—</div>
+    <div class="kpi k-open">
       <div class="kpi-lbl">持倉中</div>
-      <div class="kpi-sub" id="kOpenSub">—</div>
-      <div class="kpi-bar"></div>
+      <div class="kpi-val b" id="kOpen">—</div>
+      <div class="kpi-sub" id="kSub4">—</div>
+      <div class="kpi-accent"></div>
     </div>
   </div>
-
-  <div class="dash-sec">
+  <div class="sec-grid">
     <div class="sec-card">
-      <div class="sec-val cv-g" id="sAvgW">—</div>
+      <div class="sec-val pos" id="sAvgW">—</div>
       <div class="sec-lbl">平均獲利幅度</div>
     </div>
     <div class="sec-card">
-      <div class="sec-val cv-r" id="sAvgL">—</div>
+      <div class="sec-val neg" id="sAvgL">—</div>
       <div class="sec-lbl">平均虧損幅度</div>
     </div>
     <div class="sec-card">
-      <div class="sec-val cv-p" id="sPF">—</div>
+      <div class="sec-val pu" id="sPF">—</div>
       <div class="sec-lbl">獲利因子（盈虧比）</div>
     </div>
   </div>
-
-  <div class="chart-section" id="chartSec">
-    <div class="chart-header">
-      <span class="chart-title">資產曲線</span>
-      <span class="chart-pill neu" id="chartPill">累積報酬率</span>
-      <span style="margin-left:auto;font-size:.72rem;color:var(--text4)" id="chartRange"></span>
+  <div class="chart-wrap" id="chartWrap">
+    <div class="chart-hd">
+      <span class="chart-ttl">資產曲線</span>
+      <span class="chart-badge neu" id="chartBadge">累積報酬率</span>
+      <span style="margin-left:auto;font-size:.7rem;color:var(--text4)" id="chartRange"></span>
     </div>
-    <canvas id="eqChart" height="160"></canvas>
+    <canvas id="eqCanvas" height="160"></canvas>
   </div>
 </div>
 
-<div class="toolbar">
+<!-- FILTER BAR -->
+<div class="fbar">
+  <div class="fbar-row">
+    <span class="fbar-lbl">類別</span>
+    <button class="fpill on" onclick="setType('all',this)">全部</button>
+    <button class="fpill" onclick="setType('actual',this)">實際交易</button>
+    <button class="fpill" onclick="setType('paper',this)">預估盤</button>
+    <span style="width:1px;height:18px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
+    <span class="fbar-lbl">狀態</span>
+    <button class="fpill on" onclick="setStat('all',this)">全部</button>
+    <button class="fpill" onclick="setStat('open',this)">持倉中</button>
+    <button class="fpill" onclick="setStat('win',this)">獲利</button>
+    <button class="fpill" onclick="setStat('loss',this)">虧損</button>
+  </div>
+  <div class="fbar-row">
+    <span class="fbar-lbl">期間</span>
+    <button class="fpill" onclick="setDate('week',this)">本週</button>
+    <button class="fpill" onclick="setDate('month',this)">本月</button>
+    <button class="fpill" onclick="setDate('quarter',this)">本季</button>
+    <button class="fpill" onclick="setDate('year',this)">今年</button>
+    <button class="fpill on" onclick="setDate('all',this)">全部時間</button>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="tbar">
   <button class="btn-add" onclick="openAdd()">新增交易</button>
   <span class="tcount" id="tcount"></span>
-  <div class="filter-row">
-    <button class="tab active" onclick="setF('all',this)">全部</button>
-    <button class="tab" onclick="setF('open',this)">持倉中</button>
-    <button class="tab" onclick="setF('win',this)">獲利</button>
-    <button class="tab" onclick="setF('loss',this)">虧損</button>
-  </div>
 </div>
 
-<div class="list-wrap" id="list"><div class="loading">連線中…</div></div>
+<!-- LIST -->
+<div class="lst" id="list"><div class="loading">連線中…</div></div>
 
-<!-- 新增 / 編輯 -->
-<div class="overlay" id="addOv" onclick="bgC(event,'addOv')">
+<!-- 新增/編輯 Modal -->
+<div class="ov" id="addOv" onclick="bgC(event,'addOv')">
 <div class="modal">
-  <div class="mh">
-    <h2 id="mTitle">新增交易</h2>
-    <button class="mx" onclick="closeAdd()">x</button>
-  </div>
-  <div class="mb">
+  <div class="mhd"><h2 id="mTitle">新增交易</h2><button class="mx" onclick="closeAdd()">x</button></div>
+  <div class="mbody">
+    <div class="fsec">類別</div>
+    <div class="type-toggle">
+      <button class="ttp on" id="ttpA" onclick="setTT('actual')">實際交易</button>
+      <button class="ttp" id="ttpP" onclick="setTT('paper')">預估盤（未進場）</button>
+    </div>
     <div class="frow">
       <div class="fg"><label>股票代號 *</label><input id="fT" placeholder="2330" maxlength="6"></div>
       <div class="fg"><label>股票名稱</label><input id="fN" placeholder="台積電"></div>
@@ -292,43 +374,40 @@ canvas{display:block;width:100%}
     </div>
     <hr class="fdiv">
     <div class="fsec">進場原因（可複選）</div>
-    <div class="tpicker" id="rPicker"></div>
-    <div class="fg" style="margin-top:14px">
+    <div class="tpk" id="rPk"></div>
+    <div class="fg" style="margin-top:12px">
       <label>進場當下想法</label>
-      <textarea id="fEN" placeholder="為什麼進場？看到什麼訊號、當下判斷邏輯…"></textarea>
+      <textarea id="fEN" placeholder="看到什麼訊號？判斷邏輯是什麼…"></textarea>
     </div>
     <hr class="fdiv">
-    <div class="fsec">出場資訊（結單後填）</div>
+    <div class="fsec">出場資訊（結單後填，預估盤可不填）</div>
     <div class="frow">
       <div class="fg"><label>出場日期</label><input type="date" id="fXD"></div>
       <div class="fg"><label>出場價格</label><input type="number" id="fXP" placeholder="留空 = 持倉中" step="0.1"></div>
     </div>
     <div class="fsec" style="margin-top:4px">犯的錯誤（可複選）</div>
-    <div class="tpicker" id="mPicker"></div>
-    <div class="fg" style="margin-top:14px">
+    <div class="tpk" id="mPk"></div>
+    <div class="fg" style="margin-top:12px">
       <label>收盤後檢討</label>
-      <textarea id="fRV" placeholder="這筆交易學到什麼？哪裡做得不對，下次怎麼改進…"></textarea>
+      <textarea id="fRV" placeholder="這筆交易學到什麼？下次怎麼改進…"></textarea>
     </div>
     <button class="btn-sub" id="btnSv" onclick="save()">儲存交易記錄</button>
   </div>
 </div>
 </div>
 
-<!-- 結單 -->
-<div class="overlay" id="closeOv" onclick="bgC(event,'closeOv')">
+<!-- 結單 Modal -->
+<div class="ov" id="closeOv" onclick="bgC(event,'closeOv')">
 <div class="modal" style="max-width:460px">
-  <div class="mh">
-    <h2 id="closeT">結單</h2>
-    <button class="mx" onclick="closeOv()">x</button>
-  </div>
-  <div class="mb">
+  <div class="mhd"><h2 id="closeT">結單</h2><button class="mx" onclick="closeOv()">x</button></div>
+  <div class="mbody">
     <div class="frow">
       <div class="fg"><label>出場日期</label><input type="date" id="cXD"></div>
       <div class="fg"><label>出場價格 *</label><input type="number" id="cXP" step="0.1" placeholder="成交出場價"></div>
     </div>
     <div class="fsec">犯的錯誤（可複選）</div>
-    <div class="tpicker" id="cmPicker"></div>
-    <div class="fg" style="margin-top:14px">
+    <div class="tpk" id="cMPk"></div>
+    <div class="fg" style="margin-top:12px">
       <label>檢討與筆記</label>
       <textarea id="cRV" placeholder="這筆交易學到什麼？有哪裡做得不對…"></textarea>
     </div>
@@ -355,230 +434,241 @@ const app = initializeApp({
 const db = getFirestore(app);
 const COL = 'trades';
 
-const REASONS  = ['外資買超','投信買超','法人雙買','突破壓力','支撐反彈','缺口突破','趨勢跟隨','週線訊號','籌碼背離','融券回補','量能放大','消息面','其他'];
-const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','過早出場','過晚出場','情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
+const REASONS  = ['外資買超','投信買超','法人雙買','突破壓力','支撐反彈','缺口突破',
+                  '趨勢跟隨','週線訊號','籌碼背離','融券回補','量能放大','消息面','其他'];
+const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','過早出場','過晚出場',
+                  '情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
 
-let trades=[], curF='all', editId=null, closeId=null, selR=[], selM=[], cSelM=[];
+let trades=[], editId=null, closeId=null;
+let selR=[], selM=[], cSelM=[], curTT='actual';
+let curType='all', curStat='all', curDate='all';
 
+/* ── load ── */
 async function load(){
   try{
-    const snap = await getDocs(query(collection(db,COL), orderBy('createdAt','desc')));
-    trades = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const snap=await getDocs(query(collection(db,COL),orderBy('createdAt','desc')));
+    trades=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderAll();
   }catch(e){
     document.getElementById('list').innerHTML=`<div class="loading" style="color:var(--red)">載入失敗：${e.message}</div>`;
   }
 }
 
-window.save = async ()=>{
-  const t=v('fT'), ep=parseFloat(v('fEP'));
-  if(!t||!ep){alert('請填寫股票代號和進場價格');return;}
-  const xp=parseFloat(v('fXP'))||null;
-  const status=xp?(xp>ep?'win':'loss'):'open';
-  const data={ticker:t.toUpperCase(),name:v('fN'),entryDate:v('fED'),entryPrice:ep,
-    stopLoss:parseFloat(v('fSL'))||null,target:parseFloat(v('fTP'))||null,
-    exitDate:v('fXD')||null,exitPrice:xp,status,
-    reasons:[...selR],mistakes:[...selM],
-    entryNote:v('fEN'),reviewNote:v('fRV'),createdAt:Timestamp.now()};
-  const b=document.getElementById('btnSv'); b.disabled=true; b.textContent='儲存中…';
-  try{
-    if(editId) await updateDoc(doc(db,COL,editId),data);
-    else       await addDoc(collection(db,COL),data);
-    closeAdd(); await load();
-  }catch(e){alert('儲存失敗：'+e.message);}
-  finally{b.disabled=false; b.textContent='儲存交易記錄';}
-};
+/* ── filter helpers ── */
+function inDate(dateStr){
+  if(curDate==='all'||!dateStr) return true;
+  const d=new Date(dateStr), now=new Date(); now.setHours(23,59,59,999);
+  if(curDate==='week'){
+    const dow=now.getDay()===0?6:now.getDay()-1;
+    const mon=new Date(now); mon.setDate(now.getDate()-dow); mon.setHours(0,0,0,0);
+    return d>=mon;
+  }
+  if(curDate==='month') return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  if(curDate==='quarter'){
+    const q=Math.floor(now.getMonth()/3);
+    return d.getFullYear()===now.getFullYear()&&Math.floor(d.getMonth()/3)===q;
+  }
+  if(curDate==='year') return d.getFullYear()===now.getFullYear();
+  return true;
+}
+function typeOf(t){ return t.type||'actual'; }
+function getFiltered(){
+  return trades.filter(t=>{
+    const tyOk=curType==='all'||typeOf(t)===curType;
+    const stOk=curStat==='all'||t.status===curStat;
+    const dtOk=inDate(t.entryDate);
+    return tyOk&&stOk&&dtOk;
+  });
+}
 
-window.saveClose = async ()=>{
-  const xp=parseFloat(document.getElementById('cXP').value);
-  if(!xp){alert('請填寫出場價格');return;}
-  const t=trades.find(x=>x.id===closeId); if(!t) return;
-  const status=xp>t.entryPrice?'win':'loss';
-  try{
-    await updateDoc(doc(db,COL,closeId),{
-      exitDate:document.getElementById('cXD').value,exitPrice:xp,status,
-      mistakes:[...cSelM],reviewNote:document.getElementById('cRV').value
-    });
-    closeOv(); await load();
-  }catch(e){alert('儲存失敗：'+e.message);}
-};
-
-window.del = async id=>{
-  if(!confirm('確定刪除這筆交易記錄？'))return;
-  try{await deleteDoc(doc(db,COL,id));await load();}catch(e){alert('刪除失敗');}
-};
-
-function pnlPct(t){ return t.exitPrice&&t.entryPrice?(t.exitPrice-t.entryPrice)/t.entryPrice*100:0; }
+/* ── stats ── */
+function pct(t){ return t.exitPrice&&t.entryPrice?(t.exitPrice-t.entryPrice)/t.entryPrice*100:0; }
 function avg(arr){ return arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:null; }
 
 function renderAll(){
-  const closed=trades.filter(t=>t.status!=='open');
-  const wins  =closed.filter(t=>t.status==='win');
-  const losses=closed.filter(t=>t.status==='loss');
-  const openN =trades.filter(t=>t.status==='open').length;
-  const wr    =closed.length?wins.length/closed.length*100:null;
-  const avgW  =avg(wins.map(pnlPct));
-  const avgL  =avg(losses.map(pnlPct));
-  const pf    =avgW!=null&&avgL!=null&&avgL!==0?Math.abs(avgW/avgL):null;
-  const netPnl=closed.reduce((s,t)=>s+pnlPct(t),0);
+  const all  = getFiltered();
+  const closed= all.filter(t=>t.status!=='open');
+  const wins  = closed.filter(t=>t.status==='win');
+  const losses= closed.filter(t=>t.status==='loss');
+  const openN = all.filter(t=>t.status==='open').length;
+  const wr    = closed.length?wins.length/closed.length*100:null;
+  const avgW  = avg(wins.map(pct));
+  const avgL  = avg(losses.map(pct));
+  const pf    = avgW!=null&&avgL!=null&&avgL!==0?Math.abs(avgW/avgL):null;
+  const netPnl= closed.reduce((s,t)=>s+pct(t),0);
 
-  tx('kTotal', trades.length||'0');
-  tx('kClosedSub', `${closed.length} 筆已結單`);
-  tx('kWR', wr!=null?wr.toFixed(1)+'%':'—', wr!=null?(wr>=50?'cv-g':'cv-r'):'cv-n');
-  const wrEl=document.getElementById('wrBar');
-  wrEl.style.width=(wr||0)+'%';
-  wrEl.style.background=wr>=50?'linear-gradient(90deg,var(--green),var(--green2))':'linear-gradient(90deg,var(--red),var(--red2))';
-  tx('kNetPnl', netPnl>=0?'+'+netPnl.toFixed(2)+'%':netPnl.toFixed(2)+'%', netPnl>0?'cv-g':netPnl<0?'cv-r':'cv-n');
-  tx('kNetSub', `${wins.length} 勝 / ${losses.length} 敗`);
+  /* KPI */
+  tx('kTotal', all.length||'0');
+  tx('kSub1', `${closed.length} 筆已結單`);
+  const wrEl=document.getElementById('wrFill');
+  if(wr!=null){
+    document.getElementById('kWR').textContent=wr.toFixed(1)+'%';
+    document.getElementById('kWR').className='kpi-val '+(wr>=50?'pos':'neg');
+    wrEl.style.width=wr+'%';
+    wrEl.style.background=wr>=50?'linear-gradient(90deg,var(--green),var(--green2))'
+                                :'linear-gradient(90deg,var(--red),var(--red2))';
+  }else{document.getElementById('kWR').textContent='—';document.getElementById('kWR').className='kpi-val neu';}
+  document.getElementById('kPnl').textContent=netPnl?((netPnl>0?'+':'')+netPnl.toFixed(2)+'%'):'—';
+  document.getElementById('kPnl').className='kpi-val '+(netPnl>0?'pos':netPnl<0?'neg':'neu');
+  tx('kSub3', `${wins.length} 勝 / ${losses.length} 敗`);
   tx('kOpen', openN||'0');
-  tx('kOpenSub', openN>0?'筆部位未平倉':'目前無持倉');
-  tx('sAvgW', avgW!=null?'+'+avgW.toFixed(2)+'%':'—');
-  tx('sAvgL', avgL!=null?avgL.toFixed(2)+'%':'—');
-  tx('sPF',   pf!=null?pf.toFixed(2)+'x':'—', pf!=null?(pf>=1?'cv-p':'cv-r'):'cv-n');
+  tx('kSub4', openN>0?'筆部位未平倉':'目前無持倉');
 
+  /* sec */
+  document.getElementById('sAvgW').textContent=avgW!=null?'+'+avgW.toFixed(2)+'%':'—';
+  document.getElementById('sAvgL').textContent=avgL!=null?avgL.toFixed(2)+'%':'—';
+  const pfEl=document.getElementById('sPF');
+  pfEl.textContent=pf!=null?pf.toFixed(2)+'x':'—';
+  pfEl.className='sec-val '+(pf!=null?(pf>=1?'pu':'neg'):'');
+
+  /* nav pill */
+  const allOpen=trades.filter(t=>t.status==='open').length;
   const pill=document.getElementById('navPill');
-  if(openN>0){pill.textContent=`${openN} 筆持倉中`;pill.style.display='';}
+  if(allOpen>0){pill.textContent=`${allOpen} 筆持倉中`;pill.style.display='';}
   else pill.style.display='none';
 
   drawChart(closed);
-  renderList();
+  renderList(all);
 }
 
-function tx(id,val,cls){
-  const el=document.getElementById(id);if(!el)return;
-  el.textContent=val;
-  if(cls!==undefined) el.className=el.className.replace(/cv-\w+/g,'').trim()+' '+cls;
-}
+function tx(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
 
+/* ── chart ── */
 function drawChart(closed){
-  const sec=document.getElementById('chartSec');
-  if(closed.length<2){sec.style.display='none';return;}
-  sec.style.display='block';
+  const wrap=document.getElementById('chartWrap');
+  if(closed.length<2){wrap.style.display='none';return;}
+  wrap.style.display='block';
   const sorted=[...closed].sort((a,b)=>(a.exitDate||'')<(b.exitDate||'')?-1:1);
-  let cum=0,pts=[0];
-  sorted.forEach(t=>{cum+=pnlPct(t);pts.push(+cum.toFixed(4));});
-  const lastVal=pts[pts.length-1];
-  const pill=document.getElementById('chartPill');
-  pill.textContent=(lastVal>=0?'+':'')+lastVal.toFixed(2)+'%';
-  pill.className='chart-pill '+(lastVal>0?'pos':lastVal<0?'neg':'neu');
+  let cum=0, pts=[0];
+  sorted.forEach(t=>{cum+=pct(t);pts.push(+cum.toFixed(4));});
+  const last=pts[pts.length-1];
+  const badge=document.getElementById('chartBadge');
+  badge.textContent=(last>=0?'+':'')+last.toFixed(2)+'%';
+  badge.className='chart-badge '+(last>0?'pos':last<0?'neg':'neu');
   document.getElementById('chartRange').textContent=`${sorted[0].exitDate||''}  →  ${sorted[sorted.length-1].exitDate||''}`;
 
-  const canvas=document.getElementById('eqChart');
+  const cv=document.getElementById('eqCanvas');
   const dpr=window.devicePixelRatio||1;
-  const W=canvas.parentElement.clientWidth-44, H=160;
-  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-  const pad={t:12,b:32,l:52,r:16};
-  const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
-  const minY=Math.min(0,...pts),maxY=Math.max(0,...pts),rY=maxY-minY||1;
-  const toX=i=>pad.l+i/(pts.length-1)*cW;
-  const toY=v=>pad.t+(1-(v-minY)/rY)*cH;
+  const W=cv.parentElement.clientWidth-40, H=160;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  const p={t:10,b:28,l:48,r:12};
+  const cW=W-p.l-p.r, cH=H-p.t-p.b;
+  const minY=Math.min(0,...pts), maxY=Math.max(0,...pts), rY=maxY-minY||1;
+  const tx2=i=>p.l+i/(pts.length-1)*cW;
+  const ty=v=>p.t+(1-(v-minY)/rY)*cH;
   ctx.clearRect(0,0,W,H);
 
+  /* grid */
   ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
-  [0,.25,.5,.75,1].forEach(f=>{const y=pad.t+f*cH;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();});
+  for(let f=0;f<=4;f++){const y=p.t+f/4*cH;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(p.l+cW,y);ctx.stroke();}
 
-  const zy=toY(0);
-  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.setLineDash([4,3]);
-  ctx.beginPath();ctx.moveTo(pad.l,zy);ctx.lineTo(pad.l+cW,zy);ctx.stroke();
+  /* zero line */
+  const zy=ty(0);
+  ctx.strokeStyle='rgba(255,255,255,.14)';ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(p.l,zy);ctx.lineTo(p.l+cW,zy);ctx.stroke();
   ctx.setLineDash([]);
 
-  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+cH);
-  if(lastVal>=0){grad.addColorStop(0,'rgba(0,212,160,.3)');grad.addColorStop(1,'rgba(0,212,160,.02)');}
-  else          {grad.addColorStop(0,'rgba(255,79,110,.02)');grad.addColorStop(1,'rgba(255,79,110,.3)');}
-  ctx.beginPath();ctx.moveTo(toX(0),zy);
-  pts.forEach((v,i)=>ctx.lineTo(toX(i),toY(v)));
-  ctx.lineTo(toX(pts.length-1),zy);ctx.closePath();
-  ctx.fillStyle=grad;ctx.fill();
+  /* fill */
+  const grd=ctx.createLinearGradient(0,p.t,0,p.t+cH);
+  if(last>=0){grd.addColorStop(0,'rgba(62,207,142,.28)');grd.addColorStop(1,'rgba(62,207,142,.02)');}
+  else       {grd.addColorStop(0,'rgba(224,85,85,.02)');grd.addColorStop(1,'rgba(224,85,85,.28)');}
+  ctx.beginPath();ctx.moveTo(tx2(0),zy);
+  pts.forEach((v,i)=>ctx.lineTo(tx2(i),ty(v)));
+  ctx.lineTo(tx2(pts.length-1),zy);ctx.closePath();
+  ctx.fillStyle=grd;ctx.fill();
 
+  /* line */
   ctx.beginPath();
-  pts.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));
-  ctx.strokeStyle=lastVal>=0?'var(--green)':'var(--red)';
+  pts.forEach((v,i)=>i===0?ctx.moveTo(tx2(i),ty(v)):ctx.lineTo(tx2(i),ty(v)));
+  ctx.strokeStyle=last>=0?'var(--green)':'var(--red)';
   ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
 
+  /* dots */
   pts.forEach((v,i)=>{
-    ctx.beginPath();ctx.arc(toX(i),toY(v),i===0||i===pts.length-1?4:2.5,0,Math.PI*2);
-    ctx.fillStyle=v>0?'var(--green)':v<0?'var(--red)':'rgba(255,255,255,.3)';
+    ctx.beginPath();ctx.arc(tx2(i),ty(v),i===0||i===pts.length-1?4:2.5,0,Math.PI*2);
+    ctx.fillStyle=v>0?'var(--green)':v<0?'var(--red)':'rgba(255,255,255,.4)';
     ctx.strokeStyle='var(--bg2)';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();
   });
 
+  /* labels Y */
   ctx.fillStyle='var(--text4)';ctx.font=`11px system-ui`;ctx.textAlign='right';
-  [minY,0,maxY].forEach(v=>{ctx.fillText((v>=0?'+':'')+v.toFixed(1)+'%',pad.l-6,toY(v)+4);});
+  [minY,0,maxY].forEach(v=>ctx.fillText((v>=0?'+':'')+v.toFixed(1)+'%',p.l-5,ty(v)+4));
+  /* labels X */
   ctx.textAlign='center';ctx.fillStyle='var(--text4)';
   const step=Math.max(1,Math.floor(sorted.length/6));
-  sorted.forEach((t,i)=>{if(i%step===0||i===sorted.length-1) ctx.fillText(t.ticker||'',toX(i+1),H-10);});
+  sorted.forEach((t,i)=>{if(i%step===0||i===sorted.length-1) ctx.fillText(t.ticker||'',tx2(i+1),H-8);});
 }
 
-function renderList(){
+/* ── list ── */
+function renderList(filtered){
   const el=document.getElementById('list');
-  const items=curF==='all'?trades:trades.filter(t=>t.status===curF);
-  document.getElementById('tcount').textContent=items.length?`共 ${items.length} 筆`:'';
-  if(!items.length){
+  document.getElementById('tcount').textContent=filtered.length?`顯示 ${filtered.length} 筆`:'';
+  if(!filtered.length){
     el.innerHTML=`<div class="empty">
-      <h3>${curF==='all'?'還沒有交易記錄':'沒有符合的記錄'}</h3>
-      <p>${curF==='all'?'點上方「新增交易」記錄你的第一筆交易<br>每一筆記錄都是提升勝率的原料。':'換個篩選條件試試'}</p>
-    </div>`;
-    return;
+      <h3>沒有符合的交易記錄</h3>
+      <p>嘗試更改篩選條件，或點「新增交易」加入第一筆記錄</p>
+    </div>`;return;
   }
-  el.innerHTML=items.map(cardHTML).join('');
+  el.innerHTML=filtered.map(cardHtml).join('');
 }
 
-function cardHTML(t){
-  const p=pnlPct(t);
-  const pStr=t.status!=='open'?(p>=0?'+':'')+p.toFixed(2)+'%':'持倉中';
-  const pCls=p>0?'pos':p<0?'neg':'neu';
-  const badge=t.status==='win' ?`<span class="tbadge tbw">獲利</span>`
-             :t.status==='loss'?`<span class="tbadge tbl">虧損</span>`
-             :                  `<span class="tbadge tbo">持倉中</span>`;
-  const rVal=t.exitPrice&&t.entryPrice&&t.stopLoss&&(t.entryPrice-t.stopLoss)!==0
+function cardHtml(t){
+  const p2=pct(t);
+  const pStr=t.status!=='open'?(p2>=0?'+':'')+p2.toFixed(2)+'%':'持倉中';
+  const pCls=p2>0?'pos':p2<0?'neg':'neu';
+  const rV=t.exitPrice&&t.entryPrice&&t.stopLoss&&(t.entryPrice-t.stopLoss)!==0
     ?((t.exitPrice-t.entryPrice)/(t.entryPrice-t.stopLoss)).toFixed(2)+'R':'';
   const days=t.entryDate&&t.exitDate
     ?Math.round((new Date(t.exitDate)-new Date(t.entryDate))/86400000)+'天':null;
   const av=(t.ticker||'?').slice(0,4);
-  const dateStr=t.exitDate?`${t.entryDate} → ${t.exitDate}${days?' ('+days+')':''}`
-               :t.entryDate?`進場 ${t.entryDate}`:'—';
+  const dStr=t.exitDate?`${t.entryDate} → ${t.exitDate}${days?' ('+days+')':''}`
+             :t.entryDate?`進場 ${t.entryDate}`:'—';
+  const typ=typeOf(t);
+  const statBadge=t.status==='win'?`<span class="badge bw">獲利</span>`
+                 :t.status==='loss'?`<span class="badge bl">虧損</span>`
+                 :`<span class="badge bo">持倉中</span>`;
+  const typBadge=typ==='paper'?`<span class="badge bp">預估盤</span>`
+                              :`<span class="badge ba">實際交易</span>`;
   const firstR=t.reasons?.length
-    ?`<span class="tc-mini-tag">${esc(t.reasons[0])}</span>${t.reasons.length>1?`<span class="tc-mini-tag">+${t.reasons.length-1}</span>`:''}`:'';
+    ?`<span class="tc-mtag">${esc(t.reasons[0])}</span>${t.reasons.length>1?`<span class="tc-mtag">+${t.reasons.length-1}</span>`:''}` :'';
 
-  const prices=`<div class="tc-prices">
+  const priceBlk=`<div class="tc-prices">
     <div class="pf"><label>進場價</label><span class="pv acc">${t.entryPrice||'—'}</span></div>
-    ${t.stopLoss?`<div class="pf"><label>停損位</label><span class="pv neg">${t.stopLoss}</span></div>`:''}
-    ${t.target  ?`<div class="pf"><label>目標價</label><span class="pv pos">${t.target}</span></div>`:''}
-    ${t.exitPrice?`<div class="pf"><label>出場價</label><span class="pv ${p>=0?'pos':'neg'}">${t.exitPrice}</span></div>`:''}
-    ${rVal?`<div class="pf"><label>R 值</label><span class="pv ${p>=0?'pos':'neg'}">${rVal}</span></div>`:''}
-    ${days?`<div class="pf"><label>持有天數</label><span class="pv">${days}</span></div>`:''}
+    ${t.stopLoss?`<div class="pf"><label>停損</label><span class="pv neg">${t.stopLoss}</span></div>`:''}
+    ${t.target  ?`<div class="pf"><label>目標</label><span class="pv pos">${t.target}</span></div>`:''}
+    ${t.exitPrice?`<div class="pf"><label>出場價</label><span class="pv ${p2>=0?'pos':'neg'}">${t.exitPrice}</span></div>`:''}
+    ${rV?`<div class="pf"><label>R 值</label><span class="pv ${p2>=0?'pos':'neg'}">${rV}</span></div>`:''}
+    ${days?`<div class="pf"><label>持有</label><span class="pv">${days}</span></div>`:''}
   </div>`;
 
-  const hasContent=t.reasons?.length||t.entryNote||t.mistakes?.length||t.reviewNote;
-  const content=hasContent?`<div class="tc-content">
-    ${t.reasons?.length?`<div><div class="nc-label">進場原因</div><div class="tag-row">${t.reasons.map(r=>`<span class="rtag reason">${esc(r)}</span>`).join('')}</div></div>`:''}
-    ${t.entryNote?`<div><div class="nc-label">進場想法</div><p class="nc-text">${esc(t.entryNote)}</p></div>`:''}
-    ${t.mistakes?.length?`<div><div class="nc-label">犯的錯誤</div><div class="tag-row">${t.mistakes.map(m=>`<span class="rtag mistake">${esc(m)}</span>`).join('')}</div></div>`:''}
-    ${t.reviewNote?`<div><div class="nc-label">收盤後檢討</div><p class="nc-text">${esc(t.reviewNote)}</p></div>`:''}
+  const hasN=t.reasons?.length||t.entryNote||t.mistakes?.length||t.reviewNote;
+  const notes=hasN?`<div class="tc-notes">
+    ${t.reasons?.length?`<div><div class="nc-lbl">進場原因</div><div class="tag-row">${t.reasons.map(r=>`<span class="rtag r">${esc(r)}</span>`).join('')}</div></div>`:''}
+    ${t.entryNote?`<div><div class="nc-lbl">進場想法</div><p class="nc-txt">${esc(t.entryNote)}</p></div>`:''}
+    ${t.mistakes?.length?`<div><div class="nc-lbl">犯的錯誤</div><div class="tag-row">${t.mistakes.map(m=>`<span class="rtag m">${esc(m)}</span>`).join('')}</div></div>`:''}
+    ${t.reviewNote?`<div><div class="nc-lbl">收盤後檢討</div><p class="nc-txt">${esc(t.reviewNote)}</p></div>`:''}
   </div>`:'';
 
-  return `<div class="tc ${t.status}" id="tc-${t.id}">
-  <div class="tc-head" onclick="tog('${t.id}')">
-    <div class="tc-av">${esc(av)}</div>
-    <div class="tc-mid">
-      <div class="tc-ticker-row">
-        <span class="tc-ticker">${esc(t.ticker)}</span>
-        <span class="tc-name">${esc(t.name||'')}</span>
-      </div>
-      <div class="tc-tags-row">${firstR}</div>
-      <div class="tc-date-row">${dateStr}</div>
+  return `<div class="tc ${t.status||'open'}" id="tc-${t.id}">
+  <div class="tch" onclick="tog('${t.id}')">
+    <div class="tcav">${esc(av)}</div>
+    <div class="tcm">
+      <div class="tcm-top"><span class="tc-ticker">${esc(t.ticker)}</span><span class="tc-name">${esc(t.name||'')}</span></div>
+      <div class="tc-tags">${firstR}</div>
+      <div class="tc-date">${dStr}</div>
     </div>
-    <div class="tc-right">
+    <div class="tcr">
       <div class="tc-pnl ${pCls}">${pStr}</div>
-      <div class="tc-badge-row">${badge}${rVal?`<span class="tc-r">${rVal}</span>`:''}</div>
+      <div class="tc-badges">${statBadge}${typBadge}${rV?`<span class="badge" style="color:var(--text4);border-color:var(--border)">${rV}</span>`:''}</div>
     </div>
   </div>
-  <div class="tc-body" id="b-${t.id}">
-    ${prices}${content}
-    <div class="tc-footer">
-      ${t.status==='open'?`<button class="btn-s close-btn" onclick="openClose('${t.id}')">結單</button>`:''}
-      <button class="btn-s" onclick="openEdit('${t.id}')">編輯</button>
-      <button class="btn-s del" onclick="del('${t.id}')">刪除</button>
+  <div class="tcb" id="b-${t.id}">
+    ${priceBlk}${notes}
+    <div class="tc-foot">
+      ${t.status==='open'?`<button class="btn-sm c" onclick="openClose('${t.id}')">結單</button>`:''}
+      <button class="btn-sm" onclick="openEdit('${t.id}')">編輯</button>
+      <button class="btn-sm d" onclick="del('${t.id}')">刪除</button>
     </div>
   </div>
 </div>`;
@@ -586,42 +676,108 @@ function cardHTML(t){
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
-window.tog    = id=>document.getElementById('b-'+id)?.classList.toggle('open');
-window.setF   = (f,btn)=>{curF=f;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));renderList();};
-window.bgC    = (e,id)=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');};
-window.closeOv  = ()=>document.getElementById('closeOv').classList.remove('open');
-window.closeAdd = ()=>document.getElementById('addOv').classList.remove('open');
-const v  = id=>document.getElementById(id)?.value||'';
-const sv = (id,val)=>{const el=document.getElementById(id);if(el&&val!=null)el.value=val;};
+/* ── filter handlers ── */
+window.setType=(v,btn)=>{curType=v;setPills('ftype',btn);renderAll();};
+window.setStat=(v,btn)=>{curStat=v;setPills('fstat',btn);renderAll();};
+window.setDate=(v,btn)=>{curDate=v;setPills('fdate',btn);renderAll();};
 
-function buildP(cid,opts,arr,isErr){
+// Track filter groups by onclick pattern
+window.setType=(v,btn)=>{
+  curType=v;
+  document.querySelectorAll('[onclick^="setType"]').forEach(b=>b.classList.toggle('on',b===btn));
+  renderAll();
+};
+window.setStat=(v,btn)=>{
+  curStat=v;
+  document.querySelectorAll('[onclick^="setStat"]').forEach(b=>b.classList.toggle('on',b===btn));
+  renderAll();
+};
+window.setDate=(v,btn)=>{
+  curDate=v;
+  document.querySelectorAll('[onclick^="setDate"]').forEach(b=>b.classList.toggle('on',b===btn));
+  renderAll();
+};
+
+/* ── CRUD ── */
+window.save=async()=>{
+  const t=v('fT'),ep=parseFloat(v('fEP'));
+  if(!t||!ep){alert('請填寫股票代號和進場價格');return;}
+  const xp=parseFloat(v('fXP'))||null;
+  const status=xp?(xp>ep?'win':'loss'):'open';
+  const data={ticker:t.toUpperCase(),name:v('fN'),type:curTT,entryDate:v('fED'),
+    entryPrice:ep,stopLoss:parseFloat(v('fSL'))||null,target:parseFloat(v('fTP'))||null,
+    exitDate:v('fXD')||null,exitPrice:xp,status,reasons:[...selR],mistakes:[...selM],
+    entryNote:v('fEN'),reviewNote:v('fRV'),createdAt:Timestamp.now()};
+  const b=document.getElementById('btnSv');b.disabled=true;b.textContent='儲存中…';
+  try{
+    if(editId) await updateDoc(doc(db,COL,editId),data);
+    else       await addDoc(collection(db,COL),data);
+    closeAdd();await load();
+  }catch(e){alert('儲存失敗：'+e.message);}
+  finally{b.disabled=false;b.textContent='儲存交易記錄';}
+};
+
+window.saveClose=async()=>{
+  const xp=parseFloat(document.getElementById('cXP').value);
+  if(!xp){alert('請填寫出場價格');return;}
+  const t2=trades.find(x=>x.id===closeId);if(!t2) return;
+  const status=xp>t2.entryPrice?'win':'loss';
+  try{
+    await updateDoc(doc(db,COL,closeId),{
+      exitDate:document.getElementById('cXD').value,exitPrice:xp,status,
+      mistakes:[...cSelM],reviewNote:document.getElementById('cRV').value
+    });
+    closeOv();await load();
+  }catch(e){alert('儲存失敗：'+e.message);}
+};
+
+window.del=async id=>{
+  if(!confirm('確定刪除這筆交易記錄？'))return;
+  try{await deleteDoc(doc(db,COL,id));await load();}catch(e){alert('刪除失敗');}
+};
+
+/* ── modal helpers ── */
+window.tog     =id=>document.getElementById('b-'+id)?.classList.toggle('open');
+window.bgC     =(e,id)=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');};
+window.closeOv =()=>document.getElementById('closeOv').classList.remove('open');
+window.closeAdd=()=>document.getElementById('addOv').classList.remove('open');
+const v  =id=>document.getElementById(id)?.value||'';
+const sv =id=>val=>{const el=document.getElementById(id);if(el&&val!=null)el.value=val;};
+
+window.setTT=type=>{
+  curTT=type;
+  document.getElementById('ttpA').classList.toggle('on',type==='actual');
+  document.getElementById('ttpP').classList.toggle('on',type==='paper');
+};
+
+function buildPk(cid,opts,arr,isErr){
   const el=document.getElementById(cid);if(!el)return;el.innerHTML='';
   opts.forEach(o=>{
     const b=document.createElement('button');b.type='button';
-    b.className='topt'+(isErr?' err':'')+(arr.includes(o)?' sel':'');
-    b.textContent=o;
+    b.className='topt'+(isErr?' err':'')+(arr.includes(o)?' sel':'');b.textContent=o;
     b.onclick=()=>{const i=arr.indexOf(o);i===-1?arr.push(o):arr.splice(i,1);b.classList.toggle('sel',arr.includes(o));};
     el.appendChild(b);
   });
 }
 
 window.openAdd=()=>{
-  editId=null;selR=[];selM=[];
+  editId=null;selR=[];selM=[];curTT='actual';
   document.getElementById('mTitle').textContent='新增交易';
   ['fT','fN','fEP','fSL','fTP','fXD','fXP','fEN','fRV'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  sv('fED',new Date().toISOString().split('T')[0]);
-  buildP('rPicker',REASONS,selR,false);buildP('mPicker',MISTAKES,selM,true);
+  document.getElementById('fED').value=new Date().toISOString().split('T')[0];
+  setTT('actual');buildPk('rPk',REASONS,selR,false);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('addOv').classList.add('open');
 };
 
 window.openEdit=id=>{
   const t=trades.find(x=>x.id===id);if(!t)return;
   editId=id;selR=[...(t.reasons||[])];selM=[...(t.mistakes||[])];
+  curTT=t.type||'actual';
   document.getElementById('mTitle').textContent='編輯交易';
-  sv('fT',t.ticker);sv('fN',t.name);sv('fED',t.entryDate);sv('fEP',t.entryPrice);
-  sv('fSL',t.stopLoss);sv('fTP',t.target);sv('fXD',t.exitDate);sv('fXP',t.exitPrice);
-  sv('fEN',t.entryNote);sv('fRV',t.reviewNote);
-  buildP('rPicker',REASONS,selR,false);buildP('mPicker',MISTAKES,selM,true);
+  const fields={fT:t.ticker,fN:t.name,fED:t.entryDate,fEP:t.entryPrice,
+    fSL:t.stopLoss,fTP:t.target,fXD:t.exitDate,fXP:t.exitPrice,fEN:t.entryNote,fRV:t.reviewNote};
+  Object.entries(fields).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val??'';});
+  setTT(curTT);buildPk('rPk',REASONS,selR,false);buildPk('mPk',MISTAKES,selM,true);
   document.getElementById('addOv').classList.add('open');
 };
 
@@ -629,8 +785,9 @@ window.openClose=id=>{
   const t=trades.find(x=>x.id===id);if(!t)return;
   closeId=id;cSelM=[];
   document.getElementById('closeT').textContent=`結單：${t.ticker} ${t.name||''}`;
-  sv('cXD',new Date().toISOString().split('T')[0]);sv('cXP','');sv('cRV','');
-  buildP('cmPicker',MISTAKES,cSelM,true);
+  document.getElementById('cXD').value=new Date().toISOString().split('T')[0];
+  document.getElementById('cXP').value='';document.getElementById('cRV').value='';
+  buildPk('cMPk',MISTAKES,cSelM,true);
   document.getElementById('closeOv').classList.add('open');
 };
 
