@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>交易日誌</title>
+<link rel="manifest" href="manifest-journal.json">
+<meta name="theme-color" content="#1c1c1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="交易日誌">
+<link rel="apple-touch-icon" href="icon-journal.svg">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -37,6 +43,9 @@ input,select,textarea,button{font-family:inherit}
 .nav-back:hover{color:var(--text);border-color:var(--text3)}
 .nav-title{font-size:.95rem;font-weight:700;color:var(--text)}
 .nav-sync{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text3);margin-left:auto}
+.nav-refresh{background:none;border:1px solid var(--border);color:var(--text2);border-radius:7px;
+  width:32px;height:32px;font-size:1.1rem;cursor:pointer;transition:all .15s;line-height:1}
+.nav-refresh:hover{color:var(--text);border-color:var(--text2)}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);
   box-shadow:0 0 6px var(--green);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -315,6 +324,7 @@ canvas{display:block;width:100%}
     <div class="sync-dot"></div>
     <span>即時同步</span>
   </div>
+  <button class="nav-refresh" onclick="load()" title="重新整理">↻</button>
   <span class="nav-pill" id="navPill"></span>
 </nav>
 

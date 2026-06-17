@@ -1,0 +1,27 @@
+{
+  "name": "交易日誌",
+  "short_name": "交易日誌",
+  "description": "記錄每一筆交易的判斷與檢討，持續提升勝率",
+  "start_url": "./trade-journal.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1c1c1f",
+  "theme_color": "#1c1c1f",
+  "lang": "zh-TW",
+  "categories": ["finance"],
+  "icons": [
+    {
+      "src": "./icon-journal.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-journal.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

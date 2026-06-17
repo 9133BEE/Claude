@@ -1,4 +1,4 @@
-const CACHE = 'guxue-v10';
+const CACHE = 'guxue-v11';
 const PAGES = [
   './index.html',
   './candlestick-patterns.html',
@@ -15,7 +15,9 @@ const PAGES = [
   './strategy-glossary.html',
   './trade-journal.html',
   './manifest.json',
-  './icon.svg'
+  './manifest-journal.json',
+  './icon.svg',
+  './icon-journal.svg'
 ];
 
 // 安裝時預先快取所有頁面
