@@ -1,4 +1,4 @@
-const CACHE = 'guxue-v8';
+const CACHE = 'guxue-v9';
 const PAGES = [
   './index.html',
   './candlestick-patterns.html',
