@@ -3,298 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>交易日誌 — 股學筆記</title>
+<title>交易日誌</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;--bg2:#161b22;--card:#21262d;--border:#30363d;--border2:#21262d;
-  --text:#e6edf3;--text2:#c9d1d9;--text3:#8b949e;--text4:#484f58;
-  --accent:#f59e0b;--accent2:#fbbf24;
-  --green:#3fb950;--green2:#238636;--red:#f85149;--blue:#58a6ff;--purple:#a78bfa;
+  --bg:#080d13;--bg2:#0d1520;--card:#111927;--card2:#162030;
+  --border:#1a2840;--border2:#162030;
+  --text:#dde8f5;--text2:#9eb3cc;--text3:#5b7a99;--text4:#2e4a66;
+  --accent:#f5a623;--accent2:#ffc142;
+  --green:#00d4a0;--green2:#00b386;--green-dim:rgba(0,212,160,.1);
+  --red:#ff4f6e;--red2:#e03355;--red-dim:rgba(255,79,110,.1);
+  --blue:#4da6ff;--blue-dim:rgba(77,166,255,.1);
+  --purple:#b39dfa;--purple-dim:rgba(179,157,250,.1);
 }
-body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
+input,select,textarea,button{font-family:inherit}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ── NAV ── */
-.topnav{background:var(--bg2);border-bottom:1px solid var(--border2);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
-.back-btn{color:var(--text3);font-size:.82rem;display:flex;align-items:center;gap:4px;transition:color .15s}
-.back-btn:hover{color:var(--text)}
-.nav-title{font-size:.95rem;font-weight:700}
-.nav-badge{margin-left:auto;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--accent2);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px}
+/* NAV */
+.nav{background:rgba(13,21,32,.92);border-bottom:1px solid var(--border);padding:0 28px;height:54px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:200;backdrop-filter:blur(16px)}
+.nav-logo{font-size:1rem;font-weight:800;letter-spacing:-.01em}
+.nav-sync{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text3)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-open-pill{background:var(--blue-dim);border:1px solid rgba(77,166,255,.25);color:var(--blue);font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px;display:none;margin-left:auto}
 
-/* ── HERO ── */
-.hero{background:linear-gradient(135deg,rgba(88,166,255,.07) 0%,rgba(245,158,11,.04) 50%,transparent 100%);border-bottom:1px solid var(--border2);padding:32px 24px 28px;text-align:center}
-.hero h1{font-size:1.7rem;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
-.hero p{color:var(--text3);font-size:.88rem;margin-bottom:24px}
+/* DASHBOARD */
+.dash{padding:32px 28px 0;max-width:1060px;margin:0 auto}
+.dash-top{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px}
 
-/* ── STATS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;max-width:860px;margin:0 auto}
-.sc2{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px 12px;text-align:center;position:relative;overflow:hidden;transition:border-color .2s}
-.sc2:hover{border-color:var(--text4)}
-.sc2::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.sc2.acc::before{background:var(--accent)}
-.sc2.grn::before{background:var(--green)}
-.sc2.red::before{background:var(--red)}
-.sc2.blu::before{background:var(--blue)}
-.sc2.pur::before{background:var(--purple)}
-.sc2-icon{font-size:1.3rem;margin-bottom:4px;line-height:1}
-.sc2-val{font-size:1.4rem;font-weight:800;line-height:1.1;margin-bottom:3px}
-.sc2-lbl{font-size:.66rem;color:var(--text4);letter-spacing:.04em;text-transform:uppercase}
-.cv-acc{color:var(--accent2)}
-.cv-grn{color:var(--green)}
-.cv-red{color:var(--red)}
-.cv-blu{color:var(--blue)}
-.cv-neu{color:var(--text3)}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden;cursor:default;transition:border-color .2s,transform .2s}
+.kpi:hover{border-color:rgba(255,255,255,.07);transform:translateY(-2px)}
+.kpi-val{font-size:2.2rem;font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:4px}
+.kpi-lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600}
+.kpi-sub{font-size:.75rem;color:var(--text4);margin-top:4px}
+.kpi-bar{position:absolute;bottom:0;left:0;height:3px}
+.kpi.total  .kpi-bar{background:linear-gradient(90deg,var(--accent),var(--accent2));width:100%}
+.kpi.rate   .kpi-bar{background:linear-gradient(90deg,var(--green),var(--green2))}
+.kpi.profit .kpi-bar{background:linear-gradient(90deg,var(--purple),var(--blue));width:60%}
+.kpi.hold   .kpi-bar{background:linear-gradient(90deg,var(--blue),#60c3ff);width:40%}
+.kpi-glow{position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;filter:blur(30px);opacity:.1;pointer-events:none}
+.kpi.total  .kpi-glow{background:var(--accent)}
+.kpi.rate   .kpi-glow{background:var(--green)}
+.kpi.profit .kpi-glow{background:var(--purple)}
+.kpi.hold   .kpi-glow{background:var(--blue)}
 
-/* ── EQUITY CHART ── */
-.chart-wrap{max-width:860px;margin:20px auto 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px 14px;display:none}
-.chart-title{font-size:.74rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.chart-title span{flex:1;height:1px;background:var(--border2)}
-#equityChart{width:100%;display:block}
+.wr-bar-wrap{margin-top:8px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.wr-bar{height:100%;border-radius:2px;transition:width .8s ease;width:0%}
 
-/* ── TOOLBAR ── */
-.toolbar{max-width:860px;margin:20px auto 0;padding:0 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.btn-add{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:10px 22px;font-size:.9rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.btn-add:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,158,11,.3)}
-.count-badge{font-size:.78rem;color:var(--text4);margin-left:4px}
-.filter-tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
-.tab{background:none;border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
-.tab:hover{border-color:var(--text3);color:var(--text)}
-.tab.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:var(--accent2);font-weight:600}
+.dash-sec{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.sec-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
+.sec-val{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;line-height:1}
+.sec-lbl{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
 
-/* ── LIST ── */
-.container{max-width:860px;margin:14px auto 0;padding:0 20px 80px}
-.empty-state{text-align:center;padding:70px 20px;color:var(--text4)}
-.empty-icon{font-size:4rem;margin-bottom:14px;opacity:.5}
-.empty-state h3{font-size:1rem;color:var(--text3);margin-bottom:6px}
-.empty-state p{font-size:.85rem;line-height:1.7}
-.loading{text-align:center;padding:50px;color:var(--text4);font-size:.9rem}
+.cv-g{color:var(--green)}.cv-r{color:var(--red)}.cv-p{color:var(--purple)}
+.cv-b{color:var(--blue)}.cv-a{color:var(--accent2)}.cv-n{color:var(--text3)}
 
-/* ── TRADE CARD ── */
-.tc{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:all .2s}
-.tc:hover{border-color:var(--text4);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.tc.win{border-left:3px solid var(--green)}
+/* CHART */
+.chart-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;display:none}
+.chart-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.chart-title{font-size:.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em}
+.chart-pill{font-size:.7rem;padding:3px 10px;border-radius:20px;font-weight:600}
+.chart-pill.pos{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,212,160,.2)}
+.chart-pill.neg{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,79,110,.2)}
+.chart-pill.neu{background:rgba(255,255,255,.04);color:var(--text3)}
+canvas{display:block;width:100%}
+
+/* TOOLBAR */
+.toolbar{max-width:1060px;margin:0 auto 14px;padding:0 28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-add{background:var(--accent);color:#000;font-weight:800;border:none;border-radius:10px;padding:10px 24px;font-size:.88rem;cursor:pointer;transition:all .18s;white-space:nowrap;letter-spacing:.01em;box-shadow:0 4px 14px rgba(245,166,35,.25)}
+.btn-add:hover{background:var(--accent2);box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px)}
+.btn-add:active{transform:translateY(0)}
+.tcount{font-size:.78rem;color:var(--text4)}
+.filter-row{display:flex;gap:6px;margin-left:auto}
+.tab{background:none;border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .15s;white-space:nowrap;font-weight:500}
+.tab:hover{border-color:var(--text3);color:var(--text2)}
+.tab.active{background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.35);color:var(--accent2);font-weight:700}
+
+/* LIST */
+.list-wrap{max-width:1060px;margin:0 auto;padding:0 28px 100px}
+.empty{text-align:center;padding:80px 20px}
+.empty h3{font-size:1.1rem;color:var(--text2);margin-bottom:8px}
+.empty p{font-size:.85rem;color:var(--text3);line-height:1.8}
+.loading{text-align:center;padding:60px;color:var(--text3);font-size:.9rem}
+
+/* TRADE CARD */
+.tc{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:all .2s}
+.tc:hover{border-color:rgba(255,255,255,.08);box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.tc.win {border-left:3px solid var(--green)}
 .tc.loss{border-left:3px solid var(--red)}
 .tc.open{border-left:3px solid var(--blue)}
 
-.tc-head{padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none}
-.tc-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;letter-spacing:-.02em}
-.tc.win  .tc-avatar{background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.2)}
-.tc.loss .tc-avatar{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.2)}
-.tc.open .tc-avatar{background:rgba(88,166,255,.12);color:var(--blue);border:1px solid rgba(88,166,255,.2)}
+.tc-head{padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;cursor:pointer;user-select:none}
+.tc-av{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;letter-spacing:.02em}
+.tc.win  .tc-av{background:rgba(0,212,160,.1);color:var(--green);border:1px solid rgba(0,212,160,.2)}
+.tc.loss .tc-av{background:rgba(255,79,110,.1);color:var(--red);border:1px solid rgba(255,79,110,.2)}
+.tc.open .tc-av{background:rgba(77,166,255,.1);color:var(--blue);border:1px solid rgba(77,166,255,.2)}
 
-.tc-info{flex:1;min-width:0}
-.tc-top{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
-.tc-ticker{font-size:1rem;font-weight:800}
-.tc-name{font-size:.8rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tc-dates{font-size:.72rem;color:var(--text4)}
+.tc-mid{min-width:0}
+.tc-ticker-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.tc-ticker{font-size:1.05rem;font-weight:800;letter-spacing:-.01em}
+.tc-name{font-size:.8rem;color:var(--text3)}
+.tc-tags-row{display:flex;gap:5px;flex-wrap:wrap}
+.tc-mini-tag{font-size:.65rem;padding:2px 7px;border-radius:5px;background:rgba(77,166,255,.1);color:var(--blue);font-weight:600}
+.tc-date-row{font-size:.72rem;color:var(--text4);margin-top:3px}
 
 .tc-right{text-align:right;flex-shrink:0}
-.tc-pnl{font-size:1.1rem;font-weight:800;line-height:1}
-.tc-pnl.pos{color:var(--green)}
-.tc-pnl.neg{color:var(--red)}
-.tc-pnl.neu{color:var(--text3)}
-.tc-meta{font-size:.72rem;color:var(--text4);margin-top:3px;display:flex;gap:8px;justify-content:flex-end;align-items:center}
-.tc-badge{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:8px}
-.bw{background:rgba(63,185,80,.15);color:var(--green)}
-.bl{background:rgba(248,81,73,.15);color:var(--red)}
-.bo{background:rgba(88,166,255,.15);color:var(--blue)}
+.tc-pnl{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;line-height:1;margin-bottom:5px}
+.tc-pnl.pos{color:var(--green)}.tc-pnl.neg{color:var(--red)}.tc-pnl.neu{color:var(--text3)}
+.tc-badge-row{display:flex;gap:6px;justify-content:flex-end;align-items:center}
+.tbadge{font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em}
+.tbw{background:rgba(0,212,160,.12);color:var(--green);border:1px solid rgba(0,212,160,.2)}
+.tbl{background:rgba(255,79,110,.12);color:var(--red);border:1px solid rgba(255,79,110,.2)}
+.tbo{background:rgba(77,166,255,.12);color:var(--blue);border:1px solid rgba(77,166,255,.2)}
+.tc-r{font-size:.72rem;color:var(--text4);margin-top:2px}
 
-/* ── EXPAND BODY ── */
 .tc-body{display:none;border-top:1px solid var(--border2)}
-.tc-body.show{display:block}
+.tc-body.open{display:block}
 
-.tc-section{padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;border-bottom:1px solid var(--border2)}
-.tc-section:last-of-type{border-bottom:none}
-.tc-field label{display:block;font-size:.64rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
-.tc-field .fval{font-size:.9rem;color:var(--text2);font-weight:600}
-.tc-field .fval.pos{color:var(--green)}
-.tc-field .fval.neg{color:var(--red)}
+.tc-prices{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));border-bottom:1px solid var(--border2)}
+.pf{padding:14px 18px;border-right:1px solid var(--border2)}
+.pf:last-child{border-right:none}
+.pf label{display:block;font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);margin-bottom:4px;font-weight:600}
+.pf .pv{font-size:1rem;font-weight:700;color:var(--text2)}
+.pf .pv.pos{color:var(--green)}.pf .pv.neg{color:var(--red)}.pf .pv.acc{color:var(--accent2)}
 
-.tc-notes{padding:12px 18px;border-bottom:1px solid var(--border2);display:grid;gap:10px}
-.note-block{}
-.note-label{font-size:.64rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
-.note-text{font-size:.85rem;color:var(--text2);line-height:1.7;white-space:pre-wrap}
-.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
-.tag{font-size:.7rem;padding:3px 9px;border-radius:8px;background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.2);font-weight:500}
-.tag.err{background:rgba(248,81,73,.1);color:var(--red);border-color:rgba(248,81,73,.2)}
+.tc-content{padding:16px 18px;border-bottom:1px solid var(--border2);display:grid;gap:14px}
+.nc-label{font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);font-weight:600;margin-bottom:5px}
+.nc-text{font-size:.85rem;color:var(--text2);line-height:1.75;white-space:pre-wrap}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px}
+.rtag{font-size:.72rem;padding:3px 9px;border-radius:6px;font-weight:600}
+.rtag.reason{background:rgba(77,166,255,.1);color:var(--blue);border:1px solid rgba(77,166,255,.18)}
+.rtag.mistake{background:rgba(255,79,110,.1);color:var(--red);border:1px solid rgba(255,79,110,.18)}
 
-.tc-actions{padding:10px 18px;display:flex;gap:8px;justify-content:flex-end}
-.btn-sm{background:none;border:1px solid var(--border);color:var(--text3);padding:6px 14px;border-radius:7px;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s;font-weight:500}
-.btn-sm:hover{border-color:var(--accent2);color:var(--accent2)}
-.btn-sm.close-btn{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.3);color:var(--green)}
-.btn-sm.close-btn:hover{background:rgba(63,185,80,.15)}
-.btn-sm.del:hover{border-color:var(--red);color:var(--red)}
+.tc-footer{padding:12px 18px;display:flex;gap:8px;justify-content:flex-end}
+.btn-s{background:none;border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .15s;font-weight:500}
+.btn-s:hover{border-color:rgba(255,255,255,.15);color:var(--text)}
+.btn-s.close-btn{background:rgba(0,212,160,.06);border-color:rgba(0,212,160,.25);color:var(--green)}
+.btn-s.close-btn:hover{background:rgba(0,212,160,.12)}
+.btn-s.del:hover{border-color:rgba(255,79,110,.4);color:var(--red)}
 
-/* ── MODAL ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;backdrop-filter:blur(4px)}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;backdrop-filter:blur(6px)}
 .overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:580px;margin:auto;box-shadow:0 24px 64px rgba(0,0,0,.5)}
-.modal-head{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
-.modal-head h2{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px}
-.modal-x{background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer;padding:2px 6px;line-height:1;border-radius:6px;transition:all .15s}
-.modal-x:hover{background:rgba(255,255,255,.06);color:var(--text)}
-.modal-body{padding:20px 24px 24px}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:600px;margin:auto;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+.mh{padding:22px 26px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
+.mh h2{font-size:1rem;font-weight:700}
+.mx{background:rgba(255,255,255,.05);border:none;color:var(--text3);font-size:1rem;cursor:pointer;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.mx:hover{background:rgba(255,255,255,.1);color:var(--text)}
+.mb{padding:22px 26px 26px}
 
-/* ── FORM ── */
 .fg{margin-bottom:14px}
-.fg label{display:block;font-size:.74rem;font-weight:600;color:var(--text3);margin-bottom:5px;letter-spacing:.02em}
-.fg input,.fg select,.fg textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;transition:border-color .15s}
-.fg input:focus,.fg textarea:focus{border-color:var(--accent)}
-.fg textarea{resize:vertical;min-height:72px;line-height:1.55}
+.fg label{display:block;font-size:.72rem;font-weight:600;color:var(--text3);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-size:.95rem;outline:none;transition:border-color .15s}
+.fg input:focus,.fg textarea:focus{border-color:rgba(245,166,35,.5);box-shadow:0 0 0 3px rgba(245,166,35,.08)}
+.fg textarea{resize:vertical;min-height:76px;line-height:1.6}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--text4)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.frow.full{grid-template-columns:1fr}
-.fdiv{border:none;border-top:1px solid var(--border2);margin:16px 0}
-.fsec{font-size:.7rem;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
-.fhint{font-size:.72rem;color:var(--text4);margin-top:5px}
+.fdiv{border:none;border-top:1px solid var(--border2);margin:18px 0}
+.fsec{font-size:.68rem;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 
-/* ── TAG PICKER ── */
-.tag-picker{display:flex;flex-wrap:wrap;gap:6px}
-.topt{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:5px 11px;border-radius:10px;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .15s;user-select:none}
-.topt:hover{border-color:var(--text3)}
-.topt.sel{background:rgba(88,166,255,.15);border-color:rgba(88,166,255,.5);color:var(--blue);font-weight:600}
-.topt.sel.err{background:rgba(248,81,73,.15);border-color:rgba(248,81,73,.5);color:var(--red)}
+.tpicker{display:flex;flex-wrap:wrap;gap:6px}
+.topt{background:var(--card2);border:1px solid var(--border);color:var(--text3);padding:6px 12px;border-radius:8px;font-size:.76rem;cursor:pointer;transition:all .15s;user-select:none;font-weight:500}
+.topt:hover{border-color:var(--text3);color:var(--text2)}
+.topt.sel{background:rgba(77,166,255,.12);border-color:rgba(77,166,255,.4);color:var(--blue);font-weight:700}
+.topt.sel.err{background:rgba(255,79,110,.12);border-color:rgba(255,79,110,.4);color:var(--red)}
 
-.btn-submit{width:100%;background:var(--accent);color:#000;font-weight:700;border:none;border-radius:9px;padding:12px;font-size:.95rem;cursor:pointer;font-family:inherit;margin-top:16px;transition:all .15s;letter-spacing:.01em}
-.btn-submit:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,.3)}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-sub{width:100%;background:var(--accent);color:#000;font-weight:800;border:none;border-radius:10px;padding:13px;font-size:.95rem;cursor:pointer;margin-top:18px;transition:all .18s;letter-spacing:.01em;box-shadow:0 4px 14px rgba(245,166,35,.25)}
+.btn-sub:hover{background:var(--accent2);box-shadow:0 6px 20px rgba(245,166,35,.4);transform:translateY(-1px)}
+.btn-sub:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 
-@media(max-width:680px){
-  .stats-grid{grid-template-columns:repeat(3,1fr)}
+@media(max-width:860px){.dash-top{grid-template-columns:repeat(2,1fr)}.dash-sec{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){
+  .dash,.toolbar,.list-wrap{padding-left:16px;padding-right:16px}
+  .nav{padding:0 16px}
+  .dash-top{grid-template-columns:1fr 1fr}
+  .dash-sec{grid-template-columns:1fr}
+  .kpi-val{font-size:1.8rem}
   .frow{grid-template-columns:1fr}
-  .toolbar,.container{padding-left:14px;padding-right:14px}
-  .topnav,.hero{padding-left:14px;padding-right:14px}
-  .chart-wrap{margin-left:14px;margin-right:14px}
 }
-@media(max-width:420px){
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-}
+@media(max-width:400px){.dash-top{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<nav class="topnav">
-  <a class="back-btn" href="index.html">← 返回股學筆記</a>
-  <span class="nav-title">📒 交易日誌</span>
-  <span class="nav-badge" id="navBadge" style="display:none"></span>
+<nav class="nav">
+  <span class="nav-logo">交易日誌</span>
+  <div class="nav-sync">
+    <div class="sync-dot"></div>
+    <span>即時同步</span>
+  </div>
+  <span class="nav-open-pill" id="navPill"></span>
 </nav>
 
-<!-- ── HERO ── -->
-<div class="hero">
-  <h1>我的交易日誌</h1>
-  <p>記錄每筆判斷依據與檢討，找出自己的盲點，持續提升勝率</p>
-  <div class="stats-grid">
-    <div class="sc2 acc">
-      <div class="sc2-icon">📊</div>
-      <div class="sc2-val cv-acc" id="sTotal">—</div>
-      <div class="sc2-lbl">總筆數</div>
+<div class="dash">
+  <div class="dash-top">
+    <div class="kpi total">
+      <div class="kpi-glow"></div>
+      <div class="kpi-val cv-a" id="kTotal">—</div>
+      <div class="kpi-lbl">總交易筆數</div>
+      <div class="kpi-sub" id="kClosedSub">—</div>
+      <div class="kpi-bar"></div>
     </div>
-    <div class="sc2 grn">
-      <div class="sc2-icon">🎯</div>
-      <div class="sc2-val" id="sWinRate">—</div>
-      <div class="sc2-lbl">勝率</div>
+    <div class="kpi rate">
+      <div class="kpi-glow"></div>
+      <div class="kpi-val" id="kWR">—</div>
+      <div class="kpi-lbl">勝率</div>
+      <div class="wr-bar-wrap"><div class="wr-bar" id="wrBar"></div></div>
+      <div class="kpi-bar"></div>
     </div>
-    <div class="sc2 grn">
-      <div class="sc2-icon">📈</div>
-      <div class="sc2-val cv-grn" id="sAvgWin">—</div>
-      <div class="sc2-lbl">平均獲利</div>
+    <div class="kpi profit">
+      <div class="kpi-glow"></div>
+      <div class="kpi-val" id="kNetPnl">—</div>
+      <div class="kpi-lbl">累積盈虧</div>
+      <div class="kpi-sub" id="kNetSub">—</div>
+      <div class="kpi-bar"></div>
     </div>
-    <div class="sc2 red">
-      <div class="sc2-icon">📉</div>
-      <div class="sc2-val cv-red" id="sAvgLoss">—</div>
-      <div class="sc2-lbl">平均虧損</div>
+    <div class="kpi hold">
+      <div class="kpi-glow"></div>
+      <div class="kpi-val cv-b" id="kOpen">—</div>
+      <div class="kpi-lbl">持倉中</div>
+      <div class="kpi-sub" id="kOpenSub">—</div>
+      <div class="kpi-bar"></div>
     </div>
-    <div class="sc2 pur">
-      <div class="sc2-icon">⚖️</div>
-      <div class="sc2-val" id="sPF">—</div>
-      <div class="sc2-lbl">盈虧比</div>
+  </div>
+
+  <div class="dash-sec">
+    <div class="sec-card">
+      <div class="sec-val cv-g" id="sAvgW">—</div>
+      <div class="sec-lbl">平均獲利幅度</div>
     </div>
-    <div class="sc2 blu">
-      <div class="sc2-icon">⏳</div>
-      <div class="sc2-val cv-blu" id="sOpen">—</div>
-      <div class="sc2-lbl">持倉中</div>
+    <div class="sec-card">
+      <div class="sec-val cv-r" id="sAvgL">—</div>
+      <div class="sec-lbl">平均虧損幅度</div>
     </div>
+    <div class="sec-card">
+      <div class="sec-val cv-p" id="sPF">—</div>
+      <div class="sec-lbl">獲利因子（盈虧比）</div>
+    </div>
+  </div>
+
+  <div class="chart-section" id="chartSec">
+    <div class="chart-header">
+      <span class="chart-title">資產曲線</span>
+      <span class="chart-pill neu" id="chartPill">累積報酬率</span>
+      <span style="margin-left:auto;font-size:.72rem;color:var(--text4)" id="chartRange"></span>
+    </div>
+    <canvas id="eqChart" height="160"></canvas>
   </div>
 </div>
 
-<!-- ── 盈虧曲線 ── -->
-<div class="chart-wrap" id="chartWrap">
-  <div class="chart-title">累積盈虧曲線 <span></span></div>
-  <canvas id="equityChart" height="120"></canvas>
-</div>
-
-<!-- ── TOOLBAR ── -->
 <div class="toolbar">
-  <button class="btn-add" onclick="openAdd()">＋ 新增交易</button>
-  <span class="count-badge" id="countBadge"></span>
-  <div class="filter-tabs">
-    <button class="tab active" onclick="setFilter('all',this)">全部</button>
-    <button class="tab" onclick="setFilter('open',this)">⏳ 持倉中</button>
-    <button class="tab" onclick="setFilter('win',this)">✓ 獲利</button>
-    <button class="tab" onclick="setFilter('loss',this)">✗ 虧損</button>
+  <button class="btn-add" onclick="openAdd()">新增交易</button>
+  <span class="tcount" id="tcount"></span>
+  <div class="filter-row">
+    <button class="tab active" onclick="setF('all',this)">全部</button>
+    <button class="tab" onclick="setF('open',this)">持倉中</button>
+    <button class="tab" onclick="setF('win',this)">獲利</button>
+    <button class="tab" onclick="setF('loss',this)">虧損</button>
   </div>
 </div>
 
-<div class="container" id="list"><div class="loading">連線中…</div></div>
+<div class="list-wrap" id="list"><div class="loading">連線中…</div></div>
 
-<!-- ══════════ 新增/編輯 Modal ══════════ -->
-<div class="overlay" id="addOverlay" onclick="bgClick(event,'addOverlay')">
+<!-- 新增 / 編輯 -->
+<div class="overlay" id="addOv" onclick="bgC(event,'addOv')">
 <div class="modal">
-  <div class="modal-head">
-    <h2>📝 <span id="modalTitle">新增交易</span></h2>
-    <button class="modal-x" onclick="closeAdd()">✕</button>
+  <div class="mh">
+    <h2 id="mTitle">新增交易</h2>
+    <button class="mx" onclick="closeAdd()">x</button>
   </div>
-  <div class="modal-body">
+  <div class="mb">
     <div class="frow">
-      <div class="fg"><label>股票代號 *</label><input id="fTicker" placeholder="2330" maxlength="6"></div>
-      <div class="fg"><label>股票名稱</label><input id="fName" placeholder="台積電"></div>
+      <div class="fg"><label>股票代號 *</label><input id="fT" placeholder="2330" maxlength="6"></div>
+      <div class="fg"><label>股票名稱</label><input id="fN" placeholder="台積電"></div>
     </div>
     <div class="frow">
-      <div class="fg"><label>進場日期 *</label><input type="date" id="fEntryDate"></div>
-      <div class="fg"><label>進場價格 *</label><input type="number" id="fEntryPrice" placeholder="900" step="0.1"></div>
+      <div class="fg"><label>進場日期 *</label><input type="date" id="fED"></div>
+      <div class="fg"><label>進場價格 *</label><input type="number" id="fEP" placeholder="900" step="0.1"></div>
     </div>
     <div class="frow">
-      <div class="fg"><label>停損位</label><input type="number" id="fStop" placeholder="880" step="0.1"></div>
-      <div class="fg"><label>目標價</label><input type="number" id="fTarget" placeholder="950" step="0.1"></div>
+      <div class="fg"><label>停損位</label><input type="number" id="fSL" placeholder="880" step="0.1"></div>
+      <div class="fg"><label>目標價</label><input type="number" id="fTP" placeholder="960" step="0.1"></div>
     </div>
     <hr class="fdiv">
     <div class="fsec">進場原因（可複選）</div>
-    <div class="tag-picker" id="reasonPicker"></div>
-    <div class="fg frow full" style="margin-top:14px">
-      <div class="fg"><label>進場當下想法</label><textarea id="fEntryNote" placeholder="為什麼進場？看到什麼訊號、當下判斷邏輯…"></textarea></div>
+    <div class="tpicker" id="rPicker"></div>
+    <div class="fg" style="margin-top:14px">
+      <label>進場當下想法</label>
+      <textarea id="fEN" placeholder="為什麼進場？看到什麼訊號、當下判斷邏輯…"></textarea>
     </div>
     <hr class="fdiv">
     <div class="fsec">出場資訊（結單後填）</div>
     <div class="frow">
-      <div class="fg"><label>出場日期</label><input type="date" id="fExitDate"></div>
-      <div class="fg"><label>出場價格</label><input type="number" id="fExitPrice" placeholder="留空 = 持倉中" step="0.1"></div>
+      <div class="fg"><label>出場日期</label><input type="date" id="fXD"></div>
+      <div class="fg"><label>出場價格</label><input type="number" id="fXP" placeholder="留空 = 持倉中" step="0.1"></div>
     </div>
     <div class="fsec" style="margin-top:4px">犯的錯誤（可複選）</div>
-    <div class="tag-picker" id="mistakePicker"></div>
-    <div class="fg frow full" style="margin-top:14px">
-      <div class="fg"><label>收盤後檢討</label><textarea id="fReview" placeholder="這筆交易學到什麼？下次怎麼改進…"></textarea></div>
+    <div class="tpicker" id="mPicker"></div>
+    <div class="fg" style="margin-top:14px">
+      <label>收盤後檢討</label>
+      <textarea id="fRV" placeholder="這筆交易學到什麼？哪裡做得不對，下次怎麼改進…"></textarea>
     </div>
-    <button class="btn-submit" id="btnSave" onclick="saveTrade()">💾 儲存交易記錄</button>
+    <button class="btn-sub" id="btnSv" onclick="save()">儲存交易記錄</button>
   </div>
 </div>
 </div>
 
-<!-- ══════════ 快速結單 Modal ══════════ -->
-<div class="overlay" id="closeOverlay" onclick="bgClick(event,'closeOverlay')">
-<div class="modal" style="max-width:440px">
-  <div class="modal-head">
-    <h2>✅ <span id="closeTitle">結單</span></h2>
-    <button class="modal-x" onclick="document.getElementById('closeOverlay').classList.remove('open')">✕</button>
+<!-- 結單 -->
+<div class="overlay" id="closeOv" onclick="bgC(event,'closeOv')">
+<div class="modal" style="max-width:460px">
+  <div class="mh">
+    <h2 id="closeT">結單</h2>
+    <button class="mx" onclick="closeOv()">x</button>
   </div>
-  <div class="modal-body">
+  <div class="mb">
     <div class="frow">
-      <div class="fg"><label>出場日期</label><input type="date" id="cExitDate"></div>
-      <div class="fg"><label>出場價格 *</label><input type="number" id="cExitPrice" step="0.1" placeholder="出場成交價"></div>
+      <div class="fg"><label>出場日期</label><input type="date" id="cXD"></div>
+      <div class="fg"><label>出場價格 *</label><input type="number" id="cXP" step="0.1" placeholder="成交出場價"></div>
     </div>
     <div class="fsec">犯的錯誤（可複選）</div>
-    <div class="tag-picker" id="closeMistakePicker"></div>
-    <div class="fg" style="margin-top:14px"><label>檢討</label><textarea id="cReview" placeholder="這筆交易學到什麼？有哪裡做得不對…"></textarea></div>
-    <button class="btn-submit" onclick="saveClose()">確認結單</button>
+    <div class="tpicker" id="cmPicker"></div>
+    <div class="fg" style="margin-top:14px">
+      <label>檢討與筆記</label>
+      <textarea id="cRV" placeholder="這筆交易學到什麼？有哪裡做得不對…"></textarea>
+    </div>
+    <button class="btn-sub" onclick="saveClose()">確認結單</button>
   </div>
 </div>
 </div>
@@ -307,319 +345,297 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const app = initializeApp({
-  apiKey: "AIzaSyDMpaJo2I0KN6OU7UVgvvNRPzNNJefJiC4",
-  authDomain: "transaction-log-fe0c3.firebaseapp.com",
-  projectId: "transaction-log-fe0c3",
-  storageBucket: "transaction-log-fe0c3.firebasestorage.app",
-  messagingSenderId: "762032844405",
-  appId: "1:762032844405:web:cbc466f21dd73ab80f523c"
+  apiKey:"AIzaSyDMpaJo2I0KN6OU7UVgvvNRPzNNJefJiC4",
+  authDomain:"transaction-log-fe0c3.firebaseapp.com",
+  projectId:"transaction-log-fe0c3",
+  storageBucket:"transaction-log-fe0c3.firebasestorage.app",
+  messagingSenderId:"762032844445",
+  appId:"1:762032844405:web:cbc466f21dd73ab80f523c"
 });
 const db = getFirestore(app);
-const COLL = 'trades';
+const COL = 'trades';
 
-const REASONS = ['外資買超','投信買超','法人雙買','突破壓力','支撐反彈','缺口突破',
-  '趨勢跟隨','週線訊號','籌碼背離','融券回補','量能放大','消息面','其他'];
-const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','過早出場','過晚出場',
-  '情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
+const REASONS  = ['外資買超','投信買超','法人雙買','突破壓力','支撐反彈','缺口突破','趨勢跟隨','週線訊號','籌碼背離','融券回補','量能放大','消息面','其他'];
+const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','過早出場','過晚出場','情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
 
-let trades = [], curFilter = 'all', editId = null, closeId = null;
-let selReasons = [], selMistakes = [], closeSelMistakes = [];
+let trades=[], curF='all', editId=null, closeId=null, selR=[], selM=[], cSelM=[];
 
-/* ── Load ── */
-async function load() {
-  try {
-    const snap = await getDocs(query(collection(db, COLL), orderBy('createdAt','desc')));
-    trades = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+async function load(){
+  try{
+    const snap = await getDocs(query(collection(db,COL), orderBy('createdAt','desc')));
+    trades = snap.docs.map(d=>({id:d.id,...d.data()}));
     renderAll();
-  } catch(e) {
-    document.getElementById('list').innerHTML =
-      `<div class="loading" style="color:var(--red)">❌ 載入失敗：${e.message}<br><br>請確認 Firestore 安全規則已設為允許讀寫</div>`;
+  }catch(e){
+    document.getElementById('list').innerHTML=`<div class="loading" style="color:var(--red)">載入失敗：${e.message}</div>`;
   }
 }
 
-/* ── Stats ── */
-function pnl(t){ return t.exitPrice&&t.entryPrice ? (t.exitPrice-t.entryPrice)/t.entryPrice*100 : 0; }
-function avg(arr){ return arr.length ? arr.reduce((s,v)=>s+v,0)/arr.length : null; }
+window.save = async ()=>{
+  const t=v('fT'), ep=parseFloat(v('fEP'));
+  if(!t||!ep){alert('請填寫股票代號和進場價格');return;}
+  const xp=parseFloat(v('fXP'))||null;
+  const status=xp?(xp>ep?'win':'loss'):'open';
+  const data={ticker:t.toUpperCase(),name:v('fN'),entryDate:v('fED'),entryPrice:ep,
+    stopLoss:parseFloat(v('fSL'))||null,target:parseFloat(v('fTP'))||null,
+    exitDate:v('fXD')||null,exitPrice:xp,status,
+    reasons:[...selR],mistakes:[...selM],
+    entryNote:v('fEN'),reviewNote:v('fRV'),createdAt:Timestamp.now()};
+  const b=document.getElementById('btnSv'); b.disabled=true; b.textContent='儲存中…';
+  try{
+    if(editId) await updateDoc(doc(db,COL,editId),data);
+    else       await addDoc(collection(db,COL),data);
+    closeAdd(); await load();
+  }catch(e){alert('儲存失敗：'+e.message);}
+  finally{b.disabled=false; b.textContent='儲存交易記錄';}
+};
 
-function renderAll() {
-  const closed = trades.filter(t => t.status!=='open');
-  const wins   = closed.filter(t => t.status==='win');
-  const losses = closed.filter(t => t.status==='loss');
-  const openN  = trades.filter(t => t.status==='open').length;
-  const wr  = closed.length ? Math.round(wins.length/closed.length*100) : null;
-  const avgW = avg(wins.map(pnl));
-  const avgL = avg(losses.map(pnl));
-  const pf   = avgW!=null&&avgL!=null&&avgL!==0 ? Math.abs(avgW/avgL) : null;
+window.saveClose = async ()=>{
+  const xp=parseFloat(document.getElementById('cXP').value);
+  if(!xp){alert('請填寫出場價格');return;}
+  const t=trades.find(x=>x.id===closeId); if(!t) return;
+  const status=xp>t.entryPrice?'win':'loss';
+  try{
+    await updateDoc(doc(db,COL,closeId),{
+      exitDate:document.getElementById('cXD').value,exitPrice:xp,status,
+      mistakes:[...cSelM],reviewNote:document.getElementById('cRV').value
+    });
+    closeOv(); await load();
+  }catch(e){alert('儲存失敗：'+e.message);}
+};
 
-  setText('sTotal',   trades.length||'0', '');
-  setText('sWinRate', wr!=null ? wr+'%' : '—', wr!=null ? (wr>=50?'cv-grn':'cv-red') : 'cv-neu');
-  setText('sAvgWin',  avgW!=null ? '+'+avgW.toFixed(1)+'%' : '—', 'cv-grn');
-  setText('sAvgLoss', avgL!=null ? avgL.toFixed(1)+'%' : '—', 'cv-red');
-  setText('sPF',      pf!=null ? pf.toFixed(2)+'x' : '—', pf!=null?(pf>=1?'cv-grn':'cv-red'):'cv-neu');
-  setText('sOpen',    openN||'0', 'cv-blu');
+window.del = async id=>{
+  if(!confirm('確定刪除這筆交易記錄？'))return;
+  try{await deleteDoc(doc(db,COL,id));await load();}catch(e){alert('刪除失敗');}
+};
 
-  const nb = document.getElementById('navBadge');
-  if (openN > 0) { nb.textContent = `${openN} 筆持倉中`; nb.style.display=''; }
-  else nb.style.display='none';
+function pnlPct(t){ return t.exitPrice&&t.entryPrice?(t.exitPrice-t.entryPrice)/t.entryPrice*100:0; }
+function avg(arr){ return arr.length?arr.reduce((s,v)=>s+v,0)/arr.length:null; }
+
+function renderAll(){
+  const closed=trades.filter(t=>t.status!=='open');
+  const wins  =closed.filter(t=>t.status==='win');
+  const losses=closed.filter(t=>t.status==='loss');
+  const openN =trades.filter(t=>t.status==='open').length;
+  const wr    =closed.length?wins.length/closed.length*100:null;
+  const avgW  =avg(wins.map(pnlPct));
+  const avgL  =avg(losses.map(pnlPct));
+  const pf    =avgW!=null&&avgL!=null&&avgL!==0?Math.abs(avgW/avgL):null;
+  const netPnl=closed.reduce((s,t)=>s+pnlPct(t),0);
+
+  tx('kTotal', trades.length||'0');
+  tx('kClosedSub', `${closed.length} 筆已結單`);
+  tx('kWR', wr!=null?wr.toFixed(1)+'%':'—', wr!=null?(wr>=50?'cv-g':'cv-r'):'cv-n');
+  const wrEl=document.getElementById('wrBar');
+  wrEl.style.width=(wr||0)+'%';
+  wrEl.style.background=wr>=50?'linear-gradient(90deg,var(--green),var(--green2))':'linear-gradient(90deg,var(--red),var(--red2))';
+  tx('kNetPnl', netPnl>=0?'+'+netPnl.toFixed(2)+'%':netPnl.toFixed(2)+'%', netPnl>0?'cv-g':netPnl<0?'cv-r':'cv-n');
+  tx('kNetSub', `${wins.length} 勝 / ${losses.length} 敗`);
+  tx('kOpen', openN||'0');
+  tx('kOpenSub', openN>0?'筆部位未平倉':'目前無持倉');
+  tx('sAvgW', avgW!=null?'+'+avgW.toFixed(2)+'%':'—');
+  tx('sAvgL', avgL!=null?avgL.toFixed(2)+'%':'—');
+  tx('sPF',   pf!=null?pf.toFixed(2)+'x':'—', pf!=null?(pf>=1?'cv-p':'cv-r'):'cv-n');
+
+  const pill=document.getElementById('navPill');
+  if(openN>0){pill.textContent=`${openN} 筆持倉中`;pill.style.display='';}
+  else pill.style.display='none';
 
   drawChart(closed);
   renderList();
 }
 
-function setText(id, val, cls) {
-  const el = document.getElementById(id); if(!el) return;
-  el.textContent = val;
-  el.className = 'sc2-val ' + (cls||'');
+function tx(id,val,cls){
+  const el=document.getElementById(id);if(!el)return;
+  el.textContent=val;
+  if(cls!==undefined) el.className=el.className.replace(/cv-\w+/g,'').trim()+' '+cls;
 }
 
-/* ── Equity Curve ── */
-function drawChart(closed) {
-  const wrap = document.getElementById('chartWrap');
-  if (closed.length < 2) { wrap.style.display='none'; return; }
-  wrap.style.display='block';
+function drawChart(closed){
+  const sec=document.getElementById('chartSec');
+  if(closed.length<2){sec.style.display='none';return;}
+  sec.style.display='block';
+  const sorted=[...closed].sort((a,b)=>(a.exitDate||'')<(b.exitDate||'')?-1:1);
+  let cum=0,pts=[0];
+  sorted.forEach(t=>{cum+=pnlPct(t);pts.push(+cum.toFixed(4));});
+  const lastVal=pts[pts.length-1];
+  const pill=document.getElementById('chartPill');
+  pill.textContent=(lastVal>=0?'+':'')+lastVal.toFixed(2)+'%';
+  pill.className='chart-pill '+(lastVal>0?'pos':lastVal<0?'neg':'neu');
+  document.getElementById('chartRange').textContent=`${sorted[0].exitDate||''}  →  ${sorted[sorted.length-1].exitDate||''}`;
 
-  const canvas = document.getElementById('equityChart');
-  const W = canvas.offsetWidth || 800;
-  canvas.width  = W * devicePixelRatio;
-  canvas.height = 120 * devicePixelRatio;
-  canvas.style.height = '120px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(devicePixelRatio, devicePixelRatio);
+  const canvas=document.getElementById('eqChart');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-44, H=160;
+  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const pad={t:12,b:32,l:52,r:16};
+  const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+  const minY=Math.min(0,...pts),maxY=Math.max(0,...pts),rY=maxY-minY||1;
+  const toX=i=>pad.l+i/(pts.length-1)*cW;
+  const toY=v=>pad.t+(1-(v-minY)/rY)*cH;
+  ctx.clearRect(0,0,W,H);
 
-  /* cumulative P&L */
-  const sorted = [...closed].sort((a,b) => (a.exitDate||'') < (b.exitDate||'') ? -1 : 1);
-  const points = [0];
-  let cum = 0;
-  sorted.forEach(t => { cum += pnl(t); points.push(cum); });
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  [0,.25,.5,.75,1].forEach(f=>{const y=pad.t+f*cH;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();});
 
-  const minY = Math.min(0, ...points);
-  const maxY = Math.max(0, ...points);
-  const rangeY = maxY - minY || 1;
-  const pad = { t:10, b:28, l:44, r:16 };
-  const cW = W - pad.l - pad.r;
-  const cH = 120 - pad.t - pad.b;
-
-  const toX = i => pad.l + (i / (points.length-1)) * cW;
-  const toY = v => pad.t + (1-(v-minY)/rangeY) * cH;
-
-  ctx.clearRect(0, 0, W, 120);
-
-  /* zero line */
-  const zy = toY(0);
-  ctx.strokeStyle = 'rgba(255,255,255,.08)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4,4]);
-  ctx.beginPath(); ctx.moveTo(pad.l, zy); ctx.lineTo(pad.l+cW, zy); ctx.stroke();
+  const zy=toY(0);
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(pad.l,zy);ctx.lineTo(pad.l+cW,zy);ctx.stroke();
   ctx.setLineDash([]);
 
-  /* area fill */
-  const lastX = toX(points.length-1);
-  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t+cH);
-  const finalVal = points[points.length-1];
-  if (finalVal >= 0) {
-    grad.addColorStop(0,  'rgba(63,185,80,.35)');
-    grad.addColorStop(1,  'rgba(63,185,80,.02)');
-  } else {
-    grad.addColorStop(0,  'rgba(248,81,73,.02)');
-    grad.addColorStop(1,  'rgba(248,81,73,.35)');
-  }
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+cH);
+  if(lastVal>=0){grad.addColorStop(0,'rgba(0,212,160,.3)');grad.addColorStop(1,'rgba(0,212,160,.02)');}
+  else          {grad.addColorStop(0,'rgba(255,79,110,.02)');grad.addColorStop(1,'rgba(255,79,110,.3)');}
+  ctx.beginPath();ctx.moveTo(toX(0),zy);
+  pts.forEach((v,i)=>ctx.lineTo(toX(i),toY(v)));
+  ctx.lineTo(toX(pts.length-1),zy);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+
   ctx.beginPath();
-  ctx.moveTo(toX(0), zy);
-  points.forEach((v,i) => ctx.lineTo(toX(i), toY(v)));
-  ctx.lineTo(lastX, zy);
-  ctx.closePath();
-  ctx.fillStyle = grad;
-  ctx.fill();
+  pts.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));
+  ctx.strokeStyle=lastVal>=0?'var(--green)':'var(--red)';
+  ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
 
-  /* line */
-  ctx.beginPath();
-  points.forEach((v,i) => i===0 ? ctx.moveTo(toX(i),toY(v)) : ctx.lineTo(toX(i),toY(v)));
-  ctx.strokeStyle = finalVal >= 0 ? '#3fb950' : '#f85149';
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-  ctx.stroke();
-
-  /* dots */
-  points.forEach((v,i) => {
-    ctx.beginPath();
-    ctx.arc(toX(i), toY(v), 3, 0, Math.PI*2);
-    ctx.fillStyle = v > 0 ? '#3fb950' : v < 0 ? '#f85149' : '#8b949e';
-    ctx.fill();
+  pts.forEach((v,i)=>{
+    ctx.beginPath();ctx.arc(toX(i),toY(v),i===0||i===pts.length-1?4:2.5,0,Math.PI*2);
+    ctx.fillStyle=v>0?'var(--green)':v<0?'var(--red)':'rgba(255,255,255,.3)';
+    ctx.strokeStyle='var(--bg2)';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();
   });
 
-  /* Y axis labels */
-  ctx.fillStyle = '#484f58';
-  ctx.font = `${10 * devicePixelRatio / devicePixelRatio}px system-ui`;
-  ctx.textAlign = 'right';
-  [minY, 0, maxY].forEach(v => {
-    const y = toY(v);
-    if (Math.abs(y - toY(0)) > 10 || v === 0) {
-      ctx.fillText((v >= 0 ? '+' : '') + v.toFixed(1) + '%', pad.l - 4, y + 4);
-    }
-  });
-
-  /* X axis labels */
-  ctx.textAlign = 'center';
-  const step = Math.max(1, Math.floor((points.length-1)/5));
-  sorted.forEach((t,i) => {
-    if (i % step === 0 || i === sorted.length-1) {
-      ctx.fillText(t.ticker||'', toX(i+1), 120 - 8);
-    }
-  });
+  ctx.fillStyle='var(--text4)';ctx.font=`11px system-ui`;ctx.textAlign='right';
+  [minY,0,maxY].forEach(v=>{ctx.fillText((v>=0?'+':'')+v.toFixed(1)+'%',pad.l-6,toY(v)+4);});
+  ctx.textAlign='center';ctx.fillStyle='var(--text4)';
+  const step=Math.max(1,Math.floor(sorted.length/6));
+  sorted.forEach((t,i)=>{if(i%step===0||i===sorted.length-1) ctx.fillText(t.ticker||'',toX(i+1),H-10);});
 }
 
-/* ── Render List ── */
-function renderList() {
-  const el = document.getElementById('list');
-  const items = curFilter === 'all' ? trades : trades.filter(t => t.status===curFilter);
-  document.getElementById('countBadge').textContent = items.length ? `共 ${items.length} 筆` : '';
-  if (!items.length) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">${curFilter==='all'?'📭':'🔍'}</div>
-      <h3>${curFilter==='all'?'還沒有交易記錄':'沒有符合的記錄'}</h3>
-      <p>${curFilter==='all'?'點「＋ 新增交易」記錄你的第一筆！':'換個篩選條件試試'}</p>
+function renderList(){
+  const el=document.getElementById('list');
+  const items=curF==='all'?trades:trades.filter(t=>t.status===curF);
+  document.getElementById('tcount').textContent=items.length?`共 ${items.length} 筆`:'';
+  if(!items.length){
+    el.innerHTML=`<div class="empty">
+      <h3>${curF==='all'?'還沒有交易記錄':'沒有符合的記錄'}</h3>
+      <p>${curF==='all'?'點上方「新增交易」記錄你的第一筆交易<br>每一筆記錄都是提升勝率的原料。':'換個篩選條件試試'}</p>
     </div>`;
     return;
   }
-  el.innerHTML = items.map(tcHTML).join('');
+  el.innerHTML=items.map(cardHTML).join('');
 }
 
-function tcHTML(t) {
-  const p = pnl(t);
-  const pStr = t.status!=='open' ? (p>=0?'+':'')+p.toFixed(2)+'%' : '持倉中';
-  const pCls = p>0?'pos':p<0?'neg':'neu';
-  const badge = t.status==='win'  ? '<span class="tc-badge bw">✓ 獲利</span>'
-              : t.status==='loss' ? '<span class="tc-badge bl">✗ 虧損</span>'
-              : '<span class="tc-badge bo">⏳ 持倉</span>';
-  const rStr = t.exitPrice&&t.entryPrice&&t.stopLoss&&(t.entryPrice-t.stopLoss)!==0
-    ? ((t.exitPrice-t.entryPrice)/(t.entryPrice-t.stopLoss)).toFixed(2)+'R' : '';
+function cardHTML(t){
+  const p=pnlPct(t);
+  const pStr=t.status!=='open'?(p>=0?'+':'')+p.toFixed(2)+'%':'持倉中';
+  const pCls=p>0?'pos':p<0?'neg':'neu';
+  const badge=t.status==='win' ?`<span class="tbadge tbw">獲利</span>`
+             :t.status==='loss'?`<span class="tbadge tbl">虧損</span>`
+             :                  `<span class="tbadge tbo">持倉中</span>`;
+  const rVal=t.exitPrice&&t.entryPrice&&t.stopLoss&&(t.entryPrice-t.stopLoss)!==0
+    ?((t.exitPrice-t.entryPrice)/(t.entryPrice-t.stopLoss)).toFixed(2)+'R':'';
+  const days=t.entryDate&&t.exitDate
+    ?Math.round((new Date(t.exitDate)-new Date(t.entryDate))/86400000)+'天':null;
+  const av=(t.ticker||'?').slice(0,4);
+  const dateStr=t.exitDate?`${t.entryDate} → ${t.exitDate}${days?' ('+days+')':''}`
+               :t.entryDate?`進場 ${t.entryDate}`:'—';
+  const firstR=t.reasons?.length
+    ?`<span class="tc-mini-tag">${esc(t.reasons[0])}</span>${t.reasons.length>1?`<span class="tc-mini-tag">+${t.reasons.length-1}</span>`:''}`:'';
 
-  /* date range */
-  const dateStr = t.exitDate ? `${t.entryDate} → ${t.exitDate}` : `進場 ${t.entryDate||'—'}`;
+  const prices=`<div class="tc-prices">
+    <div class="pf"><label>進場價</label><span class="pv acc">${t.entryPrice||'—'}</span></div>
+    ${t.stopLoss?`<div class="pf"><label>停損位</label><span class="pv neg">${t.stopLoss}</span></div>`:''}
+    ${t.target  ?`<div class="pf"><label>目標價</label><span class="pv pos">${t.target}</span></div>`:''}
+    ${t.exitPrice?`<div class="pf"><label>出場價</label><span class="pv ${p>=0?'pos':'neg'}">${t.exitPrice}</span></div>`:''}
+    ${rVal?`<div class="pf"><label>R 值</label><span class="pv ${p>=0?'pos':'neg'}">${rVal}</span></div>`:''}
+    ${days?`<div class="pf"><label>持有天數</label><span class="pv">${days}</span></div>`:''}
+  </div>`;
 
-  /* avatar text = ticker initials */
-  const av = (t.ticker||'?').slice(0,4);
+  const hasContent=t.reasons?.length||t.entryNote||t.mistakes?.length||t.reviewNote;
+  const content=hasContent?`<div class="tc-content">
+    ${t.reasons?.length?`<div><div class="nc-label">進場原因</div><div class="tag-row">${t.reasons.map(r=>`<span class="rtag reason">${esc(r)}</span>`).join('')}</div></div>`:''}
+    ${t.entryNote?`<div><div class="nc-label">進場想法</div><p class="nc-text">${esc(t.entryNote)}</p></div>`:''}
+    ${t.mistakes?.length?`<div><div class="nc-label">犯的錯誤</div><div class="tag-row">${t.mistakes.map(m=>`<span class="rtag mistake">${esc(m)}</span>`).join('')}</div></div>`:''}
+    ${t.reviewNote?`<div><div class="nc-label">收盤後檢討</div><p class="nc-text">${esc(t.reviewNote)}</p></div>`:''}
+  </div>`:'';
 
   return `<div class="tc ${t.status}" id="tc-${t.id}">
-  <div class="tc-head" onclick="toggleBody('${t.id}')">
-    <div class="tc-avatar">${esc(av)}</div>
-    <div class="tc-info">
-      <div class="tc-top">
+  <div class="tc-head" onclick="tog('${t.id}')">
+    <div class="tc-av">${esc(av)}</div>
+    <div class="tc-mid">
+      <div class="tc-ticker-row">
         <span class="tc-ticker">${esc(t.ticker)}</span>
         <span class="tc-name">${esc(t.name||'')}</span>
       </div>
-      <div class="tc-dates">${dateStr}</div>
+      <div class="tc-tags-row">${firstR}</div>
+      <div class="tc-date-row">${dateStr}</div>
     </div>
     <div class="tc-right">
-      <div class="tc-pnl ${pCls}">${pStr} ${badge}</div>
-      <div class="tc-meta">
-        ${rStr ? `<span>${rStr}</span>` : ''}
-        ${t.reasons?.length ? `<span>${t.reasons[0]}${t.reasons.length>1?' +'+( t.reasons.length-1):''}</span>` : ''}
-      </div>
+      <div class="tc-pnl ${pCls}">${pStr}</div>
+      <div class="tc-badge-row">${badge}${rVal?`<span class="tc-r">${rVal}</span>`:''}</div>
     </div>
   </div>
   <div class="tc-body" id="b-${t.id}">
-    <div class="tc-section">
-      <div class="tc-field"><label>進場價</label><span class="fval">${t.entryPrice||'—'}</span></div>
-      ${t.stopLoss  ? `<div class="tc-field"><label>停損位</label><span class="fval neg">${t.stopLoss}</span></div>` : ''}
-      ${t.target    ? `<div class="tc-field"><label>目標價</label><span class="fval pos">${t.target}</span></div>` : ''}
-      ${t.exitPrice ? `<div class="tc-field"><label>出場價</label><span class="fval ${p>=0?'pos':'neg'}">${t.exitPrice}</span></div>` : ''}
-      ${rStr        ? `<div class="tc-field"><label>R 值</label><span class="fval ${p>=0?'pos':'neg'}">${rStr}</span></div>` : ''}
-    </div>
-    ${(t.reasons?.length||t.entryNote||t.mistakes?.length||t.reviewNote) ? `
-    <div class="tc-notes">
-      ${t.reasons?.length ? `<div class="note-block"><div class="note-label">進場原因</div><div class="tags">${t.reasons.map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div></div>` : ''}
-      ${t.entryNote       ? `<div class="note-block"><div class="note-label">進場想法</div><p class="note-text">${esc(t.entryNote)}</p></div>` : ''}
-      ${t.mistakes?.length? `<div class="note-block"><div class="note-label">犯的錯誤</div><div class="tags">${t.mistakes.map(m=>`<span class="tag err">${esc(m)}</span>`).join('')}</div></div>` : ''}
-      ${t.reviewNote      ? `<div class="note-block"><div class="note-label">收盤後檢討</div><p class="note-text">${esc(t.reviewNote)}</p></div>` : ''}
-    </div>` : ''}
-    <div class="tc-actions">
-      ${t.status==='open' ? `<button class="btn-sm close-btn" onclick="openClose('${t.id}')">✓ 結單</button>` : ''}
-      <button class="btn-sm" onclick="openEdit('${t.id}')">✏️ 編輯</button>
-      <button class="btn-sm del" onclick="del('${t.id}')">🗑 刪除</button>
+    ${prices}${content}
+    <div class="tc-footer">
+      ${t.status==='open'?`<button class="btn-s close-btn" onclick="openClose('${t.id}')">結單</button>`:''}
+      <button class="btn-s" onclick="openEdit('${t.id}')">編輯</button>
+      <button class="btn-s del" onclick="del('${t.id}')">刪除</button>
     </div>
   </div>
 </div>`;
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
-/* ── Toggle ── */
-window.toggleBody = id => document.getElementById('b-'+id)?.classList.toggle('show');
-window.setFilter  = (f,btn) => { curFilter=f; document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn)); renderList(); };
-window.bgClick    = (e,id)  => { if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); };
+window.tog    = id=>document.getElementById('b-'+id)?.classList.toggle('open');
+window.setF   = (f,btn)=>{curF=f;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));renderList();};
+window.bgC    = (e,id)=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');};
+window.closeOv  = ()=>document.getElementById('closeOv').classList.remove('open');
+window.closeAdd = ()=>document.getElementById('addOv').classList.remove('open');
+const v  = id=>document.getElementById(id)?.value||'';
+const sv = (id,val)=>{const el=document.getElementById(id);if(el&&val!=null)el.value=val;};
 
-/* ── Tag Picker ── */
-function buildPicker(id, opts, arr, isErr) {
-  const el = document.getElementById(id); if(!el) return;
-  el.innerHTML = '';
-  opts.forEach(opt => {
-    const b = document.createElement('button');
-    b.type='button';
-    b.className='topt'+(isErr?' err':'')+(arr.includes(opt)?' sel':'');
-    b.textContent=opt;
-    b.onclick=()=>{ const i=arr.indexOf(opt); i===-1?arr.push(opt):arr.splice(i,1); b.classList.toggle('sel',arr.includes(opt)); };
+function buildP(cid,opts,arr,isErr){
+  const el=document.getElementById(cid);if(!el)return;el.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.type='button';
+    b.className='topt'+(isErr?' err':'')+(arr.includes(o)?' sel':'');
+    b.textContent=o;
+    b.onclick=()=>{const i=arr.indexOf(o);i===-1?arr.push(o):arr.splice(i,1);b.classList.toggle('sel',arr.includes(o));};
     el.appendChild(b);
   });
 }
 
-/* ── Add/Edit Modal ── */
-window.openAdd = ()=>{ editId=null;selReasons=[];selMistakes=[]; document.getElementById('modalTitle').textContent='新增交易'; clearF(); buildPicker('reasonPicker',REASONS,selReasons,false); buildPicker('mistakePicker',MISTAKES,selMistakes,true); document.getElementById('addOverlay').classList.add('open'); };
-window.closeAdd = ()=> document.getElementById('addOverlay').classList.remove('open');
-
-function clearF(){ ['fTicker','fName','fEntryPrice','fStop','fTarget','fExitDate','fExitPrice','fEntryNote','fReview'].forEach(id=>{ const el=document.getElementById(id);if(el)el.value=''; }); document.getElementById('fEntryDate').value=new Date().toISOString().split('T')[0]; }
-
-window.openEdit = id => {
-  const t=trades.find(x=>x.id===id); if(!t) return;
-  editId=id; selReasons=[...(t.reasons||[])]; selMistakes=[...(t.mistakes||[])];
-  document.getElementById('modalTitle').textContent='編輯交易';
-  clearF();
-  const s=(i,v)=>{ const el=document.getElementById(i);if(el&&v!=null)el.value=v; };
-  s('fTicker',t.ticker);s('fName',t.name);s('fEntryDate',t.entryDate);s('fEntryPrice',t.entryPrice);s('fStop',t.stopLoss);s('fTarget',t.target);s('fExitDate',t.exitDate);s('fExitPrice',t.exitPrice);s('fEntryNote',t.entryNote);s('fReview',t.reviewNote);
-  buildPicker('reasonPicker',REASONS,selReasons,false); buildPicker('mistakePicker',MISTAKES,selMistakes,true);
-  document.getElementById('addOverlay').classList.add('open');
+window.openAdd=()=>{
+  editId=null;selR=[];selM=[];
+  document.getElementById('mTitle').textContent='新增交易';
+  ['fT','fN','fEP','fSL','fTP','fXD','fXP','fEN','fRV'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  sv('fED',new Date().toISOString().split('T')[0]);
+  buildP('rPicker',REASONS,selR,false);buildP('mPicker',MISTAKES,selM,true);
+  document.getElementById('addOv').classList.add('open');
 };
 
-window.saveTrade = async ()=>{
-  const ticker=document.getElementById('fTicker').value.trim();
-  const entryPrice=parseFloat(document.getElementById('fEntryPrice').value);
-  if(!ticker||!entryPrice){alert('請填寫股票代號和進場價格');return;}
-  const exitPrice=parseFloat(document.getElementById('fExitPrice').value)||null;
-  const status=exitPrice?(exitPrice>entryPrice?'win':'loss'):'open';
-  const data={ticker,status,name:document.getElementById('fName').value.trim(),entryDate:document.getElementById('fEntryDate').value,entryPrice,stopLoss:parseFloat(document.getElementById('fStop').value)||null,target:parseFloat(document.getElementById('fTarget').value)||null,exitDate:document.getElementById('fExitDate').value||null,exitPrice,reasons:[...selReasons],mistakes:[...selMistakes],entryNote:document.getElementById('fEntryNote').value.trim(),reviewNote:document.getElementById('fReview').value.trim(),createdAt:Timestamp.now()};
-  const btn=document.getElementById('btnSave'); btn.disabled=true; btn.textContent='儲存中…';
-  try{ if(editId) await updateDoc(doc(db,COLL,editId),data); else await addDoc(collection(db,COLL),data); closeAdd(); await load(); }
-  catch(e){alert('儲存失敗：'+e.message);}
-  finally{btn.disabled=false;btn.textContent='💾 儲存交易記錄';}
+window.openEdit=id=>{
+  const t=trades.find(x=>x.id===id);if(!t)return;
+  editId=id;selR=[...(t.reasons||[])];selM=[...(t.mistakes||[])];
+  document.getElementById('mTitle').textContent='編輯交易';
+  sv('fT',t.ticker);sv('fN',t.name);sv('fED',t.entryDate);sv('fEP',t.entryPrice);
+  sv('fSL',t.stopLoss);sv('fTP',t.target);sv('fXD',t.exitDate);sv('fXP',t.exitPrice);
+  sv('fEN',t.entryNote);sv('fRV',t.reviewNote);
+  buildP('rPicker',REASONS,selR,false);buildP('mPicker',MISTAKES,selM,true);
+  document.getElementById('addOv').classList.add('open');
 };
 
-/* ── Close Trade Modal ── */
-window.openClose = id=>{
-  const t=trades.find(x=>x.id===id); if(!t) return;
-  closeId=id; closeSelMistakes=[];
-  document.getElementById('closeTitle').textContent=`${t.ticker} ${t.name||''}`;
-  document.getElementById('cExitDate').value=new Date().toISOString().split('T')[0];
-  document.getElementById('cExitPrice').value=''; document.getElementById('cReview').value='';
-  buildPicker('closeMistakePicker',MISTAKES,closeSelMistakes,true);
-  document.getElementById('closeOverlay').classList.add('open');
+window.openClose=id=>{
+  const t=trades.find(x=>x.id===id);if(!t)return;
+  closeId=id;cSelM=[];
+  document.getElementById('closeT').textContent=`結單：${t.ticker} ${t.name||''}`;
+  sv('cXD',new Date().toISOString().split('T')[0]);sv('cXP','');sv('cRV','');
+  buildP('cmPicker',MISTAKES,cSelM,true);
+  document.getElementById('closeOv').classList.add('open');
 };
-
-window.saveClose = async ()=>{
-  const exitPrice=parseFloat(document.getElementById('cExitPrice').value);
-  if(!exitPrice){alert('請填寫出場價格');return;}
-  const t=trades.find(x=>x.id===closeId); if(!t) return;
-  const status=exitPrice>t.entryPrice?'win':'loss';
-  try{ await updateDoc(doc(db,COLL,closeId),{exitDate:document.getElementById('cExitDate').value,exitPrice,status,mistakes:[...closeSelMistakes],reviewNote:document.getElementById('cReview').value.trim()}); document.getElementById('closeOverlay').classList.remove('open'); await load(); }
-  catch(e){alert('儲存失敗：'+e.message);}
-};
-
-/* ── Delete ── */
-window.del = async id=>{ if(!confirm('確定刪除這筆記錄？')) return; try{await deleteDoc(doc(db,COLL,id));await load();}catch(e){alert('刪除失敗');} };
 
 load();
-
-/* redraw chart on resize */
-window.addEventListener('resize', ()=>{ const closed=trades.filter(t=>t.status!=='open'); drawChart(closed); });
+window.addEventListener('resize',()=>{drawChart(trades.filter(t=>t.status!=='open'));});
 </script>
 </body>
 </html>
