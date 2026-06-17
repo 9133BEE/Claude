@@ -15,119 +15,159 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
 a{color:inherit;text-decoration:none}
 
-/* NAV */
-.topnav{background:var(--bg2);border-bottom:1px solid var(--border2);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+/* ── NAV ── */
+.topnav{background:var(--bg2);border-bottom:1px solid var(--border2);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
 .back-btn{color:var(--text3);font-size:.82rem;display:flex;align-items:center;gap:4px;transition:color .15s}
 .back-btn:hover{color:var(--text)}
 .nav-title{font-size:.95rem;font-weight:700}
+.nav-badge{margin-left:auto;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--accent2);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px}
 
-/* HERO */
-.hero{background:linear-gradient(135deg,rgba(88,166,255,.06) 0%,transparent 60%);border-bottom:1px solid var(--border2);padding:28px 24px 24px;text-align:center}
-.hero h1{font-size:1.6rem;font-weight:800;margin-bottom:4px}
-.hero p{color:var(--text3);font-size:.88rem;margin-bottom:20px}
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,rgba(88,166,255,.07) 0%,rgba(245,158,11,.04) 50%,transparent 100%);border-bottom:1px solid var(--border2);padding:32px 24px 28px;text-align:center}
+.hero h1{font-size:1.7rem;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
+.hero p{color:var(--text3);font-size:.88rem;margin-bottom:24px}
 
-/* STATS */
-.stats-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:760px;margin:0 auto}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;min-width:100px;text-align:center;flex:1}
-.stat-val{font-size:1.5rem;font-weight:800;color:var(--accent)}
-.stat-val.g{color:var(--green)}
-.stat-val.r{color:var(--red)}
-.stat-val.b{color:var(--blue)}
-.stat-label{font-size:.7rem;color:var(--text3);margin-top:2px}
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;max-width:860px;margin:0 auto}
+.sc2{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px 12px;text-align:center;position:relative;overflow:hidden;transition:border-color .2s}
+.sc2:hover{border-color:var(--text4)}
+.sc2::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc2.acc::before{background:var(--accent)}
+.sc2.grn::before{background:var(--green)}
+.sc2.red::before{background:var(--red)}
+.sc2.blu::before{background:var(--blue)}
+.sc2.pur::before{background:var(--purple)}
+.sc2-icon{font-size:1.3rem;margin-bottom:4px;line-height:1}
+.sc2-val{font-size:1.4rem;font-weight:800;line-height:1.1;margin-bottom:3px}
+.sc2-lbl{font-size:.66rem;color:var(--text4);letter-spacing:.04em;text-transform:uppercase}
+.cv-acc{color:var(--accent2)}
+.cv-grn{color:var(--green)}
+.cv-red{color:var(--red)}
+.cv-blu{color:var(--blue)}
+.cv-neu{color:var(--text3)}
 
-/* TOOLBAR */
-.toolbar{max-width:900px;margin:20px auto 0;padding:0 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.btn-add{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:9px 20px;font-size:.88rem;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
-.btn-add:hover{background:var(--accent2)}
+/* ── EQUITY CHART ── */
+.chart-wrap{max-width:860px;margin:20px auto 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px 14px;display:none}
+.chart-title{font-size:.74rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.chart-title span{flex:1;height:1px;background:var(--border2)}
+#equityChart{width:100%;display:block}
+
+/* ── TOOLBAR ── */
+.toolbar{max-width:860px;margin:20px auto 0;padding:0 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-add{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:10px 22px;font-size:.9rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.btn-add:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,158,11,.3)}
+.count-badge{font-size:.78rem;color:var(--text4);margin-left:4px}
 .filter-tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
-.tab{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:7px 14px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
-.tab:hover{border-color:var(--accent);color:var(--accent2)}
+.tab{background:none;border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.tab:hover{border-color:var(--text3);color:var(--text)}
 .tab.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:var(--accent2);font-weight:600}
 
-/* LIST */
-.container{max-width:900px;margin:16px auto 0;padding:0 20px 80px}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text4)}
-.empty-state .icon{font-size:3rem;margin-bottom:12px}
-.loading{text-align:center;padding:40px;color:var(--text4);font-size:.9rem}
+/* ── LIST ── */
+.container{max-width:860px;margin:14px auto 0;padding:0 20px 80px}
+.empty-state{text-align:center;padding:70px 20px;color:var(--text4)}
+.empty-icon{font-size:4rem;margin-bottom:14px;opacity:.5}
+.empty-state h3{font-size:1rem;color:var(--text3);margin-bottom:6px}
+.empty-state p{font-size:.85rem;line-height:1.7}
+.loading{text-align:center;padding:50px;color:var(--text4);font-size:.9rem}
 
-/* TRADE CARD */
-.tc{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
-.tc:hover{border-color:var(--text4)}
+/* ── TRADE CARD ── */
+.tc{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:all .2s}
+.tc:hover{border-color:var(--text4);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .tc.win{border-left:3px solid var(--green)}
 .tc.loss{border-left:3px solid var(--red)}
 .tc.open{border-left:3px solid var(--blue)}
-.tc-head{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
-.tc-left{flex:1;min-width:0}
+
+.tc-head{padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none}
+.tc-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;letter-spacing:-.02em}
+.tc.win  .tc-avatar{background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.2)}
+.tc.loss .tc-avatar{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.2)}
+.tc.open .tc-avatar{background:rgba(88,166,255,.12);color:var(--blue);border:1px solid rgba(88,166,255,.2)}
+
+.tc-info{flex:1;min-width:0}
+.tc-top{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
 .tc-ticker{font-size:1rem;font-weight:800}
-.tc-sub{font-size:.74rem;color:var(--text4);margin-top:1px}
+.tc-name{font-size:.8rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc-dates{font-size:.72rem;color:var(--text4)}
+
 .tc-right{text-align:right;flex-shrink:0}
-.tc-pnl{font-size:1rem;font-weight:700}
+.tc-pnl{font-size:1.1rem;font-weight:800;line-height:1}
 .tc-pnl.pos{color:var(--green)}
 .tc-pnl.neg{color:var(--red)}
 .tc-pnl.neu{color:var(--text3)}
-.tc-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
-.bw{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3)}
-.bl{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.3)}
-.bo{background:rgba(88,166,255,.15);color:var(--blue);border:1px solid rgba(88,166,255,.3)}
-.tc-r{font-size:.74rem;color:var(--text4);margin-top:2px}
-.tc-body{display:none;border-top:1px solid var(--border2);padding:14px 18px 16px}
+.tc-meta{font-size:.72rem;color:var(--text4);margin-top:3px;display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.tc-badge{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:8px}
+.bw{background:rgba(63,185,80,.15);color:var(--green)}
+.bl{background:rgba(248,81,73,.15);color:var(--red)}
+.bo{background:rgba(88,166,255,.15);color:var(--blue)}
+
+/* ── EXPAND BODY ── */
+.tc-body{display:none;border-top:1px solid var(--border2)}
 .tc-body.show{display:block}
-.tc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px}
-.tc-field label{display:block;font-size:.66rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-.tc-field span{font-size:.88rem;color:var(--text2)}
-.tc-note{margin-top:10px}
-.tc-note-title{font-size:.68rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
-.tc-note p{font-size:.86rem;color:var(--text2);line-height:1.65;white-space:pre-wrap}
+
+.tc-section{padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;border-bottom:1px solid var(--border2)}
+.tc-section:last-of-type{border-bottom:none}
+.tc-field label{display:block;font-size:.64rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.tc-field .fval{font-size:.9rem;color:var(--text2);font-weight:600}
+.tc-field .fval.pos{color:var(--green)}
+.tc-field .fval.neg{color:var(--red)}
+
+.tc-notes{padding:12px 18px;border-bottom:1px solid var(--border2);display:grid;gap:10px}
+.note-block{}
+.note-label{font-size:.64rem;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.note-text{font-size:.85rem;color:var(--text2);line-height:1.7;white-space:pre-wrap}
 .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
-.tag{font-size:.7rem;padding:2px 8px;border-radius:10px;background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.2)}
+.tag{font-size:.7rem;padding:3px 9px;border-radius:8px;background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.2);font-weight:500}
 .tag.err{background:rgba(248,81,73,.1);color:var(--red);border-color:rgba(248,81,73,.2)}
-.tc-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
-.btn-sm{background:none;border:1px solid var(--border);color:var(--text3);padding:5px 12px;border-radius:6px;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn-sm:hover{border-color:var(--accent);color:var(--accent2)}
-.btn-sm.close-btn{background:rgba(63,185,80,.08);border-color:var(--green2);color:var(--green)}
+
+.tc-actions{padding:10px 18px;display:flex;gap:8px;justify-content:flex-end}
+.btn-sm{background:none;border:1px solid var(--border);color:var(--text3);padding:6px 14px;border-radius:7px;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s;font-weight:500}
+.btn-sm:hover{border-color:var(--accent2);color:var(--accent2)}
+.btn-sm.close-btn{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.3);color:var(--green)}
+.btn-sm.close-btn:hover{background:rgba(63,185,80,.15)}
 .btn-sm.del:hover{border-color:var(--red);color:var(--red)}
 
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;backdrop-filter:blur(4px)}
 .overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:580px;margin:auto}
-.modal-head{padding:18px 22px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
-.modal-head h2{font-size:.95rem;font-weight:700}
-.modal-x{background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer;padding:2px 6px;line-height:1}
-.modal-x:hover{color:var(--text)}
-.modal-body{padding:18px 22px 22px}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:580px;margin:auto;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.modal-head{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
+.modal-head h2{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.modal-x{background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer;padding:2px 6px;line-height:1;border-radius:6px;transition:all .15s}
+.modal-x:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.modal-body{padding:20px 24px 24px}
 
-/* FORM */
-.fg{margin-bottom:12px}
-.fg label{display:block;font-size:.74rem;font-weight:600;color:var(--text3);margin-bottom:5px}
-.fg input,.fg select,.fg textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;transition:border-color .15s}
+/* ── FORM ── */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:.74rem;font-weight:600;color:var(--text3);margin-bottom:5px;letter-spacing:.02em}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;transition:border-color .15s}
 .fg input:focus,.fg textarea:focus{border-color:var(--accent)}
-.fg textarea{resize:vertical;min-height:68px;line-height:1.5}
-.fg select{cursor:pointer}
+.fg textarea{resize:vertical;min-height:72px;line-height:1.55}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .frow.full{grid-template-columns:1fr}
-.fdiv{border:none;border-top:1px solid var(--border2);margin:14px 0}
-.fsec{font-size:.7rem;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.fdiv{border:none;border-top:1px solid var(--border2);margin:16px 0}
+.fsec{font-size:.7rem;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
+.fhint{font-size:.72rem;color:var(--text4);margin-top:5px}
 
-/* TAG PICKER */
+/* ── TAG PICKER ── */
 .tag-picker{display:flex;flex-wrap:wrap;gap:6px}
-.topt{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:12px;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .15s;user-select:none}
-.topt:hover{border-color:var(--accent2);color:var(--accent2)}
-.topt.sel{background:rgba(88,166,255,.15);border-color:var(--blue);color:var(--blue)}
-.topt.sel.err{background:rgba(248,81,73,.15);border-color:var(--red);color:var(--red)}
+.topt{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:5px 11px;border-radius:10px;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .15s;user-select:none}
+.topt:hover{border-color:var(--text3)}
+.topt.sel{background:rgba(88,166,255,.15);border-color:rgba(88,166,255,.5);color:var(--blue);font-weight:600}
+.topt.sel.err{background:rgba(248,81,73,.15);border-color:rgba(248,81,73,.5);color:var(--red)}
 
-.btn-submit{width:100%;background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;font-size:.95rem;cursor:pointer;font-family:inherit;margin-top:14px;transition:background .15s}
-.btn-submit:hover{background:var(--accent2)}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.btn-submit{width:100%;background:var(--accent);color:#000;font-weight:700;border:none;border-radius:9px;padding:12px;font-size:.95rem;cursor:pointer;font-family:inherit;margin-top:16px;transition:all .15s;letter-spacing:.01em}
+.btn-submit:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,.3)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-@media(max-width:600px){
+@media(max-width:680px){
+  .stats-grid{grid-template-columns:repeat(3,1fr)}
   .frow{grid-template-columns:1fr}
-  .stats-row .stat-card{min-width:80px;padding:10px}
-  .stat-val{font-size:1.2rem}
   .toolbar,.container{padding-left:14px;padding-right:14px}
-  .topnav{padding:12px 14px}
-  .hero{padding:20px 14px 18px}
-  .hero h1{font-size:1.3rem}
+  .topnav,.hero{padding-left:14px;padding-right:14px}
+  .chart-wrap{margin-left:14px;margin-right:14px}
+}
+@media(max-width:420px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
@@ -136,38 +176,72 @@ a{color:inherit;text-decoration:none}
 <nav class="topnav">
   <a class="back-btn" href="index.html">← 返回股學筆記</a>
   <span class="nav-title">📒 交易日誌</span>
+  <span class="nav-badge" id="navBadge" style="display:none"></span>
 </nav>
 
+<!-- ── HERO ── -->
 <div class="hero">
-  <h1>交易日誌</h1>
-  <p>記錄每筆交易的判斷依據與檢討，持續提升勝率</p>
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-val" id="sTotal">—</div><div class="stat-label">總筆數</div></div>
-    <div class="stat-card"><div class="stat-val" id="sWinRate">—</div><div class="stat-label">勝率</div></div>
-    <div class="stat-card"><div class="stat-val g" id="sAvgWin">—</div><div class="stat-label">平均獲利</div></div>
-    <div class="stat-card"><div class="stat-val r" id="sAvgLoss">—</div><div class="stat-label">平均虧損</div></div>
-    <div class="stat-card"><div class="stat-val" id="sPF">—</div><div class="stat-label">盈虧比</div></div>
-    <div class="stat-card"><div class="stat-val b" id="sOpen">—</div><div class="stat-label">持倉中</div></div>
+  <h1>我的交易日誌</h1>
+  <p>記錄每筆判斷依據與檢討，找出自己的盲點，持續提升勝率</p>
+  <div class="stats-grid">
+    <div class="sc2 acc">
+      <div class="sc2-icon">📊</div>
+      <div class="sc2-val cv-acc" id="sTotal">—</div>
+      <div class="sc2-lbl">總筆數</div>
+    </div>
+    <div class="sc2 grn">
+      <div class="sc2-icon">🎯</div>
+      <div class="sc2-val" id="sWinRate">—</div>
+      <div class="sc2-lbl">勝率</div>
+    </div>
+    <div class="sc2 grn">
+      <div class="sc2-icon">📈</div>
+      <div class="sc2-val cv-grn" id="sAvgWin">—</div>
+      <div class="sc2-lbl">平均獲利</div>
+    </div>
+    <div class="sc2 red">
+      <div class="sc2-icon">📉</div>
+      <div class="sc2-val cv-red" id="sAvgLoss">—</div>
+      <div class="sc2-lbl">平均虧損</div>
+    </div>
+    <div class="sc2 pur">
+      <div class="sc2-icon">⚖️</div>
+      <div class="sc2-val" id="sPF">—</div>
+      <div class="sc2-lbl">盈虧比</div>
+    </div>
+    <div class="sc2 blu">
+      <div class="sc2-icon">⏳</div>
+      <div class="sc2-val cv-blu" id="sOpen">—</div>
+      <div class="sc2-lbl">持倉中</div>
+    </div>
   </div>
 </div>
 
+<!-- ── 盈虧曲線 ── -->
+<div class="chart-wrap" id="chartWrap">
+  <div class="chart-title">累積盈虧曲線 <span></span></div>
+  <canvas id="equityChart" height="120"></canvas>
+</div>
+
+<!-- ── TOOLBAR ── -->
 <div class="toolbar">
   <button class="btn-add" onclick="openAdd()">＋ 新增交易</button>
+  <span class="count-badge" id="countBadge"></span>
   <div class="filter-tabs">
     <button class="tab active" onclick="setFilter('all',this)">全部</button>
-    <button class="tab" onclick="setFilter('open',this)">持倉中</button>
-    <button class="tab" onclick="setFilter('win',this)">獲利</button>
-    <button class="tab" onclick="setFilter('loss',this)">虧損</button>
+    <button class="tab" onclick="setFilter('open',this)">⏳ 持倉中</button>
+    <button class="tab" onclick="setFilter('win',this)">✓ 獲利</button>
+    <button class="tab" onclick="setFilter('loss',this)">✗ 虧損</button>
   </div>
 </div>
 
 <div class="container" id="list"><div class="loading">連線中…</div></div>
 
-<!-- ── 新增 / 編輯 Modal ── -->
+<!-- ══════════ 新增/編輯 Modal ══════════ -->
 <div class="overlay" id="addOverlay" onclick="bgClick(event,'addOverlay')">
 <div class="modal">
   <div class="modal-head">
-    <h2 id="modalTitle">新增交易</h2>
+    <h2>📝 <span id="modalTitle">新增交易</span></h2>
     <button class="modal-x" onclick="closeAdd()">✕</button>
   </div>
   <div class="modal-body">
@@ -186,8 +260,8 @@ a{color:inherit;text-decoration:none}
     <hr class="fdiv">
     <div class="fsec">進場原因（可複選）</div>
     <div class="tag-picker" id="reasonPicker"></div>
-    <div class="fg frow full" style="margin-top:12px">
-      <div class="fg"><label>進場當下想法</label><textarea id="fEntryNote" placeholder="為什麼進場？看到什麼訊號…"></textarea></div>
+    <div class="fg frow full" style="margin-top:14px">
+      <div class="fg"><label>進場當下想法</label><textarea id="fEntryNote" placeholder="為什麼進場？看到什麼訊號、當下判斷邏輯…"></textarea></div>
     </div>
     <hr class="fdiv">
     <div class="fsec">出場資訊（結單後填）</div>
@@ -197,29 +271,29 @@ a{color:inherit;text-decoration:none}
     </div>
     <div class="fsec" style="margin-top:4px">犯的錯誤（可複選）</div>
     <div class="tag-picker" id="mistakePicker"></div>
-    <div class="fg frow full" style="margin-top:12px">
+    <div class="fg frow full" style="margin-top:14px">
       <div class="fg"><label>收盤後檢討</label><textarea id="fReview" placeholder="這筆交易學到什麼？下次怎麼改進…"></textarea></div>
     </div>
-    <button class="btn-submit" id="btnSave" onclick="saveTrade()">儲存</button>
+    <button class="btn-submit" id="btnSave" onclick="saveTrade()">💾 儲存交易記錄</button>
   </div>
 </div>
 </div>
 
-<!-- ── 快速結單 Modal ── -->
+<!-- ══════════ 快速結單 Modal ══════════ -->
 <div class="overlay" id="closeOverlay" onclick="bgClick(event,'closeOverlay')">
-<div class="modal" style="max-width:420px">
+<div class="modal" style="max-width:440px">
   <div class="modal-head">
-    <h2 id="closeTitle">結單</h2>
+    <h2>✅ <span id="closeTitle">結單</span></h2>
     <button class="modal-x" onclick="document.getElementById('closeOverlay').classList.remove('open')">✕</button>
   </div>
   <div class="modal-body">
     <div class="frow">
       <div class="fg"><label>出場日期</label><input type="date" id="cExitDate"></div>
-      <div class="fg"><label>出場價格 *</label><input type="number" id="cExitPrice" step="0.1"></div>
+      <div class="fg"><label>出場價格 *</label><input type="number" id="cExitPrice" step="0.1" placeholder="出場成交價"></div>
     </div>
-    <div class="fsec" style="margin-top:4px">犯的錯誤（可複選）</div>
+    <div class="fsec">犯的錯誤（可複選）</div>
     <div class="tag-picker" id="closeMistakePicker"></div>
-    <div class="fg" style="margin-top:12px"><label>檢討</label><textarea id="cReview" placeholder="這筆交易學到什麼…"></textarea></div>
+    <div class="fg" style="margin-top:14px"><label>檢討</label><textarea id="cReview" placeholder="這筆交易學到什麼？有哪裡做得不對…"></textarea></div>
     <button class="btn-submit" onclick="saveClose()">確認結單</button>
   </div>
 </div>
@@ -232,7 +306,6 @@ import {
   doc, query, orderBy, Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-/* ── Firebase ── */
 const app = initializeApp({
   apiKey: "AIzaSyDMpaJo2I0KN6OU7UVgvvNRPzNNJefJiC4",
   authDomain: "transaction-log-fe0c3.firebaseapp.com",
@@ -244,81 +317,168 @@ const app = initializeApp({
 const db = getFirestore(app);
 const COLL = 'trades';
 
-/* ── 常數 ── */
 const REASONS = ['外資買超','投信買超','法人雙買','突破壓力','支撐反彈','缺口突破',
   '趨勢跟隨','週線訊號','籌碼背離','融券回補','量能放大','消息面','其他'];
 const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','過早出場','過晚出場',
   '情緒交易','部位過重','忽略大盤','未確認籌碼','貪心不出場','其他'];
 
-/* ── 狀態 ── */
-let trades = [];
-let curFilter = 'all';
-let editId = null;
-let closeId = null;
-let selReasons = [];
-let selMistakes = [];
-let closeSelMistakes = [];
+let trades = [], curFilter = 'all', editId = null, closeId = null;
+let selReasons = [], selMistakes = [], closeSelMistakes = [];
 
-/* ── 載入 ── */
+/* ── Load ── */
 async function load() {
   try {
-    const q = query(collection(db, COLL), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
+    const snap = await getDocs(query(collection(db, COLL), orderBy('createdAt','desc')));
     trades = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderAll();
   } catch(e) {
     document.getElementById('list').innerHTML =
-      `<div class="loading" style="color:var(--red)">❌ 載入失敗：${e.message}<br><br>請確認 Firebase Firestore 已建立（選「以測試模式開始」）</div>`;
+      `<div class="loading" style="color:var(--red)">❌ 載入失敗：${e.message}<br><br>請確認 Firestore 安全規則已設為允許讀寫</div>`;
   }
 }
 
-/* ── 統計 ── */
-function calcStats() {
-  const closed = trades.filter(t => t.status !== 'open');
-  const wins   = closed.filter(t => t.status === 'win');
-  const losses = closed.filter(t => t.status === 'loss');
-  const openN  = trades.filter(t => t.status === 'open').length;
-  const wr = closed.length ? Math.round(wins.length / closed.length * 100) : null;
-  const avgW = wins.length   ? avg(wins.map(pnl))   : null;
-  const avgL = losses.length ? avg(losses.map(pnl)) : null;
-  const pf   = avgW != null && avgL != null && avgL !== 0
-    ? (Math.abs(avgW) / Math.abs(avgL)).toFixed(2) : null;
-  return { total: trades.length, wr, avgW, avgL, pf, openN };
-}
-
-function avg(arr) { return arr.reduce((s,v) => s+v, 0) / arr.length; }
-
-function pnl(t) {
-  if (!t.exitPrice || !t.entryPrice) return 0;
-  return (t.exitPrice - t.entryPrice) / t.entryPrice * 100;
-}
+/* ── Stats ── */
+function pnl(t){ return t.exitPrice&&t.entryPrice ? (t.exitPrice-t.entryPrice)/t.entryPrice*100 : 0; }
+function avg(arr){ return arr.length ? arr.reduce((s,v)=>s+v,0)/arr.length : null; }
 
 function renderAll() {
-  const s = calcStats();
-  set('sTotal',   s.total || '0');
-  set('sWinRate', s.wr != null ? s.wr + '%' : '—', s.wr >= 50 ? 'g' : s.wr != null ? 'r' : '');
-  set('sAvgWin',  s.avgW != null ? '+' + s.avgW.toFixed(1) + '%' : '—', 'g');
-  set('sAvgLoss', s.avgL != null ? s.avgL.toFixed(1) + '%' : '—', 'r');
-  set('sPF',      s.pf || '—', s.pf >= 1 ? 'g' : s.pf ? 'r' : '');
-  set('sOpen',    s.openN || '0', 'b');
+  const closed = trades.filter(t => t.status!=='open');
+  const wins   = closed.filter(t => t.status==='win');
+  const losses = closed.filter(t => t.status==='loss');
+  const openN  = trades.filter(t => t.status==='open').length;
+  const wr  = closed.length ? Math.round(wins.length/closed.length*100) : null;
+  const avgW = avg(wins.map(pnl));
+  const avgL = avg(losses.map(pnl));
+  const pf   = avgW!=null&&avgL!=null&&avgL!==0 ? Math.abs(avgW/avgL) : null;
+
+  setText('sTotal',   trades.length||'0', '');
+  setText('sWinRate', wr!=null ? wr+'%' : '—', wr!=null ? (wr>=50?'cv-grn':'cv-red') : 'cv-neu');
+  setText('sAvgWin',  avgW!=null ? '+'+avgW.toFixed(1)+'%' : '—', 'cv-grn');
+  setText('sAvgLoss', avgL!=null ? avgL.toFixed(1)+'%' : '—', 'cv-red');
+  setText('sPF',      pf!=null ? pf.toFixed(2)+'x' : '—', pf!=null?(pf>=1?'cv-grn':'cv-red'):'cv-neu');
+  setText('sOpen',    openN||'0', 'cv-blu');
+
+  const nb = document.getElementById('navBadge');
+  if (openN > 0) { nb.textContent = `${openN} 筆持倉中`; nb.style.display=''; }
+  else nb.style.display='none';
+
+  drawChart(closed);
   renderList();
 }
 
-function set(id, val, cls='') {
-  const el = document.getElementById(id);
-  if (!el) return;
+function setText(id, val, cls) {
+  const el = document.getElementById(id); if(!el) return;
   el.textContent = val;
-  el.className = 'stat-val' + (cls ? ' ' + cls : '');
+  el.className = 'sc2-val ' + (cls||'');
 }
 
-/* ── 渲染列表 ── */
+/* ── Equity Curve ── */
+function drawChart(closed) {
+  const wrap = document.getElementById('chartWrap');
+  if (closed.length < 2) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+
+  const canvas = document.getElementById('equityChart');
+  const W = canvas.offsetWidth || 800;
+  canvas.width  = W * devicePixelRatio;
+  canvas.height = 120 * devicePixelRatio;
+  canvas.style.height = '120px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  /* cumulative P&L */
+  const sorted = [...closed].sort((a,b) => (a.exitDate||'') < (b.exitDate||'') ? -1 : 1);
+  const points = [0];
+  let cum = 0;
+  sorted.forEach(t => { cum += pnl(t); points.push(cum); });
+
+  const minY = Math.min(0, ...points);
+  const maxY = Math.max(0, ...points);
+  const rangeY = maxY - minY || 1;
+  const pad = { t:10, b:28, l:44, r:16 };
+  const cW = W - pad.l - pad.r;
+  const cH = 120 - pad.t - pad.b;
+
+  const toX = i => pad.l + (i / (points.length-1)) * cW;
+  const toY = v => pad.t + (1-(v-minY)/rangeY) * cH;
+
+  ctx.clearRect(0, 0, W, 120);
+
+  /* zero line */
+  const zy = toY(0);
+  ctx.strokeStyle = 'rgba(255,255,255,.08)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(pad.l, zy); ctx.lineTo(pad.l+cW, zy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* area fill */
+  const lastX = toX(points.length-1);
+  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t+cH);
+  const finalVal = points[points.length-1];
+  if (finalVal >= 0) {
+    grad.addColorStop(0,  'rgba(63,185,80,.35)');
+    grad.addColorStop(1,  'rgba(63,185,80,.02)');
+  } else {
+    grad.addColorStop(0,  'rgba(248,81,73,.02)');
+    grad.addColorStop(1,  'rgba(248,81,73,.35)');
+  }
+  ctx.beginPath();
+  ctx.moveTo(toX(0), zy);
+  points.forEach((v,i) => ctx.lineTo(toX(i), toY(v)));
+  ctx.lineTo(lastX, zy);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  /* line */
+  ctx.beginPath();
+  points.forEach((v,i) => i===0 ? ctx.moveTo(toX(i),toY(v)) : ctx.lineTo(toX(i),toY(v)));
+  ctx.strokeStyle = finalVal >= 0 ? '#3fb950' : '#f85149';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  /* dots */
+  points.forEach((v,i) => {
+    ctx.beginPath();
+    ctx.arc(toX(i), toY(v), 3, 0, Math.PI*2);
+    ctx.fillStyle = v > 0 ? '#3fb950' : v < 0 ? '#f85149' : '#8b949e';
+    ctx.fill();
+  });
+
+  /* Y axis labels */
+  ctx.fillStyle = '#484f58';
+  ctx.font = `${10 * devicePixelRatio / devicePixelRatio}px system-ui`;
+  ctx.textAlign = 'right';
+  [minY, 0, maxY].forEach(v => {
+    const y = toY(v);
+    if (Math.abs(y - toY(0)) > 10 || v === 0) {
+      ctx.fillText((v >= 0 ? '+' : '') + v.toFixed(1) + '%', pad.l - 4, y + 4);
+    }
+  });
+
+  /* X axis labels */
+  ctx.textAlign = 'center';
+  const step = Math.max(1, Math.floor((points.length-1)/5));
+  sorted.forEach((t,i) => {
+    if (i % step === 0 || i === sorted.length-1) {
+      ctx.fillText(t.ticker||'', toX(i+1), 120 - 8);
+    }
+  });
+}
+
+/* ── Render List ── */
 function renderList() {
   const el = document.getElementById('list');
-  let items = curFilter === 'all' ? trades : trades.filter(t => t.status === curFilter);
+  const items = curFilter === 'all' ? trades : trades.filter(t => t.status===curFilter);
+  document.getElementById('countBadge').textContent = items.length ? `共 ${items.length} 筆` : '';
   if (!items.length) {
-    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>${
-      curFilter === 'all' ? '還沒有交易記錄，點「＋ 新增交易」開始！' : '沒有符合的記錄'
-    }</p></div>`;
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">${curFilter==='all'?'📭':'🔍'}</div>
+      <h3>${curFilter==='all'?'還沒有交易記錄':'沒有符合的記錄'}</h3>
+      <p>${curFilter==='all'?'點「＋ 新增交易」記錄你的第一筆！':'換個篩選條件試試'}</p>
+    </div>`;
     return;
   }
   el.innerHTML = items.map(tcHTML).join('');
@@ -326,196 +486,140 @@ function renderList() {
 
 function tcHTML(t) {
   const p = pnl(t);
-  const pStr = t.status !== 'open'
-    ? (p >= 0 ? '+' : '') + p.toFixed(2) + '%'
-    : '持倉中';
-  const pCls = p > 0 ? 'pos' : p < 0 ? 'neg' : 'neu';
-  const badge = t.status === 'win'  ? '<span class="tc-badge bw">✓ 獲利</span>'
-              : t.status === 'loss' ? '<span class="tc-badge bl">✗ 虧損</span>'
+  const pStr = t.status!=='open' ? (p>=0?'+':'')+p.toFixed(2)+'%' : '持倉中';
+  const pCls = p>0?'pos':p<0?'neg':'neu';
+  const badge = t.status==='win'  ? '<span class="tc-badge bw">✓ 獲利</span>'
+              : t.status==='loss' ? '<span class="tc-badge bl">✗ 虧損</span>'
               : '<span class="tc-badge bo">⏳ 持倉</span>';
-  const rVal = t.exitPrice && t.entryPrice && t.stopLoss && (t.entryPrice - t.stopLoss) !== 0
-    ? ((t.exitPrice - t.entryPrice) / (t.entryPrice - t.stopLoss)).toFixed(2) + 'R' : '';
+  const rStr = t.exitPrice&&t.entryPrice&&t.stopLoss&&(t.entryPrice-t.stopLoss)!==0
+    ? ((t.exitPrice-t.entryPrice)/(t.entryPrice-t.stopLoss)).toFixed(2)+'R' : '';
+
+  /* date range */
+  const dateStr = t.exitDate ? `${t.entryDate} → ${t.exitDate}` : `進場 ${t.entryDate||'—'}`;
+
+  /* avatar text = ticker initials */
+  const av = (t.ticker||'?').slice(0,4);
 
   return `<div class="tc ${t.status}" id="tc-${t.id}">
   <div class="tc-head" onclick="toggleBody('${t.id}')">
-    <div class="tc-left">
-      <div class="tc-ticker">${esc(t.ticker)} <span style="font-size:.8rem;font-weight:400;color:var(--text3)">${esc(t.name||'')}</span></div>
-      <div class="tc-sub">進場 ${t.entryDate||'—'}${t.exitDate ? '　出場 '+t.exitDate : ''}</div>
+    <div class="tc-avatar">${esc(av)}</div>
+    <div class="tc-info">
+      <div class="tc-top">
+        <span class="tc-ticker">${esc(t.ticker)}</span>
+        <span class="tc-name">${esc(t.name||'')}</span>
+      </div>
+      <div class="tc-dates">${dateStr}</div>
     </div>
     <div class="tc-right">
-      <div class="tc-pnl ${pCls}">${pStr}${badge}</div>
-      ${rVal ? `<div class="tc-r">${rVal}</div>` : ''}
+      <div class="tc-pnl ${pCls}">${pStr} ${badge}</div>
+      <div class="tc-meta">
+        ${rStr ? `<span>${rStr}</span>` : ''}
+        ${t.reasons?.length ? `<span>${t.reasons[0]}${t.reasons.length>1?' +'+( t.reasons.length-1):''}</span>` : ''}
+      </div>
     </div>
   </div>
   <div class="tc-body" id="b-${t.id}">
-    <div class="tc-grid">
-      <div class="tc-field"><label>進場價</label><span>${t.entryPrice||'—'}</span></div>
-      ${t.stopLoss  ? `<div class="tc-field"><label>停損位</label><span>${t.stopLoss}</span></div>` : ''}
-      ${t.target    ? `<div class="tc-field"><label>目標價</label><span>${t.target}</span></div>` : ''}
-      ${t.exitPrice ? `<div class="tc-field"><label>出場價</label><span>${t.exitPrice}</span></div>` : ''}
+    <div class="tc-section">
+      <div class="tc-field"><label>進場價</label><span class="fval">${t.entryPrice||'—'}</span></div>
+      ${t.stopLoss  ? `<div class="tc-field"><label>停損位</label><span class="fval neg">${t.stopLoss}</span></div>` : ''}
+      ${t.target    ? `<div class="tc-field"><label>目標價</label><span class="fval pos">${t.target}</span></div>` : ''}
+      ${t.exitPrice ? `<div class="tc-field"><label>出場價</label><span class="fval ${p>=0?'pos':'neg'}">${t.exitPrice}</span></div>` : ''}
+      ${rStr        ? `<div class="tc-field"><label>R 值</label><span class="fval ${p>=0?'pos':'neg'}">${rStr}</span></div>` : ''}
     </div>
-    ${t.reasons?.length  ? `<div class="tc-note"><div class="tc-note-title">進場原因</div><div class="tags">${t.reasons.map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div></div>` : ''}
-    ${t.entryNote        ? `<div class="tc-note"><div class="tc-note-title">進場想法</div><p>${esc(t.entryNote)}</p></div>` : ''}
-    ${t.mistakes?.length ? `<div class="tc-note"><div class="tc-note-title">犯的錯誤</div><div class="tags">${t.mistakes.map(m=>`<span class="tag err">${esc(m)}</span>`).join('')}</div></div>` : ''}
-    ${t.reviewNote       ? `<div class="tc-note"><div class="tc-note-title">收盤後檢討</div><p>${esc(t.reviewNote)}</p></div>` : ''}
+    ${(t.reasons?.length||t.entryNote||t.mistakes?.length||t.reviewNote) ? `
+    <div class="tc-notes">
+      ${t.reasons?.length ? `<div class="note-block"><div class="note-label">進場原因</div><div class="tags">${t.reasons.map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div></div>` : ''}
+      ${t.entryNote       ? `<div class="note-block"><div class="note-label">進場想法</div><p class="note-text">${esc(t.entryNote)}</p></div>` : ''}
+      ${t.mistakes?.length? `<div class="note-block"><div class="note-label">犯的錯誤</div><div class="tags">${t.mistakes.map(m=>`<span class="tag err">${esc(m)}</span>`).join('')}</div></div>` : ''}
+      ${t.reviewNote      ? `<div class="note-block"><div class="note-label">收盤後檢討</div><p class="note-text">${esc(t.reviewNote)}</p></div>` : ''}
+    </div>` : ''}
     <div class="tc-actions">
-      ${t.status==='open' ? `<button class="btn-sm close-btn" onclick="openClose('${t.id}')">結單</button>` : ''}
-      <button class="btn-sm" onclick="openEdit('${t.id}')">編輯</button>
-      <button class="btn-sm del" onclick="del('${t.id}')">刪除</button>
+      ${t.status==='open' ? `<button class="btn-sm close-btn" onclick="openClose('${t.id}')">✓ 結單</button>` : ''}
+      <button class="btn-sm" onclick="openEdit('${t.id}')">✏️ 編輯</button>
+      <button class="btn-sm del" onclick="del('${t.id}')">🗑 刪除</button>
     </div>
   </div>
 </div>`;
 }
 
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 
 /* ── Toggle ── */
 window.toggleBody = id => document.getElementById('b-'+id)?.classList.toggle('show');
-
-/* ── 篩選 ── */
-window.setFilter = (f, btn) => {
-  curFilter = f;
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b===btn));
-  renderList();
-};
+window.setFilter  = (f,btn) => { curFilter=f; document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn)); renderList(); };
+window.bgClick    = (e,id)  => { if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); };
 
 /* ── Tag Picker ── */
-function buildPicker(containerId, opts, selArr, isErr) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
+function buildPicker(id, opts, arr, isErr) {
+  const el = document.getElementById(id); if(!el) return;
   el.innerHTML = '';
   opts.forEach(opt => {
     const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'topt' + (isErr?' err':'') + (selArr.includes(opt)?' sel':'');
-    b.textContent = opt;
-    b.onclick = () => {
-      const i = selArr.indexOf(opt);
-      i===-1 ? selArr.push(opt) : selArr.splice(i,1);
-      b.classList.toggle('sel', selArr.includes(opt));
-    };
+    b.type='button';
+    b.className='topt'+(isErr?' err':'')+(arr.includes(opt)?' sel':'');
+    b.textContent=opt;
+    b.onclick=()=>{ const i=arr.indexOf(opt); i===-1?arr.push(opt):arr.splice(i,1); b.classList.toggle('sel',arr.includes(opt)); };
     el.appendChild(b);
   });
 }
 
-/* ── 新增 Modal ── */
-window.openAdd = () => {
-  editId = null;
-  selReasons = []; selMistakes = [];
-  document.getElementById('modalTitle').textContent = '新增交易';
-  clearF();
-  buildPicker('reasonPicker',  REASONS,  selReasons,  false);
-  buildPicker('mistakePicker', MISTAKES, selMistakes, true);
-  document.getElementById('addOverlay').classList.add('open');
-};
+/* ── Add/Edit Modal ── */
+window.openAdd = ()=>{ editId=null;selReasons=[];selMistakes=[]; document.getElementById('modalTitle').textContent='新增交易'; clearF(); buildPicker('reasonPicker',REASONS,selReasons,false); buildPicker('mistakePicker',MISTAKES,selMistakes,true); document.getElementById('addOverlay').classList.add('open'); };
+window.closeAdd = ()=> document.getElementById('addOverlay').classList.remove('open');
 
-window.closeAdd = () => document.getElementById('addOverlay').classList.remove('open');
-
-window.bgClick = (e, id) => { if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); };
-
-function clearF() {
-  ['fTicker','fName','fEntryPrice','fStop','fTarget','fExitDate','fExitPrice','fEntryNote','fReview'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  document.getElementById('fEntryDate').value = new Date().toISOString().split('T')[0];
-}
-
-function fillF(t) {
-  const s=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
-  s('fTicker',t.ticker); s('fName',t.name); s('fEntryDate',t.entryDate);
-  s('fEntryPrice',t.entryPrice); s('fStop',t.stopLoss); s('fTarget',t.target);
-  s('fExitDate',t.exitDate); s('fExitPrice',t.exitPrice);
-  s('fEntryNote',t.entryNote); s('fReview',t.reviewNote);
-}
+function clearF(){ ['fTicker','fName','fEntryPrice','fStop','fTarget','fExitDate','fExitPrice','fEntryNote','fReview'].forEach(id=>{ const el=document.getElementById(id);if(el)el.value=''; }); document.getElementById('fEntryDate').value=new Date().toISOString().split('T')[0]; }
 
 window.openEdit = id => {
-  const t = trades.find(x=>x.id===id);
-  if (!t) return;
-  editId = id;
-  selReasons  = [...(t.reasons  || [])];
-  selMistakes = [...(t.mistakes || [])];
-  document.getElementById('modalTitle').textContent = '編輯交易';
-  clearF(); fillF(t);
-  buildPicker('reasonPicker',  REASONS,  selReasons,  false);
-  buildPicker('mistakePicker', MISTAKES, selMistakes, true);
+  const t=trades.find(x=>x.id===id); if(!t) return;
+  editId=id; selReasons=[...(t.reasons||[])]; selMistakes=[...(t.mistakes||[])];
+  document.getElementById('modalTitle').textContent='編輯交易';
+  clearF();
+  const s=(i,v)=>{ const el=document.getElementById(i);if(el&&v!=null)el.value=v; };
+  s('fTicker',t.ticker);s('fName',t.name);s('fEntryDate',t.entryDate);s('fEntryPrice',t.entryPrice);s('fStop',t.stopLoss);s('fTarget',t.target);s('fExitDate',t.exitDate);s('fExitPrice',t.exitPrice);s('fEntryNote',t.entryNote);s('fReview',t.reviewNote);
+  buildPicker('reasonPicker',REASONS,selReasons,false); buildPicker('mistakePicker',MISTAKES,selMistakes,true);
   document.getElementById('addOverlay').classList.add('open');
 };
 
-/* ── 儲存 ── */
-window.saveTrade = async () => {
-  const ticker = document.getElementById('fTicker').value.trim();
-  const entryPrice = parseFloat(document.getElementById('fEntryPrice').value);
-  if (!ticker || !entryPrice) { alert('請填寫股票代號和進場價格'); return; }
-  const exitPrice = parseFloat(document.getElementById('fExitPrice').value) || null;
-  const status = exitPrice ? (exitPrice > entryPrice ? 'win' : 'loss') : 'open';
-  const data = {
-    ticker, status,
-    name:      document.getElementById('fName').value.trim(),
-    entryDate: document.getElementById('fEntryDate').value,
-    entryPrice,
-    stopLoss:  parseFloat(document.getElementById('fStop').value)   || null,
-    target:    parseFloat(document.getElementById('fTarget').value) || null,
-    exitDate:  document.getElementById('fExitDate').value || null,
-    exitPrice,
-    reasons:   [...selReasons],
-    mistakes:  [...selMistakes],
-    entryNote: document.getElementById('fEntryNote').value.trim(),
-    reviewNote:document.getElementById('fReview').value.trim(),
-    createdAt: Timestamp.now(),
-  };
-  const btn = document.getElementById('btnSave');
-  btn.disabled = true; btn.textContent = '儲存中…';
-  try {
-    if (editId) await updateDoc(doc(db, COLL, editId), data);
-    else        await addDoc(collection(db, COLL), data);
-    closeAdd();
-    await load();
-  } catch(e) { alert('儲存失敗：'+e.message); }
-  finally { btn.disabled=false; btn.textContent='儲存'; }
+window.saveTrade = async ()=>{
+  const ticker=document.getElementById('fTicker').value.trim();
+  const entryPrice=parseFloat(document.getElementById('fEntryPrice').value);
+  if(!ticker||!entryPrice){alert('請填寫股票代號和進場價格');return;}
+  const exitPrice=parseFloat(document.getElementById('fExitPrice').value)||null;
+  const status=exitPrice?(exitPrice>entryPrice?'win':'loss'):'open';
+  const data={ticker,status,name:document.getElementById('fName').value.trim(),entryDate:document.getElementById('fEntryDate').value,entryPrice,stopLoss:parseFloat(document.getElementById('fStop').value)||null,target:parseFloat(document.getElementById('fTarget').value)||null,exitDate:document.getElementById('fExitDate').value||null,exitPrice,reasons:[...selReasons],mistakes:[...selMistakes],entryNote:document.getElementById('fEntryNote').value.trim(),reviewNote:document.getElementById('fReview').value.trim(),createdAt:Timestamp.now()};
+  const btn=document.getElementById('btnSave'); btn.disabled=true; btn.textContent='儲存中…';
+  try{ if(editId) await updateDoc(doc(db,COLL,editId),data); else await addDoc(collection(db,COLL),data); closeAdd(); await load(); }
+  catch(e){alert('儲存失敗：'+e.message);}
+  finally{btn.disabled=false;btn.textContent='💾 儲存交易記錄';}
 };
 
-/* ── 結單 Modal ── */
-window.openClose = id => {
-  const t = trades.find(x=>x.id===id);
-  if (!t) return;
-  closeId = id;
-  closeSelMistakes = [];
-  document.getElementById('closeTitle').textContent = `結單：${t.ticker} ${t.name||''}`;
-  document.getElementById('cExitDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('cExitPrice').value = '';
-  document.getElementById('cReview').value = '';
-  buildPicker('closeMistakePicker', MISTAKES, closeSelMistakes, true);
+/* ── Close Trade Modal ── */
+window.openClose = id=>{
+  const t=trades.find(x=>x.id===id); if(!t) return;
+  closeId=id; closeSelMistakes=[];
+  document.getElementById('closeTitle').textContent=`${t.ticker} ${t.name||''}`;
+  document.getElementById('cExitDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('cExitPrice').value=''; document.getElementById('cReview').value='';
+  buildPicker('closeMistakePicker',MISTAKES,closeSelMistakes,true);
   document.getElementById('closeOverlay').classList.add('open');
 };
 
-window.saveClose = async () => {
-  const exitPrice = parseFloat(document.getElementById('cExitPrice').value);
-  if (!exitPrice) { alert('請填寫出場價格'); return; }
-  const t = trades.find(x=>x.id===closeId);
-  if (!t) return;
-  const status = exitPrice > t.entryPrice ? 'win' : 'loss';
-  try {
-    await updateDoc(doc(db, COLL, closeId), {
-      exitDate:   document.getElementById('cExitDate').value,
-      exitPrice, status,
-      mistakes:   [...closeSelMistakes],
-      reviewNote: document.getElementById('cReview').value.trim(),
-    });
-    document.getElementById('closeOverlay').classList.remove('open');
-    await load();
-  } catch(e) { alert('儲存失敗：'+e.message); }
+window.saveClose = async ()=>{
+  const exitPrice=parseFloat(document.getElementById('cExitPrice').value);
+  if(!exitPrice){alert('請填寫出場價格');return;}
+  const t=trades.find(x=>x.id===closeId); if(!t) return;
+  const status=exitPrice>t.entryPrice?'win':'loss';
+  try{ await updateDoc(doc(db,COLL,closeId),{exitDate:document.getElementById('cExitDate').value,exitPrice,status,mistakes:[...closeSelMistakes],reviewNote:document.getElementById('cReview').value.trim()}); document.getElementById('closeOverlay').classList.remove('open'); await load(); }
+  catch(e){alert('儲存失敗：'+e.message);}
 };
 
-/* ── 刪除 ── */
-window.del = async id => {
-  if (!confirm('確定刪除這筆記錄？')) return;
-  try { await deleteDoc(doc(db, COLL, id)); await load(); }
-  catch(e) { alert('刪除失敗'); }
-};
+/* ── Delete ── */
+window.del = async id=>{ if(!confirm('確定刪除這筆記錄？')) return; try{await deleteDoc(doc(db,COLL,id));await load();}catch(e){alert('刪除失敗');} };
 
 load();
+
+/* redraw chart on resize */
+window.addEventListener('resize', ()=>{ const closed=trades.filter(t=>t.status!=='open'); drawChart(closed); });
 </script>
 </body>
 </html>
