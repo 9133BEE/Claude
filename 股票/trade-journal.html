@@ -90,6 +90,14 @@ canvas{display:block;width:100%}
 .fbar-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0;
   border-bottom:1px solid var(--border)}
 .fbar-row:last-child{border-bottom:none;padding-top:8px;padding-bottom:0}
+.date-custom-wrap{display:none;align-items:center;gap:6px;flex-wrap:wrap}
+.date-custom-wrap.show{display:flex}
+.date-custom-wrap input[type=date]{background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:5px 10px;color:var(--text);font-size:.78rem;outline:none;
+  transition:border-color .14s;cursor:pointer}
+.date-custom-wrap input[type=date]:focus{border-color:rgba(232,162,40,.55)}
+.date-custom-wrap input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer}
+.date-sep{font-size:.8rem;color:var(--text4)}
 .fbar-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
   color:var(--text4);white-space:nowrap;min-width:32px}
 .fpill{background:none;border:1px solid var(--border);color:var(--text3);
@@ -162,8 +170,8 @@ canvas{display:block;width:100%}
 .pf{padding:13px 16px;border-right:1px solid var(--border2)}
 .pf:last-child{border-right:none}
 .pf label{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--text4);margin-bottom:4px;font-weight:600}
-.pf .pv{font-size:.95rem;font-weight:700;color:var(--text2)}
+  color:var(--text2);margin-bottom:4px;font-weight:600}
+.pf .pv{font-size:.95rem;font-weight:700;color:#fff}
 .pf .pv.pos{color:var(--green)}.pf .pv.neg{color:var(--red)}.pf .pv.acc{color:var(--accent2)}
 
 .tc-notes{padding:16px;border-bottom:1px solid var(--border2);display:grid;gap:12px}
@@ -338,6 +346,12 @@ canvas{display:block;width:100%}
     <button class="fpill" onclick="setDate('quarter',this)">本季</button>
     <button class="fpill" onclick="setDate('year',this)">今年</button>
     <button class="fpill on" onclick="setDate('all',this)">全部時間</button>
+    <button class="fpill" onclick="setDate('custom',this)">自訂</button>
+    <div class="date-custom-wrap" id="customDateWrap">
+      <input type="date" id="dateFrom" onchange="applyCustomDate()">
+      <span class="date-sep">—</span>
+      <input type="date" id="dateTo" onchange="applyCustomDate()">
+    </div>
   </div>
 </div>
 
@@ -442,6 +456,7 @@ const MISTAKES = ['追高進場','未設停損','停損太寬','停損太窄','�
 let trades=[], editId=null, closeId=null;
 let selR=[], selM=[], cSelM=[], curTT='actual';
 let curType='all', curStat='all', curDate='all';
+let customFrom='', customTo='';
 
 /* ── load ── */
 async function load(){
@@ -469,8 +484,18 @@ function inDate(dateStr){
     return d.getFullYear()===now.getFullYear()&&Math.floor(d.getMonth()/3)===q;
   }
   if(curDate==='year') return d.getFullYear()===now.getFullYear();
+  if(curDate==='custom'){
+    if(customFrom){const f=new Date(customFrom);f.setHours(0,0,0,0);if(d<f)return false;}
+    if(customTo){const t=new Date(customTo);t.setHours(23,59,59,999);if(d>t)return false;}
+    return true;
+  }
   return true;
 }
+window.applyCustomDate=()=>{
+  customFrom=document.getElementById('dateFrom').value;
+  customTo=document.getElementById('dateTo').value;
+  renderAll();
+};
 function typeOf(t){ return t.type||'actual'; }
 function getFiltered(){
   return trades.filter(t=>{
@@ -503,10 +528,9 @@ function renderAll(){
   const wrEl=document.getElementById('wrFill');
   if(wr!=null){
     document.getElementById('kWR').textContent=wr.toFixed(1)+'%';
-    document.getElementById('kWR').className='kpi-val '+(wr>=50?'pos':'neg');
+    document.getElementById('kWR').className='kpi-val neg';
     wrEl.style.width=wr+'%';
-    wrEl.style.background=wr>=50?'linear-gradient(90deg,var(--green),var(--green2))'
-                                :'linear-gradient(90deg,var(--red),var(--red2))';
+    wrEl.style.background='linear-gradient(90deg,var(--red),var(--red2))';
   }else{document.getElementById('kWR').textContent='—';document.getElementById('kWR').className='kpi-val neu';}
   document.getElementById('kPnl').textContent=netPnl?((netPnl>0?'+':'')+netPnl.toFixed(2)+'%'):'—';
   document.getElementById('kPnl').className='kpi-val '+(netPnl>0?'pos':netPnl<0?'neg':'neu');
@@ -519,7 +543,7 @@ function renderAll(){
   document.getElementById('sAvgL').textContent=avgL!=null?avgL.toFixed(2)+'%':'—';
   const pfEl=document.getElementById('sPF');
   pfEl.textContent=pf!=null?pf.toFixed(2)+'x':'—';
-  pfEl.className='sec-val '+(pf!=null?(pf>=1?'pu':'neg'):'');
+  pfEl.className='sec-val '+(pf!=null?'pos':'');
 
   /* nav pill */
   const allOpen=trades.filter(t=>t.status==='open').length;
@@ -695,6 +719,9 @@ window.setStat=(v,btn)=>{
 window.setDate=(v,btn)=>{
   curDate=v;
   document.querySelectorAll('[onclick^="setDate"]').forEach(b=>b.classList.toggle('on',b===btn));
+  const wrap=document.getElementById('customDateWrap');
+  if(wrap) wrap.classList.toggle('show',v==='custom');
+  if(v!=='custom'){customFrom='';customTo='';}
   renderAll();
 };
 
