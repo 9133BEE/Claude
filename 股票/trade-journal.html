@@ -40,6 +40,10 @@ input,select,textarea,button{font-family:inherit}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);
   box-shadow:0 0 6px var(--green);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.img-loading{display:flex;align-items:center;gap:8px;padding:10px 0;color:var(--text2);font-size:.8rem}
+.img-loading::before{content:'';width:14px;height:14px;border:2px solid var(--border2);
+  border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 .nav-pill{background:var(--b-bg);border:1px solid var(--b-bd);color:var(--blue);
   font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;display:none}
 
@@ -516,31 +520,33 @@ async function compressImg(file){
   return new Promise(res=>{
     const img=new Image(), url=URL.createObjectURL(file);
     img.onload=()=>{
-      const s=Math.min(1,1400/img.width);
+      const s=Math.min(1,900/img.width);
       const cv=document.createElement('canvas');
       cv.width=img.width*s; cv.height=img.height*s;
       cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-      cv.toBlob(b=>{URL.revokeObjectURL(url);res(b);},'image/jpeg',.82);
+      cv.toBlob(b=>{URL.revokeObjectURL(url);res(b);},'image/jpeg',.70);
     };
     img.src=url;
   });
 }
-async function uploadImg(file, name){
-  const blob=await compressImg(file);
+async function uploadImg(blob, name){
   const r=sRef(storage,`trades/${name}_${Date.now()}`);
   await uploadBytes(r,blob);
   return getDownloadURL(r);
 }
-window.prevImg=(input,prevId,type)=>{
+window.prevImg=async(input,prevId,type)=>{
   const file=input.files[0]; if(!file)return;
-  if(type==='entry') entryImgFile=file; else exitImgFile=file;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    document.getElementById(prevId).innerHTML=
-      `<div class="img-prev-wrap"><img src="${e.target.result}" class="img-prev">
+  const prevEl=document.getElementById(prevId);
+  prevEl.innerHTML='<div class="img-loading">壓縮中…</div>';
+  try{
+    const blob=await compressImg(file);
+    if(type==='entry') entryImgFile=blob; else exitImgFile=blob;
+    const url=URL.createObjectURL(blob);
+    prevEl.innerHTML=
+      `<div class="img-prev-wrap"><img src="${url}" class="img-prev">
        <button class="img-del" onclick="clearImg('${type}','${prevId}')">移除</button></div>`;
-  };
-  reader.readAsDataURL(file);
+  }catch(e){prevEl.innerHTML='<div style="color:var(--red);font-size:.8rem;padding:8px 0">圖片處理失敗</div>';}
+  input.value='';
 };
 window.clearImg=(type,prevId)=>{
   if(type==='entry'){entryImgFile=null;existingEUrl=null;document.getElementById('fEImg').value='';}
