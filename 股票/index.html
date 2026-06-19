@@ -250,23 +250,39 @@ a { color: inherit; text-decoration: none; }
 }
 .journal-btn {
   display: flex; align-items: center; justify-content: space-between;
-  width: 100%; background: #0e1118; border: 1.5px solid #252c42;
-  border-radius: 14px; padding: 18px 24px; cursor: pointer;
-  transition: border-color .2s, box-shadow .2s; text-decoration: none;
+  width: 100%;
+  background: linear-gradient(135deg, #1a1206 0%, #0e1118 60%);
+  border: 1.5px solid #3d2e0a;
+  border-radius: 14px; padding: 20px 28px; cursor: pointer;
+  transition: all .25s; text-decoration: none;
   font-family: var(--font);
+  position: relative; overflow: hidden;
+}
+.journal-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(232,162,40,.08) 0%, transparent 60%);
+  pointer-events: none;
 }
 .journal-btn:hover {
   border-color: #e8a228;
-  box-shadow: 0 4px 20px rgba(232,162,40,.15);
+  box-shadow: 0 4px 28px rgba(232,162,40,.2);
+  background: linear-gradient(135deg, #211608 0%, #101318 60%);
 }
-.jb-left { display: flex; align-items: center; gap: 14px; text-align: left; }
-.jb-dot { width: 10px; height: 10px; border-radius: 50%;
-  background: #3ecf8e; box-shadow: 0 0 8px #3ecf8e;
-  animation: jpulse 2s ease-in-out infinite; flex-shrink: 0; }
+.jb-left { display: flex; align-items: center; gap: 16px; text-align: left; }
+.jb-icon {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(232,162,40,.15); border: 1px solid rgba(232,162,40,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+}
+.jb-dot { display: none; }
 @keyframes jpulse{0%,100%{opacity:1}50%{opacity:.3}}
-.jb-title { font-size: .95rem; font-weight: 700; color: #f0f3fc; letter-spacing: -.01em; }
-.jb-sub { font-size: .78rem; color: #506080; margin-top: 2px; }
-.jb-arrow { font-size: 1.2rem; color: #e8a228; font-weight: 700; flex-shrink: 0; }
+.jb-title { font-size: 1rem; font-weight: 700; color: #f0f3fc; letter-spacing: -.01em; }
+.jb-sub { font-size: .8rem; color: #7a6030; margin-top: 3px; }
+.jb-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.jb-badge { background: rgba(232,162,40,.15); border: 1px solid rgba(232,162,40,.3); color: #e8a228; font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.jb-arrow { font-size: 1.1rem; color: #e8a228; font-weight: 700; }
 @media(max-width:640px){
   .journal-banner { padding: 0 16px; }
   .journal-btn { padding: 14px 16px; }
@@ -624,7 +640,7 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
     <!-- 交易日誌 -->
-    <a class="gnav-btn" href="trade-journal.html" style="text-decoration:none">交易日誌</a>
+    <a href="trade-journal.html" style="text-decoration:none;background:#e8a228;color:#000;font-weight:700;font-size:.85rem;padding:6px 16px;border-radius:8px;border:none;cursor:pointer;white-space:nowrap">交易日誌</a>
     <!-- 收藏 -->
     <div class="gnav-group" id="gnav-fav" style="margin-left:auto">
       <button class="gnav-btn fav-btn" onclick="switchFavorites()" id="fav-btn">
@@ -639,13 +655,16 @@ a { color: inherit; text-decoration: none; }
 <div class="journal-banner">
   <a class="journal-btn" href="trade-journal.html">
     <div class="jb-left">
-      <div class="jb-dot"></div>
+      <div class="jb-icon">📒</div>
       <div>
         <div class="jb-title">交易日誌</div>
         <div class="jb-sub">記錄每一筆交易的判斷與檢討，持續提升勝率</div>
       </div>
     </div>
-    <span class="jb-arrow">→</span>
+    <div class="jb-right">
+      <span class="jb-badge">立即記錄</span>
+      <span class="jb-arrow">→</span>
+    </div>
   </a>
 </div>
 
