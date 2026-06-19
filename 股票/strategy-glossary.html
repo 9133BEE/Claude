@@ -28,8 +28,14 @@ a{color:inherit;text-decoration:none}
 .search-wrap input::placeholder{color:var(--text4)}
 .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text4);width:16px;height:16px;pointer-events:none}
 
+/* SOURCE TOGGLE */
+.source-bar{display:flex;gap:12px;justify-content:center;padding:20px 24px 0}
+.src-btn{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:11px 32px;border-radius:24px;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:.02em}
+.src-btn:hover{border-color:var(--accent);color:var(--accent2)}
+.src-btn.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);color:var(--accent2);box-shadow:0 0 0 3px rgba(245,158,11,.15)}
+
 /* FILTER */
-.filter-bar{display:flex;gap:8px;justify-content:center;padding:20px 24px 0;flex-wrap:wrap}
+.filter-bar{display:flex;gap:8px;justify-content:center;padding:12px 24px 0;flex-wrap:wrap}
 .flt-btn{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:20px;font-size:.82rem;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
 .flt-btn:hover{border-color:var(--accent);color:var(--accent2)}
 .flt-btn.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:var(--accent2);font-weight:600}
@@ -53,6 +59,7 @@ a{color:inherit;text-decoration:none}
 .badge-foundation{background:rgba(245,158,11,.12);color:var(--accent2);border:1px solid rgba(245,158,11,.25)}
 .badge-hot{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25);animation:pulse 2s infinite}
 .badge-chip{background:rgba(20,184,166,.12);color:#2dd4bf;border:1px solid rgba(20,184,166,.25)}
+.badge-user{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 .sc-name{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:3px}
 .sc-en{color:var(--text3);font-size:.8rem}
@@ -155,9 +162,14 @@ a{color:inherit;text-decoration:none}
   </div>
   <div class="jump-wrap">
     <select id="jumpSelect">
-      <option value="">⚡ 快速跳到某個策略…</option>
+      <option value="">選擇</option>
     </select>
   </div>
+</div>
+
+<div class="source-bar">
+  <button class="src-btn" id="aiFltBtn" onclick="filterSource('ai',this)">🤖 AI分析</button>
+  <button class="src-btn" id="userFltBtn" onclick="filterSource('user',this)">🌱 肥料</button>
 </div>
 
 <div class="filter-bar">
@@ -900,13 +912,13 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- 外資買賣張數背離訊號 -->
 <!-- ══════════════════════════════════════════════════════ -->
-<div class="sc" data-cat="chip" data-keywords="外資 買賣超 買張 賣張 背離 籌碼 法人 隱藏低點 進場訊號 掩護建倉 出貨型買超">
+<div class="sc" data-cat="chip" data-source="user" data-keywords="外資 買賣超 買張 賣張 背離 籌碼 法人 隱藏低點 進場訊號 掩護建倉 出貨型買超">
   <div class="sc-head" onclick="toggle(this)">
     <div class="sc-icon">🔍</div>
     <div class="sc-meta">
       <div class="sc-badges">
         <span class="badge badge-chip">籌碼分析</span>
-        <span class="badge badge-hot">實戰策略</span>
+        <span class="badge badge-user">肥料筆記</span>
       </div>
       <div class="sc-name">外資買賣張數背離訊號</div>
       <div class="sc-en">Foreign Investor Volume Divergence Signal</div>
@@ -1183,10 +1195,135 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 🌱 肥料：第二層籌碼確認 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="chip" data-source="user" data-keywords="第二層 籌碼確認 投信 大股東 融券 軋空 法人 買超 轉讓 肥料">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🔬</div>
+    <div class="sc-meta">
+      <div class="sc-badges">
+        <span class="badge badge-chip">籌碼分析</span>
+        <span class="badge badge-user">肥料筆記</span>
+      </div>
+      <div class="sc-name">第二層籌碼確認</div>
+      <div class="sc-en">Layer 2 — Institutional Cross-Validation</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">外資訊號出現後，再用「其他法人動向」交叉確認。三個條件都符合，才算強度足夠的進場訊號。</div>
+  <div class="sc-body collapsed">
+    <div class="blk">
+      <div class="blk-title">使用時機</div>
+      <div class="hl">
+        <b>📌 外資訊號出現後才用</b>
+        第一層：外資賣超但買張大增（買賣比提升）→ 疑似暗中建倉。<br>
+        第二層：其他法人有沒有一起動？籌碼面有沒有配合？都符合才算真的。
+      </div>
+    </div>
+    <div class="blk">
+      <div class="blk-title">三項確認條件</div>
+      <ul class="checklist">
+        <li class="pass"><b>投信同向（買超或持平）</b><br><span style="font-size:.85rem;color:var(--text3)">投信也在買，代表法人共識；持平也可接受。投信大賣則警示。</span></li>
+        <li class="pass"><b>大股東無申報轉讓</b><br><span style="font-size:.85rem;color:var(--text3)">查公開資訊觀測站「內部人持股異動」。大股東申報轉讓是出貨警訊。</span></li>
+        <li class="pass"><b>融券增加 → 加分（軋空潛力）</b><br><span style="font-size:.85rem;color:var(--text3)">空方增加時，一旦上漲空單需回補，軋空行情漲速更快。加分項，非必要。</span></li>
+      </ul>
+    </div>
+    <div class="blk">
+      <div class="blk-title">查詢方式</div>
+      <div class="two-col">
+        <div class="mini-card"><h4>投信動向</h4><p>TWSE 三大法人明細 → 投信欄位<br>或 Goodinfo.tw 法人買賣頁</p></div>
+        <div class="mini-card"><h4>大股東申報</h4><p>公開資訊觀測站 → 股東持股異動<br>或 CMoney 內部人持股</p></div>
+        <div class="mini-card"><h4>融券餘額</h4><p>TWSE 信用交易統計 → 融券餘額變化</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 🌱 肥料：撐壓的本質與局限（Instagram 交易日記 EP.36） -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="foundation" data-source="user" data-keywords="支撐 阻力 撐壓 主力 技術分析 基礎 決策工具 不保證 洗盤 肥料">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🌱</div>
+    <div class="sc-meta">
+      <div class="sc-badges">
+        <span class="badge badge-foundation">基礎工具</span>
+        <span class="badge badge-user">肥料筆記</span>
+      </div>
+      <div class="sc-name">撐壓的本質與局限</div>
+      <div class="sc-en">Support &amp; Resistance — Reality Check</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">支撐壓力是決策工具，不是保證。主力可以突破任何技術線——真正重要的是你在突破時怎麼反應，而不是那條線「應該」守住。</div>
+  <div class="sc-body collapsed">
+
+    <div class="blk">
+      <div class="blk-title">核心觀點</div>
+      <div class="hl">
+        <b>📌 撐壓是工具，不是神</b>
+        「支撐有用，但不代表一定跌不破；壓力有用，但不代表一定漲不過去。」把撐壓當成絕對定律的人，最容易在主力刻意打壓時被洗掉。
+      </div>
+      <div class="warn">
+        <b>⚠️ 不是每條線都重要</b>
+        圖上畫的撐壓線越多，你越容易被干擾。真正有效的只有「最多人在看的那條線」——通常是整數關卡、前高前低、或長期均線。圖上超過3條重要線就代表你還沒想清楚。
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">實戰心態</div>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>撐壓被破，不是技術失效</h4>
+          <p>主力有足夠資金刻意打穿支撐，洗掉散戶停損，再拉回。支撐被破的瞬間，不是「技術失效」，而是「你該用停損保護自己」的時刻。相信支撐一定守住，是在賭主力不會打你。</p>
+        </div>
+        <div class="mini-card">
+          <h4>決策之後，紀律最重要</h4>
+          <p>撐壓給你一個「根據」，讓你在不確定中有個依據進場或出場。但之後的事要靠紀律——突破就出，不要找理由繼續持有。技術給你框架，執行靠自己。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">怎麼找最關鍵的那條線</div>
+      <ul class="checklist">
+        <li class="pass">時間框架越大的撐壓越重要（週線 > 日線 > 小時線）</li>
+        <li class="pass">被多次測試仍守住的線，代表很多人在這個價位有「記憶」</li>
+        <li class="pass">整數關卡（整百整千）因心理因素往往有大量掛單</li>
+        <li class="pass">只挑最多3條，逼自己排出優先順序</li>
+        <li class="fail">在同一張圖上畫超過5條線，代表你沒有決策，只是在逃避</li>
+        <li class="fail">只看一個時間框架的支撐就進場，往往忽略更大圖面的壓力</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">與 AI 整理版的差異</div>
+      <div class="pro">
+        <b>💡 這筆記的獨特觀點</b>
+        AI 整理版的支撐阻力著重「怎麼找」和「怎麼用」，這篇的重點是「心態」——強調不要迷信技術線，主力打穿支撐是正常的，重要的是你的反應速度和紀律，而不是那條線對不對。
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">來源</div>
+      <p style="color:var(--text3);font-size:.82rem">📱 Instagram 交易日記 EP.36 ／ 個人整理筆記</p>
+    </div>
+
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
 </div><!-- /container -->
 
 <script>
 let currentCat = 'all';
+let currentSource = 'all';
 let showStarred = false;
 
 /* ── 星號收藏（localStorage） ── */
@@ -1241,14 +1378,30 @@ function filter(cat, btn) {
   if (cat === 'starred') {
     showStarred = !showStarred;
     btn.classList.toggle('active', showStarred);
-    /* 切收藏模式時不改 currentCat，只加一層過濾 */
   } else {
     showStarred = false;
     document.getElementById('starFltBtn').classList.remove('active');
     currentCat = cat;
     document.querySelectorAll('.flt-btn').forEach(b => {
-      if (b.id !== 'starFltBtn') b.classList.toggle('active', b === btn);
+      if (b.id !== 'starFltBtn' && b.id !== 'aiFltBtn' && b.id !== 'userFltBtn')
+        b.classList.toggle('active', b === btn);
     });
+  }
+  applyAll();
+}
+
+/* ── 來源篩選（AI分析 / 肥料） ── */
+function filterSource(source, btn) {
+  showStarred = false;
+  document.getElementById('starFltBtn').classList.remove('active');
+  if (currentSource === source) {
+    currentSource = 'all';
+    btn.classList.remove('active');
+  } else {
+    currentSource = source;
+    document.getElementById('aiFltBtn').classList.remove('active');
+    document.getElementById('userFltBtn').classList.remove('active');
+    btn.classList.add('active');
   }
   applyAll();
 }
@@ -1263,12 +1416,13 @@ function applyAll() {
   let count = 0;
   document.querySelectorAll('.sc').forEach(sc => {
     const catMatch = currentCat === 'all' || sc.dataset.cat === currentCat;
+    const srcMatch = currentSource === 'all' || (sc.dataset.source || 'ai') === currentSource;
     const starMatch = !showStarred || starred.includes(sc.dataset.id);
     const kwMatch = !q ||
       (sc.dataset.keywords||'').includes(q) ||
       (sc.querySelector('.sc-name')||{textContent:''}).textContent.toLowerCase().includes(q) ||
       (sc.querySelector('.sc-short')||{textContent:''}).textContent.toLowerCase().includes(q);
-    const hide = !catMatch || !kwMatch || !starMatch;
+    const hide = !catMatch || !srcMatch || !kwMatch || !starMatch;
     sc.classList.toggle('hidden', hide);
     if(!hide) count++;
   });
@@ -1277,7 +1431,7 @@ function applyAll() {
 
 /* ── 初始化：注入星號按鈕 + 建立跳轉選單 ── */
 (function init() {
-  const catLabel = {theory:'核心理論',indicator:'技術指標',pattern:'型態辨識',foundation:'基礎工具',chip:'籌碼分析'};
+  const catLabel = {theory:'核心理論',indicator:'技術指標',pattern:'型態辨識',foundation:'基礎工具',chip:'籌碼分析',user:'肥料筆記'};
   const groups = {};
 
   document.querySelectorAll('.sc').forEach((sc, i) => {
@@ -1302,7 +1456,7 @@ function applyAll() {
 
   /* 建立分組下拉選單 */
   const sel = document.getElementById('jumpSelect');
-  const catOrder = ['theory','indicator','pattern','foundation','chip'];
+  const catOrder = ['theory','indicator','pattern','foundation','chip','user'];
   catOrder.forEach(cat => {
     if (!groups[cat]) return;
     const og = document.createElement('optgroup');

@@ -1,182 +1,343 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>外資籌碼篩選</title>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; font-size: 15px; }
+    /* ── RESET ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ── BASE ── */
     body {
-      background: #0a0e14;
-      color: #dde3ed;
+      background: #131722;
+      color: #D1D4DC;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 15px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.4;
     }
 
-    /* ── HEADER ── */
+    /* ── HEADER (height 48px, single row) ── */
     .header {
-      background: #111720;
-      border-bottom: 1px solid #1e2636;
-      padding: 20px 24px 18px;
-    }
-    .header h1 {
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 16px;
-      letter-spacing: .02em;
+      background: #1E222D;
+      border-bottom: 1px solid #2A2E39;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 0;
     }
 
-    /* ── CONTROLS ── */
+    .toolbar-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #D1D4DC;
+      letter-spacing: .02em;
+      padding-right: 16px;
+      margin-right: 12px;
+      border-right: 1px solid #2A2E39;
+      white-space: nowrap;
+      flex-shrink: 0;
+      height: 100%;
+    }
+
+    /* ── CONTROLS (all items 28px tall, baseline-aligned) ── */
     .controls {
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 6px;
+      flex: 1;
     }
+
     .ctrl-block {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
     }
+
     .ctrl-block-label {
-      font-size: 15px;
-      color: #6b7a90;
+      font-size: 10px;
+      color: #787B86;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: .06em;
+      letter-spacing: .07em;
+      line-height: 1;
     }
+
     .ctrl-select,
-    input[type=date],
-    input[type=number] {
-      background: #0a0e14;
-      border: 1px solid #2a3447;
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #dde3ed;
-      font-size: 15px;
+    input[type=date] {
+      background: #131722;
+      border: 1px solid #2A2E39;
+      border-radius: 4px;
+      padding: 0 12px;
+      color: #D1D4DC;
+      font-size: 13px;
       font-family: inherit;
       outline: none;
       color-scheme: dark;
+      height: 28px;
+      line-height: 28px;
     }
+
     .ctrl-select:focus,
-    input[type=date]:focus,
-    input[type=number]:focus {
-      border-color: #3b82f6;
+    input[type=date]:focus {
+      border-color: #2962FF;
+      box-shadow: 0 0 0 2px rgba(41,98,255,.15);
     }
-    input[type=number] { width: 80px; text-align: center; }
+
     .op-symbol {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 700;
-      color: #f0b90b;
-      padding: 0 4px;
+      color: #787B86;
+      flex-shrink: 0;
       align-self: flex-end;
-      padding-bottom: 10px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      padding: 0 2px;
     }
+
     .btn {
-      background: #1d6f3a;
+      background: #2962FF;
       border: none;
-      border-radius: 8px;
-      padding: 14px 36px;
+      border-radius: 4px;
+      padding: 0 16px;
+      height: 28px;
       color: #fff;
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       letter-spacing: .02em;
       align-self: flex-end;
       transition: background .15s;
+      white-space: nowrap;
+      font-family: inherit;
     }
-    .btn:hover { background: #238636; }
+    .btn:hover { background: #1E53E5; }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── CONDITION BAR (two rows, no extra gap) ── */
+    .cond-bar {
+      background: #1E222D;
+      border-bottom: 1px solid #2A2E39;
+      padding: 6px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .cond-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .layer-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      padding: 2px 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .layer-badge.gold {
+      color: #7BA3F8;
+      background: rgba(41,98,255,.1);
+      border: 1px solid rgba(41,98,255,.2);
+    }
+
+    .layer-badge.blue {
+      color: #7BA3F8;
+      background: rgba(41,98,255,.1);
+      border: 1px solid rgba(41,98,255,.2);
+    }
+
+    .cond-item {
+      background: rgba(41,98,255,.08);
+      border: 1px solid rgba(41,98,255,.2);
+      color: #7BA3F8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .cond-sep {
+      color: #787B86;
+      font-weight: 700;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .chk-item-bar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #787B86;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .chk-item-bar input[type=checkbox] {
+      width: 12px;
+      height: 12px;
+      accent-color: #2962FF;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .chk-item-bar input:checked + * {
+      text-decoration: line-through;
+      color: #2962FF;
+      opacity: .7;
+    }
 
     /* ── META BAR ── */
     .meta {
-      padding: 10px 24px;
-      font-size: 15px;
-      color: #6b7a90;
-      background: #0d1218;
-      border-bottom: 1px solid #1e2636;
-      min-height: 38px;
+      padding: 4px 16px;
+      font-size: 11px;
+      color: #787B86;
+      background: #131722;
+      border-bottom: 1px solid #2A2E39;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
     }
 
     /* ── STATUS ── */
-    .status { text-align: center; padding: 72px 24px; color: #6b7a90; }
-    .status-icon { font-size: 72px; margin-bottom: 16px; }
-    .progress { margin-top: 10px; font-size: 24px; }
+    .status {
+      text-align: center;
+      padding: 64px 24px;
+      color: #787B86;
+      font-size: 13px;
+    }
+    .status-icon { font-size: 40px; margin-bottom: 12px; }
+    .progress { margin-top: 6px; font-size: 11px; color: #787B86; }
 
     /* ── RESULT COUNT ── */
     .result-count {
-      padding: 12px 24px;
-      font-size: 24px;
-      color: #6b7a90;
-      border-bottom: 1px solid #1e2636;
+      padding: 5px 16px;
+      font-size: 11px;
+      color: #787B86;
+      border-bottom: 1px solid #2A2E39;
     }
-    .result-count strong { color: #dde3ed; font-size: 28px; }
+    .result-count strong { color: #D1D4DC; font-weight: 600; }
 
-    /* ── TABLE ── */
+    /* ── MAIN TABLE ── */
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; border-collapse: collapse; font-size: 15px; }
+
+    table { width: 100%; border-collapse: collapse; }
+
     thead { position: sticky; top: 0; z-index: 2; }
+
     th {
-      background: #111720;
-      padding: 13px 16px;
-      color: #6b7a90;
-      font-weight: 600;
-      font-size: 15px;
+      background: #1E222D;
+      padding: 6px 12px;
+      color: #787B86;
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
       white-space: nowrap;
-      border-bottom: 1px solid #1e2636;
+      border-bottom: 1px solid #2A2E39;
       cursor: pointer;
       user-select: none;
-      letter-spacing: .02em;
     }
-    th:hover { color: #dde3ed; }
-    th.col-a { color: #4a90d9; }
-    th.col-b { color: #4a6a90; }
+    th:hover { color: #D1D4DC; }
+    th.col-a { color: #4a8fd4; }
+    th.col-b { color: #5a7a96; }
+
     td {
-      padding: 16px 20px;
-      border-bottom: 1px solid #141b26;
+      padding: 5px 12px;
+      border-bottom: 1px solid #1E222D;
       white-space: nowrap;
-      font-size: 30px;
+      font-size: 13px;
     }
-    tr:hover td { background: #131b27; }
+
     tr { cursor: pointer; }
+    tr:hover td { background: #1C2C3E; }
 
     .text-right { text-align: right; }
     .text-left  { text-align: left; }
 
-    .pos { color: #3ecf6a; }
-    .neg { color: #f05151; }
-    .highlight { color: #f0b90b; font-weight: 700; }
+    /* ── DATA COLORS ── */
+    .pos { color: #F23645; }
+    .neg { color: #089981; }
+    .highlight { color: #F0B90B; font-weight: 700; }
     .col-a { color: #5aa3f0; }
     .col-b { color: #7a8fa8; }
-    .diff-pos { color: #3ecf6a; font-weight: 700; }
-    .diff-neg { color: #f05151; font-weight: 700; }
+    .diff-pos { color: #F23645; font-weight: 700; }
+    .diff-neg { color: #089981; font-weight: 700; }
 
-    .stock-code { font-weight: 700; font-size: 30px; color: #fff; }
-    .stock-name { font-size: 15px; color: #6b7a90; margin-top: 4px; }
+    /* ── STOCK CELL ── */
+    .stock-code {
+      font-weight: 700;
+      font-size: 14px;
+      color: #D1D4DC;
+      line-height: 1.3;
+    }
+    .stock-name {
+      font-size: 11px;
+      color: #787B86;
+      margin-top: 1px;
+      line-height: 1.3;
+    }
 
+    /* ── BADGE ── */
     .badge {
       display: inline-block;
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
     }
-    .badge-sell { background: rgba(240,81,81,.12); color: #f05151; border: 1px solid rgba(240,81,81,.3); }
-    .badge-buy  { background: rgba(62,207,106,.12); color: #3ecf6a; border: 1px solid rgba(62,207,106,.3); }
+    .badge-sell {
+      background: rgba(242,54,69,.1);
+      color: #F23645;
+      border: 1px solid rgba(242,54,69,.3);
+    }
+    .badge-buy {
+      background: rgba(8,153,129,.1);
+      color: #089981;
+      border: 1px solid rgba(8,153,129,.3);
+    }
 
-    .pct-bar { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-    .bar-bg { width: 48px; height: 6px; background: #1e2636; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
-    .bar-fill { height: 100%; background: #f0b90b; border-radius: 4px; }
+    /* ── PCT BAR ── */
+    .pct-bar { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .bar-bg {
+      width: 40px;
+      height: 4px;
+      background: #2A2E39;
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .bar-fill { height: 100%; background: #F0B90B; border-radius: 2px; }
 
     /* ── DETAIL PANEL ── */
-    .detail { display: none; position: fixed; inset: 0; background: #0a0e14; z-index: 100; overflow-y: auto; }
+    .detail {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #131722;
+      z-index: 100;
+      overflow-y: auto;
+    }
     .detail.open { display: block; }
+
     .detail-header {
-      background: #111720;
-      border-bottom: 1px solid #1e2636;
-      padding: 18px 24px;
+      background: #1E222D;
+      border-bottom: 1px solid #2A2E39;
+      height: 48px;
+      padding: 0 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -184,102 +345,248 @@
       top: 0;
       z-index: 1;
     }
-    .detail-title { font-weight: 700; font-size: 32px; color: #fff; }
+
+    .detail-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #D1D4DC;
+    }
+
     .close-btn {
-      background: #1e2636;
+      background: #2A2E39;
       border: none;
-      border-radius: 8px;
-      padding: 8px 18px;
-      color: #dde3ed;
+      border-radius: 4px;
+      padding: 0 12px;
+      height: 28px;
+      color: #D1D4DC;
       cursor: pointer;
-      font-size: 24px;
+      font-size: 13px;
       font-family: inherit;
+      transition: background .15s;
     }
-    .detail-body { padding: 24px 32px; max-width: 900px; }
+    .close-btn:hover { background: #363A45; }
 
-    .day-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid #1e2636;
-    }
-    .day-date { font-size: 15px; color: #6b7a90; font-weight: 500; }
-    .day-nums { display: flex; gap: 24px; }
-    .day-col { min-width: 72px; text-align: right; }
-    .day-col-label { font-size: 15px; color: #6b7a90; }
-    .day-col-val { font-size: 32px; font-weight: 700; margin-top: 6px; }
+    .detail-body { padding: 16px 20px; max-width: 900px; }
 
+    /* ── INFO BOX ── */
     .info-box {
-      background: #111720;
-      border-left: 4px solid #3b82f6;
-      padding: 20px 24px;
-      border-radius: 6px;
-      margin-bottom: 24px;
-      font-size: 15px;
-      color: #9aa8bd;
-      line-height: 2;
+      background: #1E222D;
+      border-left: 3px solid #2962FF;
+      padding: 8px 14px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      color: #787B86;
+      line-height: 1.6;
     }
 
     /* ── MONTH TABLE ── */
     .month-table-wrap { overflow-x: auto; }
-    .month-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .month-table { width: 100%; border-collapse: collapse; }
     .month-table th {
-      padding: 14px 20px;
-      font-size: 15px;
-      color: #6b7a90;
-      font-weight: 600;
-      border-bottom: 1px solid #1e2636;
-      background: #111720;
+      padding: 6px 12px;
+      font-size: 10px;
+      color: #787B86;
+      font-weight: 500;
+      border-bottom: 1px solid #2A2E39;
+      background: #1E222D;
       text-transform: uppercase;
-      letter-spacing: .04em;
+      letter-spacing: .06em;
       white-space: nowrap;
     }
-    .month-table td { padding: 14px 20px; border-bottom: 1px solid #141b26; white-space: nowrap; font-size: 24px; }
-    .month-table tr:hover td { background: #131b27 !important; }
+    .month-table td {
+      padding: 5px 12px;
+      border-bottom: 1px solid #1E222D;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .month-table tr:hover td { background: #1C2C3E !important; }
 
-    .day-tag { display: inline-block; padding: 2px 10px; border-radius: 8px; font-size: 18px; font-weight: 700; margin-left: 6px; vertical-align: middle; }
-    .tag-a { background: rgba(90,163,240,.15); color: #5aa3f0; }
-    .tag-b { background: rgba(62,207,106,.12); color: #3ecf6a; }
+    .day-tag {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .tag-a {
+      background: rgba(41,98,255,.12);
+      color: #7BA3F8;
+      border: 1px solid rgba(41,98,255,.25);
+    }
+    .tag-b {
+      background: rgba(8,153,129,.1);
+      color: #089981;
+      border: 1px solid rgba(8,153,129,.25);
+    }
+
+    /* ── LAYER2 PANEL (detail view) ── */
+    .layer2 {
+      margin-top: 14px;
+      background: #1E222D;
+      border: 1px solid #2A2E39;
+      border-radius: 4px;
+      padding: 12px 16px;
+    }
+    .layer2-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #F0B90B;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .layer2-note {
+      font-size: 11px;
+      color: #787B86;
+      margin-bottom: 10px;
+    }
+    .layer2-items { display: flex; flex-direction: column; gap: 5px; }
+    .chk-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #D1D4DC;
+      cursor: pointer;
+      user-select: none;
+    }
+    .chk-item input[type=checkbox] {
+      width: 14px;
+      height: 14px;
+      accent-color: #2962FF;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .chk-item input:checked + span { color: #2962FF; text-decoration: line-through; opacity: .7; }
+
+    .tag-bonus {
+      background: rgba(240,185,11,.12);
+      color: #F0B90B;
+      border: 1px solid rgba(240,185,11,.25);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      margin: 0 3px;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      .header {
+        height: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 14px;
+        gap: 8px;
+      }
+      .toolbar-title {
+        height: auto;
+        border-right: none;
+        padding-right: 0;
+        margin-right: 0;
+        font-size: 14px;
+        border-bottom: 1px solid #2A2E39;
+        padding-bottom: 8px;
+        width: 100%;
+      }
+      .controls {
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+      }
+      .ctrl-block { flex: 1 1 120px; }
+      .ctrl-select, input[type=date] { width: 100%; }
+      .btn { flex: 0 0 auto; height: 36px; padding: 0 20px; }
+      .op-symbol { display: none; }
+
+      .cond-bar { padding: 8px 14px; }
+      .cond-row { gap: 6px; }
+      .cond-item { font-size: 11px; padding: 2px 7px; }
+      .layer-badge { font-size: 10px; }
+      .chk-item-bar { font-size: 11px; }
+
+      .meta { padding: 4px 14px; font-size: 11px; }
+      .result-count { padding: 6px 14px; }
+
+      th { padding: 7px 10px; font-size: 11px; }
+      td { padding: 6px 10px; font-size: 13px; }
+      .stock-code { font-size: 14px; }
+      .stock-name { font-size: 11px; }
+
+      .detail-header { height: auto; padding: 10px 14px; }
+      .detail-title { font-size: 16px; }
+      .close-btn { height: 32px; padding: 0 12px; font-size: 13px; }
+      .detail-body { padding: 12px 14px; }
+      .month-table td { padding: 5px 10px; font-size: 12px; }
+      .month-table th { padding: 5px 10px; font-size: 10px; }
+
+      .layer2 { padding: 10px 12px; }
+    }
   </style>
 </head>
 <body>
 
+<!-- HEADER: 48px single row -->
 <div class="header">
-  <h1>外資籌碼篩選</h1>
+  <div class="toolbar-title">
+    📊 外資籌碼篩選
+  </div>
   <div class="controls">
     <div class="ctrl-block">
-      <span class="ctrl-block-label">買賣超篩選</span>
-      <select id="filter-type" class="ctrl-select">
+      <span class="ctrl-block-label">方向</span>
+      <select id="filter-type" class="ctrl-select" onchange="updateCondLabels()">
         <option value="sell">賣超</option>
         <option value="buy">買超</option>
         <option value="all">全部</option>
       </select>
     </div>
     <div class="ctrl-block">
-      <span class="ctrl-block-label">比較日期（新）</span>
+      <span class="ctrl-block-label">日期（新）</span>
       <input type="date" id="date-a">
     </div>
-    <div class="op-symbol">＞</div>
+    <div class="op-symbol">&gt;</div>
     <div class="ctrl-block">
-      <span class="ctrl-block-label">比較日期（舊）</span>
+      <span class="ctrl-block-label">日期（舊）</span>
       <input type="date" id="date-b">
     </div>
     <button class="btn" id="run-btn" onclick="runScreener()">執行篩選</button>
   </div>
 </div>
 
+<!-- CONDITION BAR: two rows, no gap between them -->
+<div class="cond-bar">
+  <div class="cond-row">
+    <span class="layer-badge gold">第一層</span>
+    <span class="cond-item" id="cond1">① 買張增幅 ≥ 35%</span>
+    <span class="cond-sep">＋</span>
+    <span class="cond-item" id="cond2">② 賣張增幅 ＜ 買張增幅 × 50%</span>
+    <span class="cond-sep">＋</span>
+    <span class="cond-item" id="cond3">③ 買賣比提升 ≥ 35%</span>
+  </div>
+  <div class="cond-row">
+    <span class="layer-badge blue">第二層確認</span>
+    <label class="chk-item-bar"><input type="checkbox"> 投信同向（買超或持平）</label>
+    <label class="chk-item-bar"><input type="checkbox"> 大股東無申報轉讓</label>
+    <label class="chk-item-bar"><input type="checkbox"> 融券增加</label>
+  </div>
+</div>
+
+<!-- META BAR -->
 <div class="meta" id="meta">資料來源：台灣證交所 T86（每日收盤後 18:00 更新）</div>
 
+<!-- MAIN CONTENT -->
 <div id="main-content">
   <div class="status">
     <div class="status-icon">📊</div>
     <div>點擊執行篩選開始</div>
-    <div class="progress" style="color:#8b949e;font-size:11px;margin-top:8px">篩選條件：當日外資賣超，且今日買張 ÷ 5日均買張 ≥ 設定增幅</div>
+    <div class="progress">篩選條件：當日外資賣超，且今日買張 ÷ 5日均買張 ≥ 設定增幅</div>
   </div>
 </div>
 
-<!-- 個股5日明細 panel -->
+<!-- 個股明細 PANEL -->
 <div class="detail" id="detail-panel">
   <div class="detail-header">
     <span class="detail-title" id="detail-title"></span>
@@ -321,20 +628,33 @@ async function apiFetch(url) {
 
 async function fetchT86(yyyymmdd) {
   if (allData[yyyymmdd]) return allData[yyyymmdd];
-  const url = `https://www.twse.com.tw/fund/T86?response=json&date=${yyyymmdd}&selectType=ALL`;
-  const d = await apiFetch(url);
-  if (!d || d.stat !== 'OK' || !d.data) return null;
   const map = {};
-  d.data.forEach(row => {
-    const code = row[0].trim();
-    // T86 unit is 股, divide by 1000 = 張
-    map[code] = {
-      name: row[1].trim(),
-      buy:  Math.round(parseInt(row[2].replace(/,/g,'')) / 1000) || 0,
-      sell: Math.round(parseInt(row[3].replace(/,/g,'')) / 1000) || 0,
-      net:  Math.round(parseInt(row[4].replace(/,/g,'')) / 1000) || 0,
-    };
-  });
+  const bust = Date.now();
+  const toZ = s => Math.round(parseInt((s || '0').replace(/,/g, '')) / 1000) || 0;
+
+  // ── 上市 TSE (T86) ──
+  const tseUrl = `https://www.twse.com.tw/fund/T86?response=json&date=${yyyymmdd}&selectType=ALL&_=${bust}`;
+  const tse = await apiFetch(tseUrl);
+  if (tse?.stat === 'OK' && tse?.data) {
+    tse.data.forEach(row => {
+      const code = row[0]?.trim(); if (!code) return;
+      map[code] = { name: row[1]?.trim() || '', buy: toZ(row[2]), sell: toZ(row[3]), net: toZ(row[4]) };
+    });
+  }
+
+  // ── 上櫃 TPEX ──
+  const roc = parseInt(yyyymmdd.slice(0, 4)) - 1911;
+  const td  = `${roc}/${yyyymmdd.slice(4, 6)}/${yyyymmdd.slice(6, 8)}`;
+  const otcUrl = `https://www.tpex.org.tw/web/stock/3insti/daily_trade/3itrade_hedge_result.php?l=zh-tw&se=EW&t=D&d=${td}&s=0,asc,0&_=${bust}`;
+  const otc = await apiFetch(otcUrl);
+  if (otc?.aaData) {
+    otc.aaData.forEach(row => {
+      const code = row[0]?.trim(); if (!code || map[code]) return;
+      map[code] = { name: row[1]?.trim() || '', buy: toZ(row[2]), sell: toZ(row[3]), net: toZ(row[4]) };
+    });
+  }
+
+  if (!Object.keys(map).length) return null;
   allData[yyyymmdd] = map;
   return map;
 }
@@ -409,20 +729,23 @@ async function runScreener() {
 
     const buyDiff  = rA.buy  - rB.buy;
     const sellDiff = rA.sell - rB.sell;
-    const buyPct   = buyDiff / rB.buy;              // 買張增幅
-    const sellPct  = sellDiff / rB.sell;            // 賣張增幅
+    const buyPct   = buyDiff  / rB.buy;
+    const sellPct  = sellDiff / rB.sell;
+    const ratioA   = rA.buy / rA.sell;
+    const ratioB   = rB.buy / rB.sell;
+    const ratioPct = (ratioA - ratioB) / ratioB;
 
-    // ① 買張增幅 ≥ 35%
-    if (buyPct < 0.35) return;
-    // ② 賣張增幅 < 買張增幅 × 50%（排除只是量放大的假訊號）
-    if (sellPct >= buyPct * 0.5) return;
-
-    const ratioA   = rA.buy / rA.sell;              // 新日買賣比
-    const ratioB   = rB.buy / rB.sell;              // 舊日買賣比
-    const ratioPct = (ratioA - ratioB) / ratioB;   // 買賣比提升幅度
-
-    // ③ 買賣比提升幅度 ≥ 35%
-    if (ratioPct < 0.35) return;
+    if (filterType === 'sell') {
+      if (buyPct  < 0.35)          return; // ① 買張增幅 ≥ 35%
+      if (sellPct >= buyPct * 0.5) return; // ② 賣張增幅 < 買張增幅×50%
+      if (ratioPct < 0.35)         return; // ③ 買賣比提升 ≥ 35%
+    } else if (filterType === 'buy') {
+      if (sellPct  < 0.35)          return; // ① 賣張增幅 ≥ 35%
+      if (buyPct  >= sellPct * 0.5) return; // ② 買張增幅 < 賣張增幅×50%
+      if (ratioPct > -0.35)         return; // ③ 買賣比下降 ≥ 35%
+    } else {
+      if (buyPct < 0.35) return;            // 全部：只要買張增幅 ≥ 35%
+    }
 
     results.push({ code, name: rA.name,
       buyA: rA.buy, sellA: rA.sell, netA: rA.net,
@@ -539,15 +862,15 @@ async function showDetail(code) {
   const prev21 = tradingDates(21, dADate);
   const allDates = [dA, ...prev21];
 
-  // 逐一補抓未快取的日期
-  for (let i = 0; i < allDates.length; i++) {
-    const dt = allDates[i];
-    if (!allData[dt]) {
-      document.getElementById('detail-body').innerHTML =
-        `<div class="status"><div class="status-icon">⏳</div><div>載入資料 ${i+1} / ${allDates.length}</div></div>`;
-      await fetchT86(dt);
-      await sleep(250);
-    }
+  // 並行批次抓取（每批4筆同時發出，避免單次打爆 API）
+  const missing = allDates.filter(dt => !allData[dt]);
+  const BATCH = 4;
+  for (let i = 0; i < missing.length; i += BATCH) {
+    const batch = missing.slice(i, i + BATCH);
+    document.getElementById('detail-body').innerHTML =
+      `<div class="status"><div class="status-icon">⏳</div><div>載入資料 ${Math.min(i + BATCH, missing.length)} / ${missing.length}</div></div>`;
+    await Promise.all(batch.map(dt => fetchT86(dt)));
+    if (i + BATCH < missing.length) await sleep(80);
   }
 
   // 整理各日資料
@@ -596,25 +919,43 @@ async function showDetail(code) {
               <td class="text-right pos" style="font-size:15px;font-weight:600">${d.buy.toLocaleString()}</td>
               <td style="width:90px;padding:0 8px">
                 <div style="height:6px;background:#1e2636;border-radius:3px;overflow:hidden">
-                  <div style="height:100%;width:${buyBar}%;background:#3ecf6a;border-radius:3px"></div>
+                  <div style="height:100%;width:${buyBar}%;background:#f05151;border-radius:3px"></div>
                 </div>
               </td>
               <td class="text-right neg" style="font-size:15px;font-weight:600">${d.sell.toLocaleString()}</td>
               <td style="width:90px;padding:0 8px">
                 <div style="height:6px;background:#1e2636;border-radius:3px;overflow:hidden">
-                  <div style="height:100%;width:${sellBar}%;background:#f05151;border-radius:3px"></div>
+                  <div style="height:100%;width:${sellBar}%;background:#3ecf6a;border-radius:3px"></div>
                 </div>
               </td>
-              <td class="text-right" style="font-size:15px;font-weight:700;color:${d.net>=0?'#3ecf6a':'#f05151'}">${d.net>=0?'+':''}${d.net.toLocaleString()}</td>
+              <td class="text-right" style="font-size:15px;font-weight:700;color:${d.net>=0?'#f05151':'#3ecf6a'}">${d.net>=0?'+':''}${d.net.toLocaleString()}</td>
             </tr>`;
           }).join('')}
         </tbody>
       </table>
+    </div>
+
+    <div class="layer2">
+      <div class="layer2-title">第二層｜其他法人動向 × 籌碼確認</div>
+      <div class="layer2-note">以下需人工確認，全數符合才算強訊號</div>
+      <div class="layer2-items">
+        <label class="chk-item"><input type="checkbox"> <span>投信同向（買超或持平）</span></label>
+        <label class="chk-item"><input type="checkbox"> <span>大股東無申報轉讓</span></label>
+        <label class="chk-item"><input type="checkbox"> <span>融券增加（軋空潛力）</span></label>
+      </div>
     </div>`;
 }
 
 function closeDetail() {
   document.getElementById('detail-panel').classList.remove('open');
+}
+
+function updateCondLabels() {
+  const ft = document.getElementById('filter-type').value;
+  const isBuy = ft === 'buy';
+  document.getElementById('cond1').textContent = isBuy ? '① 賣張增幅 ≥ 35%'          : '① 買張增幅 ≥ 35%';
+  document.getElementById('cond2').textContent = isBuy ? '② 買張增幅 ＜ 賣張增幅 × 50%' : '② 賣張增幅 ＜ 買張增幅 × 50%';
+  document.getElementById('cond3').textContent = isBuy ? '③ 買賣比下降 ≥ 35%'          : '③ 買賣比提升 ≥ 35%';
 }
 </script>
 </body>
