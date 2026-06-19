@@ -13,7 +13,7 @@
       background: #131722;
       color: #D1D4DC;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 13px;
+      font-size: 19px;
       line-height: 1.4;
     }
 
@@ -21,23 +21,23 @@
     .header {
       background: #1E222D;
       border-bottom: 1px solid #2A2E39;
-      height: 50px;
+      height: 64px;
       display: flex;
       align-items: center;
-      padding: 0 14px;
+      padding: 0 20px;
       gap: 0;
     }
 
     .toolbar-title {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 12px;
+      gap: 7px;
+      font-size: 18px;
       font-weight: 700;
       color: #D1D4DC;
       letter-spacing: .02em;
-      padding-right: 12px;
-      margin-right: 10px;
+      padding-right: 18px;
+      margin-right: 15px;
       border-right: 1px solid #2A2E39;
       white-space: nowrap;
       flex-shrink: 0;
@@ -48,18 +48,18 @@
     .controls {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 13px;
       flex: 1;
     }
 
     .ctrl-block {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
     }
 
     .ctrl-block-label {
-      font-size: 9px;
+      font-size: 13px;
       color: #787B86;
       font-weight: 500;
       text-transform: uppercase;
@@ -72,14 +72,14 @@
       background: #131722;
       border: 1px solid #2A2E39;
       border-radius: 4px;
-      padding: 0 7px;
+      padding: 0 10px;
       color: #D1D4DC;
-      font-size: 12px;
+      font-size: 18px;
       font-family: inherit;
       outline: none;
       color-scheme: dark;
-      height: 30px;
-      line-height: 30px;
+      height: 40px;
+      line-height: 40px;
     }
 
     .ctrl-select:focus,
@@ -89,12 +89,12 @@
     }
 
     .op-symbol {
-      font-size: 12px;
+      font-size: 18px;
       font-weight: 700;
       color: #787B86;
       flex-shrink: 0;
       align-self: flex-end;
-      height: 30px;
+      height: 40px;
       display: flex;
       align-items: center;
       padding: 0 2px;
@@ -104,10 +104,10 @@
       background: #2962FF;
       border: none;
       border-radius: 4px;
-      padding: 0 16px;
-      height: 30px;
+      padding: 0 22px;
+      height: 40px;
       color: #fff;
-      font-size: 12px;
+      font-size: 18px;
       font-weight: 600;
       cursor: pointer;
       letter-spacing: .02em;
@@ -123,26 +123,26 @@
     .cond-bar {
       background: #1E222D;
       border-bottom: 1px solid #2A2E39;
-      padding: 6px 16px;
+      padding: 12px 22px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 7px;
     }
 
     .cond-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 13px;
       flex-wrap: wrap;
     }
 
     .layer-badge {
-      font-size: 10px;
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: .04em;
       text-transform: uppercase;
       border-radius: 4px;
-      padding: 2px 6px;
+      padding: 3px 9px;
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -163,9 +163,9 @@
       background: rgba(41,98,255,.08);
       border: 1px solid rgba(41,98,255,.2);
       color: #7BA3F8;
-      padding: 2px 8px;
+      padding: 4px 12px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 16px;
       font-weight: 500;
       white-space: nowrap;
     }
@@ -173,23 +173,23 @@
     .cond-sep {
       color: #787B86;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 16px;
       flex-shrink: 0;
     }
 
     .chk-item-bar {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 11px;
+      gap: 7px;
+      font-size: 16px;
       color: #787B86;
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
     }
     .chk-item-bar input[type=checkbox] {
-      width: 12px;
-      height: 12px;
+      width: 18px;
+      height: 18px;
       accent-color: #2962FF;
       cursor: pointer;
       flex-shrink: 0;
@@ -202,12 +202,12 @@
 
     /* ── META BAR ── */
     .meta {
-      padding: 4px 16px;
-      font-size: 11px;
+      padding: 8px 22px;
+      font-size: 16px;
       color: #787B86;
       background: #131722;
       border-bottom: 1px solid #2A2E39;
-      min-height: 24px;
+      min-height: 36px;
       display: flex;
       align-items: center;
     }
@@ -215,17 +215,17 @@
     /* ── STATUS ── */
     .status {
       text-align: center;
-      padding: 64px 24px;
+      padding: 96px 36px;
       color: #787B86;
-      font-size: 13px;
+      font-size: 19px;
     }
-    .status-icon { font-size: 40px; margin-bottom: 12px; }
-    .progress { margin-top: 6px; font-size: 11px; color: #787B86; }
+    .status-icon { font-size: 60px; margin-bottom: 18px; }
+    .progress { margin-top: 9px; font-size: 16px; color: #787B86; }
 
     /* ── RESULT COUNT ── */
     .result-count {
-      padding: 5px 16px;
-      font-size: 11px;
+      padding: 8px 22px;
+      font-size: 16px;
       color: #787B86;
       border-bottom: 1px solid #2A2E39;
     }
@@ -240,10 +240,10 @@
 
     th {
       background: #1E222D;
-      padding: 6px 12px;
+      padding: 9px 18px;
       color: #787B86;
       font-weight: 500;
-      font-size: 11px;
+      font-size: 16px;
       text-transform: uppercase;
       letter-spacing: .04em;
       white-space: nowrap;
@@ -256,10 +256,10 @@
     th.col-b { color: #5a7a96; }
 
     td {
-      padding: 5px 12px;
+      padding: 8px 18px;
       border-bottom: 1px solid #1E222D;
       white-space: nowrap;
-      font-size: 13px;
+      font-size: 19px;
     }
 
     tr { cursor: pointer; }
@@ -280,12 +280,12 @@
     /* ── STOCK CELL ── */
     .stock-code {
       font-weight: 700;
-      font-size: 14px;
+      font-size: 21px;
       color: #D1D4DC;
       line-height: 1.3;
     }
     .stock-name {
-      font-size: 11px;
+      font-size: 16px;
       color: #787B86;
       margin-top: 1px;
       line-height: 1.3;
@@ -294,9 +294,9 @@
     /* ── BADGE ── */
     .badge {
       display: inline-block;
-      padding: 2px 7px;
+      padding: 3px 10px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 16px;
       font-weight: 600;
     }
     .badge-sell {
@@ -311,10 +311,10 @@
     }
 
     /* ── PCT BAR ── */
-    .pct-bar { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .pct-bar { display: flex; align-items: center; gap: 13px; justify-content: flex-end; }
     .bar-bg {
-      width: 40px;
-      height: 4px;
+      width: 60px;
+      height: 6px;
       background: #2A2E39;
       border-radius: 2px;
       overflow: hidden;
@@ -337,7 +337,7 @@
       background: #1E222D;
       border-bottom: 1px solid #2A2E39;
       height: 48px;
-      padding: 0 16px;
+      padding: 0 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -348,7 +348,7 @@
 
     .detail-title {
       font-weight: 700;
-      font-size: 14px;
+      font-size: 21px;
       color: #D1D4DC;
     }
 
@@ -360,22 +360,22 @@
       height: 28px;
       color: #D1D4DC;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 19px;
       font-family: inherit;
       transition: background .15s;
     }
     .close-btn:hover { background: #363A45; }
 
-    .detail-body { padding: 16px 20px; max-width: 900px; }
+    .detail-body { padding: 24px 28px; max-width: 900px; }
 
     /* ── INFO BOX ── */
     .info-box {
       background: #1E222D;
       border-left: 3px solid #2962FF;
-      padding: 8px 14px;
+      padding: 12px 20px;
       border-radius: 4px;
-      margin-bottom: 12px;
-      font-size: 11px;
+      margin-bottom: 18px;
+      font-size: 16px;
       color: #787B86;
       line-height: 1.6;
     }
@@ -384,8 +384,8 @@
     .month-table-wrap { overflow-x: auto; }
     .month-table { width: 100%; border-collapse: collapse; }
     .month-table th {
-      padding: 6px 12px;
-      font-size: 10px;
+      padding: 9px 18px;
+      font-size: 15px;
       color: #787B86;
       font-weight: 500;
       border-bottom: 1px solid #2A2E39;
@@ -395,18 +395,18 @@
       white-space: nowrap;
     }
     .month-table td {
-      padding: 5px 12px;
+      padding: 8px 18px;
       border-bottom: 1px solid #1E222D;
       white-space: nowrap;
-      font-size: 12px;
+      font-size: 18px;
     }
     .month-table tr:hover td { background: #1C2C3E !important; }
 
     .day-tag {
       display: inline-block;
-      padding: 1px 5px;
+      padding: 2px 8px;
       border-radius: 3px;
-      font-size: 11px;
+      font-size: 16px;
       font-weight: 700;
       margin-left: 4px;
       vertical-align: middle;
@@ -424,14 +424,14 @@
 
     /* ── LAYER2 PANEL (detail view) ── */
     .layer2 {
-      margin-top: 14px;
+      margin-top: 20px;
       background: #1E222D;
       border: 1px solid #2A2E39;
       border-radius: 4px;
-      padding: 12px 16px;
+      padding: 18px 22px;
     }
     .layer2-title {
-      font-size: 11px;
+      font-size: 16px;
       font-weight: 700;
       color: #F0B90B;
       margin-bottom: 3px;
@@ -439,16 +439,16 @@
       letter-spacing: .04em;
     }
     .layer2-note {
-      font-size: 11px;
+      font-size: 16px;
       color: #787B86;
       margin-bottom: 10px;
     }
-    .layer2-items { display: flex; flex-direction: column; gap: 5px; }
+    .layer2-items { display: flex; flex-direction: column; gap: 7px; }
     .chk-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 13px;
+      gap: 12px;
+      font-size: 19px;
       color: #D1D4DC;
       cursor: pointer;
       user-select: none;
@@ -466,12 +466,57 @@
       background: rgba(240,185,11,.12);
       color: #F0B90B;
       border: 1px solid rgba(240,185,11,.25);
-      padding: 1px 5px;
+      padding: 2px 8px;
       border-radius: 3px;
-      font-size: 10px;
+      font-size: 15px;
       font-weight: 700;
       margin: 0 3px;
     }
+
+    /* ── HAMBURGER ── */
+    .hamburger {
+      background: none; border: none; color: #D1D4DC; font-size: 18px;
+      cursor: pointer; padding: 0 12px 0 0; line-height: 1; flex-shrink: 0;
+    }
+    .hamburger:hover { color: #fff; }
+
+    /* ── SIDEBAR ── */
+    .sb-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 299;
+    }
+    .sb-overlay.open { display: block; }
+
+    .sidebar {
+      position: fixed; top: 0; left: -260px; width: 240px; height: 100vh;
+      background: #1E222D; border-right: 1px solid #2A2E39;
+      z-index: 300; transition: left .22s ease; overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .sidebar.open { left: 0; }
+
+    .sb-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; border-bottom: 1px solid #2A2E39; flex-shrink: 0;
+    }
+    .sb-logo { font-size: 19px; font-weight: 700; color: #D1D4DC; }
+    .sb-close {
+      background: none; border: none; color: #787B86; font-size: 16px;
+      cursor: pointer; padding: 0; line-height: 1;
+    }
+    .sb-close:hover { color: #D1D4DC; }
+
+    .sb-nav { padding: 8px 0 24px; }
+    .sb-section-title {
+      font-size: 15px; font-weight: 700; color: #787B86; letter-spacing: .08em;
+      text-transform: uppercase; padding: 16px 16px 6px;
+    }
+    .sb-item {
+      display: block; padding: 7px 16px; font-size: 19px; color: #9AA3B2;
+      text-decoration: none; transition: background .12s, color .12s;
+    }
+    .sb-item:hover { background: #252931; color: #D1D4DC; }
+    .sb-item.sb-active { color: #D1D4DC; font-weight: 600; }
 
     /* ── MOBILE ── */
     @media (max-width: 640px) {
@@ -480,21 +525,21 @@
         flex-direction: column;
         align-items: flex-start;
         padding: 10px 14px;
-        gap: 8px;
+        gap: 12px;
       }
       .toolbar-title {
         height: auto;
         border-right: none;
         padding-right: 0;
         margin-right: 0;
-        font-size: 14px;
+        font-size: 21px;
         border-bottom: 1px solid #2A2E39;
         padding-bottom: 8px;
         width: 100%;
       }
       .controls {
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 12px;
         width: 100%;
       }
       .ctrl-block { flex: 1 1 120px; }
@@ -502,26 +547,26 @@
       .btn { flex: 0 0 auto; height: 36px; padding: 0 20px; }
       .op-symbol { display: none; }
 
-      .cond-bar { padding: 8px 14px; }
-      .cond-row { gap: 6px; }
-      .cond-item { font-size: 11px; padding: 2px 7px; }
-      .layer-badge { font-size: 10px; }
-      .chk-item-bar { font-size: 11px; }
+      .cond-bar { padding: 12px 20px; }
+      .cond-row { gap: 13px; }
+      .cond-item { font-size: 16px; padding: 3px 10px; }
+      .layer-badge { font-size: 15px; }
+      .chk-item-bar { font-size: 16px; }
 
-      .meta { padding: 4px 14px; font-size: 11px; }
+      .meta { padding: 4px 14px; font-size: 16px; }
       .result-count { padding: 6px 14px; }
 
-      th { padding: 7px 10px; font-size: 11px; }
-      td { padding: 6px 10px; font-size: 13px; }
-      .stock-code { font-size: 14px; }
-      .stock-name { font-size: 11px; }
+      th { padding: 7px 10px; font-size: 16px; }
+      td { padding: 6px 10px; font-size: 19px; }
+      .stock-code { font-size: 21px; }
+      .stock-name { font-size: 16px; }
 
       .detail-header { height: auto; padding: 10px 14px; }
       .detail-title { font-size: 16px; }
-      .close-btn { height: 32px; padding: 0 12px; font-size: 13px; }
+      .close-btn { height: 32px; padding: 0 12px; font-size: 19px; }
       .detail-body { padding: 12px 14px; }
-      .month-table td { padding: 5px 10px; font-size: 12px; }
-      .month-table th { padding: 5px 10px; font-size: 10px; }
+      .month-table td { padding: 5px 10px; font-size: 18px; }
+      .month-table th { padding: 5px 10px; font-size: 15px; }
 
       .layer2 { padding: 10px 12px; }
     }
@@ -529,10 +574,44 @@
 </head>
 <body>
 
-<!-- HEADER: 48px single row -->
+<!-- SIDEBAR OVERLAY -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <span class="sb-logo">📊 股票工具箱</span>
+    <button class="sb-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section-title">工具</div>
+    <a class="sb-item sb-active" href="../stock-monitor/">外資籌碼篩選</a>
+
+    <div class="sb-section-title">學習筆記</div>
+    <a class="sb-item" href="../股票/">首頁</a>
+    <a class="sb-item" href="../股票/strategy-glossary.html">策略筆記</a>
+    <a class="sb-item" href="../股票/trade-journal.html">交易日誌</a>
+    <a class="sb-item" href="../股票/advanced-indicators.html">進階指標精解</a>
+    <a class="sb-item" href="../股票/candlestick-patterns.html">K線形態</a>
+    <a class="sb-item" href="../股票/tradingview-guide.html">TradingView 指南</a>
+    <a class="sb-item" href="../股票/tv-indicators.html">TV 指標策略</a>
+
+    <div class="sb-section-title">課程</div>
+    <a class="sb-item" href="../股票/stock-course.html">台股課程</a>
+    <a class="sb-item" href="../股票/stock-glossary.html">股票名詞</a>
+    <a class="sb-item" href="../股票/stock-quiz.html">股票測驗</a>
+    <a class="sb-item" href="../股票/futures-course.html">期貨課程</a>
+    <a class="sb-item" href="../股票/futures-glossary.html">期貨名詞</a>
+    <a class="sb-item" href="../股票/us-stock-course.html">美股課程</a>
+    <a class="sb-item" href="../股票/us-futures-course.html">美期課程</a>
+  </nav>
+</div>
+
+<!-- HEADER: single row -->
 <div class="header">
+  <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="toolbar-title">
-    📊 外資籌碼篩選
+    外資籌碼篩選
   </div>
   <div class="controls">
     <div class="ctrl-block">
@@ -948,6 +1027,15 @@ async function showDetail(code) {
 
 function closeDetail() {
   document.getElementById('detail-panel').classList.remove('open');
+}
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
 }
 
 function updateCondLabels() {

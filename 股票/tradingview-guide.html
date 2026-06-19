@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradingView 上手指南 | 股學筆記</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+a{color:#58a6ff;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topbar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar-title{font-size:1.1rem;font-weight:700;color:#e6edf3}
+.topbar a{font-size:.85rem;color:#8b949e;padding:4px 10px;border-radius:6px;border:1px solid #30363d;transition:all .2s}
+.topbar a:hover{color:#58a6ff;border-color:#58a6ff;text-decoration:none}
+
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#1a1f2e 100%);padding:48px 20px 32px;text-align:center;border-bottom:1px solid #30363d}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:#8b949e;font-size:1rem;max-width:600px;margin:0 auto 8px}
+.hero-badge{display:inline-block;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:#60a5fa;font-size:.78rem;padding:4px 12px;border-radius:20px;margin-top:8px}
+
+.toc{max-width:900px;margin:24px auto;padding:0 20px}
+.toc-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px 24px}
+.toc-title{font-size:.78rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.toc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:#c9d1d9;font-size:.85rem;cursor:pointer;transition:background .15s;text-decoration:none}
+.toc-item:hover{background:#21262d;color:#58a6ff;text-decoration:none}
+.toc-num{font-size:.72rem;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#21262d;color:#8b949e}
+
+.filters{display:flex;gap:8px;padding:20px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
+.filter-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:6px 16px;border-radius:20px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.filter-btn:hover{border-color:#58a6ff;color:#58a6ff}
+.filter-btn.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa}
+.filter-btn.cat-screen.active{background:rgba(245,158,11,.15);border-color:#f59e0b;color:#f59e0b}
+.filter-btn.cat-chart.active{background:rgba(34,197,94,.15);border-color:#22c55e;color:#22c55e}
+.filter-btn.cat-watch.active{background:rgba(139,92,246,.15);border-color:#8b5cf6;color:#8b5cf6}
+.filter-btn.cat-alert.active{background:rgba(236,72,153,.15);border-color:#ec4899;color:#ec4899}
+.filter-btn.cat-strategy.active{background:rgba(244,63,94,.15);border-color:#f43f5e;color:#fb7185}
+
+.guide-grid{max-width:1100px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,500px),1fr));gap:24px}
+@media(max-width:640px){
+  .guide-grid{grid-template-columns:1fr;padding:12px 10px;gap:16px}
+  .toc-list{grid-template-columns:1fr 1fr}
+  .shortcut-grid{grid-template-columns:1fr}
+  .filters{gap:6px;padding:12px 10px}
+  .filter-btn{font-size:.78rem;padding:5px 11px}
+  .topbar{gap:8px;padding:10px 14px}
+  .topbar a{display:none}
+  .topbar a:first-of-type{display:inline}
+  .hero{padding:28px 14px 20px}
+  .hero h1{font-size:1.45rem}
+  .card-diagram svg{border-radius:6px}
+  .filter-recipe-title{font-size:.78rem}
+  .filter-row{font-size:.78rem}
+}
+
+.guide-card{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.guide-card:hover{border-color:#58a6ff;box-shadow:0 4px 20px rgba(88,166,255,.1)}
+.guide-card.cat-interface{border-top:3px solid #3b82f6}
+.guide-card.cat-screen{border-top:3px solid #f59e0b}
+.guide-card.cat-chart{border-top:3px solid #22c55e}
+.guide-card.cat-watch{border-top:3px solid #8b5cf6}
+.guide-card.cat-alert{border-top:3px solid #ec4899}
+.guide-card.cat-strategy{border-top:3px solid #f43f5e}
+
+.card-header{padding:20px 20px 0;display:flex;align-items:flex-start;gap:12px}
+.card-num{background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:.75rem;font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.card-meta{flex:1}
+.cat-tag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.cat-interface .cat-tag{background:rgba(59,130,246,.15);color:#60a5fa}
+.cat-screen .cat-tag{background:rgba(245,158,11,.15);color:#f59e0b}
+.cat-chart .cat-tag{background:rgba(34,197,94,.15);color:#22c55e}
+.cat-watch .cat-tag{background:rgba(139,92,246,.15);color:#8b5cf6}
+.cat-alert .cat-tag{background:rgba(236,72,153,.15);color:#ec4899}
+.cat-strategy .cat-tag{background:rgba(244,63,94,.15);color:#fb7185}
+.entry-box{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.25);border-left:3px solid #22c55e;border-radius:8px;padding:10px 14px;margin:8px 0}
+.entry-box h4{color:#22c55e;font-size:.78rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.stop-box{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-left:3px solid #ef4444;border-radius:8px;padding:10px 14px;margin:8px 0}
+.stop-box h4{color:#ef4444;font-size:.78rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.signal-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.sig{background:#21262d;border:1px solid #30363d;border-radius:6px;padding:3px 10px;font-size:.78rem;color:#c9d1d9}
+.sig.bull{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5}
+.sig.bear{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.3);color:#86efac}
+.sig.blue{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.sig.gold{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:#fcd34d}
+.card-title{font-size:1.05rem;font-weight:700;color:#e6edf3;line-height:1.3}
+.card-sub{font-size:.82rem;color:#8b949e;margin-top:3px}
+
+.card-diagram{padding:16px 20px 0}
+.card-diagram svg{width:100%;height:auto;display:block;border-radius:8px;background:#0d1117;border:1px solid #21262d}
+
+.card-body{padding:16px 20px 20px}
+.card-body p{font-size:.88rem;color:#8b949e;line-height:1.65;margin-bottom:6px}
+.card-body ul{padding-left:18px;margin:4px 0}
+.card-body li{font-size:.86rem;color:#8b949e;line-height:1.6;margin-bottom:3px}
+.card-body strong{color:#e6edf3}
+
+.blue-box{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-left:3px solid #3b82f6;border-radius:8px;padding:12px 14px;margin:10px 0}
+.blue-box h4{color:#60a5fa;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.gold-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-left:3px solid #f59e0b;border-radius:8px;padding:12px 14px;margin:10px 0}
+.gold-box h4{color:#f59e0b;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.green-box{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-left:3px solid #22c55e;border-radius:8px;padding:12px 14px;margin:10px 0}
+.green-box h4{color:#22c55e;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.red-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-left:3px solid #ef4444;border-radius:8px;padding:12px 14px;margin:10px 0}
+.red-box h4{color:#ef4444;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.purple-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-left:3px solid #8b5cf6;border-radius:8px;padding:12px 14px;margin:10px 0}
+.purple-box h4{color:#a78bfa;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.pink-box{background:rgba(236,72,153,.08);border:1px solid rgba(236,72,153,.25);border-left:3px solid #ec4899;border-radius:8px;padding:12px 14px;margin:10px 0}
+.pink-box h4{color:#f472b6;font-size:.8rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+
+.step-list{list-style:none;padding:0;margin:10px 0}
+.step-list li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #21262d;font-size:.86rem;color:#8b949e;line-height:1.55}
+.step-list li:last-child{border-bottom:none}
+.step-num{background:rgba(59,130,246,.2);color:#60a5fa;font-size:.72rem;font-weight:800;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-list li strong{color:#e6edf3}
+
+.shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.shortcut-item{display:flex;justify-content:space-between;align-items:center;background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:7px 10px;font-size:.8rem}
+.shortcut-key{background:#21262d;border:1px solid #30363d;border-radius:4px;padding:2px 7px;font-family:monospace;font-size:.78rem;color:#c9d1d9}
+.shortcut-desc{color:#8b949e}
+
+.filter-recipe{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 14px;margin:8px 0}
+.filter-recipe-title{font-size:.78rem;font-weight:700;color:#60a5fa;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.filter-row{display:flex;gap:8px;align-items:center;font-size:.82rem;color:#8b949e;padding:4px 0;flex-wrap:wrap}
+.filter-tag{background:#21262d;border:1px solid #30363d;border-radius:5px;padding:2px 8px;color:#c9d1d9;font-size:.78rem}
+.filter-op{color:#8b5cf6;font-size:.78rem;font-weight:700}
+.filter-val{color:#22c55e;font-weight:600;font-size:.82rem}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-title">TradingView 上手指南</span>
+  <a href="index.html">← 回主頁</a>
+  <a href="advanced-tips.html">進階技巧</a>
+  <a href="candlestick-patterns.html">K棒圖鑑</a>
+</div>
+
+<div class="hero">
+  <h1>TradingView 完整上手指南</h1>
+  <p>從介面認識、篩選器到選股清單與警示設定，一頁搞定 TradingView 核心功能</p>
+  <span class="hero-badge">適用 TradingView 網頁版 · 台股 TWSE / TPEx</span>
+</div>
+
+<div class="toc">
+  <div class="toc-box">
+    <div class="toc-title">目錄</div>
+    <div class="toc-list">
+      <a class="toc-item" href="#s1"><span class="toc-num">1</span>介面總覽</a>
+      <a class="toc-item" href="#s2"><span class="toc-num">2</span>切換台股 + 時間框架</a>
+      <a class="toc-item" href="#s3"><span class="toc-num">3</span>加入技術指標</a>
+      <a class="toc-item" href="#s4"><span class="toc-num">4</span>畫線工具</a>
+      <a class="toc-item" href="#s5"><span class="toc-num">5</span>股票篩選器開啟方式</a>
+      <a class="toc-item" href="#s6"><span class="toc-num">6</span>篩選器條件設定</a>
+      <a class="toc-item" href="#s7"><span class="toc-num">7</span>四大選股公式</a>
+      <a class="toc-item" href="#s8"><span class="toc-num">8</span>觀察清單</a>
+      <a class="toc-item" href="#s9"><span class="toc-num">9</span>警示設定（手機通知）</a>
+      <a class="toc-item" href="#s10"><span class="toc-num">10</span>版面儲存與快捷鍵</a>
+    </div>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filterCards('all',this)">全部 20</button>
+  <button class="filter-btn cat-interface" onclick="filterCards('cat-interface',this)">介面操作</button>
+  <button class="filter-btn cat-screen" onclick="filterCards('cat-screen',this)">篩選器</button>
+  <button class="filter-btn cat-chart" onclick="filterCards('cat-chart',this)">圖表設定</button>
+  <button class="filter-btn cat-watch" onclick="filterCards('cat-watch',this)">觀察清單</button>
+  <button class="filter-btn cat-alert" onclick="filterCards('cat-alert',this)">警示設定</button>
+  <button class="filter-btn cat-strategy" onclick="filterCards('cat-strategy',this)">台股交易策略 10</button>
+</div>
+
+<div class="guide-grid" id="guideGrid">
+
+<!-- ─── 1. 介面總覽 ─────────────────────────────────────────── -->
+<div class="guide-card cat-interface" id="s1">
+  <div class="card-header">
+    <div class="card-num">1</div>
+    <div class="card-meta">
+      <span class="cat-tag">介面操作</span>
+      <div class="card-title">介面總覽 — 認識每個區域</div>
+      <div class="card-sub">開啟 TradingView 後看到的所有區塊說明</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- 背景 -->
+      <rect width="480" height="280" fill="#0d1117"/>
+      <!-- 頂部工具列 -->
+      <rect x="0" y="0" width="480" height="36" fill="#161b22" rx="0"/>
+      <text x="10" y="14" font-size="8" fill="#8b949e" font-family="monospace">2330</text>
+      <rect x="50" y="5" width="28" height="16" rx="3" fill="#21262d"/>
+      <text x="64" y="15" font-size="7" fill="#c9d1d9" text-anchor="middle">1天</text>
+      <rect x="82" y="5" width="28" height="16" rx="3" fill="#21262d"/>
+      <text x="96" y="15" font-size="7" fill="#c9d1d9" text-anchor="middle">1週</text>
+      <rect x="120" y="5" width="46" height="16" rx="3" fill="#21262d"/>
+      <text x="143" y="15" font-size="7" fill="#60a5fa" text-anchor="middle">技術指標+</text>
+      <rect x="170" y="5" width="38" height="16" rx="3" fill="#21262d"/>
+      <text x="189" y="15" font-size="7" fill="#c9d1d9" text-anchor="middle">範本</text>
+      <rect x="420" y="5" width="50" height="16" rx="3" fill="#1d4ed8"/>
+      <text x="445" y="15" font-size="7" fill="#fff" text-anchor="middle">立即升級</text>
+      <!-- 左側工具 -->
+      <rect x="0" y="36" width="32" height="244" fill="#161b22"/>
+      <text x="16" y="58" font-size="9" fill="#8b949e" text-anchor="middle">✕</text>
+      <text x="16" y="78" font-size="9" fill="#8b949e" text-anchor="middle">╱</text>
+      <text x="16" y="98" font-size="9" fill="#8b949e" text-anchor="middle">↔</text>
+      <text x="16" y="118" font-size="9" fill="#8b949e" text-anchor="middle">☰</text>
+      <text x="16" y="138" font-size="9" fill="#8b949e" text-anchor="middle">T</text>
+      <text x="16" y="158" font-size="9" fill="#8b949e" text-anchor="middle">▷</text>
+      <text x="16" y="178" font-size="9" fill="#8b949e" text-anchor="middle">📐</text>
+      <!-- 主圖區 -->
+      <rect x="32" y="36" width="358" height="190" fill="#0d1117"/>
+      <!-- K棒示意 -->
+      <line x1="80" y1="80" x2="80" y2="160" stroke="#30363d" stroke-width="0.5"/>
+      <rect x="74" y="100" width="12" height="35" fill="#ef4444" rx="1"/>
+      <line x1="80" y1="96" x2="80" y2="104" stroke="#ef4444" stroke-width="1.5"/>
+      <line x1="80" y1="134" x2="80" y2="142" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="96" y="90" width="12" height="40" fill="#ef4444" rx="1"/>
+      <line x1="102" y1="85" x2="102" y2="94" stroke="#ef4444" stroke-width="1.5"/>
+      <line x1="102" y1="128" x2="102" y2="138" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="112" y="115" width="12" height="30" fill="#22c55e" rx="1"/>
+      <line x1="118" y1="108" x2="118" y2="119" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="118" y1="143" x2="118" y2="152" stroke="#22c55e" stroke-width="1.5"/>
+      <rect x="128" y="100" width="12" height="35" fill="#ef4444" rx="1"/>
+      <rect x="144" y="88" width="12" height="38" fill="#ef4444" rx="1"/>
+      <rect x="160" y="105" width="12" height="30" fill="#22c55e" rx="1"/>
+      <rect x="176" y="92" width="12" height="32" fill="#ef4444" rx="1"/>
+      <rect x="192" y="80" width="12" height="38" fill="#ef4444" rx="1"/>
+      <rect x="208" y="88" width="12" height="30" fill="#22c55e" rx="1"/>
+      <rect x="224" y="72" width="12" height="36" fill="#ef4444" rx="1"/>
+      <rect x="240" y="60" width="12" height="35" fill="#ef4444" rx="1"/>
+      <rect x="256" y="68" width="12" height="30" fill="#22c55e" rx="1"/>
+      <rect x="272" y="55" width="12" height="32" fill="#ef4444" rx="1"/>
+      <rect x="288" y="60" width="12" height="28" fill="#22c55e" rx="1"/>
+      <rect x="304" y="48" width="12" height="30" fill="#ef4444" rx="1"/>
+      <rect x="320" y="42" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="336" y="50" width="12" height="26" fill="#22c55e" rx="1"/>
+      <!-- MA線 -->
+      <polyline points="80,145 102,138 118,142 134,132 150,126 166,122 182,118 198,110 214,104 230,96 246,88 262,82 278,74 294,68 310,62 326,56 342,52" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+      <polyline points="80,155 102,150 118,148 134,144 150,140 166,136 182,130 198,124 214,118 230,112 246,104 262,98 278,90 294,84 310,78 326,72 342,66" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+      <!-- 成交量區 -->
+      <rect x="32" y="226" width="358" height="54" fill="#0d1117"/>
+      <line x1="32" y1="226" x2="390" y2="226" stroke="#21262d" stroke-width="1"/>
+      <rect x="74" y="245" width="12" height="32" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="96" y="240" width="12" height="37" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="112" y="250" width="12" height="27" fill="rgba(34,197,94,.4)" rx="1"/>
+      <rect x="128" y="242" width="12" height="35" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="144" y="235" width="12" height="42" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="160" y="248" width="12" height="29" fill="rgba(34,197,94,.4)" rx="1"/>
+      <rect x="176" y="243" width="12" height="34" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="192" y="238" width="12" height="39" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="208" y="250" width="12" height="27" fill="rgba(34,197,94,.4)" rx="1"/>
+      <rect x="224" y="242" width="12" height="35" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="240" y="232" width="12" height="45" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="256" y="248" width="12" height="29" fill="rgba(34,197,94,.4)" rx="1"/>
+      <rect x="272" y="245" width="12" height="32" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="288" y="250" width="12" height="27" fill="rgba(34,197,94,.4)" rx="1"/>
+      <rect x="304" y="240" width="12" height="37" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="320" y="234" width="12" height="43" fill="rgba(239,68,68,.4)" rx="1"/>
+      <rect x="336" y="247" width="12" height="30" fill="rgba(34,197,94,.4)" rx="1"/>
+      <!-- 右側面板 -->
+      <rect x="390" y="36" width="90" height="244" fill="#161b22"/>
+      <line x1="390" y1="36" x2="390" y2="280" stroke="#30363d" stroke-width="1"/>
+      <!-- 右側圖示 -->
+      <circle cx="420" cy="60" r="12" fill="#21262d"/>
+      <text x="420" y="64" font-size="10" fill="#8b949e" text-anchor="middle">☆</text>
+      <circle cx="450" cy="60" r="12" fill="#21262d"/>
+      <text x="450" y="64" font-size="8" fill="#8b949e" text-anchor="middle">☰</text>
+      <text x="406" y="82" font-size="7" fill="#60a5fa">← 觀察清單</text>
+      <text x="406" y="94" font-size="7" fill="#60a5fa">← 篩選器入口</text>
+      <rect x="394" y="100" width="82" height="160" fill="#0d1117" rx="4"/>
+      <text x="435" y="116" font-size="7" fill="#8b949e" text-anchor="middle">觀察清單</text>
+      <text x="398" y="132" font-size="7" fill="#c9d1d9">2330 台積電</text>
+      <text x="398" y="145" font-size="7" fill="#c9d1d9">0050 元大台灣</text>
+      <text x="398" y="158" font-size="7" fill="#c9d1d9">2454 聯發科</text>
+      <text x="398" y="171" font-size="7" fill="#c9d1d9">2308 台達電</text>
+      <text x="398" y="184" font-size="7" fill="#c9d1d9">2317 鴻海</text>
+      <!-- 標籤說明 -->
+      <rect x="32" y="196" width="65" height="14" rx="3" fill="rgba(59,130,246,.2)" stroke="#3b82f6" stroke-width="0.8"/>
+      <text x="64" y="205" font-size="7" fill="#60a5fa" text-anchor="middle">主K線圖區</text>
+      <rect x="32" y="259" width="55" height="14" rx="3" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width="0.8"/>
+      <text x="59" y="268" font-size="7" fill="#22c55e" text-anchor="middle">成交量副圖</text>
+      <rect x="0" y="155" width="30" height="14" rx="3" fill="rgba(245,158,11,.2)" stroke="#f59e0b" stroke-width="0.8"/>
+      <text x="15" y="164" font-size="7" fill="#f59e0b" text-anchor="middle">畫線工具</text>
+      <rect x="0" y="10" width="30" height="14" rx="3" fill="rgba(139,92,246,.2)" stroke="#8b5cf6" stroke-width="0.8"/>
+      <text x="15" y="19" font-size="7" fill="#a78bfa" text-anchor="middle">頂部工具</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="blue-box">
+      <h4>五大區域</h4>
+      <ul>
+        <li><strong>頂部工具列</strong>：股票搜尋、時間框架切換、加技術指標、儲存版面</li>
+        <li><strong>左側工具欄</strong>：畫線、畫趨勢線、加文字標籤、量測工具</li>
+        <li><strong>主K線圖區</strong>：拖曳縮放、滾輪放大縮小</li>
+        <li><strong>副圖區</strong>：成交量、KD、RSI 等指標顯示在這裡</li>
+        <li><strong>右側面板</strong>：觀察清單、警示、新聞、篩選器入口（圓形圖示列）</li>
+      </ul>
+    </div>
+    <p>右側最邊緣有一排<strong>垂直圓形圖示</strong>，第一個是觀察清單，第二個是篩選器，這是股票篩選器的入口。</p>
+  </div>
+</div>
+
+<!-- ─── 2. 切換台股 + 時間框架 ────────────────────────────────── -->
+<div class="guide-card cat-interface" id="s2">
+  <div class="card-header">
+    <div class="card-num">2</div>
+    <div class="card-meta">
+      <span class="cat-tag">介面操作</span>
+      <div class="card-title">搜尋台股 + 切換時間框架</div>
+      <div class="card-sub">找到台股股票，並切換到適合的K線周期</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="180" fill="#0d1117"/>
+      <!-- 搜尋框 -->
+      <rect x="20" y="20" width="200" height="34" rx="6" fill="#161b22" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="36" y="41" font-size="11" fill="#60a5fa">🔍 搜尋 2330</text>
+      <!-- 搜尋結果 -->
+      <rect x="20" y="58" width="200" height="100" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+      <rect x="24" y="62" width="192" height="24" rx="4" fill="#1d4ed8"/>
+      <text x="34" y="76" font-size="9" fill="#fff" font-weight="700">2330 · TWSE</text>
+      <text x="34" y="86" font-size="8" fill="#93c5fd">台積電 ← 選這個（台股）</text>
+      <rect x="24" y="90" width="192" height="22" rx="4" fill="transparent"/>
+      <text x="34" y="102" font-size="9" fill="#8b949e">TSM · NYSE</text>
+      <text x="34" y="112" font-size="8" fill="#6b7280">TSMC ADS（美股，勿選）</text>
+      <rect x="24" y="116" width="192" height="22" rx="4" fill="transparent"/>
+      <text x="34" y="128" font-size="9" fill="#8b949e">2330 · TPEX</text>
+      <text x="34" y="138" font-size="8" fill="#6b7280">（興櫃，非台積電）</text>
+      <text x="130" y="154" font-size="8" fill="#22c55e" text-anchor="middle">選 TWSE = 台灣證交所</text>
+      <!-- 時間框架 -->
+      <rect x="250" y="20" width="210" height="140" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="355" y="38" font-size="9" fill="#8b949e" text-anchor="middle" font-weight="700">時間框架快速切換</text>
+      <rect x="262" y="46" width="38" height="22" rx="4" fill="#21262d"/>
+      <text x="281" y="60" font-size="8" fill="#c9d1d9" text-anchor="middle">1分</text>
+      <rect x="304" y="46" width="38" height="22" rx="4" fill="#21262d"/>
+      <text x="323" y="60" font-size="8" fill="#c9d1d9" text-anchor="middle">5分</text>
+      <rect x="346" y="46" width="38" height="22" rx="4" fill="#21262d"/>
+      <text x="365" y="60" font-size="8" fill="#c9d1d9" text-anchor="middle">15分</text>
+      <rect x="388" y="46" width="38" height="22" rx="4" fill="#21262d"/>
+      <text x="407" y="60" font-size="8" fill="#c9d1d9" text-anchor="middle">60分</text>
+      <rect x="262" y="74" width="38" height="22" rx="4" fill="#1d4ed8"/>
+      <text x="281" y="88" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">日K</text>
+      <rect x="304" y="74" width="38" height="22" rx="4" fill="#21262d"/>
+      <text x="323" y="88" font-size="8" fill="#c9d1d9" text-anchor="middle">週K</text>
+      <rect x="346" y="74" width="38" height="22" rx="4" fill="#21262d"/>
+      <text x="365" y="88" font-size="8" fill="#c9d1d9" text-anchor="middle">月K</text>
+      <text x="355" y="118" font-size="8" fill="#f59e0b" text-anchor="middle">建議：先看週K掌握大方向</text>
+      <text x="355" y="132" font-size="8" fill="#f59e0b" text-anchor="middle">再看日K確認進出場時機</text>
+      <text x="355" y="146" font-size="8" fill="#8b949e" text-anchor="middle">短線可加看 60 分 K</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <ul class="step-list">
+      <li><span class="step-num">1</span>左上角點搜尋框（或按 <strong>/</strong> 鍵），輸入股票代號如 <strong>2330</strong></li>
+      <li><span class="step-num">2</span>結果列表選 <strong>TWSE</strong>（台灣證交所），勿選 NYSE（美股 ADR）</li>
+      <li><span class="step-num">3</span>上方時間列選擇 <strong>日K</strong> 開始分析，或自訂輸入 D/W/M</li>
+    </ul>
+    <div class="gold-box">
+      <h4>多週期分析流程</h4>
+      <p style="margin:0;font-size:.86rem;color:#c9d1d9">月K → 看長期趨勢方向 &nbsp;|&nbsp; 週K → 確認支撐壓力 &nbsp;|&nbsp; 日K → 找進出場時機 &nbsp;|&nbsp; 60分K → 短線精確進場點</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 3. 加入技術指標 ────────────────────────────────────────── -->
+<div class="guide-card cat-chart" id="s3">
+  <div class="card-header">
+    <div class="card-num">3</div>
+    <div class="card-meta">
+      <span class="cat-tag">圖表設定</span>
+      <div class="card-title">加入技術指標（均線/KD/RSI/布林）</div>
+      <div class="card-sub">點技術指標按鈕新增，完成後儲存為預設版面</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="220" fill="#0d1117"/>
+      <!-- 頂部 -->
+      <rect x="0" y="0" width="480" height="32" fill="#161b22"/>
+      <rect x="120" y="6" width="70" height="20" rx="4" fill="#3b82f6"/>
+      <text x="155" y="19" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">技術指標 ▾</text>
+      <text x="80" y="19" font-size="8" fill="#8b949e">← 點這裡</text>
+      <!-- 搜尋框 -->
+      <rect x="20" y="44" width="180" height="24" rx="5" fill="#21262d" stroke="#30363d"/>
+      <text x="35" y="58" font-size="9" fill="#6b7280">搜尋指標名稱…</text>
+      <!-- 指標列表 -->
+      <rect x="20" y="76" width="180" height="132" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="30" y="94" font-size="8" fill="#8b949e" font-weight="700">常用</text>
+      <rect x="24" y="100" width="172" height="22" rx="3" fill="#21262d"/>
+      <text x="30" y="113" font-size="8.5" fill="#e6edf3">移動平均線（MA）</text>
+      <text x="172" y="113" font-size="8" fill="#22c55e">+</text>
+      <rect x="24" y="126" width="172" height="22" rx="3" fill="transparent"/>
+      <text x="30" y="139" font-size="8.5" fill="#c9d1d9">隨機指標（KD）</text>
+      <text x="172" y="139" font-size="8" fill="#22c55e">+</text>
+      <rect x="24" y="150" width="172" height="22" rx="3" fill="transparent"/>
+      <text x="30" y="163" font-size="8.5" fill="#c9d1d9">相對強弱指標（RSI）</text>
+      <text x="172" y="163" font-size="8" fill="#22c55e">+</text>
+      <rect x="24" y="174" width="172" height="22" rx="3" fill="transparent"/>
+      <text x="30" y="187" font-size="8.5" fill="#c9d1d9">布林通道（BB）</text>
+      <text x="172" y="187" font-size="8" fill="#22c55e">+</text>
+      <!-- 右側設定 -->
+      <rect x="230" y="44" width="230" height="164" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="345" y="62" font-size="9" fill="#60a5fa" text-anchor="middle" font-weight="700">移動平均線 設定</text>
+      <text x="242" y="82" font-size="8" fill="#8b949e">類型</text>
+      <rect x="290" y="72" width="60" height="16" rx="3" fill="#21262d"/>
+      <text x="320" y="82" font-size="7.5" fill="#c9d1d9" text-anchor="middle">SMA（簡單）</text>
+      <text x="242" y="102" font-size="8" fill="#8b949e">長度（週期）</text>
+      <rect x="320" y="92" width="36" height="16" rx="3" fill="#21262d" stroke="#3b82f6" stroke-width="1"/>
+      <text x="338" y="102" font-size="8" fill="#60a5fa" text-anchor="middle">50</text>
+      <text x="242" y="122" font-size="8" fill="#8b949e">顏色</text>
+      <rect x="290" y="112" width="24" height="16" rx="3" fill="#3b82f6"/>
+      <text x="242" y="142" font-size="8" fill="#f59e0b">重複加3條 → 50 / 150 / 200</text>
+      <text x="242" y="156" font-size="8" fill="#f59e0b">50=藍 150=紅 200=橘</text>
+      <rect x="230" y="170" width="230" height="30" rx="5" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="1"/>
+      <text x="345" y="190" font-size="9" fill="#22c55e" text-anchor="middle">設好後點「確定」儲存</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <ul class="step-list">
+      <li><span class="step-num">1</span>頂部點 <strong>技術指標</strong>（或按 <strong>Alt+I</strong>），搜尋指標名稱</li>
+      <li><span class="step-num">2</span>點 <strong>移動平均線（MA）</strong>，設定週期50，顏色藍色，按確定</li>
+      <li><span class="step-num">3</span>再重複加兩條：週期<strong>150</strong>（紅色）和<strong>200</strong>（橘色）</li>
+      <li><span class="step-num">4</span>再加 <strong>KD（隨機）</strong>：週期9，K值藍色、D值紅色</li>
+      <li><span class="step-num">5</span>加 <strong>RSI</strong>：週期14，超買線70、超賣線30</li>
+    </ul>
+    <div class="green-box">
+      <h4>儲存為預設版面</h4>
+      <p style="margin:0;font-size:.86rem;color:#c9d1d9">設定好後點頂部的「<strong>版面</strong>」→「儲存版面配置」→ 取名，之後每次開啟圖表都會自動套用。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 4. 畫線工具 ────────────────────────────────────────────── -->
+<div class="guide-card cat-chart" id="s4">
+  <div class="card-header">
+    <div class="card-num">4</div>
+    <div class="card-meta">
+      <span class="cat-tag">圖表設定</span>
+      <div class="card-title">畫線工具 — 支撐壓力線、趨勢線</div>
+      <div class="card-sub">在圖表上標記關鍵價位，輔助判斷進出場</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 左側工具 -->
+      <rect x="0" y="0" width="40" height="200" fill="#161b22"/>
+      <!-- 工具圖示 -->
+      <rect x="6" y="12" width="28" height="28" rx="4" fill="#3b82f6"/>
+      <text x="20" y="30" font-size="10" fill="#fff" text-anchor="middle">╱</text>
+      <text x="20" y="45" font-size="7" fill="#60a5fa" text-anchor="middle">選中</text>
+      <rect x="6" y="52" width="28" height="28" rx="4" fill="#21262d"/>
+      <text x="20" y="70" font-size="10" fill="#8b949e" text-anchor="middle">↔</text>
+      <text x="20" y="85" font-size="7" fill="#8b949e" text-anchor="middle">水平線</text>
+      <rect x="6" y="92" width="28" height="28" rx="4" fill="#21262d"/>
+      <text x="20" y="110" font-size="10" fill="#8b949e" text-anchor="middle">↗</text>
+      <text x="20" y="125" font-size="7" fill="#8b949e" text-anchor="middle">趨勢線</text>
+      <rect x="6" y="132" width="28" height="28" rx="4" fill="#21262d"/>
+      <text x="20" y="150" font-size="10" fill="#8b949e" text-anchor="middle">□</text>
+      <text x="20" y="165" font-size="7" fill="#8b949e" text-anchor="middle">矩形</text>
+      <rect x="6" y="172" width="28" height="28" rx="4" fill="#21262d"/>
+      <text x="20" y="190" font-size="9" fill="#8b949e" text-anchor="middle">T</text>
+      <!-- 主圖 -->
+      <rect x="40" y="0" width="440" height="200" fill="#0d1117"/>
+      <!-- K棒 -->
+      <rect x="60" y="80" width="10" height="35" fill="#ef4444" rx="1"/>
+      <rect x="78" y="70" width="10" height="40" fill="#ef4444" rx="1"/>
+      <rect x="96" y="90" width="10" height="30" fill="#22c55e" rx="1"/>
+      <rect x="114" y="75" width="10" height="38" fill="#ef4444" rx="1"/>
+      <rect x="132" y="65" width="10" height="35" fill="#ef4444" rx="1"/>
+      <rect x="150" y="78" width="10" height="30" fill="#22c55e" rx="1"/>
+      <rect x="168" y="60" width="10" height="32" fill="#ef4444" rx="1"/>
+      <rect x="186" y="50" width="10" height="35" fill="#ef4444" rx="1"/>
+      <rect x="204" y="62" width="10" height="28" fill="#22c55e" rx="1"/>
+      <rect x="222" y="45" width="10" height="32" fill="#ef4444" rx="1"/>
+      <rect x="240" y="38" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="258" y="42" width="10" height="26" fill="#22c55e" rx="1"/>
+      <rect x="276" y="35" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="294" y="30" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="312" y="34" width="10" height="24" fill="#22c55e" rx="1"/>
+      <rect x="330" y="28" width="10" height="25" fill="#ef4444" rx="1"/>
+      <rect x="348" y="22" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="366" y="26" width="10" height="24" fill="#22c55e" rx="1"/>
+      <rect x="384" y="20" width="10" height="24" fill="#ef4444" rx="1"/>
+      <rect x="402" y="16" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="420" y="20" width="10" height="20" fill="#22c55e" rx="1"/>
+      <!-- 水平壓力線 -->
+      <line x1="40" y1="75" x2="460" y2="75" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="5,4"/>
+      <text x="444" y="73" font-size="8" fill="#ef4444">壓力</text>
+      <!-- 水平支撐線 -->
+      <line x1="40" y1="113" x2="460" y2="113" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="5,4"/>
+      <text x="440" y="111" font-size="8" fill="#22c55e">支撐</text>
+      <!-- 趨勢線 -->
+      <line x1="70" y1="115" x2="430" y2="40" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="280" y="100" font-size="8" fill="#f59e0b">上升趨勢線</text>
+      <!-- 說明框 -->
+      <rect x="48" y="150" width="200" height="42" rx="5" fill="rgba(59,130,246,.1)" stroke="#3b82f6" stroke-width="0.8"/>
+      <text x="148" y="165" font-size="7.5" fill="#60a5fa" text-anchor="middle">📌 畫水平線：選左側 ↔ 工具</text>
+      <text x="148" y="177" font-size="7.5" fill="#60a5fa" text-anchor="middle">點擊高點或低點即可拉線</text>
+      <text x="148" y="189" font-size="7.5" fill="#60a5fa" text-anchor="middle">雙擊可修改顏色/粗細</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="shortcut-grid">
+      <div class="shortcut-item"><span class="shortcut-desc">水平線（支撐壓力）</span><span class="shortcut-key">Alt+H</span></div>
+      <div class="shortcut-item"><span class="shortcut-desc">趨勢線</span><span class="shortcut-key">Alt+T</span></div>
+      <div class="shortcut-item"><span class="shortcut-desc">刪除選中的線</span><span class="shortcut-key">Del</span></div>
+      <div class="shortcut-item"><span class="shortcut-desc">複製圖表連結</span><span class="shortcut-key">Alt+S</span></div>
+    </div>
+    <p>畫線後<strong>雙擊</strong>可修改顏色、線型（實線/虛線）、延伸方式。右鍵選「延伸至左/右」讓線條貫穿整張圖。</p>
+    <div class="blue-box">
+      <h4>常用畫線邏輯</h4>
+      <ul>
+        <li>連接<strong>多個高點</strong>畫壓力線（紅色虛線）</li>
+        <li>連接<strong>多個低點</strong>畫支撐線（綠色虛線）</li>
+        <li>缺口上下緣各畫一條線標記缺口區間</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 5. 篩選器開啟 ─────────────────────────────────────────── -->
+<div class="guide-card cat-screen" id="s5">
+  <div class="card-header">
+    <div class="card-num">5</div>
+    <div class="card-meta">
+      <span class="cat-tag">篩選器</span>
+      <div class="card-title">股票篩選器（Screener）怎麼開啟</div>
+      <div class="card-sub">只有網頁版才有完整篩選器，App 版功能受限</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 方法1：右側圖示 -->
+      <rect x="10" y="10" width="220" height="175" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="120" y="30" font-size="9" fill="#f59e0b" text-anchor="middle" font-weight="700">方法一：從圖表右側進入</text>
+      <!-- 右側圖示欄模擬 -->
+      <rect x="170" y="50" width="48" height="120" rx="6" fill="#0d1117" stroke="#21262d"/>
+      <circle cx="194" cy="73" r="16" fill="#21262d"/>
+      <text x="194" y="77" font-size="11" fill="#8b949e" text-anchor="middle">☆</text>
+      <circle cx="194" cy="105" r="16" fill="#3b82f6"/>
+      <text x="194" y="109" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">☰</text>
+      <circle cx="194" cy="137" r="16" fill="#21262d"/>
+      <text x="194" y="141" font-size="9" fill="#8b949e" text-anchor="middle">🔔</text>
+      <text x="150" y="107" font-size="8" fill="#22c55e">← 點這個</text>
+      <!-- 箭頭 -->
+      <line x1="155" y1="105" x2="175" y2="105" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="30" y="65" font-size="8.5" fill="#c9d1d9">1. 開啟任意股票圖表</text>
+      <text x="30" y="82" font-size="8.5" fill="#c9d1d9">2. 右側邊欄找圓形圖示列</text>
+      <text x="30" y="99" font-size="8.5" fill="#c9d1d9">3. 點第二個「表格」圖示</text>
+      <text x="30" y="116" font-size="8.5" fill="#c9d1d9">4. 選「股票篩選器」</text>
+      <text x="30" y="148" font-size="8" fill="#8b949e">台股需先設市場為</text>
+      <text x="30" y="162" font-size="8" fill="#60a5fa">TW（台灣）→ TWSE/TPEx</text>
+      <!-- 方法2：直接從首頁 -->
+      <rect x="246" y="10" width="224" height="175" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="358" y="30" font-size="9" fill="#f59e0b" text-anchor="middle" font-weight="700">方法二：TradingView 首頁</text>
+      <rect x="258" y="42" width="200" height="130" rx="6" fill="#0d1117" stroke="#21262d"/>
+      <text x="358" y="62" font-size="8.5" fill="#8b949e" text-anchor="middle">tw.tradingview.com</text>
+      <rect x="266" y="70" width="184" height="22" rx="4" fill="#21262d"/>
+      <text x="358" y="83" font-size="8.5" fill="#c9d1d9" text-anchor="middle">產品 ▾</text>
+      <text x="298" y="105" font-size="8" fill="#60a5fa">↓ 展開產品選單</text>
+      <rect x="266" y="114" width="90" height="22" rx="4" fill="#1d4ed8"/>
+      <text x="311" y="127" font-size="8" fill="#fff" text-anchor="middle">股票篩選器</text>
+      <text x="358" y="160" font-size="7.5" fill="#8b949e" text-anchor="middle">直接進入篩選器頁面</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="gold-box">
+      <h4>注意：只有網頁版才完整</h4>
+      <p style="margin:0;font-size:.86rem;color:#c9d1d9">手機 App 篩選器功能非常少，建議在電腦開 <strong>tw.tradingview.com</strong>，然後把想關注的股票加入觀察清單，再到手機 App 查看。</p>
+    </div>
+    <ul class="step-list">
+      <li><span class="step-num">1</span>進入篩選器後，先點左上角<strong>市場</strong>，選「TW」</li>
+      <li><span class="step-num">2</span>選取所屬交易所：<strong>TWSE</strong>（上市）或 <strong>TPEx</strong>（上櫃）</li>
+      <li><span class="step-num">3</span>現在顯示的就是全部台股，再依條件篩選</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── 6. 篩選器條件設定 ─────────────────────────────────────── -->
+<div class="guide-card cat-screen" id="s6">
+  <div class="card-header">
+    <div class="card-num">6</div>
+    <div class="card-meta">
+      <span class="cat-tag">篩選器</span>
+      <div class="card-title">篩選器條件設定技巧</div>
+      <div class="card-sub">加入篩選條件、組合多條件、儲存篩選組合</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 篩選列 -->
+      <rect x="10" y="10" width="460" height="36" rx="6" fill="#161b22" stroke="#30363d"/>
+      <rect x="18" y="18" width="40" height="20" rx="4" fill="#21262d"/>
+      <text x="38" y="30" font-size="7.5" fill="#c9d1d9" text-anchor="middle">TW ≡</text>
+      <rect x="64" y="18" width="55" height="20" rx="4" fill="#21262d"/>
+      <text x="91" y="30" font-size="7.5" fill="#c9d1d9" text-anchor="middle">價格 % ▾</text>
+      <rect x="124" y="18" width="55" height="20" rx="4" fill="#21262d"/>
+      <text x="151" y="30" font-size="7.5" fill="#c9d1d9" text-anchor="middle">成交量 ▾</text>
+      <rect x="184" y="18" width="45" height="20" rx="4" fill="#21262d"/>
+      <text x="206" y="30" font-size="7.5" fill="#c9d1d9" text-anchor="middle">總市值 ▾</text>
+      <rect x="234" y="18" width="35" height="20" rx="4" fill="#21262d"/>
+      <text x="251" y="30" font-size="7.5" fill="#c9d1d9" text-anchor="middle">P/E ▾</text>
+      <rect x="274" y="18" width="50" height="20" rx="4" fill="#3b82f6"/>
+      <text x="299" y="30" font-size="7.5" fill="#fff" text-anchor="middle">+ 新增篩選</text>
+      <!-- 下拉選單 -->
+      <rect x="10" y="55" width="220" height="135" rx="6" fill="#161b22" stroke="#3b82f6" stroke-width="1"/>
+      <text x="120" y="72" font-size="8.5" fill="#60a5fa" text-anchor="middle" font-weight="700">可新增的篩選條件</text>
+      <line x1="14" y1="78" x2="226" y2="78" stroke="#21262d"/>
+      <text x="20" y="92" font-size="8" fill="#8b949e">技術指標</text>
+      <text x="20" y="106" font-size="8" fill="#c9d1d9">  MA 均線位置（在MA上/下方）</text>
+      <text x="20" y="118" font-size="8" fill="#c9d1d9">  RSI 值範圍</text>
+      <text x="20" y="130" font-size="8" fill="#c9d1d9">  布林通道位置</text>
+      <text x="20" y="142" font-size="8" fill="#8b949e">基本面</text>
+      <text x="20" y="154" font-size="8" fill="#c9d1d9">  每股盈餘 EPS 成長率</text>
+      <text x="20" y="166" font-size="8" fill="#c9d1d9">  股息殖利率</text>
+      <text x="20" y="178" font-size="8" fill="#c9d1d9">  P/E 本益比</text>
+      <!-- 右側條件設定 -->
+      <rect x="244" y="55" width="226" height="135" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="357" y="72" font-size="8.5" fill="#e6edf3" text-anchor="middle" font-weight="700">成交量 條件設定</text>
+      <text x="254" y="92" font-size="7.5" fill="#8b949e">大於 / 小於 / 區間</text>
+      <rect x="254" y="98" width="60" height="20" rx="4" fill="#21262d"/>
+      <text x="284" y="111" font-size="7.5" fill="#c9d1d9" text-anchor="middle">大於</text>
+      <rect x="320" y="98" width="60" height="20" rx="4" fill="#21262d" stroke="#3b82f6" stroke-width="1"/>
+      <text x="350" y="111" font-size="7.5" fill="#60a5fa" text-anchor="middle">3000 張</text>
+      <line x1="248" y1="126" x2="466" y2="126" stroke="#21262d"/>
+      <text x="254" y="142" font-size="7.5" fill="#8b949e">相對於成交量均量</text>
+      <rect x="254" y="148" width="100" height="20" rx="4" fill="#21262d"/>
+      <text x="304" y="161" font-size="7.5" fill="#c9d1d9" text-anchor="middle">成交量 &gt; 均量 1.5 倍</text>
+      <rect x="254" y="172" width="80" height="16" rx="4" fill="#22c55e"/>
+      <text x="294" y="182" font-size="7.5" fill="#000" text-anchor="middle" font-weight="700">確定</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <p>篩選器上方有<strong>預設欄位</strong>（價格、成交量、市值等），點欄位直接設定範圍。點「<strong>篩選條件</strong>」可以加入更多技術面或基本面條件。</p>
+    <div class="gold-box">
+      <h4>常用篩選欄位對照</h4>
+      <ul>
+        <li><strong>成交量</strong> → 過濾冷門低流動性股票，建議 &gt; 1000 張</li>
+        <li><strong>漲跌幅 %</strong> → 當日異動股，設 &gt;3% 或 &lt;-3%</li>
+        <li><strong>總市值</strong> → 過濾過小的公司，建議 &gt; 50 億</li>
+        <li><strong>MA 位置</strong> → 股價站上/跌破某均線</li>
+        <li><strong>RSI(14)</strong> → 超賣條件設 &lt; 30，超買設 &gt; 70</li>
+      </ul>
+    </div>
+    <p>設定好後點「<strong>儲存篩選</strong>」（上方按鈕）可以命名保存，下次直接套用不用重設。</p>
+  </div>
+</div>
+
+<!-- ─── 7. 四大選股公式 ────────────────────────────────────────── -->
+<div class="guide-card cat-screen" id="s7">
+  <div class="card-header">
+    <div class="card-num">7</div>
+    <div class="card-meta">
+      <span class="cat-tag">篩選器</span>
+      <div class="card-title">四大實用選股公式</div>
+      <div class="card-sub">可直接複製的篩選器條件組合，每日掃股用</div>
+    </div>
+  </div>
+  <div class="card-body" style="padding-top:20px">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">📈 強勢突破選股</div>
+      <div class="filter-row">
+        <span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">3000 張</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">漲幅</span><span class="filter-op">&gt;</span><span class="filter-val">3%</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">股價</span><span class="filter-op">站上</span><span class="filter-val">MA20</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">均量1.5倍</span>
+      </div>
+      <p style="margin-top:6px;font-size:.8rem;color:#8b949e">→ 找當日價量齊揚、突破均線的個股</p>
+    </div>
+
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🔵 RSI 超賣反彈選股</div>
+      <div class="filter-row">
+        <span class="filter-tag">RSI(14)</span><span class="filter-op">&lt;</span><span class="filter-val">32</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">2000 張</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">市值</span><span class="filter-op">&gt;</span><span class="filter-val">50億</span>
+      </div>
+      <p style="margin-top:6px;font-size:.8rem;color:#8b949e">→ 跌深超賣的中大型股，等待反彈機會</p>
+    </div>
+
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🟡 三線多頭排列選股</div>
+      <div class="filter-row">
+        <span class="filter-tag">股價</span><span class="filter-op">&gt;</span><span class="filter-val">MA20</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">MA20</span><span class="filter-op">&gt;</span><span class="filter-val">MA60</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">MA60</span><span class="filter-op">&gt;</span><span class="filter-val">MA120</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">1000張</span>
+      </div>
+      <p style="margin-top:6px;font-size:.8rem;color:#8b949e">→ 趨勢最強的多頭排列股，適合跟隨趨勢操作</p>
+    </div>
+
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🟣 法人買超放量選股</div>
+      <div class="filter-row">
+        <span class="filter-tag">外資連買</span><span class="filter-op">≥</span><span class="filter-val">3 天</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">均量 2 倍</span>
+        <span style="color:#8b949e">且</span>
+        <span class="filter-tag">漲幅</span><span class="filter-op">&gt;</span><span class="filter-val">1%</span>
+      </div>
+      <p style="margin-top:6px;font-size:.8rem;color:#8b949e">→ 有法人連買支撐的強勢股（部分條件需 Pro+ 方案）</p>
+    </div>
+
+    <div class="red-box">
+      <h4>注意免費版限制</h4>
+      <p style="margin:0;font-size:.86rem;color:#c9d1d9">免費版同時只能保存 <strong>1 個</strong>篩選條件組合；自定義指標數量也有限制。法人買超等籌碼資料需要付費方案才能在篩選器中使用。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 8. 觀察清單 ──────────────────────────────────────────── -->
+<div class="guide-card cat-watch" id="s8">
+  <div class="card-header">
+    <div class="card-num">8</div>
+    <div class="card-meta">
+      <span class="cat-tag">觀察清單</span>
+      <div class="card-title">觀察清單建立與管理</div>
+      <div class="card-sub">建立多個清單分類管理，手機 App 即時追蹤</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 右側面板 -->
+      <rect x="10" y="10" width="200" height="180" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="110" y="30" font-size="9" fill="#e6edf3" text-anchor="middle" font-weight="700">觀察清單</text>
+      <line x1="14" y1="36" x2="206" y2="36" stroke="#21262d"/>
+      <!-- 下拉列表 -->
+      <rect x="18" y="42" width="120" height="18" rx="3" fill="#21262d"/>
+      <text x="30" y="53" font-size="7.5" fill="#c9d1d9">自選清單 ▾</text>
+      <rect x="142" y="42" width="22" height="18" rx="3" fill="#21262d"/>
+      <text x="153" y="53" font-size="9" fill="#c9d1d9" text-anchor="middle">+</text>
+      <rect x="168" y="42" width="30" height="18" rx="3" fill="#21262d"/>
+      <text x="183" y="53" font-size="8" fill="#c9d1d9" text-anchor="middle">≡</text>
+      <!-- 股票列表 -->
+      <rect x="14" y="66" width="182" height="22" rx="3" fill="#21262d"/>
+      <text x="22" y="79" font-size="8" fill="#e6edf3">2330 台積電</text>
+      <text x="175" y="79" font-size="8" fill="#ef4444" text-anchor="end">2,410</text>
+      <rect x="14" y="92" width="182" height="22" rx="3" fill="transparent"/>
+      <text x="22" y="105" font-size="8" fill="#c9d1d9">0050 元大台灣50</text>
+      <text x="175" y="105" font-size="8" fill="#22c55e" text-anchor="end">178.5</text>
+      <rect x="14" y="117" width="182" height="22" rx="3" fill="transparent"/>
+      <text x="22" y="130" font-size="8" fill="#c9d1d9">2454 聯發科</text>
+      <text x="175" y="130" font-size="8" fill="#ef4444" text-anchor="end">4,390</text>
+      <rect x="14" y="142" width="182" height="22" rx="3" fill="transparent"/>
+      <text x="22" y="155" font-size="8" fill="#c9d1d9">2317 鴻海</text>
+      <text x="175" y="155" font-size="8" fill="#22c55e" text-anchor="end">268</text>
+      <rect x="14" y="167" width="182" height="18" rx="3" fill="rgba(59,130,246,.15)" stroke="#3b82f6" stroke-width="0.8"/>
+      <text x="105" y="178" font-size="7.5" fill="#60a5fa" text-anchor="middle">+ 新增股票到清單</text>
+      <!-- 右側：多清單說明 -->
+      <rect x="228" y="10" width="242" height="180" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="349" y="30" font-size="9" fill="#e6edf3" text-anchor="middle" font-weight="700">多清單管理建議</text>
+      <line x1="232" y1="36" x2="466" y2="36" stroke="#21262d"/>
+      <rect x="238" y="46" width="90" height="26" rx="5" fill="rgba(245,158,11,.15)" stroke="#f59e0b" stroke-width="0.8"/>
+      <text x="283" y="62" font-size="8" fill="#f59e0b" text-anchor="middle">📋 每日掃股清單</text>
+      <text x="338" y="62" font-size="7.5" fill="#8b949e">← 篩選結果放這</text>
+      <rect x="238" y="78" width="90" height="26" rx="5" fill="rgba(59,130,246,.15)" stroke="#3b82f6" stroke-width="0.8"/>
+      <text x="283" y="94" font-size="8" fill="#60a5fa" text-anchor="middle">⭐ 準備進場清單</text>
+      <text x="338" y="94" font-size="7.5" fill="#8b949e">← 符合條件的</text>
+      <rect x="238" y="110" width="90" height="26" rx="5" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="0.8"/>
+      <text x="283" y="126" font-size="8" fill="#22c55e" text-anchor="middle">📌 持倉中</text>
+      <text x="338" y="126" font-size="7.5" fill="#8b949e">← 目前在手的</text>
+      <rect x="238" y="142" width="90" height="26" rx="5" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="0.8"/>
+      <text x="283" y="158" font-size="8" fill="#a78bfa" text-anchor="middle">📚 長期追蹤</text>
+      <text x="338" y="158" font-size="7.5" fill="#8b949e">← 長期觀察標的</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <ul class="step-list">
+      <li><span class="step-num">1</span>右側面板點「觀察清單」圖示，點 <strong>+</strong> 新增清單，取名（如「準備進場」）</li>
+      <li><span class="step-num">2</span>在篩選器結果中，右鍵股票 → <strong>加入觀察清單</strong></li>
+      <li><span class="step-num">3</span>或是搜尋股票後，點五角星 ★ 加入預設清單</li>
+      <li><span class="step-num">4</span>手機開 TradingView App → 同帳號，觀察清單自動同步</li>
+    </ul>
+    <div class="purple-box">
+      <h4>觀察清單分類建議</h4>
+      <ul>
+        <li><strong>每日掃股</strong>：當天篩選器跑出來的結果，看完可清空</li>
+        <li><strong>準備進場</strong>：符合進場條件、等待訊號確認的股票</li>
+        <li><strong>持倉中</strong>：目前在手的部位，方便快速看盤</li>
+        <li><strong>長期追蹤</strong>：基本面好但還在等技術面訊號</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 9. 警示設定 ──────────────────────────────────────────── -->
+<div class="guide-card cat-alert" id="s9">
+  <div class="card-header">
+    <div class="card-num">9</div>
+    <div class="card-meta">
+      <span class="cat-tag">警示設定</span>
+      <div class="card-title">警示（Alert）— 手機推播通知</div>
+      <div class="card-sub">股價突破設定值時，手機自動推播，不用盯盤</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 警示設定框 -->
+      <rect x="10" y="10" width="220" height="175" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="120" y="30" font-size="9" fill="#e6edf3" text-anchor="middle" font-weight="700">新增警示</text>
+      <line x1="14" y1="36" x2="226" y2="36" stroke="#21262d"/>
+      <text x="20" y="52" font-size="7.5" fill="#8b949e">條件</text>
+      <rect x="18" y="58" width="100" height="18" rx="3" fill="#21262d"/>
+      <text x="68" y="69" font-size="7.5" fill="#c9d1d9" text-anchor="middle">大於</text>
+      <rect x="122" y="58" width="62" height="18" rx="3" fill="#21262d" stroke="#f59e0b" stroke-width="1"/>
+      <text x="153" y="69" font-size="7.5" fill="#f59e0b" text-anchor="middle">2,050</text>
+      <text x="20" y="90" font-size="7.5" fill="#8b949e">觸發頻率</text>
+      <rect x="18" y="96" width="120" height="18" rx="3" fill="#21262d"/>
+      <text x="78" y="107" font-size="7.5" fill="#c9d1d9" text-anchor="middle">每次條件符合時</text>
+      <text x="20" y="128" font-size="7.5" fill="#8b949e">到期時間</text>
+      <rect x="18" y="134" width="120" height="18" rx="3" fill="#21262d"/>
+      <text x="78" y="145" font-size="7.5" fill="#c9d1d9" text-anchor="middle">1 個月後</text>
+      <text x="20" y="165" font-size="7.5" fill="#8b949e">通知方式</text>
+      <rect x="18" y="170" width="22" height="12" rx="2" fill="#3b82f6"/>
+      <text x="29" y="179" font-size="6" fill="#fff" text-anchor="middle">✓</text>
+      <text x="46" y="179" font-size="7" fill="#c9d1d9">推播通知</text>
+      <rect x="88" y="170" width="22" height="12" rx="2" fill="#3b82f6"/>
+      <text x="99" y="179" font-size="6" fill="#fff" text-anchor="middle">✓</text>
+      <text x="116" y="179" font-size="7" fill="#c9d1d9">電子郵件</text>
+      <!-- 觸發方式選項 -->
+      <rect x="248" y="10" width="222" height="175" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="359" y="30" font-size="9" fill="#e6edf3" text-anchor="middle" font-weight="700">常見警示設定場景</text>
+      <line x1="252" y1="36" x2="466" y2="36" stroke="#21262d"/>
+      <rect x="256" y="44" width="206" height="30" rx="4" fill="rgba(239,68,68,.08)" stroke="rgba(239,68,68,.3)"/>
+      <text x="259" y="56" font-size="7.5" fill="#f87171">【突破壓力】</text>
+      <text x="259" y="68" font-size="7" fill="#8b949e">股價 &gt; 壓力位 2,050 → 確認突破</text>
+      <rect x="256" y="80" width="206" height="30" rx="4" fill="rgba(34,197,94,.08)" stroke="rgba(34,197,94,.3)"/>
+      <text x="259" y="92" font-size="7.5" fill="#34d399">【支撐確認】</text>
+      <text x="259" y="104" font-size="7" fill="#8b949e">股價 &lt; 支撐位 1,900 → 考慮停損</text>
+      <rect x="256" y="116" width="206" height="30" rx="4" fill="rgba(245,158,11,.08)" stroke="rgba(245,158,11,.3)"/>
+      <text x="259" y="128" font-size="7.5" fill="#fbbf24">【指標觸發】</text>
+      <text x="259" y="140" font-size="7" fill="#8b949e">RSI(14) 進入 30 以下 → 超賣訊號</text>
+      <rect x="256" y="152" width="206" height="28" rx="4" fill="rgba(139,92,246,.08)" stroke="rgba(139,92,246,.3)"/>
+      <text x="259" y="164" font-size="7.5" fill="#a78bfa">【成交量異常】</text>
+      <text x="259" y="175" font-size="7" fill="#8b949e">成交量 &gt; 均量 3 倍 → 異常放量</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <ul class="step-list">
+      <li><span class="step-num">1</span>在圖表上<strong>右鍵</strong>價格軸上的目標價位 → 點「加入警示」</li>
+      <li><span class="step-num">2</span>或點上方鐘形圖示 🔔 → 新增警示 → 設定條件</li>
+      <li><span class="step-num">3</span>選「<strong>推播通知</strong>」，確保手機 App 已允許 TradingView 通知權限</li>
+      <li><span class="step-num">4</span>設定到期時間（建議 1 個月），免費帳號最多 <strong>1 個</strong>警示同時存在</li>
+    </ul>
+    <div class="pink-box">
+      <h4>免費 vs 付費差異</h4>
+      <ul>
+        <li>免費：同時存 <strong>1 個</strong>警示，到期後可重設</li>
+        <li>Essential（最低付費方案）：20 個警示同時存在</li>
+        <li>付費版可設「指標條件」警示（如 KD 黃金交叉）</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 10. 版面儲存與快捷鍵 ─────────────────────────────────── -->
+<div class="guide-card cat-interface" id="s10">
+  <div class="card-header">
+    <div class="card-num">10</div>
+    <div class="card-meta">
+      <span class="cat-tag">介面操作</span>
+      <div class="card-title">版面儲存、分享 + 常用快捷鍵</div>
+      <div class="card-sub">儲存設定好的圖表版面，快速操作提升效率</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="160" fill="#0d1117"/>
+      <!-- 版面選單 -->
+      <rect x="10" y="10" width="200" height="140" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="110" y="28" font-size="9" fill="#e6edf3" text-anchor="middle" font-weight="700">版面 → 版面配置</text>
+      <line x1="14" y1="34" x2="206" y2="34" stroke="#21262d"/>
+      <rect x="18" y="40" width="180" height="22" rx="4" fill="#21262d"/>
+      <text x="28" y="54" font-size="8" fill="#c9d1d9">儲存版面配置</text>
+      <text x="192" y="54" font-size="7.5" fill="#8b949e" text-anchor="end">Ctrl+S</text>
+      <rect x="18" y="66" width="180" height="22" rx="4" fill="transparent"/>
+      <text x="28" y="80" font-size="8" fill="#c9d1d9">另存為新版面</text>
+      <rect x="18" y="92" width="180" height="22" rx="4" fill="transparent"/>
+      <text x="28" y="106" font-size="8" fill="#c9d1d9">版面管理…</text>
+      <line x1="14" y1="118" x2="206" y2="118" stroke="#21262d"/>
+      <rect x="18" y="124" width="180" height="22" rx="4" fill="rgba(59,130,246,.15)" stroke="#3b82f6" stroke-width="0.8"/>
+      <text x="28" y="138" font-size="8" fill="#60a5fa">分享圖表連結</text>
+      <text x="192" y="138" font-size="7.5" fill="#60a5fa" text-anchor="end">Alt+S</text>
+      <!-- 快捷鍵表 -->
+      <rect x="228" y="10" width="242" height="140" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="349" y="28" font-size="9" fill="#e6edf3" text-anchor="middle" font-weight="700">常用快捷鍵</text>
+      <line x1="232" y1="34" x2="466" y2="34" stroke="#21262d"/>
+      <text x="238" y="50" font-size="7.5" fill="#8b949e">搜尋股票</text>
+      <rect x="380" y="40" width="50" height="14" rx="2" fill="#21262d"/>
+      <text x="405" y="50" font-size="7" fill="#c9d1d9" text-anchor="middle">/（斜線）</text>
+      <text x="238" y="66" font-size="7.5" fill="#8b949e">加技術指標</text>
+      <rect x="380" y="56" width="50" height="14" rx="2" fill="#21262d"/>
+      <text x="405" y="66" font-size="7" fill="#c9d1d9" text-anchor="middle">Alt + I</text>
+      <text x="238" y="82" font-size="7.5" fill="#8b949e">水平線</text>
+      <rect x="380" y="72" width="50" height="14" rx="2" fill="#21262d"/>
+      <text x="405" y="82" font-size="7" fill="#c9d1d9" text-anchor="middle">Alt + H</text>
+      <text x="238" y="98" font-size="7.5" fill="#8b949e">趨勢線</text>
+      <rect x="380" y="88" width="50" height="14" rx="2" fill="#21262d"/>
+      <text x="405" y="98" font-size="7" fill="#c9d1d9" text-anchor="middle">Alt + T</text>
+      <text x="238" y="114" font-size="7.5" fill="#8b949e">隱藏所有畫線</text>
+      <rect x="380" y="104" width="50" height="14" rx="2" fill="#21262d"/>
+      <text x="405" y="114" font-size="7" fill="#c9d1d9" text-anchor="middle">Ctrl + H</text>
+      <text x="238" y="130" font-size="7.5" fill="#8b949e">縮放重置</text>
+      <rect x="380" y="120" width="50" height="14" rx="2" fill="#21262d"/>
+      <text x="405" y="130" font-size="7" fill="#c9d1d9" text-anchor="middle">Ctrl + R</text>
+      <text x="238" y="146" font-size="7.5" fill="#8b949e">截圖</text>
+      <rect x="380" y="136" width="50" height="14" rx="2" fill="#21262d"/>
+      <text x="405" y="146" font-size="7" fill="#c9d1d9" text-anchor="middle">Alt + S</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="green-box">
+      <h4>版面儲存流程（一次設定，終身使用）</h4>
+      <ol style="padding-left:16px;font-size:.86rem;color:#c9d1d9;line-height:1.7">
+        <li>設好 MA 50/150/200 + 成交量 + KD 或 RSI</li>
+        <li>調整好 K 棒顏色（紅漲綠跌）</li>
+        <li>按 <strong>Ctrl+S</strong> 或頂部「版面」→「儲存版面配置」</li>
+        <li>取名為「基本版面」，之後每次開圖都自動套用</li>
+      </ol>
+    </div>
+    <div class="blue-box">
+      <h4>手機 App 搭配使用</h4>
+      <ul>
+        <li>電腦負責：篩選股票、設定警示、詳細技術分析</li>
+        <li>手機負責：看觀察清單報價、接收警示通知、快速看 K 線確認</li>
+        <li>兩者同帳號自動同步，觀察清單 + 警示共享</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     台股交易策略 S11–S20
+════════════════════════════════════════════════════════ -->
+
+<!-- S11 外資連買 + 均線多頭突破 -->
+<div class="guide-card cat-strategy" id="s11">
+  <div class="card-header">
+    <div class="card-num">11</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">外資連買 × 均線多頭排列突破</div>
+      <div class="card-sub">追蹤法人資金流入方向，等均線確認再進場</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- MA線 -->
+      <polyline points="30,160 70,148 110,134 150,118 190,100 230,84 270,70 310,56 350,44 400,34 450,26" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+      <polyline points="30,170 70,162 110,152 150,140 190,126 230,112 270,98 310,84 350,72 400,62 450,54" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+      <polyline points="30,178 70,172 110,165 150,157 190,146 230,135 270,124 310,112 350,102 400,94 450,88" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+      <!-- K棒 -->
+      <rect x="30" y="158" width="8" height="12" fill="#22c55e" rx="1"/>
+      <rect x="46" y="150" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="62" y="146" width="8" height="12" fill="#ef4444" rx="1"/>
+      <rect x="78" y="140" width="8" height="12" fill="#ef4444" rx="1"/>
+      <rect x="94" y="128" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="110" y="122" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="126" y="114" width="8" height="12" fill="#22c55e" rx="1"/>
+      <rect x="142" y="106" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="158" y="96" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="174" y="88" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="190" y="78" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="206" y="70" width="8" height="14" fill="#22c55e" rx="1"/>
+      <!-- 突破點 + 大量長紅K -->
+      <line x1="220" y1="10" x2="220" y2="190" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="222" y="22" font-size="8" fill="#f59e0b">突破</text>
+      <rect x="220" y="52" width="12" height="24" fill="#ef4444" rx="1"/>
+      <line x1="226" y1="44" x2="226" y2="56" stroke="#ef4444" stroke-width="1.5"/>
+      <line x1="226" y1="74" x2="226" y2="80" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="238" y="44" width="12" height="22" fill="#ef4444" rx="1"/>
+      <rect x="254" y="40" width="12" height="20" fill="#ef4444" rx="1"/>
+      <rect x="270" y="36" width="12" height="18" fill="#ef4444" rx="1"/>
+      <rect x="286" y="30" width="12" height="18" fill="#ef4444" rx="1"/>
+      <!-- 進場箭頭 -->
+      <polygon points="226,85 222,98 230,98" fill="#22c55e"/>
+      <text x="232" y="96" font-size="8" fill="#22c55e">進場</text>
+      <!-- 外資買超條 -->
+      <rect x="30" y="180" width="480" height="14" fill="#0d1117"/>
+      <text x="30" y="192" font-size="7" fill="#8b949e">外資買超：</text>
+      <rect x="90" y="182" width="18" height="8" rx="2" fill="rgba(59,130,246,.5)"/>
+      <rect x="112" y="182" width="22" height="8" rx="2" fill="rgba(59,130,246,.6)"/>
+      <rect x="138" y="182" width="20" height="8" rx="2" fill="rgba(59,130,246,.6)"/>
+      <rect x="162" y="182" width="24" height="8" rx="2" fill="rgba(59,130,246,.7)"/>
+      <rect x="190" y="182" width="26" height="8" rx="2" fill="rgba(59,130,246,.8)"/>
+      <rect x="220" y="182" width="32" height="8" rx="2" fill="#3b82f6"/>
+      <text x="258" y="190" font-size="7" fill="#60a5fa">← 連買放大</text>
+      <!-- 標籤 -->
+      <text x="455" y="30" font-size="7" fill="#3b82f6" text-anchor="end">MA20</text>
+      <text x="455" y="58" font-size="7" fill="#f59e0b" text-anchor="end">MA60</text>
+      <text x="455" y="92" font-size="7" fill="#ef4444" text-anchor="end">MA120</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🔵 TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">股價</span><span class="filter-op">&gt;</span><span class="filter-val">MA20 &gt; MA60 &gt; MA120</span><span style="color:#8b949e">且</span><span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">2000 張</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">漲幅</span><span class="filter-op">&gt;</span><span class="filter-val">2%</span><span style="color:#8b949e">且</span><span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">均量 1.5 倍</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：帶量長紅K</span>
+      <span class="sig blue">指標：MA 多頭排列</span>
+      <span class="sig gold">籌碼：外資連買 ≥ 3 日</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：收盤<strong>突破前波高點</strong>且量比 &gt;1.5 倍確認當日收紅<br>停損：跌破 <strong>MA5</strong>（約 2–4% 風險），目標看前高整數關卡</p>
+    </div>
+    <p>外資連買是最可靠的法人資金訊號之一。均線多頭排列（MA20&gt;60&gt;120）代表趨勢明確，搭配帶量突破可大幅提升勝率。</p>
+  </div>
+</div>
+
+<!-- S12 布林帶收窄爆發策略 -->
+<div class="guide-card cat-strategy" id="s12">
+  <div class="card-header">
+    <div class="card-num">12</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">布林帶收窄 → 爆發策略（彈弓型）</div>
+      <div class="card-sub">能量蓄積後的爆發，方向確認才進場</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="210" fill="#0d1117"/>
+      <!-- 布林上軌 -->
+      <polyline points="30,50 80,60 120,68 160,72 200,74 230,73 260,74 300,68 340,55 380,36 430,18" fill="none" stroke="rgba(59,130,246,.6)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <!-- 布林中軌 -->
+      <polyline points="30,100 80,100 120,100 160,100 200,100 230,100 260,100 300,100 340,100 380,96 430,88" fill="none" stroke="#60a5fa" stroke-width="1.2"/>
+      <!-- 布林下軌 -->
+      <polyline points="30,150 80,140 120,132 160,128 200,126 230,127 260,126 300,132 340,145 380,158 430,168" fill="none" stroke="rgba(59,130,246,.6)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <!-- 收窄區示意 -->
+      <rect x="150" y="72" width="110" height="56" rx="4" fill="rgba(245,158,11,.06)" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="205" y="106" font-size="8" fill="#f59e0b" text-anchor="middle">能量蓄積</text>
+      <!-- K棒（收窄中） -->
+      <rect x="160" y="92" width="7" height="14" fill="#22c55e" rx="1"/>
+      <rect x="172" y="90" width="7" height="16" fill="#ef4444" rx="1"/>
+      <rect x="184" y="91" width="7" height="14" fill="#22c55e" rx="1"/>
+      <rect x="196" y="92" width="7" height="14" fill="#ef4444" rx="1"/>
+      <rect x="208" y="91" width="7" height="14" fill="#22c55e" rx="1"/>
+      <rect x="220" y="90" width="7" height="15" fill="#ef4444" rx="1"/>
+      <rect x="232" y="92" width="7" height="13" fill="#22c55e" rx="1"/>
+      <rect x="244" y="91" width="7" height="14" fill="#ef4444" rx="1"/>
+      <!-- 爆發K棒 -->
+      <line x1="264" y1="10" x2="264" y2="200" stroke="#f43f5e" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="266" y="20" font-size="8" fill="#f43f5e">爆發</text>
+      <rect x="260" y="64" width="10" height="38" fill="#ef4444" rx="1"/>
+      <line x1="265" y1="56" x2="265" y2="68" stroke="#ef4444" stroke-width="1.5"/>
+      <line x1="265" y1="100" x2="265" y2="108" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="274" y="52" width="10" height="36" fill="#ef4444" rx="1"/>
+      <rect x="288" y="44" width="10" height="34" fill="#ef4444" rx="1"/>
+      <rect x="302" y="36" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="316" y="30" width="10" height="26" fill="#ef4444" rx="1"/>
+      <!-- 進場箭頭 -->
+      <polygon points="265,112 261,124 269,124" fill="#22c55e"/>
+      <text x="272" y="122" font-size="8" fill="#22c55e">進場</text>
+      <!-- 成交量條 -->
+      <rect x="160" y="185" width="7" height="12" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="172" y="183" width="7" height="14" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="184" y="185" width="7" height="12" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="196" y="183" width="7" height="14" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="208" y="185" width="7" height="12" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="220" y="184" width="7" height="13" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="232" y="186" width="7" height="11" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="244" y="185" width="7" height="12" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="260" y="170" width="10" height="27" rx="1" fill="#ef4444" opacity="0.7"/>
+      <rect x="274" y="162" width="10" height="35" rx="1" fill="#ef4444" opacity="0.8"/>
+      <rect x="288" y="155" width="10" height="42" rx="1" fill="#ef4444"/>
+      <text x="210" y="205" font-size="7" fill="#8b949e" text-anchor="middle">量縮整理</text>
+      <text x="295" y="205" font-size="7" fill="#ef4444" text-anchor="middle">量爆</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🟡 TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">BB 帶寬</span><span class="filter-op">為近 20 日</span><span class="filter-val">最窄</span><span style="color:#8b949e">且</span><span class="filter-tag">RSI(14)</span><span class="filter-op">介於</span><span class="filter-val">42–58</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">成交量</span><span class="filter-op">&lt;</span><span class="filter-val">均量 0.7 倍</span><span style="color:#8b949e">（量縮整理）</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：突破布林上軌長紅K</span>
+      <span class="sig blue">布林：帶寬極度收窄後放大</span>
+      <span class="sig gold">成交量：爆量確認突破</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：<strong>收盤站上布林上軌</strong>且成交量 &gt; 前 5 日均量 2 倍<br>停損：跌回<strong>布林中線</strong>（MA20）以下，目標上軌 × 1 個帶寬距離</p>
+    </div>
+    <p>帶寬（BB Width）越窄代表蓄積能量越大。方向不確定前<strong>不進場</strong>，等突破上軌（看漲）或下軌（看跌）確認後再行動。</p>
+  </div>
+</div>
+
+<!-- S13 KD底背離 + RSI超賣反彈 -->
+<div class="guide-card cat-strategy" id="s13">
+  <div class="card-header">
+    <div class="card-num">13</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">KD 底背離 × RSI 超賣反彈策略</div>
+      <div class="card-sub">股價創新低但指標不創新低，轉折訊號最強的型態</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="220" fill="#0d1117"/>
+      <!-- 股價區 -->
+      <text x="10" y="14" font-size="7" fill="#8b949e">股價</text>
+      <polyline points="30,30 80,50 120,70 150,55 180,80 220,100 260,90 300,115 340,138 380,118 420,125" fill="none" stroke="#30363d" stroke-width="1" stroke-dasharray="2,2"/>
+      <!-- K棒 -->
+      <rect x="26" y="32" width="8" height="16" fill="#ef4444" rx="1"/>
+      <rect x="42" y="42" width="8" height="16" fill="#ef4444" rx="1"/>
+      <rect x="58" y="55" width="8" height="18" fill="#ef4444" rx="1"/>
+      <rect x="74" y="48" width="8" height="14" fill="#22c55e" rx="1"/>
+      <rect x="90" y="60" width="8" height="18" fill="#ef4444" rx="1"/>
+      <rect x="106" y="72" width="8" height="16" fill="#ef4444" rx="1"/>
+      <rect x="122" y="62" width="8" height="16" fill="#22c55e" rx="1"/>
+      <rect x="138" y="74" width="8" height="18" fill="#ef4444" rx="1"/>
+      <rect x="154" y="84" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="170" y="76" width="8" height="16" fill="#22c55e" rx="1"/>
+      <rect x="186" y="88" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="202" y="95" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="218" y="88" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="234" y="96" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="250" y="102" width="8" height="24" fill="#ef4444" rx="1"/>
+      <!-- 股價低點連線（下降） -->
+      <line x1="34" y1="48" x2="258" y2="126" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+      <circle cx="34" cy="48" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+      <circle cx="258" cy="126" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="20" y="46" font-size="8" fill="#ef4444">低①</text>
+      <text x="230" y="138" font-size="8" fill="#ef4444">低②</text>
+      <!-- 分隔線 -->
+      <line x1="0" y1="140" x2="480" y2="140" stroke="#21262d" stroke-width="1"/>
+      <text x="10" y="154" font-size="7" fill="#8b949e">KD</text>
+      <!-- KD圖 -->
+      <polyline points="30,180 80,175 120,182 150,170 180,178 220,172 260,165 300,155 340,170 380,158 420,152" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+      <!-- KD低點連線（上升=背離） -->
+      <circle cx="80" cy="175" r="4" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <circle cx="300" cy="155" r="4" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="80" y1="175" x2="300" y2="155" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="62" y="172" font-size="8" fill="#22c55e">KD①</text>
+      <text x="270" y="152" font-size="8" fill="#22c55e">KD②更高</text>
+      <text x="160" y="210" font-size="8" fill="#22c55e" text-anchor="middle">底背離：股價低點↘ 但KD低點↗</text>
+      <!-- 進場 -->
+      <polygon points="300,130 296,142 304,142" fill="#22c55e"/>
+      <text x="306" y="140" font-size="8" fill="#22c55e">KD黃金交叉進場</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🔴 TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">RSI(14)</span><span class="filter-op">&lt;</span><span class="filter-val">32</span><span style="color:#8b949e">且</span><span class="filter-tag">股價</span><span class="filter-op">創</span><span class="filter-val">近 20 日新低</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">成交量</span><span class="filter-op">&lt;</span><span class="filter-val">均量 0.8 倍</span><span style="color:#8b949e">（縮量止跌）</span><span class="filter-tag">市值</span><span class="filter-op">&gt;</span><span class="filter-val">50 億</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：錘子線 / 長下影線</span>
+      <span class="sig blue">KD：底背離 + 黃金交叉</span>
+      <span class="sig bear">RSI：&lt;30 後回升</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：<strong>KD 黃金交叉確認</strong>（K 線穿越 D 線向上）<br>停損：跌破第二個低點（底背離失效），風險約 3–5%</p>
+    </div>
+    <p>底背離是教科書級別的轉折訊號，但須配合<strong>縮量止跌</strong>（跌不動）才可靠，若是大跌中量仍在放大則不適用。</p>
+  </div>
+</div>
+
+<!-- S14 週線年線回測策略 -->
+<div class="guide-card cat-strategy" id="s14">
+  <div class="card-header">
+    <div class="card-num">14</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">週線站穩年線 → 回測支撐策略</div>
+      <div class="card-sub">年線（MA52週）是機構法人的長期持倉基準線</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 年線 MA52 -->
+      <polyline points="30,160 100,150 160,136 220,118 280,100 340,86 400,80 460,78" fill="none" stroke="#f59e0b" stroke-width="2"/>
+      <text x="430" y="73" font-size="8" fill="#f59e0b">年線 MA52</text>
+      <!-- K棒（週K）大K棒 -->
+      <rect x="30" y="155" width="14" height="20" fill="#ef4444" rx="1"/>
+      <rect x="52" y="145" width="14" height="24" fill="#ef4444" rx="1"/>
+      <rect x="74" y="150" width="14" height="18" fill="#22c55e" rx="1"/>
+      <rect x="96" y="140" width="14" height="20" fill="#ef4444" rx="1"/>
+      <rect x="118" y="128" width="14" height="22" fill="#ef4444" rx="1"/>
+      <rect x="140" y="120" width="14" height="20" fill="#22c55e" rx="1"/>
+      <rect x="162" y="108" width="14" height="22" fill="#ef4444" rx="1"/>
+      <rect x="184" y="96" width="14" height="24" fill="#ef4444" rx="1"/>
+      <!-- 突破年線 -->
+      <rect x="208" y="80" width="14" height="28" fill="#ef4444" rx="1"/>
+      <line x1="215" y1="68" x2="215" y2="84" stroke="#ef4444" stroke-width="2"/>
+      <!-- 站上年線後走 -->
+      <rect x="232" y="72" width="14" height="22" fill="#ef4444" rx="1"/>
+      <rect x="256" y="64" width="14" height="24" fill="#ef4444" rx="1"/>
+      <rect x="280" y="56" width="14" height="22" fill="#ef4444" rx="1"/>
+      <!-- 回測年線 -->
+      <rect x="306" y="74" width="14" height="28" fill="#22c55e" rx="1"/>
+      <line x1="313" y1="86" x2="313" y2="108" stroke="#22c55e" stroke-width="2"/>
+      <rect x="330" y="68" width="14" height="22" fill="#22c55e" rx="1"/>
+      <line x1="337" y1="82" x2="337" y2="96" stroke="#22c55e" stroke-width="2"/>
+      <rect x="354" y="60" width="14" height="22" fill="#ef4444" rx="1"/>
+      <rect x="378" y="52" width="14" height="20" fill="#ef4444" rx="1"/>
+      <!-- 標記 -->
+      <text x="212" y="62" font-size="8" fill="#22c55e" text-anchor="middle">站上</text>
+      <text x="310" y="58" font-size="8" fill="#f59e0b" text-anchor="middle">回測</text>
+      <polygon points="313,116 309,130 317,130" fill="#22c55e"/>
+      <text x="320" y="128" font-size="8" fill="#22c55e">進場</text>
+      <!-- 停損線 -->
+      <line x1="300" y1="148" x2="470" y2="148" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="400" y="158" font-size="7" fill="#ef4444">停損線（週K跌破年線）</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🟠 TradingView 篩選條件（週線圖）</div>
+      <div class="filter-row"><span class="filter-tag">週K</span><span class="filter-op">站上</span><span class="filter-val">MA52（年線）</span><span style="color:#8b949e">超過 3 個月</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">週K 回測</span><span class="filter-op">接觸 MA52</span><span class="filter-val">±3% 以內</span><span style="color:#8b949e">且</span><span class="filter-tag">日K 出現止跌K</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">週K：長下影線止跌</span>
+      <span class="sig gold">年線：過去多次支撐</span>
+      <span class="sig blue">日K：錘子 / 吞噬確認</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：週K 收盤回到年線附近 + 日K 出現止跌型態當日<br>停損：<strong>週K 跌破年線收盤</strong>，風險約 5–8%，報酬比高</p>
+    </div>
+    <p>年線是外資與退休基金的進出依據，<strong>第一次回測年線</strong>成功率遠高於後續測試，台積電、聯發科等龍頭股此策略歷史勝率超高。</p>
+  </div>
+</div>
+
+<!-- S15 融券回補強攻策略 -->
+<div class="guide-card cat-strategy" id="s15">
+  <div class="card-header">
+    <div class="card-num">15</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">融券大幅回補 × 外資買超強攻策略</div>
+      <div class="card-sub">空頭被迫回補 + 法人同步買進，形成軋空行情</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- K棒 -->
+      <rect x="30" y="120" width="10" height="30" fill="#22c55e" rx="1"/>
+      <rect x="46" y="110" width="10" height="32" fill="#ef4444" rx="1"/>
+      <rect x="62" y="118" width="10" height="28" fill="#22c55e" rx="1"/>
+      <rect x="78" y="105" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="94" y="98" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="110" y="88" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="126" y="80" width="10" height="28" fill="#22c55e" rx="1"/>
+      <rect x="142" y="70" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="158" y="62" width="10" height="26" fill="#ef4444" rx="1"/>
+      <!-- 前高 -->
+      <line x1="0" y1="62" x2="480" y2="62" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="10" y="58" font-size="7.5" fill="#f59e0b">前高</text>
+      <!-- 突破K棒 -->
+      <rect x="174" y="34" width="12" height="40" fill="#ef4444" rx="1"/>
+      <line x1="180" y1="24" x2="180" y2="38" stroke="#ef4444" stroke-width="2"/>
+      <line x1="180" y1="72" x2="180" y2="80" stroke="#ef4444" stroke-width="2"/>
+      <rect x="192" y="24" width="12" height="36" fill="#ef4444" rx="1"/>
+      <rect x="210" y="18" width="12" height="30" fill="#ef4444" rx="1"/>
+      <rect x="228" y="12" width="12" height="28" fill="#ef4444" rx="1"/>
+      <polygon points="180,84 176,96 184,96" fill="#22c55e"/>
+      <text x="188" y="94" font-size="8" fill="#22c55e">進場</text>
+      <!-- 融券張數折線（下降=回補） -->
+      <text x="10" y="130" font-size="7" fill="#8b949e">融券張數：</text>
+      <polyline points="30,138 60,142 90,146 120,150 150,158 175,168 210,172 240,176" fill="none" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="245" y="176" font-size="7" fill="#a78bfa">急速回補↘</text>
+      <!-- 外資買超 -->
+      <text x="10" y="152" font-size="7" fill="#8b949e">外資：</text>
+      <rect x="90" y="155" width="14" height="6" rx="1" fill="rgba(59,130,246,.5)"/>
+      <rect x="108" y="153" width="14" height="8" rx="1" fill="rgba(59,130,246,.6)"/>
+      <rect x="126" y="150" width="14" height="11" rx="1" fill="rgba(59,130,246,.7)"/>
+      <rect x="144" y="147" width="14" height="14" rx="1" fill="rgba(59,130,246,.8)"/>
+      <rect x="162" y="144" width="14" height="17" rx="1" fill="#3b82f6"/>
+      <rect x="180" y="140" width="14" height="21" rx="1" fill="#3b82f6"/>
+      <text x="200" y="159" font-size="7" fill="#60a5fa">外資持續買超↑</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🟣 TradingView 篩選 + 需搭配外部籌碼資料</div>
+      <div class="filter-row"><span class="filter-tag">漲幅</span><span class="filter-op">&gt;</span><span class="filter-val">3%</span><span style="color:#8b949e">且</span><span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">均量 2 倍</span><span style="color:#8b949e">且</span><span class="filter-tag">股價</span><span class="filter-op">創</span><span class="filter-val">月線新高</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：帶量突破前高長紅K</span>
+      <span class="sig gold">籌碼：融券張數連續減少</span>
+      <span class="sig blue">法人：外資連買 + 投信參與</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：突破前高當日帶量收紅進場（不追漲停）<br>停損：跌回突破點下方，融券回補完畢後動能可能消失</p>
+    </div>
+    <div class="red-box" style="margin-top:8px">
+      <h4>注意</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">TradingView <strong>無法直接看到融券張數</strong>，需搭配台灣證交所或 Goodinfo 確認融券數據。在 TradingView 篩選帶量突破後，到外部確認融券是否在減少。</p>
+    </div>
+  </div>
+</div>
+
+<!-- S16 主力吸貨啟動策略 -->
+<div class="guide-card cat-strategy" id="s16">
+  <div class="card-header">
+    <div class="card-num">16</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">主力吸貨啟動策略（異常爆量）</div>
+      <div class="card-sub">單日爆大量 + 收盤靠近最高，代表主力正在吃貨</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- K棒 -->
+      <rect x="30" y="120" width="10" height="24" fill="#22c55e" rx="1"/>
+      <rect x="46" y="112" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="62" y="118" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="78" y="108" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="94" y="114" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="110" y="105" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="126" y="116" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="142" y="110" width="10" height="24" fill="#ef4444" rx="1"/>
+      <!-- 爆量長紅K（特大） -->
+      <rect x="160" y="68" width="14" height="56" fill="#ef4444" rx="2"/>
+      <line x1="167" y1="54" x2="167" y2="72" stroke="#ef4444" stroke-width="2"/>
+      <line x1="167" y1="122" x2="167" y2="132" stroke="#ef4444" stroke-width="2"/>
+      <text x="178" y="90" font-size="7.5" fill="#ef4444">收盤靠近最高</text>
+      <text x="178" y="100" font-size="7.5" fill="#ef4444">（上影線極短）</text>
+      <!-- 後續延伸 -->
+      <rect x="182" y="58" width="10" height="46" fill="#ef4444" rx="1"/>
+      <rect x="198" y="50" width="10" height="44" fill="#ef4444" rx="1"/>
+      <rect x="214" y="42" width="10" height="42" fill="#ef4444" rx="1"/>
+      <rect x="230" y="38" width="10" height="38" fill="#ef4444" rx="1"/>
+      <polygon points="167,138 163,152 171,152" fill="#22c55e"/>
+      <text x="175" y="150" font-size="8" fill="#22c55e">次日確認進場</text>
+      <!-- 成交量（醒目對比） -->
+      <rect x="30" y="165" width="10" height="14" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="46" y="163" width="10" height="16" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="62" y="165" width="10" height="14" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="78" y="162" width="10" height="17" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="94" y="165" width="10" height="14" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="110" y="163" width="10" height="16" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="126" y="166" width="10" height="13" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="142" y="164" width="10" height="15" rx="1" fill="rgba(239,68,68,.3)"/>
+      <!-- 爆量柱 -->
+      <rect x="158" y="140" width="16" height="40" rx="1" fill="#ef4444"/>
+      <text x="167" y="192" font-size="8" fill="#ef4444" text-anchor="middle">爆量</text>
+      <text x="80" y="192" font-size="8" fill="#8b949e" text-anchor="middle">量縮整理</text>
+      <!-- 箭頭指示 -->
+      <text x="10" y="190" font-size="7" fill="#8b949e">量：</text>
+      <rect x="182" y="152" width="10" height="28" rx="1" fill="#ef4444" opacity="0.7"/>
+      <rect x="198" y="158" width="10" height="22" rx="1" fill="#ef4444" opacity="0.6"/>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">⚡ TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">均量 3 倍</span><span style="color:#8b949e">且</span><span class="filter-tag">漲幅</span><span class="filter-op">&gt;</span><span class="filter-val">3%</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">收盤位置</span><span class="filter-op">在當日</span><span class="filter-val">高低區間 90% 以上</span><span style="color:#8b949e">（上影線短）</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：大量長紅K（上影線極短）</span>
+      <span class="sig gold">量：爆量為均量 3 倍以上</span>
+      <span class="sig blue">籌碼：外資 + 投信同步買超</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：<strong>爆量日隔日開盤</strong>確認不回落（開高維持）再進場<br>停損：跌破爆量日低點，代表主力已出走</p>
+    </div>
+    <p>「收盤靠近最高」代表主力尾盤拉抬意圖強烈，上影線越短越理想。若爆量但收盤在中間或下方則是出貨訊號，完全相反意義。</p>
+  </div>
+</div>
+
+<!-- S17 跳空缺口突破策略 -->
+<div class="guide-card cat-strategy" id="s17">
+  <div class="card-header">
+    <div class="card-num">17</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">跳空突破缺口策略（Gap &amp; Run）</div>
+      <div class="card-sub">跳空缺口是市場共識改變的強力訊號，缺口不填多頭最強</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- 跳空前K棒 -->
+      <rect x="30" y="110" width="10" height="30" fill="#ef4444" rx="1"/>
+      <line x1="35" y1="100" x2="35" y2="114" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="46" y="102" width="10" height="32" fill="#ef4444" rx="1"/>
+      <rect x="62" y="108" width="10" height="28" fill="#22c55e" rx="1"/>
+      <rect x="78" y="98" width="10" height="30" fill="#ef4444" rx="1"/>
+      <line x1="83" y1="88" x2="83" y2="102" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="94" y="104" width="10" height="28" fill="#22c55e" rx="1"/>
+      <rect x="110" y="96" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="126" y="102" width="10" height="26" fill="#22c55e" rx="1"/>
+      <!-- 跳空缺口區 -->
+      <rect x="142" y="62" width="28" height="32" rx="3" fill="rgba(245,158,11,.08)" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="156" y="76" font-size="7" fill="#f59e0b" text-anchor="middle">缺口</text>
+      <text x="156" y="86" font-size="7" fill="#f59e0b" text-anchor="middle">GAP</text>
+      <!-- 跳空K棒 -->
+      <rect x="170" y="50" width="12" height="38" fill="#ef4444" rx="1"/>
+      <line x1="176" y1="38" x2="176" y2="54" stroke="#ef4444" stroke-width="2"/>
+      <line x1="176" y1="86" x2="176" y2="95" stroke="#ef4444" stroke-width="2"/>
+      <rect x="188" y="40" width="12" height="36" fill="#ef4444" rx="1"/>
+      <rect x="206" y="32" width="12" height="34" fill="#ef4444" rx="1"/>
+      <rect x="224" y="28" width="12" height="30" fill="#ef4444" rx="1"/>
+      <rect x="242" y="24" width="12" height="28" fill="#ef4444" rx="1"/>
+      <!-- 缺口支撐線 -->
+      <line x1="142" y1="94" x2="480" y2="94" stroke="#22c55e" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="10" y="92" font-size="7.5" fill="#22c55e">缺口下緣（支撐）</text>
+      <line x1="142" y1="62" x2="480" y2="62" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="10" y="60" font-size="7.5" fill="#ef4444">缺口上緣（突破點）</text>
+      <!-- 進場 + 停損箭頭 -->
+      <polygon points="176,100 172,114 180,114" fill="#22c55e"/>
+      <text x="184" y="112" font-size="8" fill="#22c55e">進場（缺口日）</text>
+      <!-- 成交量 -->
+      <rect x="110" y="155" width="10" height="20" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="126" y="152" width="10" height="23" rx="1" fill="rgba(22,163,74,.4)"/>
+      <rect x="142" y="150" width="10" height="25" rx="1" fill="#ef4444" opacity="0.4"/>
+      <rect x="158" y="140" width="14" height="35" rx="1" fill="#ef4444" opacity="0.7"/>
+      <rect x="176" y="133" width="14" height="42" rx="1" fill="#ef4444"/>
+      <text x="176" y="185" font-size="8" fill="#ef4444" text-anchor="middle">缺口日爆量</text>
+      <!-- 停損 -->
+      <line x1="0" y1="130" x2="480" y2="130" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+      <text x="280" y="144" font-size="7.5" fill="#ef4444">停損：填補缺口跌破下緣</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">⬆️ TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">開盤跳空</span><span class="filter-op">&gt;</span><span class="filter-val">前日收盤 2%</span><span style="color:#8b949e">且</span><span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">前日 1.5 倍</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">收盤</span><span class="filter-op">在</span><span class="filter-val">缺口上方</span><span style="color:#8b949e">（缺口完整保留未填）</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：跳空長紅K</span>
+      <span class="sig gold">缺口：收盤維持在缺口上方</span>
+      <span class="sig blue">成交量：明顯放大確認</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：<strong>缺口日收盤確認不回填</strong>進場（積極者開盤即進）<br>停損：<strong>回補缺口（跌破缺口下緣）</strong>代表突破失敗立即出場</p>
+    </div>
+    <p>跳空缺口的強度依序：<strong>突破缺口</strong>（最強，整理後突破）&gt; 逃逸缺口（趨勢加速）&gt; 竭盡缺口（趨勢末端，風險高）。配合消息面（法說會/財報）判斷類型。</p>
+  </div>
+</div>
+
+<!-- S18 月線長期支撐反彈 -->
+<div class="guide-card cat-strategy" id="s18">
+  <div class="card-header">
+    <div class="card-num">18</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">月線（MA240）長期支撐反彈策略</div>
+      <div class="card-sub">240日均線是機構法人的長期成本線，跌到這裡常有強力護盤</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- 月線（幾乎水平微升） -->
+      <polyline points="30,130 100,128 180,125 260,122 340,120 420,118 470,117" fill="none" stroke="#f59e0b" stroke-width="2"/>
+      <text x="420" y="113" font-size="8" fill="#f59e0b">月線 MA240</text>
+      <!-- 前段下跌K棒 -->
+      <rect x="30" y="50" width="9" height="28" fill="#22c55e" rx="1"/>
+      <rect x="44" y="62" width="9" height="32" fill="#ef4444" rx="1"/>
+      <rect x="58" y="74" width="9" height="30" fill="#ef4444" rx="1"/>
+      <rect x="72" y="84" width="9" height="32" fill="#ef4444" rx="1"/>
+      <rect x="86" y="94" width="9" height="30" fill="#ef4444" rx="1"/>
+      <rect x="100" y="102" width="9" height="26" fill="#22c55e" rx="1"/>
+      <rect x="114" y="108" width="9" height="28" fill="#ef4444" rx="1"/>
+      <rect x="128" y="114" width="9" height="26" fill="#ef4444" rx="1"/>
+      <!-- 接觸月線 + 錘子線 -->
+      <rect x="144" y="116" width="9" height="18" fill="#22c55e" rx="1"/>
+      <line x1="148.5" y1="116" x2="148.5" y2="138" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="115" y="148" font-size="7.5" fill="#f59e0b">觸及月線</text>
+      <!-- 反彈K棒 -->
+      <rect x="160" y="106" width="9" height="28" fill="#ef4444" rx="1"/>
+      <rect x="174" y="92" width="9" height="28" fill="#ef4444" rx="1"/>
+      <rect x="188" y="80" width="9" height="26" fill="#ef4444" rx="1"/>
+      <rect x="202" y="68" width="9" height="26" fill="#ef4444" rx="1"/>
+      <rect x="216" y="58" width="9" height="26" fill="#ef4444" rx="1"/>
+      <rect x="230" y="50" width="9" height="24" fill="#ef4444" rx="1"/>
+      <rect x="244" y="44" width="9" height="22" fill="#ef4444" rx="1"/>
+      <!-- 進場箭頭 -->
+      <polygon points="148,140 144,154 152,154" fill="#22c55e"/>
+      <text x="156" y="152" font-size="8" fill="#22c55e">進場（止跌K確認）</text>
+      <!-- RSI副圖 -->
+      <line x1="0" y1="170" x2="480" y2="170" stroke="#21262d"/>
+      <text x="10" y="183" font-size="7" fill="#8b949e">RSI:</text>
+      <polyline points="30,175 80,172 130,185 148,188 160,180 200,172 240,163 280,155 320,148" fill="none" stroke="#a78bfa" stroke-width="1.2"/>
+      <line x1="0" y1="183" x2="480" y2="183" stroke="rgba(239,68,68,.3)" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="430" y="182" font-size="6.5" fill="#ef4444">30 超賣線</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🟡 TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">股價</span><span class="filter-op">距 MA240</span><span class="filter-val">±3% 以內</span><span style="color:#8b949e">且</span><span class="filter-tag">RSI(14)</span><span class="filter-op">&lt;</span><span class="filter-val">35</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">成交量</span><span class="filter-op">&lt;</span><span class="filter-val">均量 0.7 倍</span><span style="color:#8b949e">（縮量止跌，代表賣壓收斂）</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：錘子線 / 長下影陽K</span>
+      <span class="sig gold">月線：歷史多次支撐確認</span>
+      <span class="sig bear">RSI：超賣後轉折向上</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：止跌K型出現 + 次日開盤未破低才進（確認反彈）<br>停損：<strong>跌破月線 3%</strong>（月線明顯失守），風險控制在 5% 內</p>
+    </div>
+    <p>月線支撐策略特別適用於台積電、聯電、聯發科等權值股，這些股票在月線附近常有退休基金、主權基金等機構入場護盤。</p>
+  </div>
+</div>
+
+<!-- S19 飆股前兆：三線排列 + 創高 -->
+<div class="guide-card cat-strategy" id="s19">
+  <div class="card-header">
+    <div class="card-num">19</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">飆股前兆策略：三線多頭 × 籌碼集中 × 創高</div>
+      <div class="card-sub">強者恆強原則 — 創新高的股票往往繼續創新高</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 三條MA -->
+      <polyline points="30,170 80,158 130,142 180,124 230,104 280,84 330,64 380,46 430,30" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+      <polyline points="30,178 80,169 130,156 180,141 230,124 280,106 330,88 380,72 430,58" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+      <polyline points="30,185 80,178 130,168 180,156 230,142 280,128 330,114 380,100 430,88" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="432" y="28" font-size="7" fill="#3b82f6">MA20</text>
+      <text x="432" y="56" font-size="7" fill="#f59e0b">MA60</text>
+      <text x="432" y="86" font-size="7" fill="#ef4444">MA120</text>
+      <!-- K棒 -->
+      <rect x="30" y="162" width="9" height="18" fill="#ef4444" rx="1"/>
+      <rect x="46" y="154" width="9" height="18" fill="#ef4444" rx="1"/>
+      <rect x="62" y="144" width="9" height="18" fill="#22c55e" rx="1"/>
+      <rect x="78" y="136" width="9" height="20" fill="#ef4444" rx="1"/>
+      <rect x="94" y="126" width="9" height="20" fill="#ef4444" rx="1"/>
+      <rect x="110" y="116" width="9" height="18" fill="#22c55e" rx="1"/>
+      <rect x="126" y="106" width="9" height="20" fill="#ef4444" rx="1"/>
+      <rect x="142" y="96" width="9" height="20" fill="#ef4444" rx="1"/>
+      <rect x="158" y="86" width="9" height="20" fill="#ef4444" rx="1"/>
+      <rect x="174" y="78" width="9" height="18" fill="#22c55e" rx="1"/>
+      <rect x="190" y="70" width="9" height="18" fill="#ef4444" rx="1"/>
+      <!-- 52週高點突破 -->
+      <line x1="0" y1="68" x2="480" y2="68" stroke="#f43f5e" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="10" y="64" font-size="7.5" fill="#f43f5e">52 週高點</text>
+      <rect x="208" y="50" width="12" height="28" fill="#ef4444" rx="1"/>
+      <line x1="214" y1="40" x2="214" y2="54" stroke="#ef4444" stroke-width="2"/>
+      <rect x="226" y="38" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="244" y="28" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="262" y="18" width="12" height="28" fill="#ef4444" rx="1"/>
+      <text x="214" y="32" font-size="8" fill="#f43f5e" text-anchor="middle">突破</text>
+      <polygon points="214,84 210,98 218,98" fill="#22c55e"/>
+      <text x="222" y="96" font-size="8" fill="#22c55e">回測進場</text>
+      <!-- 籌碼集中指示 -->
+      <rect x="0" y="155" width="480" height="40" fill="#0d1117"/>
+      <text x="10" y="170" font-size="7" fill="#8b949e">外資：</text>
+      <rect x="50" y="160" width="14" height="8" rx="1" fill="rgba(59,130,246,.5)"/>
+      <rect x="68" y="158" width="14" height="10" rx="1" fill="rgba(59,130,246,.6)"/>
+      <rect x="86" y="156" width="14" height="12" rx="1" fill="rgba(59,130,246,.7)"/>
+      <rect x="104" y="154" width="14" height="14" rx="1" fill="rgba(59,130,246,.8)"/>
+      <rect x="122" y="152" width="14" height="16" rx="1" fill="#3b82f6"/>
+      <text x="10" y="188" font-size="7" fill="#8b949e">投信：</text>
+      <rect x="50" y="178" width="10" height="8" rx="1" fill="rgba(139,92,246,.5)"/>
+      <rect x="64" y="176" width="10" height="10" rx="1" fill="rgba(139,92,246,.6)"/>
+      <rect x="78" y="174" width="10" height="12" rx="1" fill="rgba(139,92,246,.7)"/>
+      <rect x="92" y="172" width="10" height="14" rx="1" fill="#8b5cf6"/>
+      <text x="145" y="170" font-size="7" fill="#60a5fa">法人雙買連 5 日</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🚀 TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">股價</span><span class="filter-op">創</span><span class="filter-val">52 週新高</span><span style="color:#8b949e">且</span><span class="filter-tag">MA20 &gt; MA60 &gt; MA120</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">成交量</span><span class="filter-op">持續</span><span class="filter-val">放大趨勢</span><span style="color:#8b949e">且</span><span class="filter-tag">漲幅</span><span class="filter-op">&gt;</span><span class="filter-val">1.5%</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：連續多根長紅K</span>
+      <span class="sig gold">三線：MA20&gt;60&gt;120 多頭排列</span>
+      <span class="sig blue">法人：外資+投信雙買 ≥ 5 日</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：<strong>突破52週高點後回測不破</strong>（量縮回測健康），非追漲停<br>停損：跌破 <strong>MA10</strong>，上漲趨勢未破繼續持有</p>
+    </div>
+    <p>飆股往往在創新高時才是真正的起點，不是頂點。關鍵在<strong>回測不破</strong>確認支撐後進場，比追漲停板更安全且更低成本。</p>
+  </div>
+</div>
+
+<!-- S20 跌深V型反轉策略 -->
+<div class="guide-card cat-strategy" id="s20">
+  <div class="card-header">
+    <div class="card-num">20</div>
+    <div class="card-meta">
+      <span class="cat-tag">台股交易策略</span>
+      <div class="card-title">跌深 V 型反轉策略（多空轉折確認）</div>
+      <div class="card-sub">連續重挫後出現爆量止跌K，是最乾淨的多空轉折訊號</div>
+    </div>
+  </div>
+  <div class="card-diagram">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 下跌段 -->
+      <rect x="20" y="40" width="9" height="28" fill="#22c55e" rx="1"/>
+      <rect x="34" y="52" width="9" height="30" fill="#ef4444" rx="1"/>
+      <rect x="48" y="62" width="9" height="32" fill="#ef4444" rx="1"/>
+      <rect x="62" y="72" width="9" height="34" fill="#ef4444" rx="1"/>
+      <rect x="76" y="82" width="9" height="32" fill="#ef4444" rx="1"/>
+      <rect x="90" y="90" width="9" height="34" fill="#ef4444" rx="1"/>
+      <rect x="104" y="98" width="9" height="34" fill="#ef4444" rx="1"/>
+      <rect x="118" y="108" width="9" height="36" fill="#ef4444" rx="1"/>
+      <rect x="132" y="116" width="9" height="34" fill="#ef4444" rx="1"/>
+      <!-- V型底部：超大量止跌K -->
+      <rect x="148" y="100" width="14" height="52" fill="#22c55e" rx="2"/>
+      <line x1="155" y1="82" x2="155" y2="104" stroke="#22c55e" stroke-width="2"/>
+      <line x1="155" y1="150" x2="155" y2="165" stroke="#22c55e" stroke-width="2"/>
+      <text x="155" y="76" font-size="7.5" fill="#22c55e" text-anchor="middle">吞噬K</text>
+      <!-- 反彈段 -->
+      <rect x="168" y="94" width="10" height="36" fill="#ef4444" rx="1"/>
+      <rect x="184" y="82" width="10" height="34" fill="#ef4444" rx="1"/>
+      <rect x="200" y="70" width="10" height="32" fill="#ef4444" rx="1"/>
+      <rect x="216" y="60" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="232" y="50" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="248" y="42" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="264" y="34" width="10" height="24" fill="#ef4444" rx="1"/>
+      <!-- V型示意 -->
+      <polyline points="20,40 148,120 270,34" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+      <!-- 進場 -->
+      <polygon points="155,168 151,182 159,182" fill="#22c55e"/>
+      <text x="163" y="180" font-size="8" fill="#22c55e">次日確認進場</text>
+      <!-- 爆量條 -->
+      <rect x="20" y="168" width="9" height="12" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="34" y="166" width="9" height="14" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="48" y="164" width="9" height="16" rx="1" fill="rgba(239,68,68,.4)"/>
+      <rect x="62" y="163" width="9" height="17" rx="1" fill="rgba(239,68,68,.4)"/>
+      <rect x="76" y="162" width="9" height="18" rx="1" fill="rgba(239,68,68,.5)"/>
+      <rect x="90" y="161" width="9" height="19" rx="1" fill="rgba(239,68,68,.5)"/>
+      <rect x="104" y="160" width="9" height="20" rx="1" fill="rgba(239,68,68,.6)"/>
+      <rect x="118" y="158" width="9" height="22" rx="1" fill="rgba(239,68,68,.7)"/>
+      <rect x="132" y="157" width="9" height="23" rx="1" fill="rgba(239,68,68,.8)"/>
+      <rect x="148" y="148" width="14" height="32" rx="1" fill="#22c55e"/>
+      <text x="155" y="197" font-size="7.5" fill="#22c55e" text-anchor="middle">爆量</text>
+      <rect x="168" y="162" width="10" height="18" rx="1" fill="rgba(239,68,68,.6)"/>
+      <rect x="184" y="165" width="10" height="15" rx="1" fill="rgba(239,68,68,.5)"/>
+      <rect x="200" y="168" width="10" height="12" rx="1" fill="rgba(239,68,68,.4)"/>
+      <text x="80" y="196" font-size="7.5" fill="#ef4444" text-anchor="middle">下跌量能遞增</text>
+      <!-- RSI -->
+      <text x="320" y="50" font-size="7.5" fill="#8b949e">RSI 底部條件：</text>
+      <text x="320" y="65" font-size="8" fill="#ef4444">RSI &lt; 25 超低水位</text>
+      <text x="320" y="80" font-size="8" fill="#22c55e">+ 連跌 7 日以上</text>
+      <text x="320" y="95" font-size="8" fill="#60a5fa">+ 今日成交量</text>
+      <text x="320" y="110" font-size="8" fill="#60a5fa">  &gt; 前 3 日均量 2 倍</text>
+      <text x="320" y="125" font-size="8" fill="#f59e0b">+ 收盤在當日</text>
+      <text x="320" y="140" font-size="8" fill="#f59e0b">  高低區間 70% 以上</text>
+    </svg>
+  </div>
+  <div class="card-body">
+    <div class="filter-recipe">
+      <div class="filter-recipe-title">🔻→🔺 TradingView 篩選條件</div>
+      <div class="filter-row"><span class="filter-tag">RSI(14)</span><span class="filter-op">&lt;</span><span class="filter-val">25</span><span style="color:#8b949e">且</span><span class="filter-tag">成交量</span><span class="filter-op">&gt;</span><span class="filter-val">前 3 日均量 2 倍</span></div>
+      <div class="filter-row" style="margin-top:4px"><span class="filter-tag">漲幅</span><span class="filter-op">&gt;</span><span class="filter-val">2%</span><span style="color:#8b949e">（反彈確認）</span><span class="filter-tag">市值</span><span class="filter-op">&gt;</span><span class="filter-val">100 億</span></div>
+    </div>
+    <div class="signal-row">
+      <span class="sig bull">K棒：大量吞噬K / 長下影錘子</span>
+      <span class="sig bear">前提：連跌 ≥ 7 日</span>
+      <span class="sig gold">RSI：&lt;25 極度超賣</span>
+    </div>
+    <div class="entry-box">
+      <h4>進場 / 停損</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">進場：<strong>止跌K隔日開盤</strong>開高維持（跳空反彈確認）再進場<br>停損：跌破止跌K低點，V型反轉失敗立刻出場</p>
+    </div>
+    <div class="red-box" style="margin-top:8px">
+      <h4>高風險提醒</h4>
+      <p style="margin:0;font-size:.84rem;color:#c9d1d9">V型反轉勝率雖高但失敗代價大，<strong>停損必須嚴格執行</strong>。只適用於中大型流動性高的股票，避免小型股（有地雷風險）。次日開盤跳空低開則放棄進場。</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.guide-grid -->
+
+<script>
+function filterCards(cat, btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.guide-card').forEach(c=>{
+    if(cat==='all') c.classList.remove('hidden');
+    else c.classList.toggle('hidden', !c.classList.contains(cat));
+  });
+}
+</script>
+
+<!-- 交易日誌捷徑 -->
+<a href="trade-journal.html" class="jfab" style="position:fixed;top:64px;right:16px;z-index:9999;background:#e8a228;color:#000;font-weight:700;font-size:.78rem;padding:9px 16px;border-radius:22px;text-decoration:none;box-shadow:0 4px 16px rgba(232,162,40,.45);white-space:nowrap;line-height:1;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" fill="rgba(0,0,0,.25)"/><line x1="4" y1="4.5" x2="10" y2="4.5" stroke="#000" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="7" x2="8.5" y2="7" stroke="#000" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="9.5" x2="10" y2="9.5" stroke="#000" stroke-width="1.2" stroke-linecap="round"/></svg>交易日誌</a>
+</body>
+</html>
