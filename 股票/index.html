@@ -594,34 +594,37 @@ a { color: inherit; text-decoration: none; }
         <a class="gnav-item" href="candlestick-patterns.html?cat=combo">組合型態</a>
       </div>
     </div>
-    <!-- 課程 -->
+    <!-- 教學 -->
     <div class="gnav-group" id="gnav-courses">
       <button class="gnav-btn" onclick="toggleDrop('courses')">
-        課程 <span class="gnav-arrow">▾</span>
+        教學 <span class="gnav-arrow">▾</span>
       </button>
       <div class="gnav-drop">
         <a class="gnav-item" href="stock-course.html">台股課程</a>
         <a class="gnav-item" href="us-stock-course.html">美股課程</a>
         <a class="gnav-item" href="futures-course.html">台指期課程</a>
         <a class="gnav-item" href="us-futures-course.html">美股期貨課程</a>
-        <a class="gnav-item" href="stock-quiz.html">股票考題</a>
-        <a class="gnav-item" href="futures-quiz.html">期貨考題</a>
-      </div>
-    </div>
-    <!-- 專有名詞及策略 -->
-    <div class="gnav-group" id="gnav-glossary">
-      <button class="gnav-btn" onclick="toggleDrop('glossary')">
-        名詞及策略 <span class="gnav-arrow">▾</span>
-      </button>
-      <div class="gnav-drop">
         <a class="gnav-item" href="stock-glossary.html">股票相關名詞</a>
         <a class="gnav-item" href="futures-glossary.html">期貨相關名詞</a>
+        <a class="gnav-item" href="stock-quiz.html">股票題型</a>
+        <a class="gnav-item" href="futures-quiz.html">期貨題型</a>
+      </div>
+    </div>
+    <!-- 策略 -->
+    <div class="gnav-group" id="gnav-glossary">
+      <button class="gnav-btn" onclick="toggleDrop('glossary')">
+        策略 <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
         <a class="gnav-item" href="strategy-glossary.html">技術分析策略</a>
         <a class="gnav-item" href="advanced-tips.html">股票進階技巧</a>
         <a class="gnav-item" href="futures-advanced-tips.html">期貨進階技巧</a>
-        <a class="gnav-item" href="trade-journal.html">交易日誌</a>
+        <a class="gnav-item" href="tradingview-guide.html">TradingView 指南</a>
+        <a class="gnav-item" href="advanced-indicators.html">進階指標精解</a>
       </div>
     </div>
+    <!-- 交易日誌 -->
+    <a class="gnav-btn" href="trade-journal.html" style="text-decoration:none">交易日誌</a>
     <!-- 收藏 -->
     <div class="gnav-group" id="gnav-fav" style="margin-left:auto">
       <button class="gnav-btn fav-btn" onclick="switchFavorites()" id="fav-btn">
@@ -1257,8 +1260,21 @@ let expandedCard = null;
 let favorites = new Set(JSON.parse(localStorage.getItem('stock-favorites') || '[]'));
 
 function saveFavorites() {
-  localStorage.setItem('stock-favorites', JSON.stringify([...favorites]));
+  const arr = [...favorites];
+  localStorage.setItem('stock-favorites', JSON.stringify(arr));
+  window._syncFavCloud?.(arr);
 }
+
+window._updateFavFromCloud = ids => {
+  favorites = new Set(ids);
+  localStorage.setItem('stock-favorites', JSON.stringify(ids));
+  updateFavBtn();
+  document.querySelectorAll('[data-id]').forEach(el => {
+    const star = el.querySelector('.card-star');
+    if (star) star.classList.toggle('starred', favorites.has(el.dataset.id));
+  });
+  if (currentSection === 'favorites') renderSection('favorites');
+};
 
 function toggleStar(id, e) {
   e.stopPropagation();
@@ -1593,6 +1609,33 @@ window.addEventListener('resize', updateTabIndicator);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
+</script>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey:"AIzaSyDMpaJo2I0KN6OU7UVgvvNRPzNNJefJiC4",
+  authDomain:"transaction-log-fe0c3.firebaseapp.com",
+  projectId:"transaction-log-fe0c3",
+  storageBucket:"transaction-log-fe0c3.firebasestorage.app",
+  messagingSenderId:"762032844445",
+  appId:"1:762032844405:web:cbc466f21dd73ab80f523c"
+});
+const db = getFirestore(app);
+const FAV_DOC = doc(db, 'settings', 'favorites');
+
+(async () => {
+  try {
+    const snap = await getDoc(FAV_DOC);
+    if (snap.exists()) window._updateFavFromCloud?.(snap.data().ids || []);
+  } catch {}
+})();
+
+window._syncFavCloud = async ids => {
+  try { await setDoc(FAV_DOC, { ids }); } catch {}
+};
 </script>
 </body>
 </html>

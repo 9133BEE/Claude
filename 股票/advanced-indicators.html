@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>進階技術指標精解 | 股學筆記</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+a{color:#58a6ff;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topbar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar-title{font-size:1.1rem;font-weight:700;color:#e6edf3}
+.topbar a{font-size:.85rem;color:#8b949e;padding:4px 10px;border-radius:6px;border:1px solid #30363d;transition:all .2s}
+.topbar a:hover{color:#58a6ff;border-color:#58a6ff;text-decoration:none}
+
+.hero{background:linear-gradient(135deg,#0d1117 0%,#1a1025 50%,#0d1117 100%);padding:48px 20px 32px;text-align:center;border-bottom:1px solid #30363d}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#f43f5e,#f59e0b,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:#8b949e;font-size:1rem;max-width:620px;margin:0 auto 8px}
+.hero-badge{display:inline-block;background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.4);color:#fb7185;font-size:.78rem;padding:4px 12px;border-radius:20px;margin-top:8px}
+
+.toc{max-width:960px;margin:24px auto;padding:0 20px}
+.toc-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px 24px}
+.toc-title{font-size:.78rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:#c9d1d9;font-size:.84rem;cursor:pointer;transition:background .15s;text-decoration:none}
+.toc-item:hover{background:#21262d;color:#58a6ff;text-decoration:none}
+.toc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+.filters{display:flex;gap:8px;padding:16px 20px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
+.filter-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:6px 16px;border-radius:20px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.filter-btn:hover{border-color:#58a6ff;color:#58a6ff}
+.filter-btn.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa}
+.filter-btn.f-st.active{background:rgba(244,63,94,.15);border-color:#f43f5e;color:#fb7185}
+.filter-btn.f-obv.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa}
+.filter-btn.f-ttm.active{background:rgba(245,158,11,.15);border-color:#f59e0b;color:#fbbf24}
+.filter-btn.f-combo.active{background:rgba(34,197,94,.15);border-color:#22c55e;color:#4ade80}
+
+.grid{max-width:1120px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:24px}
+
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:#58a6ff;box-shadow:0 4px 20px rgba(88,166,255,.08)}
+.card.st{border-top:3px solid #f43f5e}
+.card.obv{border-top:3px solid #3b82f6}
+.card.ttm{border-top:3px solid #f59e0b}
+.card.combo{border-top:3px solid #22c55e}
+
+.ch{padding:20px 20px 0;display:flex;gap:12px;align-items:flex-start}
+.cn{background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:.75rem;font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.cm{flex:1}
+.ctag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.st .ctag{background:rgba(244,63,94,.15);color:#fb7185}
+.obv .ctag{background:rgba(59,130,246,.15);color:#60a5fa}
+.ttm .ctag{background:rgba(245,158,11,.15);color:#fbbf24}
+.combo .ctag{background:rgba(34,197,94,.15);color:#4ade80}
+.ctitle{font-size:1.05rem;font-weight:700;color:#e6edf3;line-height:1.3}
+.csub{font-size:.82rem;color:#8b949e;margin-top:3px}
+
+.diag{padding:14px 20px 0}
+.diag svg{width:100%;height:auto;display:block;border-radius:8px;background:#0d1117;border:1px solid #21262d}
+
+.cb{padding:16px 20px 20px}
+.cb p{font-size:.87rem;color:#8b949e;line-height:1.65;margin-bottom:6px}
+.cb ul,.cb ol{padding-left:18px;margin:4px 0}
+.cb li{font-size:.86rem;color:#8b949e;line-height:1.6;margin-bottom:3px}
+.cb strong{color:#e6edf3}
+
+.box{border-radius:8px;padding:11px 14px;margin:9px 0;font-size:.86rem}
+.bx-r{background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.25);border-left:3px solid #f43f5e}
+.bx-r h4{color:#fb7185;font-size:.77rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.bx-b{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.25);border-left:3px solid #3b82f6}
+.bx-b h4{color:#60a5fa;font-size:.77rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.bx-g{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.25);border-left:3px solid #22c55e}
+.bx-g h4{color:#4ade80;font-size:.77rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.bx-y{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-left:3px solid #f59e0b}
+.bx-y h4{color:#fbbf24;font-size:.77rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.bx-p{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.25);border-left:3px solid #8b5cf6}
+.bx-p h4{color:#a78bfa;font-size:.77rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tag{padding:3px 10px;border-radius:6px;font-size:.78rem;font-weight:500}
+.tag-r{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.3);color:#fca5a5}
+.tag-g{background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.3);color:#86efac}
+.tag-b{background:rgba(59,130,246,.10);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
+.tag-y{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.3);color:#fcd34d}
+.tag-p{background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.3);color:#c4b5fd}
+
+.pair-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.pair-card{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:10px 12px}
+.pair-name{font-size:.82rem;font-weight:700;color:#e6edf3;margin-bottom:3px}
+.pair-why{font-size:.76rem;color:#8b949e;line-height:1.5}
+
+.signal-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.82rem}
+.signal-table th{background:#21262d;color:#8b949e;padding:7px 10px;text-align:left;font-weight:600;border-bottom:1px solid #30363d}
+.signal-table td{padding:7px 10px;border-bottom:1px solid #21262d;color:#c9d1d9;vertical-align:top}
+.signal-table tr:last-child td{border-bottom:none}
+
+.hidden{display:none!important}
+
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr;padding:12px 10px;gap:14px}
+  .toc-grid{grid-template-columns:1fr 1fr}
+  .pair-grid{grid-template-columns:1fr}
+  .filters{gap:5px;padding:10px}
+  .filter-btn{font-size:.76rem;padding:5px 10px}
+  .hero h1{font-size:1.5rem}
+  .topbar a{display:none}
+  .topbar a:first-of-type{display:inline}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-title">進階技術指標精解</span>
+  <a href="index.html">← 回主頁</a>
+  <a href="tradingview-guide.html">TradingView 指南</a>
+  <a href="advanced-tips.html">進階技巧</a>
+</div>
+
+<div class="hero">
+  <h1>進階技術指標精解</h1>
+  <p>超越 MA/KD/RSI 的散戶層級 — 三大機構級指標完整解析，附圖解與搭配策略</p>
+  <span class="hero-badge">Supertrend · OBV · TTM Squeeze · 組合策略</span>
+</div>
+
+<div class="toc">
+  <div class="toc-box">
+    <div class="toc-title">目錄</div>
+    <div class="toc-grid">
+      <a class="toc-item" href="#s1"><span class="toc-dot" style="background:#f43f5e"></span>Supertrend 原理</a>
+      <a class="toc-item" href="#s2"><span class="toc-dot" style="background:#f43f5e"></span>Supertrend 多空訊號</a>
+      <a class="toc-item" href="#s3"><span class="toc-dot" style="background:#f43f5e"></span>Supertrend 多週期用法</a>
+      <a class="toc-item" href="#s4"><span class="toc-dot" style="background:#3b82f6"></span>OBV 原理與計算</a>
+      <a class="toc-item" href="#s5"><span class="toc-dot" style="background:#3b82f6"></span>OBV 正背離</a>
+      <a class="toc-item" href="#s6"><span class="toc-dot" style="background:#3b82f6"></span>OBV 隱藏背離</a>
+      <a class="toc-item" href="#s7"><span class="toc-dot" style="background:#f59e0b"></span>TTM Squeeze 原理</a>
+      <a class="toc-item" href="#s8"><span class="toc-dot" style="background:#f59e0b"></span>TTM 四色判讀</a>
+      <a class="toc-item" href="#s9"><span class="toc-dot" style="background:#f59e0b"></span>TTM 爆發強度判斷</a>
+      <a class="toc-item" href="#s10"><span class="toc-dot" style="background:#22c55e"></span>三指標組合進場</a>
+      <a class="toc-item" href="#s11"><span class="toc-dot" style="background:#22c55e"></span>三指標組合出場</a>
+      <a class="toc-item" href="#s12"><span class="toc-dot" style="background:#22c55e"></span>常見錯誤與陷阱</a>
+    </div>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filt('all',this)">全部 12</button>
+  <button class="filter-btn f-st" onclick="filt('st',this)">Supertrend 3</button>
+  <button class="filter-btn f-obv" onclick="filt('obv',this)">OBV 3</button>
+  <button class="filter-btn f-ttm" onclick="filt('ttm',this)">TTM Squeeze 3</button>
+  <button class="filter-btn f-combo" onclick="filt('combo',this)">組合策略 3</button>
+</div>
+
+<div class="grid" id="mainGrid">
+
+<!-- ══════════════════════════ SUPERTREND ══════════════════════════ -->
+
+<!-- S1 Supertrend 原理 -->
+<div class="card st" id="s1">
+  <div class="ch"><div class="cn">1</div><div class="cm">
+    <span class="ctag">Supertrend</span>
+    <div class="ctitle">Supertrend — 什麼是動態停損線？</div>
+    <div class="csub">設定：ATR 長度 7，係數 3</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="220" fill="#0d1117"/>
+      <!-- 下跌段 + 紅色 Supertrend 線在上方 -->
+      <polyline points="30,60 70,72 110,90 150,105 170,100 190,112 215,108" fill="none" stroke="#f43f5e" stroke-width="2" stroke-dasharray="0"/>
+      <!-- K棒（下跌段） -->
+      <rect x="26" y="68" width="8" height="20" fill="#22c55e" rx="1"/>
+      <line x1="30" y1="62" x2="30" y2="72" stroke="#22c55e" stroke-width="1.5"/>
+      <rect x="42" y="80" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="58" y="92" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="74" y="98" width="8" height="24" fill="#22c55e" rx="1"/>
+      <rect x="90" y="105" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="106" y="112" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="122" y="104" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="138" y="108" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="154" y="98" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="170" y="100" width="8" height="24" fill="#22c55e" rx="1"/>
+      <rect x="186" y="110" width="8" height="22" fill="#22c55e" rx="1"/>
+      <!-- 翻轉點 -->
+      <line x1="215" y1="0" x2="215" y2="220" stroke="#fff" stroke-width="0.6" stroke-dasharray="4,4" opacity=".25"/>
+      <text x="217" y="14" font-size="8" fill="#fff" opacity=".5">翻色</text>
+      <!-- 上升段 + 綠色 Supertrend 線在下方 -->
+      <polyline points="215,148 255,138 295,126 335,112 375,98 420,86 460,76" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <!-- K棒（上升段） -->
+      <rect x="202" y="112" width="10" height="36" fill="#ef4444" rx="1"/>
+      <line x1="207" y1="102" x2="207" y2="116" stroke="#ef4444" stroke-width="2"/>
+      <rect x="218" y="100" width="8" height="32" fill="#ef4444" rx="1"/>
+      <rect x="234" y="88" width="8" height="34" fill="#ef4444" rx="1"/>
+      <rect x="250" y="78" width="8" height="32" fill="#ef4444" rx="1"/>
+      <rect x="266" y="70" width="8" height="30" fill="#ef4444" rx="1"/>
+      <rect x="282" y="62" width="8" height="30" fill="#ef4444" rx="1"/>
+      <rect x="298" y="56" width="8" height="28" fill="#22c55e" rx="1"/>
+      <rect x="314" y="50" width="8" height="28" fill="#ef4444" rx="1"/>
+      <rect x="330" y="44" width="8" height="26" fill="#ef4444" rx="1"/>
+      <rect x="346" y="40" width="8" height="24" fill="#ef4444" rx="1"/>
+      <rect x="362" y="36" width="8" height="24" fill="#22c55e" rx="1"/>
+      <rect x="378" y="30" width="8" height="24" fill="#ef4444" rx="1"/>
+      <!-- 標籤 -->
+      <rect x="24" y="32" width="90" height="22" rx="4" fill="rgba(244,63,94,.15)" stroke="rgba(244,63,94,.4)"/>
+      <text x="70" y="46" font-size="8" fill="#fb7185" text-anchor="middle">紅線在上 = 空方區</text>
+      <rect x="310" y="32" width="90" height="22" rx="4" fill="rgba(34,197,94,.15)" stroke="rgba(34,197,94,.4)"/>
+      <text x="355" y="46" font-size="8" fill="#4ade80" text-anchor="middle">綠線在下 = 多方區</text>
+      <!-- 進場箭頭 -->
+      <polygon points="207,154 203,168 211,168" fill="#22c55e"/>
+      <text x="215" y="167" font-size="8.5" fill="#22c55e" font-weight="700">進場</text>
+      <!-- ATR說明 -->
+      <rect x="10" y="180" width="460" height="36" rx="5" fill="#161b22" stroke="#21262d"/>
+      <text x="240" y="195" font-size="8" fill="#8b949e" text-anchor="middle">Supertrend = 中間價 ± （係數 × ATR）</text>
+      <text x="240" y="210" font-size="7.5" fill="#6b7280" text-anchor="middle">ATR 越大 = 市場波動越大 = 線離價格越遠 = 較不易假突破</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-r"><h4>計算原理</h4>
+      <p style="margin:0;color:#c9d1d9">Supertrend 用 <strong>ATR（真實波動範圍）</strong>計算，不是固定距離而是隨市場波動動態調整：<br>
+      上軌 = (最高+最低)÷2 + 係數×ATR(7)　← 紅線位置<br>
+      下軌 = (最高+最低)÷2 − 係數×ATR(7)　← 綠線位置</p>
+    </div>
+    <div class="bx-g"><h4>為什麼比均線強</h4>
+      <ul style="color:#c9d1d9">
+        <li>均線是<strong>落後指標</strong>（平均過去價格），Supertrend 把當前波動率納入</li>
+        <li>不會在盤整時頻繁發假訊號（因為帶入 ATR，震盪小時線更貼近）</li>
+        <li>直接給出<strong>動態停損位</strong>，不需要自己決定停損在哪</li>
+      </ul>
+    </div>
+    <p>係數 3 比係數 2 訊號更少但更準，係數越大越少翻色但追蹤越慢。</p>
+    <div class="tag-row">
+      <span class="tag tag-r">建議搭配：成交量確認翻色</span>
+      <span class="tag tag-b">建議搭配：OBV 同向</span>
+      <span class="tag tag-y">建議搭配：週線確認大趨勢</span>
+    </div>
+  </div>
+</div>
+
+<!-- S2 Supertrend 多空訊號 -->
+<div class="card st" id="s2">
+  <div class="ch"><div class="cn">2</div><div class="cm">
+    <span class="ctag">Supertrend</span>
+    <div class="ctitle">Supertrend 進出場訊號完整判讀</div>
+    <div class="csub">四種情境：翻綠進場、翻紅出場、假訊號辨識</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 240" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="240" fill="#0d1117"/>
+      <!-- 情境一：正常翻綠 -->
+      <text x="10" y="16" font-size="8.5" fill="#4ade80" font-weight="700">情境①  正常翻綠進場</text>
+      <polyline points="10,50 40,55 70,65 90,60" fill="none" stroke="#f43f5e" stroke-width="1.5"/>
+      <polyline points="90,80 120,72 150,62 175,52" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="90" y1="10" x2="90" y2="110" stroke="#fff" stroke-width="0.5" stroke-dasharray="3,3" opacity=".2"/>
+      <rect x="8" y="38" width="6" height="18" fill="#22c55e" rx="1"/>
+      <rect x="20" y="42" width="6" height="20" fill="#22c55e" rx="1"/>
+      <rect x="32" y="48" width="6" height="22" fill="#22c55e" rx="1"/>
+      <rect x="44" y="44" width="6" height="20" fill="#22c55e" rx="1"/>
+      <rect x="56" y="52" width="6" height="22" fill="#22c55e" rx="1"/>
+      <rect x="68" y="48" width="6" height="20" fill="#22c55e" rx="1"/>
+      <rect x="82" y="52" width="8" height="30" fill="#ef4444" rx="1"/>
+      <line x1="86" y1="42" x2="86" y2="56" stroke="#ef4444" stroke-width="2"/>
+      <rect x="96" y="64" width="7" height="24" fill="#ef4444" rx="1"/>
+      <rect x="110" y="56" width="7" height="22" fill="#ef4444" rx="1"/>
+      <rect x="124" y="48" width="7" height="22" fill="#ef4444" rx="1"/>
+      <rect x="138" y="42" width="7" height="20" fill="#ef4444" rx="1"/>
+      <rect x="152" y="36" width="7" height="20" fill="#ef4444" rx="1"/>
+      <rect x="166" y="30" width="7" height="22" fill="#ef4444" rx="1"/>
+      <polygon points="86,90 82,102 90,102" fill="#22c55e"/>
+      <text x="94" y="100" font-size="7.5" fill="#22c55e">進場 + 成交量確認</text>
+
+      <!-- 情境二：假訊號 -->
+      <text x="10" y="126" font-size="8.5" fill="#fbbf24" font-weight="700">情境②  假訊號（量小翻色要小心）</text>
+      <polyline points="10,158 50,150 80,155 110,148 130,152 145,145" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <polyline points="145,162 170,168 190,160" fill="none" stroke="#f43f5e" stroke-width="1.5"/>
+      <polyline points="190,148 230,138 260,128" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <rect x="8" y="145" width="6" height="18" fill="#ef4444" rx="1"/>
+      <rect x="20" y="142" width="6" height="16" fill="#ef4444" rx="1"/>
+      <rect x="32" y="146" width="6" height="16" fill="#22c55e" rx="1"/>
+      <rect x="44" y="142" width="6" height="16" fill="#ef4444" rx="1"/>
+      <rect x="56" y="144" width="6" height="15" fill="#ef4444" rx="1"/>
+      <rect x="68" y="140" width="6" height="15" fill="#ef4444" rx="1"/>
+      <rect x="80" y="144" width="6" height="14" fill="#22c55e" rx="1"/>
+      <rect x="92" y="140" width="6" height="15" fill="#ef4444" rx="1"/>
+      <rect x="104" y="138" width="6" height="16" fill="#ef4444" rx="1"/>
+      <!-- 假翻紅 -->
+      <rect x="118" y="142" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="132" y="138" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="148" y="150" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="164" y="155" width="8" height="18" fill="#22c55e" rx="1"/>
+      <text x="118" y="135" font-size="7.5" fill="#fbbf24">假翻紅（量小）</text>
+      <line x1="118" y1="137" x2="164" y2="137" stroke="#fbbf24" stroke-width="0.8"/>
+      <!-- 量圖 -->
+      <text x="10" y="228" font-size="7" fill="#8b949e">量：</text>
+      <rect x="30" y="210" width="6" height="18" rx="1" fill="rgba(239,68,68,.5)"/>
+      <rect x="42" y="208" width="6" height="20" rx="1" fill="rgba(239,68,68,.5)"/>
+      <rect x="54" y="212" width="6" height="16" rx="1" fill="rgba(239,68,68,.4)"/>
+      <rect x="66" y="214" width="6" height="14" rx="1" fill="rgba(239,68,68,.4)"/>
+      <rect x="78" y="215" width="6" height="13" rx="1" fill="rgba(34,197,94,.4)"/>
+      <rect x="90" y="216" width="6" height="12" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="102" y="217" width="6" height="11" rx="1" fill="rgba(239,68,68,.3)"/>
+      <rect x="114" y="218" width="8" height="10" rx="1" fill="rgba(34,197,94,.2)"/>
+      <rect x="126" y="218" width="8" height="10" rx="1" fill="rgba(34,197,94,.2)"/>
+      <text x="116" y="207" font-size="7" fill="#fbbf24">量縮 = 假訊號</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <table class="signal-table">
+      <tr><th>訊號</th><th>發生條件</th><th>操作</th></tr>
+      <tr><td><strong style="color:#4ade80">翻綠進場</strong></td><td>K棒收盤突破 Supertrend 線上方，線由紅轉綠</td><td>隔日開盤進場，量要同步放大</td></tr>
+      <tr><td><strong style="color:#f43f5e">翻紅出場</strong></td><td>K棒收盤跌破 Supertrend 線下方，線由綠轉紅</td><td>收盤確認後出場，不等隔日</td></tr>
+      <tr><td><strong style="color:#fbbf24">假翻色</strong></td><td>翻色當日成交量低於均量</td><td>觀望，等量能確認再動作</td></tr>
+      <tr><td><strong style="color:#a78bfa">強勢持有</strong></td><td>線在下方且股價遠離線（大於 2 ATR）</td><td>不出場，趨勢強勢，等正常翻紅</td></tr>
+    </table>
+    <div class="bx-y"><h4>假訊號過濾法則</h4>
+      <p style="margin:0;color:#c9d1d9">翻色當日成交量 &lt; 5日均量 → <strong>不動作，等第二根確認</strong><br>若第二根仍維持方向且量放大 → 才正式進出場</p>
+    </div>
+  </div>
+</div>
+
+<!-- S3 Supertrend 多週期 -->
+<div class="card st" id="s3">
+  <div class="ch"><div class="cn">3</div><div class="cm">
+    <span class="ctag">Supertrend</span>
+    <div class="ctitle">Supertrend 多週期共振用法</div>
+    <div class="csub">週線 + 日線雙確認，勝率大幅提升</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 週線（大框架）-->
+      <rect x="10" y="10" width="220" height="180" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="120" y="28" font-size="9" fill="#8b949e" text-anchor="middle" font-weight="700">週線（大方向）</text>
+      <polyline points="20,100 50,90 80,78 110,66 140,58 170,50 200,44" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <rect x="20" y="86" width="10" height="24" fill="#ef4444" rx="1"/>
+      <rect x="36" y="76" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="52" y="66" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="68" y="58" width="10" height="20" fill="#ef4444" rx="1"/>
+      <rect x="84" y="50" width="10" height="20" fill="#ef4444" rx="1"/>
+      <rect x="100" y="44" width="10" height="20" fill="#ef4444" rx="1"/>
+      <rect x="116" y="38" width="10" height="20" fill="#ef4444" rx="1"/>
+      <rect x="132" y="32" width="10" height="20" fill="#22c55e" rx="1"/>
+      <rect x="148" y="26" width="10" height="20" fill="#ef4444" rx="1"/>
+      <rect x="164" y="22" width="10" height="20" fill="#ef4444" rx="1"/>
+      <rect x="180" y="18" width="10" height="20" fill="#ef4444" rx="1"/>
+      <text x="120" y="142" font-size="9" fill="#4ade80" text-anchor="middle">週線 Supertrend 綠色</text>
+      <text x="120" y="158" font-size="8" fill="#8b949e" text-anchor="middle">→ 大方向多頭確立</text>
+      <rect x="20" y="168" width="196" height="16" rx="4" fill="rgba(34,197,94,.12)" stroke="rgba(34,197,94,.3)"/>
+      <text x="118" y="179" font-size="7.5" fill="#4ade80" text-anchor="middle">只找做多機會，不做空</text>
+
+      <!-- 日線（精確進場）-->
+      <rect x="248" y="10" width="224" height="180" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="360" y="28" font-size="9" fill="#8b949e" text-anchor="middle" font-weight="700">日線（精確進場點）</text>
+      <!-- 日線先翻紅（回檔）再翻綠（進場） -->
+      <polyline points="258,120 280,118 300,124 315,118" fill="none" stroke="#f43f5e" stroke-width="1.5"/>
+      <polyline points="315,148 340,138 365,126 390,114 415,102 445,92 462,84" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <rect x="256" y="108" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="268" y="112" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="280" y="116" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="292" y="120" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="304" y="116" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="318" y="106" width="9" height="42" fill="#ef4444" rx="1"/>
+      <line x1="322.5" y1="96" x2="322.5" y2="110" stroke="#ef4444" stroke-width="2"/>
+      <line x1="322.5" y1="146" x2="322.5" y2="156" stroke="#ef4444" stroke-width="2"/>
+      <rect x="334" y="100" width="8" height="34" fill="#ef4444" rx="1"/>
+      <rect x="348" y="90" width="8" height="32" fill="#ef4444" rx="1"/>
+      <rect x="362" y="80" width="8" height="32" fill="#ef4444" rx="1"/>
+      <rect x="376" y="72" width="8" height="30" fill="#ef4444" rx="1"/>
+      <rect x="390" y="64" width="8" height="28" fill="#ef4444" rx="1"/>
+      <rect x="404" y="56" width="8" height="28" fill="#22c55e" rx="1"/>
+      <rect x="418" y="50" width="8" height="26" fill="#ef4444" rx="1"/>
+      <rect x="432" y="44" width="8" height="26" fill="#ef4444" rx="1"/>
+      <polygon points="322,162 318,174 326,174" fill="#22c55e"/>
+      <text x="330" y="172" font-size="7.5" fill="#22c55e">日線翻綠 = 進場</text>
+      <text x="360" y="192" font-size="7.5" fill="#8b949e" text-anchor="middle">週線綠 + 日線翻綠 = 最強共振</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-g"><h4>多週期共振策略</h4>
+      <ol style="color:#c9d1d9">
+        <li>先看<strong>週線</strong> Supertrend → 確認大方向（綠=只做多，紅=只做空或觀望）</li>
+        <li>切換到<strong>日線</strong>等待 Supertrend 回檔後翻綠</li>
+        <li>週線綠 + 日線翻綠 = 最強共振訊號，勝率最高</li>
+      </ol>
+    </div>
+    <div class="bx-r"><h4>嚴禁操作</h4>
+      <p style="margin:0;color:#c9d1d9">週線 Supertrend 紅色時，<strong>日線翻綠不進場</strong> — 這是下跌趨勢中的反彈，不是新多頭，做多風險極高</p>
+    </div>
+    <div class="pair-grid">
+      <div class="pair-card">
+        <div class="pair-name" style="color:#f59e0b">搭配：OBV</div>
+        <div class="pair-why">翻綠時 OBV 也創高 = 量價配合，訊號最強</div>
+      </div>
+      <div class="pair-card">
+        <div class="pair-name" style="color:#fbbf24">搭配：TTM Squeeze</div>
+        <div class="pair-why">翻綠剛好是 TTM 爆發點 = 同步啟動最猛</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ OBV ══════════════════════════ -->
+
+<!-- S4 OBV 原理 -->
+<div class="card obv" id="s4">
+  <div class="ch"><div class="cn">4</div><div class="cm">
+    <span class="ctag">OBV</span>
+    <div class="ctitle">OBV（能量潮）— 看穿法人藏貨的工具</div>
+    <div class="csub">On Balance Volume — 比 RSI 早 2–3 根K棒</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="220" fill="#0d1117"/>
+      <!-- 股價區（上半） -->
+      <text x="10" y="14" font-size="7.5" fill="#8b949e">股價（盤整）</text>
+      <line x1="0" y1="90" x2="480" y2="90" stroke="#21262d" stroke-width="1"/>
+      <!-- 盤整K棒 -->
+      <rect x="20" y="55" width="8" height="25" fill="#ef4444" rx="1"/>
+      <rect x="34" y="58" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="48" y="54" width="8" height="26" fill="#ef4444" rx="1"/>
+      <rect x="62" y="58" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="76" y="55" width="8" height="25" fill="#ef4444" rx="1"/>
+      <rect x="90" y="57" width="8" height="23" fill="#22c55e" rx="1"/>
+      <rect x="104" y="54" width="8" height="26" fill="#ef4444" rx="1"/>
+      <rect x="118" y="56" width="8" height="24" fill="#22c55e" rx="1"/>
+      <rect x="132" y="55" width="8" height="24" fill="#ef4444" rx="1"/>
+      <rect x="146" y="57" width="8" height="23" fill="#22c55e" rx="1"/>
+      <rect x="160" y="54" width="8" height="26" fill="#ef4444" rx="1"/>
+      <rect x="174" y="56" width="8" height="24" fill="#22c55e" rx="1"/>
+      <!-- 水平頂底部線（盤整框） -->
+      <line x1="18" y1="54" x2="185" y2="54" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <line x1="18" y1="80" x2="185" y2="80" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="186" y="56" font-size="7.5" fill="#f59e0b">壓力</text>
+      <text x="186" y="82" font-size="7.5" fill="#f59e0b">支撐</text>
+      <!-- 噴出K棒 -->
+      <rect x="192" y="30" width="10" height="36" fill="#ef4444" rx="1"/>
+      <line x1="197" y1="20" x2="197" y2="34" stroke="#ef4444" stroke-width="2"/>
+      <rect x="208" y="20" width="10" height="32" fill="#ef4444" rx="1"/>
+      <rect x="224" y="12" width="10" height="30" fill="#ef4444" rx="1"/>
+      <!-- OBV 區（下半）-->
+      <text x="10" y="106" font-size="7.5" fill="#60a5fa">OBV（持續上升中）</text>
+      <polyline points="20,200 34,195 48,188 62,182 76,175 90,168 104,160 118,153 132,146 146,140 160,134 174,128 192,120 208,112 224,106" fill="none" stroke="#3b82f6" stroke-width="2"/>
+      <text x="130" y="138" font-size="8" fill="#22c55e">OBV 持續創高</text>
+      <text x="130" y="150" font-size="8" fill="#22c55e">→ 法人悄悄在買</text>
+      <!-- 箭頭 -->
+      <polygon points="197,72 193,84 201,84" fill="#22c55e"/>
+      <text x="210" y="82" font-size="8" fill="#22c55e">終於噴出</text>
+      <text x="200" y="210" font-size="8" fill="#60a5fa" text-anchor="middle">OBV 先走，股價後走</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-b"><h4>OBV 計算邏輯</h4>
+      <p style="margin:0;color:#c9d1d9">
+      今日收盤 &gt; 昨日收盤 → <strong>+今日成交量</strong>（上漲的量全算買方）<br>
+      今日收盤 &lt; 昨日收盤 → <strong>−今日成交量</strong>（下跌的量全算賣方）<br>
+      OBV = 每天累計上述數值 → 代表<strong>買賣方力量的長期累積</strong>
+      </p>
+    </div>
+    <p>OBV 的核心洞察：機構在進貨時不可能不動用成交量，就算股價被壓著不漲，OBV 也會因為量在增加而悄悄上升，這就是<strong>量比價早說話</strong>的原因。</p>
+    <div class="pair-grid">
+      <div class="pair-card">
+        <div class="pair-name" style="color:#f43f5e">搭配：Supertrend</div>
+        <div class="pair-why">Supertrend 翻綠 + OBV 同步創高 = 最強進場訊號</div>
+      </div>
+      <div class="pair-card">
+        <div class="pair-name" style="color:#f59e0b">搭配：MA(20) on OBV</div>
+        <div class="pair-why">在 OBV 上加一條 MA20，OBV 穿越自身 MA20 向上也是進場訊號</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S5 OBV 正背離 -->
+<div class="card obv" id="s5">
+  <div class="ch"><div class="cn">5</div><div class="cm">
+    <span class="ctag">OBV</span>
+    <div class="ctitle">OBV 正背離 — 主力出貨的預警</div>
+    <div class="csub">股價創新高，OBV 不跟 = 趕快跑</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="220" fill="#0d1117"/>
+      <text x="10" y="14" font-size="7.5" fill="#8b949e">股價</text>
+      <text x="10" y="120" font-size="7.5" fill="#60a5fa">OBV</text>
+      <line x1="0" y1="108" x2="480" y2="108" stroke="#21262d"/>
+      <!-- 股價上升 -->
+      <rect x="20" y="72" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="34" y="65" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="48" y="60" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="62" y="55" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="76" y="50" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="90" y="56" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="104" y="48" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="118" y="44" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="132" y="40" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="146" y="46" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="160" y="38" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="174" y="34" width="8" height="22" fill="#ef4444" rx="1"/>
+      <!-- 股價高點連線（上升） -->
+      <line x1="24" y1="72" x2="178" y2="34" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <circle cx="24" cy="72" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+      <circle cx="178" cy="34" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="178" y="28" font-size="8" fill="#ef4444">股價高①→高②↗</text>
+      <!-- OBV（下降背離）-->
+      <polyline points="20,170 50,162 80,155 110,152 140,156 170,162 200,170" fill="none" stroke="#3b82f6" stroke-width="2"/>
+      <circle cx="20" cy="170" r="4" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <circle cx="200" cy="170" r="4" fill="none" stroke="#f43f5e" stroke-width="1.5"/>
+      <line x1="20" y1="170" x2="200" y2="170" stroke="#f43f5e" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="200" y="165" font-size="8" fill="#f43f5e">OBV 不創高↘（背離）</text>
+      <!-- 背離箭頭 -->
+      <line x1="104" y1="36" x2="104" y2="96" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="104" y1="110" x2="104" y2="152" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="108" y="56" font-size="8" fill="#fbbf24">背離</text>
+      <!-- 後續下跌 -->
+      <rect x="192" y="54" width="9" height="28" fill="#22c55e" rx="1"/>
+      <rect x="206" y="64" width="9" height="30" fill="#22c55e" rx="1"/>
+      <rect x="220" y="72" width="9" height="28" fill="#22c55e" rx="1"/>
+      <rect x="234" y="80" width="9" height="30" fill="#22c55e" rx="1"/>
+      <rect x="248" y="88" width="9" height="28" fill="#22c55e" rx="1"/>
+      <text x="216" y="50" font-size="8" fill="#f43f5e">背離後下跌</text>
+      <!-- 警告 -->
+      <rect x="10" y="196" width="460" height="20" rx="4" fill="rgba(244,63,94,.1)" stroke="rgba(244,63,94,.3)"/>
+      <text x="240" y="209" font-size="8" fill="#fb7185" text-anchor="middle">⚠ 股價創新高但 OBV 不創高 = 主力正在出貨，準備離場</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-r"><h4>正背離（頂背離）— 出場訊號</h4>
+      <p style="margin:0;color:#c9d1d9"><strong>股價創新高，OBV 不創新高</strong><br>
+      代表：股價是被少量的買盤硬撐上去的，主力同步在出貨，散戶在接手</p>
+    </div>
+    <div class="bx-g"><h4>正背離（底背離）— 進場訊號</h4>
+      <p style="margin:0;color:#c9d1d9"><strong>股價創新低，OBV 不創新低</strong><br>
+      代表：股價下跌但賣壓在縮，主力在悄悄買進，即將反彈</p>
+    </div>
+    <p>關鍵：OBV 背離比 RSI 背離<strong>早 2–3 根K棒</strong>出現，給你更多時間反應。但背離不代表立刻反轉，需要等 <strong>Supertrend 翻色</strong>才確認。</p>
+    <div class="tag-row">
+      <span class="tag tag-r">搭配：Supertrend 翻紅確認出場</span>
+      <span class="tag tag-b">搭配：TTM Squeeze 轉紅</span>
+    </div>
+  </div>
+</div>
+
+<!-- S6 OBV 隱藏背離 -->
+<div class="card obv" id="s6">
+  <div class="ch"><div class="cn">6</div><div class="cm">
+    <span class="ctag">OBV</span>
+    <div class="ctitle">OBV 隱藏背離 — 趨勢延伸的確認</div>
+    <div class="csub">這個訊號大多數人都不知道，卻是高勝率加碼點</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 上升趨勢中回檔 -->
+      <text x="10" y="14" font-size="8" fill="#4ade80" font-weight="700">多頭隱藏底背離（加碼點）</text>
+      <!-- K棒 -->
+      <rect x="20" y="60" width="8" height="24" fill="#ef4444" rx="1"/>
+      <rect x="34" y="52" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="48" y="44" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="62" y="50" width="8" height="22" fill="#22c55e" rx="1"/>
+      <!-- 回檔 -->
+      <rect x="78" y="56" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="92" y="62" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="106" y="58" width="8" height="22" fill="#22c55e" rx="1"/>
+      <!-- 繼續上漲 -->
+      <rect x="122" y="46" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="136" y="38" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="150" y="30" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="164" y="22" width="8" height="22" fill="#ef4444" rx="1"/>
+      <!-- 股價低點 -->
+      <circle cx="24" cy="84" r="4" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+      <circle cx="110" cy="80" r="4" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+      <line x1="24" y1="84" x2="110" y2="80" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="10" y="98" font-size="7.5" fill="#f59e0b">股價低點②較高（回檔淺）</text>
+      <!-- OBV -->
+      <text x="10" y="120" font-size="7.5" fill="#60a5fa">OBV</text>
+      <line x1="0" y1="110" x2="480" y2="110" stroke="#21262d"/>
+      <polyline points="20,180 48,172 76,165 90,172 110,180 136,168 164,154 192,140" fill="none" stroke="#3b82f6" stroke-width="2"/>
+      <circle cx="20" cy="180" r="4" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+      <circle cx="110" cy="180" r="4" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+      <line x1="20" y1="180" x2="110" y2="180" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="8" y="196" font-size="7.5" fill="#fbbf24">OBV 低點②更低（賣壓略增）→ 但股價沒跌更深 = 多頭隱藏底背離</text>
+      <!-- 結論 -->
+      <rect x="240" y="118" width="230" height="72" rx="6" fill="#161b22" stroke="#22c55e" stroke-width="1"/>
+      <text x="355" y="136" font-size="8" fill="#4ade80" text-anchor="middle" font-weight="700">隱藏底背離 = 加碼點</text>
+      <text x="355" y="152" font-size="7.5" fill="#8b949e" text-anchor="middle">趨勢仍健康，回檔是機會</text>
+      <text x="355" y="167" font-size="7.5" fill="#8b949e" text-anchor="middle">等回檔止穩 + Supertrend 仍綠</text>
+      <text x="355" y="182" font-size="7.5" fill="#4ade80" text-anchor="middle">→ 加碼或新進場</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <table class="signal-table">
+      <tr><th>類型</th><th>股價</th><th>OBV</th><th>意義</th></tr>
+      <tr><td><strong style="color:#f43f5e">正背離（頂）</strong></td><td>創新高</td><td>不創高</td><td>即將下跌，出場</td></tr>
+      <tr><td><strong style="color:#22c55e">正背離（底）</strong></td><td>創新低</td><td>不創低</td><td>即將反彈，進場</td></tr>
+      <tr><td><strong style="color:#fbbf24">隱藏底背離</strong></td><td>回檔但沒破低</td><td>OBV 略低</td><td>多頭延伸，加碼</td></tr>
+      <tr><td><strong style="color:#a78bfa">隱藏頂背離</strong></td><td>反彈但沒破高</td><td>OBV 略高</td><td>空頭延伸，不追</td></tr>
+    </table>
+    <div class="bx-p"><h4>實戰應用</h4>
+      <p style="margin:0;color:#c9d1d9">多頭行情中遇到回檔，看 OBV 是否出現隱藏底背離（OBV 回檔幅度 &gt; 股價回檔幅度），若是則回檔買進，<strong>這是機構加倉的痕跡</strong>。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ TTM SQUEEZE ══════════════════════════ -->
+
+<!-- S7 TTM Squeeze 原理 -->
+<div class="card ttm" id="s7">
+  <div class="ch"><div class="cn">7</div><div class="cm">
+    <span class="ctag">TTM Squeeze</span>
+    <div class="ctitle">TTM Squeeze — 能量壓縮偵測器原理</div>
+    <div class="csub">Lazybear 版本：同時偵測布林通道 + 肯特納通道</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="220" fill="#0d1117"/>
+      <!-- 布林通道 -->
+      <polyline points="20,40 80,55 130,65 175,72 200,74 230,72 260,65 310,52 360,36 420,20" fill="none" stroke="rgba(59,130,246,.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+      <polyline points="20,110 80,107 130,104 175,102 200,102 230,102 260,104 310,108 360,112 420,116" fill="none" stroke="#60a5fa" stroke-width="1.2"/>
+      <polyline points="20,180 80,165 130,155 175,148 200,146 230,148 260,155 310,166 360,180 420,196" fill="none" stroke="rgba(59,130,246,.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+      <text x="10" y="38" font-size="7.5" fill="#60a5fa">布林上軌</text>
+      <text x="10" y="113" font-size="7.5" fill="#60a5fa">布林中軌</text>
+      <text x="10" y="183" font-size="7.5" fill="#60a5fa">布林下軌</text>
+      <!-- 肯特納通道 -->
+      <polyline points="20,60 80,70 130,78 175,84 200,86 230,84 260,78 310,68 360,58 420,46" fill="none" stroke="rgba(245,158,11,.5)" stroke-width="1.5" stroke-dasharray="3,4"/>
+      <polyline points="20,160 80,148 130,138 175,132 200,130 230,132 260,138 310,148 360,158 420,168" fill="none" stroke="rgba(245,158,11,.5)" stroke-width="1.5" stroke-dasharray="3,4"/>
+      <text x="422" y="48" font-size="7" fill="#fbbf24">KC上軌</text>
+      <text x="422" y="170" font-size="7" fill="#fbbf24">KC下軌</text>
+      <!-- 壓縮區示意 -->
+      <rect x="152" y="70" width="96" height="66" rx="4" fill="rgba(244,63,94,.06)" stroke="#f43f5e" stroke-width="0.8"/>
+      <text x="200" y="108" font-size="8" fill="#fb7185" text-anchor="middle" font-weight="700">BB 在 KC 內</text>
+      <text x="200" y="120" font-size="7.5" fill="#8b949e" text-anchor="middle">= 壓縮中</text>
+      <!-- 點點（TTM 指示器） -->
+      <text x="10" y="208" font-size="7.5" fill="#8b949e">TTM 點點：</text>
+      <circle cx="75" cy="205" r="5" fill="#f43f5e"/>
+      <text x="84" y="208" font-size="7" fill="#8b949e">紅點（爆發↓）</text>
+      <circle cx="158" cy="205" r="5" fill="#22c55e"/>
+      <text x="167" y="208" font-size="7" fill="#8b949e">綠點（爆發↑）</text>
+      <circle cx="240" cy="205" r="5" fill="#6b7280"/>
+      <text x="249" y="208" font-size="7" fill="#8b949e">灰點（壓縮中）</text>
+      <circle cx="330" cy="205" r="5" fill="#1f2937" stroke="#6b7280" stroke-width="1.5"/>
+      <text x="339" y="208" font-size="7" fill="#8b949e">黑點（最強壓縮）</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-y"><h4>核心邏輯：兩個通道的寬窄關係</h4>
+      <p style="margin:0;color:#c9d1d9">
+      <strong>布林通道（BB）</strong>：基於價格標準差，反應市場波動<br>
+      <strong>肯特納通道（KC）</strong>：基於 ATR，更穩定<br>
+      當 <strong>BB 縮窄到 KC 內側</strong> → 能量被壓縮（市場即將爆發）<br>
+      當 <strong>BB 擴張超出 KC</strong> → 能量釋放（方向由動量柱決定）
+      </p>
+    </div>
+    <p>TTM Squeeze 解決了布林帶策略最大的問題：布林帶只能告訴你<strong>要爆發了</strong>，但不知道往哪個方向。TTM 的<strong>動量柱（Histogram）</strong>解決了方向問題。</p>
+    <div class="tag-row">
+      <span class="tag tag-b">搭配：OBV 確認方向</span>
+      <span class="tag tag-r">搭配：Supertrend 多空確認</span>
+      <span class="tag tag-y">TradingView 搜尋：Squeeze Momentum Indicator [LazyBear]</span>
+    </div>
+  </div>
+</div>
+
+<!-- S8 TTM 四色判讀 -->
+<div class="card ttm" id="s8">
+  <div class="ch"><div class="cn">8</div><div class="cm">
+    <span class="ctag">TTM Squeeze</span>
+    <div class="ctitle">TTM 四色點點完整判讀表</div>
+    <div class="csub">黑點 → 灰點 → 綠/紅點 = 從蓄力到爆發的完整流程</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- K棒 -->
+      <rect x="20" y="80" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="34" y="84" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="48" y="78" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="62" y="82" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="76" y="80" width="8" height="18" fill="#ef4444" rx="1"/>
+      <rect x="90" y="82" width="8" height="18" fill="#22c55e" rx="1"/>
+      <rect x="104" y="78" width="8" height="18" fill="#ef4444" rx="1"/>
+      <rect x="118" y="80" width="8" height="18" fill="#22c55e" rx="1"/>
+      <!-- 噴出 -->
+      <rect x="134" y="54" width="10" height="34" fill="#ef4444" rx="1"/>
+      <line x1="139" y1="44" x2="139" y2="58" stroke="#ef4444" stroke-width="2"/>
+      <rect x="150" y="40" width="10" height="32" fill="#ef4444" rx="1"/>
+      <rect x="166" y="32" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="182" y="26" width="10" height="28" fill="#22c55e" rx="1"/>
+      <rect x="198" y="22" width="10" height="28" fill="#ef4444" rx="1"/>
+      <!-- 點點時間軸 -->
+      <text x="10" y="125" font-size="7.5" fill="#8b949e">壓縮狀態：</text>
+      <!-- 黑點區 -->
+      <circle cx="24" cy="140" r="6" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="38" cy="140" r="6" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="52" cy="140" r="6" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="66" cy="140" r="6" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <!-- 灰點區 -->
+      <circle cx="80" cy="140" r="6" fill="#4b5563"/>
+      <circle cx="94" cy="140" r="6" fill="#4b5563"/>
+      <circle cx="108" cy="140" r="6" fill="#4b5563"/>
+      <circle cx="122" cy="140" r="6" fill="#4b5563"/>
+      <!-- 綠點爆發 -->
+      <circle cx="138" cy="140" r="7" fill="#22c55e"/>
+      <circle cx="154" cy="140" r="7" fill="#22c55e"/>
+      <circle cx="170" cy="140" r="7" fill="#22c55e"/>
+      <circle cx="186" cy="140" r="7" fill="#22c55e"/>
+      <circle cx="202" cy="140" r="7" fill="#22c55e"/>
+      <!-- 動量柱 -->
+      <text x="10" y="165" font-size="7.5" fill="#8b949e">動量柱：</text>
+      <rect x="18" y="168" width="8" height="4" rx="1" fill="#22c55e" opacity=".4"/>
+      <rect x="32" y="166" width="8" height="6" rx="1" fill="#22c55e" opacity=".5"/>
+      <rect x="46" y="164" width="8" height="8" rx="1" fill="#22c55e" opacity=".6"/>
+      <rect x="60" y="162" width="8" height="10" rx="1" fill="#22c55e" opacity=".7"/>
+      <rect x="74" y="159" width="8" height="13" rx="1" fill="#22c55e" opacity=".8"/>
+      <rect x="88" y="156" width="8" height="16" rx="1" fill="#22c55e" opacity=".9"/>
+      <rect x="102" y="153" width="8" height="19" rx="1" fill="#22c55e"/>
+      <rect x="116" y="150" width="8" height="22" rx="1" fill="#22c55e"/>
+      <rect x="132" y="147" width="10" height="25" rx="1" fill="#22c55e"/>
+      <rect x="148" y="144" width="10" height="28" rx="1" fill="#22c55e"/>
+      <rect x="164" y="142" width="10" height="30" rx="1" fill="#22c55e"/>
+      <!-- 標籤 -->
+      <text x="44" y="156" font-size="7.5" fill="#374151" text-anchor="middle">黑點</text>
+      <text x="44" y="165" font-size="7" fill="#6b7280" text-anchor="middle">最強壓縮</text>
+      <text x="100" y="156" font-size="7.5" fill="#6b7280" text-anchor="middle">灰點</text>
+      <text x="100" y="165" font-size="7" fill="#6b7280" text-anchor="middle">壓縮中</text>
+      <text x="168" y="156" font-size="7.5" fill="#22c55e" text-anchor="middle">綠點</text>
+      <text x="168" y="165" font-size="7" fill="#4ade80" text-anchor="middle">爆發↑</text>
+      <!-- 說明框 -->
+      <rect x="230" y="118" width="240" height="72" rx="6" fill="#161b22" stroke="#f59e0b" stroke-width="1"/>
+      <text x="350" y="134" font-size="8" fill="#fbbf24" text-anchor="middle" font-weight="700">動量柱的方向 = 爆發方向</text>
+      <text x="350" y="150" font-size="7.5" fill="#c9d1d9" text-anchor="middle">柱子在 0 以上且增大 → 向上爆發</text>
+      <text x="350" y="165" font-size="7.5" fill="#c9d1d9" text-anchor="middle">柱子在 0 以下且縮小（絕對值）→</text>
+      <text x="350" y="180" font-size="7.5" fill="#4ade80" text-anchor="middle">動量減弱，可能即將反轉向上</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <table class="signal-table">
+      <tr><th>點點顏色</th><th>代表狀態</th><th>操作建議</th></tr>
+      <tr><td><strong style="color:#6b7280">⬤ 黑點</strong></td><td>最強壓縮，BB 完全在 KC 內部</td><td>等待，準備下單，不提前進場</td></tr>
+      <tr><td><strong style="color:#4b5563">⬤ 灰點</strong></td><td>壓縮中，BB 仍在 KC 內</td><td>繼續觀察動量柱方向</td></tr>
+      <tr><td><strong style="color:#22c55e">⬤ 綠點</strong></td><td>壓縮結束，向上爆發</td><td>動量柱增大時進場做多</td></tr>
+      <tr><td><strong style="color:#f43f5e">⬤ 紅點</strong></td><td>壓縮結束，向下爆發</td><td>動量柱轉負時出場或做空</td></tr>
+    </table>
+    <div class="bx-y"><h4>關鍵細節</h4>
+      <p style="margin:0;color:#c9d1d9">看<strong>動量柱的大小</strong>（高度），不是只看顏色。綠點亮起但動量柱很小 → 爆發力弱，等柱子增大再進場。<br>最強進場點：<strong>黑點 → 綠點轉換的第一根</strong>，能量最飽滿。</p>
+    </div>
+  </div>
+</div>
+
+<!-- S9 TTM 爆發強度 -->
+<div class="card ttm" id="s9">
+  <div class="ch"><div class="cn">9</div><div class="cm">
+    <span class="ctag">TTM Squeeze</span>
+    <div class="ctitle">TTM 爆發強度判斷 — 哪種壓縮最猛？</div>
+    <div class="csub">壓縮時間越長 + 動量柱加速 = 爆發幅度越大</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 短壓縮（弱） -->
+      <rect x="10" y="10" width="200" height="185" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="110" y="28" font-size="8.5" fill="#8b949e" text-anchor="middle" font-weight="700">短壓縮（弱爆發）</text>
+      <!-- 黑點 x2，灰點 x2，綠點 -->
+      <circle cx="30" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="70" cy="50" r="5" fill="#4b5563"/>
+      <circle cx="90" cy="50" r="5" fill="#4b5563"/>
+      <circle cx="110" cy="50" r="6" fill="#22c55e"/>
+      <circle cx="130" cy="50" r="6" fill="#22c55e"/>
+      <text x="110" y="68" font-size="7.5" fill="#8b949e" text-anchor="middle">壓縮 4 根</text>
+      <!-- 動量柱（小） -->
+      <rect x="28" y="120" width="8" height="8" rx="1" fill="#22c55e" opacity=".4"/>
+      <rect x="48" y="116" width="8" height="12" rx="1" fill="#22c55e" opacity=".5"/>
+      <rect x="68" y="112" width="8" height="16" rx="1" fill="#22c55e" opacity=".6"/>
+      <rect x="88" y="108" width="8" height="20" rx="1" fill="#22c55e" opacity=".7"/>
+      <rect x="108" y="104" width="8" height="24" rx="1" fill="#22c55e" opacity=".8"/>
+      <rect x="128" y="102" width="8" height="26" rx="1" fill="#22c55e" opacity=".9"/>
+      <!-- K棒（小幅上漲） -->
+      <rect x="108" y="76" width="8" height="16" fill="#ef4444" rx="1"/>
+      <rect x="122" y="72" width="8" height="16" fill="#ef4444" rx="1"/>
+      <rect x="136" y="70" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="150" y="68" width="8" height="14" fill="#ef4444" rx="1"/>
+      <rect x="164" y="66" width="8" height="14" fill="#22c55e" rx="1"/>
+      <text x="110" y="175" font-size="8" fill="#8b949e" text-anchor="middle">漲幅：+5~8%</text>
+      <text x="110" y="188" font-size="7.5" fill="#6b7280" text-anchor="middle">（普通）</text>
+
+      <!-- 長壓縮（強） -->
+      <rect x="258" y="10" width="214" height="185" rx="6" fill="#161b22" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="365" y="28" font-size="8.5" fill="#fbbf24" text-anchor="middle" font-weight="700">長壓縮（強爆發）⚡</text>
+      <!-- 黑點多 -->
+      <circle cx="270" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="285" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="300" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="315" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="330" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="345" cy="50" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="360" cy="50" r="5" fill="#4b5563"/>
+      <circle cx="375" cy="50" r="5" fill="#4b5563"/>
+      <circle cx="390" cy="50" r="7" fill="#22c55e"/>
+      <circle cx="407" cy="50" r="7" fill="#22c55e"/>
+      <circle cx="424" cy="50" r="7" fill="#22c55e"/>
+      <text x="365" y="68" font-size="7.5" fill="#fbbf24" text-anchor="middle">壓縮 8 根以上</text>
+      <!-- 動量柱（大） -->
+      <rect x="268" y="128" width="10" height="4" rx="1" fill="#22c55e" opacity=".3"/>
+      <rect x="283" y="124" width="10" height="8" rx="1" fill="#22c55e" opacity=".4"/>
+      <rect x="298" y="118" width="10" height="14" rx="1" fill="#22c55e" opacity=".5"/>
+      <rect x="313" y="112" width="10" height="20" rx="1" fill="#22c55e" opacity=".6"/>
+      <rect x="328" y="105" width="10" height="27" rx="1" fill="#22c55e" opacity=".7"/>
+      <rect x="343" y="98" width="10" height="34" rx="1" fill="#22c55e" opacity=".8"/>
+      <rect x="358" y="90" width="10" height="42" rx="1" fill="#22c55e" opacity=".9"/>
+      <rect x="373" y="82" width="10" height="50" rx="1" fill="#22c55e"/>
+      <!-- K棒（大幅上漲） -->
+      <rect x="390" y="54" width="12" height="42" fill="#ef4444" rx="1"/>
+      <line x1="396" y1="44" x2="396" y2="58" stroke="#ef4444" stroke-width="2"/>
+      <rect x="408" y="42" width="12" height="36" fill="#ef4444" rx="1"/>
+      <rect x="424" y="32" width="12" height="32" fill="#ef4444" rx="1"/>
+      <text x="365" y="175" font-size="8.5" fill="#4ade80" text-anchor="middle">漲幅：+15~30%+</text>
+      <text x="365" y="188" font-size="7.5" fill="#fbbf24" text-anchor="middle">⚡ 這個才是飆股的前兆</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-y"><h4>爆發強度公式</h4>
+      <p style="margin:0;color:#c9d1d9">
+      <strong>壓縮時間</strong>（黑點根數）× <strong>動量柱加速度</strong> = 預期爆發幅度<br>
+      黑點 ≥ 6 根 + 動量柱每根都比前一根大 → 大波段啟動訊號
+      </p>
+    </div>
+    <ul>
+      <li>壓縮 2–4 根：小波動，漲 3–8%，短線操作</li>
+      <li>壓縮 6–10 根：中波段，漲 10–20%，波段操作</li>
+      <li>壓縮 10 根以上：大行情，漲 30%+，這是飆股起點</li>
+    </ul>
+    <div class="tag-row">
+      <span class="tag tag-g">搭配：Supertrend 同步翻綠 = 加碼確認</span>
+      <span class="tag tag-b">搭配：OBV 同步創高 = 三重確認</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ 組合策略 ══════════════════════════ -->
+
+<!-- S10 三指標組合進場 -->
+<div class="card combo" id="s10">
+  <div class="ch"><div class="cn">10</div><div class="cm">
+    <span class="ctag">組合策略</span>
+    <div class="ctitle">三指標組合進場系統</div>
+    <div class="csub">Supertrend + OBV + TTM Squeeze 同步確認才進場</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="230" fill="#0d1117"/>
+      <!-- 三層指標 -->
+      <!-- 主圖 + Supertrend -->
+      <text x="10" y="14" font-size="7.5" fill="#8b949e">①  Supertrend</text>
+      <line x1="0" y1="78" x2="480" y2="78" stroke="#21262d"/>
+      <rect x="20" y="38" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="34" y="32" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="48" y="40" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="62" y="36" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="76" y="30" width="8" height="22" fill="#22c55e" rx="1"/>
+      <rect x="90" y="26" width="8" height="20" fill="#ef4444" rx="1"/>
+      <!-- 翻綠K棒 -->
+      <rect x="106" y="18" width="10" height="28" fill="#ef4444" rx="1"/>
+      <line x1="111" y1="8" x2="111" y2="22" stroke="#ef4444" stroke-width="2"/>
+      <rect x="122" y="14" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="138" y="10" width="10" height="24" fill="#ef4444" rx="1"/>
+      <!-- Supertrend 線 -->
+      <polyline points="20,64 48,62 76,58 90,55" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <polyline points="90,36 106,34 122,30 138,26" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="142" y="28" font-size="8" fill="#4ade80">① 翻綠✓</text>
+      <!-- OBV -->
+      <text x="10" y="94" font-size="7.5" fill="#60a5fa">②  OBV</text>
+      <line x1="0" y1="138" x2="480" y2="138" stroke="#21262d"/>
+      <polyline points="20,130 40,126 60,120 80,114 100,108 120,102 140,96 160,90" fill="none" stroke="#3b82f6" stroke-width="2"/>
+      <text x="142" y="92" font-size="8" fill="#60a5fa">② 同步創高✓</text>
+      <!-- TTM 點點 -->
+      <text x="10" y="154" font-size="7.5" fill="#fbbf24">③  TTM Squeeze</text>
+      <circle cx="24" cy="170" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="40" cy="170" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="56" cy="170" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="72" cy="170" r="5" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <circle cx="88" cy="170" r="5" fill="#4b5563"/>
+      <circle cx="104" cy="170" r="5" fill="#4b5563"/>
+      <circle cx="120" cy="170" r="7" fill="#22c55e"/>
+      <circle cx="138" cy="170" r="7" fill="#22c55e"/>
+      <text x="142" y="174" font-size="8" fill="#4ade80">③ 轉綠✓</text>
+      <!-- 進場線 -->
+      <line x1="120" y1="0" x2="120" y2="230" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <polygon points="120,195 115,210 125,210" fill="#22c55e"/>
+      <rect x="126" y="195" width="100" height="26" rx="4" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1"/>
+      <text x="176" y="205" font-size="8" fill="#4ade80" text-anchor="middle" font-weight="700">三重確認</text>
+      <text x="176" y="216" font-size="7.5" fill="#4ade80" text-anchor="middle">→ 進場</text>
+      <!-- 動量柱 -->
+      <rect x="18" y="196" width="8" height="6" rx="1" fill="#22c55e" opacity=".3"/>
+      <rect x="34" y="192" width="8" height="10" rx="1" fill="#22c55e" opacity=".4"/>
+      <rect x="50" y="188" width="8" height="14" rx="1" fill="#22c55e" opacity=".5"/>
+      <rect x="66" y="183" width="8" height="19" rx="1" fill="#22c55e" opacity=".6"/>
+      <rect x="82" y="177" width="8" height="25" rx="1" fill="#22c55e" opacity=".7"/>
+      <rect x="98" y="170" width="8" height="32" rx="1" fill="#22c55e" opacity=".9"/>
+      <rect x="114" y="163" width="8" height="39" rx="1" fill="#22c55e"/>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-g"><h4>進場三重確認清單</h4>
+      <ol style="color:#c9d1d9">
+        <li><strong>Supertrend 翻綠</strong>（K棒收盤站上 Supertrend 線，線由紅轉綠）</li>
+        <li><strong>OBV 同步創高</strong>（OBV 在進場前就已趨勢向上，或同步突破）</li>
+        <li><strong>TTM Squeeze 轉綠點</strong>（且動量柱在 0 上方且增大）</li>
+      </ol>
+    </div>
+    <div class="bx-b"><h4>加碼確認（可選）</h4>
+      <ul style="color:#c9d1d9">
+        <li>週線 Supertrend 也是綠色（大方向確認）</li>
+        <li>成交量 &gt; 20日均量（量能支撐）</li>
+        <li>OBV 隱藏底背離（機構加倉痕跡）</li>
+      </ul>
+    </div>
+    <p>三個訊號不會每次同時出現，但<strong>同時出現時勝率極高</strong>。沒有三重確認時寧可不進場，等下一次機會。</p>
+  </div>
+</div>
+
+<!-- S11 三指標組合出場 -->
+<div class="card combo" id="s11">
+  <div class="ch"><div class="cn">11</div><div class="cm">
+    <span class="ctag">組合策略</span>
+    <div class="ctitle">三指標組合出場系統</div>
+    <div class="csub">任何一個觸發就減碼，兩個觸發就全出</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 上升段 -->
+      <polyline points="10,90 50,80 90,68 130,56 170,44 200,36" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <rect x="10" y="76" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="24" y="68" width="8" height="22" fill="#ef4444" rx="1"/>
+      <rect x="38" y="62" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="52" y="56" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="66" y="50" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="80" y="44" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="94" y="40" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="108" y="36" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="122" y="32" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="136" y="30" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="150" y="28" width="8" height="20" fill="#22c55e" rx="1"/>
+      <rect x="164" y="26" width="8" height="20" fill="#ef4444" rx="1"/>
+      <rect x="178" y="24" width="8" height="22" fill="#22c55e" rx="1"/>
+      <!-- 出場訊號 -->
+      <!-- ① Supertrend翻紅 -->
+      <line x1="200" y1="0" x2="200" y2="200" stroke="#f43f5e" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="202" y="16" font-size="8" fill="#fb7185">① ST翻紅</text>
+      <rect x="196" y="28" width="10" height="30" fill="#22c55e" rx="1"/>
+      <line x1="201" y1="18" x2="201" y2="32" stroke="#22c55e" stroke-width="2"/>
+      <polyline points="200,64 230,70 260,76 290,80 320,84 350,86 380,88 420,90" fill="none" stroke="#f43f5e" stroke-width="1.5"/>
+      <rect x="210" y="46" width="8" height="28" fill="#22c55e" rx="1"/>
+      <rect x="224" y="52" width="8" height="30" fill="#22c55e" rx="1"/>
+      <rect x="238" y="58" width="8" height="28" fill="#22c55e" rx="1"/>
+      <!-- ② OBV背離 -->
+      <line x1="290" y1="0" x2="290" y2="200" stroke="#3b82f6" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="292" y="16" font-size="8" fill="#60a5fa">② OBV背離</text>
+      <!-- ③ TTM轉紅 -->
+      <line x1="370" y1="0" x2="370" y2="200" stroke="#f59e0b" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="372" y="16" font-size="8" fill="#fbbf24">③ TTM紅</text>
+      <!-- OBV線（下跌背離） -->
+      <polyline points="10,150 50,144 90,138 130,132 160,128 200,124 240,128 280,134 300,140 340,148 380,156 420,164" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="240" y="168" font-size="7.5" fill="#3b82f6" text-anchor="middle">OBV 在高點就開始掉頭</text>
+      <!-- TTM 點點 -->
+      <circle cx="370" cy="176" r="7" fill="#f43f5e"/>
+      <circle cx="390" cy="176" r="7" fill="#f43f5e"/>
+      <circle cx="410" cy="176" r="7" fill="#f43f5e"/>
+      <!-- 減碼/全出 -->
+      <polygon points="200,110 196,124 204,124" fill="#fbbf24"/>
+      <text x="206" y="122" font-size="7.5" fill="#fbbf24">減碼 50%</text>
+      <polygon points="370,110 366,124 374,124" fill="#f43f5e"/>
+      <text x="376" y="122" font-size="7.5" fill="#f43f5e">全出</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <table class="signal-table">
+      <tr><th>出場觸發</th><th>動作</th><th>說明</th></tr>
+      <tr><td><strong style="color:#f43f5e">Supertrend 翻紅</strong></td><td>減碼 50%</td><td>第一道警訊，趨勢可能反轉</td></tr>
+      <tr><td><strong style="color:#60a5fa">OBV 頂背離</strong></td><td>減碼 30%</td><td>量能不支撐股價，主力出貨中</td></tr>
+      <tr><td><strong style="color:#fbbf24">TTM 轉紅點</strong></td><td>全部出清</td><td>動量反轉確認，不戀棧</td></tr>
+      <tr><td>任意兩個同時觸發</td><td><strong>全出</strong></td><td>不等第三個，保護獲利</td></tr>
+    </table>
+    <div class="bx-r"><h4>止損規則（進場前先設好）</h4>
+      <p style="margin:0;color:#c9d1d9">進場同時設停損：<strong>Supertrend 線下方</strong>即為停損位（動態調整）<br>
+      每次 Supertrend 往上移動，停損線也隨之上移（追蹤停損）</p>
+    </div>
+  </div>
+</div>
+
+<!-- S12 常見錯誤 -->
+<div class="card combo" id="s12">
+  <div class="ch"><div class="cn">12</div><div class="cm">
+    <span class="ctag">組合策略</span>
+    <div class="ctitle">常見錯誤與陷阱 — 這些坑別踩</div>
+    <div class="csub">90% 的虧損來自這 6 個錯誤</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="180" fill="#0d1117"/>
+      <!-- 錯誤1：量小翻色 -->
+      <rect x="10" y="10" width="140" height="76" rx="6" fill="#161b22" stroke="rgba(244,63,94,.4)"/>
+      <text x="80" y="26" font-size="7.5" fill="#fb7185" text-anchor="middle" font-weight="700">❌ 錯誤①</text>
+      <text x="80" y="40" font-size="7" fill="#8b949e" text-anchor="middle">量縮時 Supertrend 翻綠</text>
+      <text x="80" y="54" font-size="7" fill="#8b949e" text-anchor="middle">進場 → 隔日打臉</text>
+      <text x="80" y="70" font-size="7.5" fill="#4ade80" text-anchor="middle">✓ 正確：等量放大確認</text>
+      <!-- 錯誤2：單一指標 -->
+      <rect x="160" y="10" width="140" height="76" rx="6" fill="#161b22" stroke="rgba(244,63,94,.4)"/>
+      <text x="230" y="26" font-size="7.5" fill="#fb7185" text-anchor="middle" font-weight="700">❌ 錯誤②</text>
+      <text x="230" y="40" font-size="7" fill="#8b949e" text-anchor="middle">只看一個指標就進場</text>
+      <text x="230" y="54" font-size="7" fill="#8b949e" text-anchor="middle">（如 TTM 轉綠就衝）</text>
+      <text x="230" y="70" font-size="7.5" fill="#4ade80" text-anchor="middle">✓ 正確：等三重確認</text>
+      <!-- 錯誤3：週線空頭做多 -->
+      <rect x="310" y="10" width="160" height="76" rx="6" fill="#161b22" stroke="rgba(244,63,94,.4)"/>
+      <text x="390" y="26" font-size="7.5" fill="#fb7185" text-anchor="middle" font-weight="700">❌ 錯誤③</text>
+      <text x="390" y="40" font-size="7" fill="#8b949e" text-anchor="middle">週線 ST 紅，日線 ST 綠</text>
+      <text x="390" y="54" font-size="7" fill="#8b949e" text-anchor="middle">→ 做多進場</text>
+      <text x="390" y="70" font-size="7.5" fill="#4ade80" text-anchor="middle">✓ 正確：週線決定方向</text>
+      <!-- 錯誤4 -->
+      <rect x="10" y="96" width="140" height="76" rx="6" fill="#161b22" stroke="rgba(244,63,94,.4)"/>
+      <text x="80" y="112" font-size="7.5" fill="#fb7185" text-anchor="middle" font-weight="700">❌ 錯誤④</text>
+      <text x="80" y="126" font-size="7" fill="#8b949e" text-anchor="middle">OBV 背離出現就立刻出</text>
+      <text x="80" y="140" font-size="7" fill="#8b949e" text-anchor="middle">（背離可以持續很久）</text>
+      <text x="80" y="156" font-size="7.5" fill="#4ade80" text-anchor="middle">✓ 正確：等 ST 翻紅確認</text>
+      <!-- 錯誤5 -->
+      <rect x="160" y="96" width="140" height="76" rx="6" fill="#161b22" stroke="rgba(244,63,94,.4)"/>
+      <text x="230" y="112" font-size="7.5" fill="#fb7185" text-anchor="middle" font-weight="700">❌ 錯誤⑤</text>
+      <text x="230" y="126" font-size="7" fill="#8b949e" text-anchor="middle">TTM 黑點直接進場</text>
+      <text x="230" y="140" font-size="7" fill="#8b949e" text-anchor="middle">（壓縮不代表已爆發）</text>
+      <text x="230" y="156" font-size="7.5" fill="#4ade80" text-anchor="middle">✓ 正確：等轉綠點才進</text>
+      <!-- 錯誤6 -->
+      <rect x="310" y="96" width="160" height="76" rx="6" fill="#161b22" stroke="rgba(244,63,94,.4)"/>
+      <text x="390" y="112" font-size="7.5" fill="#fb7185" text-anchor="middle" font-weight="700">❌ 錯誤⑥</text>
+      <text x="390" y="126" font-size="7" fill="#8b949e" text-anchor="middle">沒有停損計畫就進場</text>
+      <text x="390" y="140" font-size="7" fill="#8b949e" text-anchor="middle">Supertrend 是動態停損</text>
+      <text x="390" y="156" font-size="7.5" fill="#4ade80" text-anchor="middle">✓ 正確：進場前先設好</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-p"><h4>終極心法</h4>
+      <p style="margin:0;color:#c9d1d9">這三個指標的組合不是為了<strong>找到每一次漲幅</strong>，而是為了找到<strong>高機率、高風報比</strong>的進出場點。寧可錯過 10 次，不可錯誤進 1 次。</p>
+    </div>
+    <div class="bx-g"><h4>每日看盤流程（5 分鐘）</h4>
+      <ol style="color:#c9d1d9">
+        <li>看觀察清單 → <strong>週線 Supertrend 顏色</strong>，確認大方向</li>
+        <li>切日線 → 有沒有 <strong>TTM 黑點轉灰點</strong>（即將爆發）</li>
+        <li>有候選股 → 確認 <strong>OBV 趨勢</strong>，上升才考慮做多</li>
+        <li>三個全符合 → 等隔日確認後進場，設好停損</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.grid -->
+
+<script>
+function filt(cat, btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.card').forEach(c=>{
+    if(cat==='all') c.classList.remove('hidden');
+    else c.classList.toggle('hidden', !c.classList.contains(cat));
+  });
+}
+</script>
+
+<!-- 交易日誌捷徑 -->
+<a href="trade-journal.html" class="jfab" style="position:fixed;top:64px;right:16px;z-index:9999;background:#e8a228;color:#000;font-weight:700;font-size:.78rem;padding:9px 16px;border-radius:22px;text-decoration:none;box-shadow:0 4px 16px rgba(232,162,40,.45);white-space:nowrap;line-height:1;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" fill="rgba(0,0,0,.25)"/><line x1="4" y1="4.5" x2="10" y2="4.5" stroke="#000" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="7" x2="8.5" y2="7" stroke="#000" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="9.5" x2="10" y2="9.5" stroke="#000" stroke-width="1.2" stroke-linecap="round"/></svg>交易日誌</a>
+</body>
+</html>
