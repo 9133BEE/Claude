@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>進階技術指標精解 | 股學筆記</title>
+<title>TradingView指標策略 | 股學筆記</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
@@ -21,12 +21,20 @@ a:hover{text-decoration:underline}
 .hero-badge{display:inline-block;background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.4);color:#fb7185;font-size:.78rem;padding:4px 12px;border-radius:20px;margin-top:8px}
 
 .toc{max-width:960px;margin:24px auto;padding:0 20px}
-.toc-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px 24px}
-.toc-title{font-size:.78rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
-.toc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:#c9d1d9;font-size:.84rem;cursor:pointer;transition:background .15s;text-decoration:none}
-.toc-item:hover{background:#21262d;color:#58a6ff;text-decoration:none}
-.toc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.toc-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.toc-cat{display:flex;flex-direction:column;gap:4px}
+.toc-cat-lbl{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:4px;width:fit-content}
+.toc-cat-lbl.st{background:rgba(244,63,94,.15);color:#fb7185}
+.toc-cat-lbl.obv{background:rgba(59,130,246,.15);color:#60a5fa}
+.toc-cat-lbl.ttm{background:rgba(245,158,11,.15);color:#fbbf24}
+.toc-cat-lbl.combo{background:rgba(34,197,94,.15);color:#4ade80}
+.toc-cat-lbl.tool{background:rgba(139,92,246,.15);color:#c4b5fd}
+.toc-links{display:flex;flex-wrap:wrap;gap:4px}
+.toc-item{padding:4px 12px;border-radius:20px;color:#c9d1d9;font-size:.82rem;background:#21262d;border:1px solid #30363d;text-decoration:none;transition:all .15s;white-space:nowrap}
+.toc-item:hover{color:#58a6ff;border-color:#58a6ff;background:#161b22;text-decoration:none}
+.toc-dot{display:none}
+/* SVG 文字全白 */
+.diag svg text{fill:#e6edf3}
 
 .filters{display:flex;gap:8px;padding:16px 20px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
 .filter-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:6px 16px;border-radius:20px;cursor:pointer;font-size:.85rem;transition:all .2s}
@@ -36,6 +44,9 @@ a:hover{text-decoration:underline}
 .filter-btn.f-obv.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa}
 .filter-btn.f-ttm.active{background:rgba(245,158,11,.15);border-color:#f59e0b;color:#fbbf24}
 .filter-btn.f-combo.active{background:rgba(34,197,94,.15);border-color:#22c55e;color:#4ade80}
+.filter-btn.f-tool.active{background:rgba(139,92,246,.15);border-color:#8b5cf6;color:#c4b5fd}
+.card.tool{border-top:3px solid #8b5cf6}
+.tool .ctag{background:rgba(139,92,246,.15);color:#c4b5fd}
 
 .grid{max-width:1120px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:24px}
 
@@ -100,7 +111,7 @@ a:hover{text-decoration:underline}
 
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;padding:12px 10px;gap:14px}
-  .toc-grid{grid-template-columns:1fr 1fr}
+  .toc-links{gap:4px}
   .pair-grid{grid-template-columns:1fr}
   .filters{gap:5px;padding:10px}
   .filter-btn{font-size:.76rem;padding:5px 10px}
@@ -113,44 +124,77 @@ a:hover{text-decoration:underline}
 <body>
 
 <div class="topbar">
-  <span class="topbar-title">進階技術指標精解</span>
+  <span class="topbar-title">TradingView 指標策略</span>
   <a href="index.html">← 回主頁</a>
   <a href="tradingview-guide.html">TradingView 指南</a>
   <a href="advanced-tips.html">進階技巧</a>
 </div>
 
 <div class="hero">
-  <h1>進階技術指標精解</h1>
-  <p>超越 MA/KD/RSI 的散戶層級 — 三大機構級指標完整解析，附圖解與搭配策略</p>
-  <span class="hero-badge">Supertrend · OBV · TTM Squeeze · 組合策略</span>
+  <h1>TradingView 指標策略</h1>
+  <p>超越 MA/KD/RSI 的散戶層級 — 機構級指標完整解析，附圖解與搭配策略</p>
+  <span class="hero-badge">Supertrend · OBV · TTM Squeeze · VWAP · Fibonacci · Ichimoku · 更多</span>
 </div>
 
 <div class="toc">
   <div class="toc-box">
-    <div class="toc-title">目錄</div>
-    <div class="toc-grid">
-      <a class="toc-item" href="#s1"><span class="toc-dot" style="background:#f43f5e"></span>Supertrend 原理</a>
-      <a class="toc-item" href="#s2"><span class="toc-dot" style="background:#f43f5e"></span>Supertrend 多空訊號</a>
-      <a class="toc-item" href="#s3"><span class="toc-dot" style="background:#f43f5e"></span>Supertrend 多週期用法</a>
-      <a class="toc-item" href="#s4"><span class="toc-dot" style="background:#3b82f6"></span>OBV 原理與計算</a>
-      <a class="toc-item" href="#s5"><span class="toc-dot" style="background:#3b82f6"></span>OBV 正背離</a>
-      <a class="toc-item" href="#s6"><span class="toc-dot" style="background:#3b82f6"></span>OBV 隱藏背離</a>
-      <a class="toc-item" href="#s7"><span class="toc-dot" style="background:#f59e0b"></span>TTM Squeeze 原理</a>
-      <a class="toc-item" href="#s8"><span class="toc-dot" style="background:#f59e0b"></span>TTM 四色判讀</a>
-      <a class="toc-item" href="#s9"><span class="toc-dot" style="background:#f59e0b"></span>TTM 爆發強度判斷</a>
-      <a class="toc-item" href="#s10"><span class="toc-dot" style="background:#22c55e"></span>三指標組合進場</a>
-      <a class="toc-item" href="#s11"><span class="toc-dot" style="background:#22c55e"></span>三指標組合出場</a>
-      <a class="toc-item" href="#s12"><span class="toc-dot" style="background:#22c55e"></span>常見錯誤與陷阱</a>
+    <div class="toc-cat">
+      <span class="toc-cat-lbl st">Supertrend</span>
+      <div class="toc-links">
+        <a class="toc-item" href="#s1">01 原理</a>
+        <a class="toc-item" href="#s2">02 進出場訊號</a>
+        <a class="toc-item" href="#s3">03 多週期共振</a>
+      </div>
+    </div>
+    <div class="toc-cat">
+      <span class="toc-cat-lbl obv">OBV 能量潮</span>
+      <div class="toc-links">
+        <a class="toc-item" href="#s4">04 原理與計算</a>
+        <a class="toc-item" href="#s5">05 正背離</a>
+        <a class="toc-item" href="#s6">06 隱藏背離</a>
+      </div>
+    </div>
+    <div class="toc-cat">
+      <span class="toc-cat-lbl ttm">TTM Squeeze</span>
+      <div class="toc-links">
+        <a class="toc-item" href="#s7">07 原理</a>
+        <a class="toc-item" href="#s8">08 四色判讀</a>
+        <a class="toc-item" href="#s9">09 爆發強度</a>
+      </div>
+    </div>
+    <div class="toc-cat">
+      <span class="toc-cat-lbl combo">組合策略</span>
+      <div class="toc-links">
+        <a class="toc-item" href="#s10">10 三指標進場</a>
+        <a class="toc-item" href="#s11">11 三指標出場</a>
+        <a class="toc-item" href="#s12">12 常見錯誤</a>
+      </div>
+    </div>
+    <div class="toc-cat">
+      <span class="toc-cat-lbl tool">進階工具</span>
+      <div class="toc-links">
+        <a class="toc-item" href="#s13">13 VWAP</a>
+        <a class="toc-item" href="#s14">14 Fibonacci</a>
+        <a class="toc-item" href="#s15">15 Ichimoku</a>
+        <a class="toc-item" href="#s16">16 ATR 停損</a>
+        <a class="toc-item" href="#s17">17 StochRSI</a>
+        <a class="toc-item" href="#s18">18 Williams %R</a>
+        <a class="toc-item" href="#s19">19 CMF 資金流</a>
+        <a class="toc-item" href="#s20">20 Volume Profile</a>
+        <a class="toc-item" href="#s21">21 相對強度</a>
+        <a class="toc-item" href="#s22">22 Elder Ray</a>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="filters">
-  <button class="filter-btn active" onclick="filt('all',this)">全部 12</button>
+  <button class="filter-btn active" onclick="filt('all',this)">全部 22</button>
   <button class="filter-btn f-st" onclick="filt('st',this)">Supertrend 3</button>
   <button class="filter-btn f-obv" onclick="filt('obv',this)">OBV 3</button>
   <button class="filter-btn f-ttm" onclick="filt('ttm',this)">TTM Squeeze 3</button>
   <button class="filter-btn f-combo" onclick="filt('combo',this)">組合策略 3</button>
+  <button class="filter-btn f-tool" onclick="filt('tool',this)">進階工具 10</button>
 </div>
 
 <div class="grid" id="mainGrid">
@@ -1046,6 +1090,609 @@ a:hover{text-decoration:underline}
         <li>有候選股 → 確認 <strong>OBV 趨勢</strong>，上升才考慮做多</li>
         <li>三個全符合 → 等隔日確認後進場，設好停損</li>
       </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ 進階工具 S13–S22 ══════════════════════════ -->
+
+<!-- S13 VWAP -->
+<div class="card tool" id="s13">
+  <div class="ch"><div class="cn">13</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">VWAP — 機構的真實成本線</div>
+    <div class="csub">Volume Weighted Average Price：法人每日進出的基準價格</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- VWAP 線 -->
+      <polyline points="20,100 70,96 120,90 170,84 220,80 270,76 320,72 370,70 430,68" fill="none" stroke="#a78bfa" stroke-width="2.5"/>
+      <text x="435" y="66" font-size="11" font-weight="700">VWAP</text>
+      <!-- K棒在VWAP上方（多方） -->
+      <rect x="20" y="76" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="38" y="70" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="56" y="66" width="12" height="28" fill="#22c55e" rx="1"/>
+      <rect x="74" y="60" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="92" y="56" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="110" y="52" width="12" height="28" fill="#22c55e" rx="1"/>
+      <rect x="128" y="48" width="12" height="28" fill="#ef4444" rx="1"/>
+      <!-- 跌到VWAP附近回測 -->
+      <rect x="148" y="72" width="12" height="26" fill="#22c55e" rx="1"/>
+      <rect x="166" y="76" width="12" height="24" fill="#22c55e" rx="1"/>
+      <!-- 彈回 -->
+      <rect x="186" y="62" width="12" height="26" fill="#ef4444" rx="1"/>
+      <rect x="204" y="54" width="12" height="26" fill="#ef4444" rx="1"/>
+      <rect x="222" y="48" width="12" height="24" fill="#ef4444" rx="1"/>
+      <rect x="240" y="42" width="12" height="24" fill="#ef4444" rx="1"/>
+      <!-- 回測箭頭 -->
+      <polygon points="172,106 168,120 176,120" fill="#4ade80"/>
+      <text x="180" y="118" font-size="11" fill="#4ade80">回測進場</text>
+      <!-- 說明區 -->
+      <rect x="20" y="140" width="440" height="42" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="240" y="157" font-size="11" text-anchor="middle">價格 &gt; VWAP = 多方佔優，做多機會為主</text>
+      <text x="240" y="175" font-size="11" text-anchor="middle">價格 &lt; VWAP = 空方佔優，回測 VWAP 是最佳進場點</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-p"><h4>什麼是 VWAP</h4>
+      <p style="margin:0;color:#c9d1d9">每筆成交量 × 成交價 的加總 ÷ 總成交量 = 當日<strong>成交量加權均價</strong>。機構的交易演算法都以 VWAP 為基準，買在 VWAP 以下算划算，賣在以上算好。</p>
+    </div>
+    <div class="bx-g"><h4>進場邏輯</h4>
+      <ul style="color:#c9d1d9">
+        <li>趨勢多頭中 → 等<strong>回測 VWAP 不破</strong>，收盤守住後進場</li>
+        <li>VWAP 轉向（由上升到走平）→ 多頭力道減弱，注意出場</li>
+        <li>大量K棒出現在 VWAP 上方 → 機構在買，可跟進</li>
+      </ul>
+    </div>
+    <div class="pair-grid">
+      <div class="pair-card"><div class="pair-name" style="color:#f43f5e">搭配：Supertrend</div><div class="pair-why">ST 綠 + 價格在 VWAP 上 = 最強做多環境</div></div>
+      <div class="pair-card"><div class="pair-name" style="color:#3b82f6">搭配：OBV</div><div class="pair-why">OBV 上升 + 回測 VWAP 支撐 = 最佳進場點</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S14 Fibonacci -->
+<div class="card tool" id="s14">
+  <div class="ch"><div class="cn">14</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">Fibonacci 回撤 — 黃金比例支撐阻力</div>
+    <div class="csub">38.2%、50%、61.8% 是全球機構共同關注的關鍵價位</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="210" fill="#0d1117"/>
+      <!-- 上漲波段 -->
+      <rect x="20" y="130" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="36" y="118" width="10" height="30" fill="#ef4444" rx="1"/>
+      <rect x="52" y="106" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="68" y="94" width="10" height="28" fill="#22c55e" rx="1"/>
+      <rect x="84" y="82" width="10" height="28" fill="#ef4444" rx="1"/>
+      <rect x="100" y="70" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="116" y="60" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="132" y="50" width="10" height="26" fill="#ef4444" rx="1"/>
+      <!-- Fib 水平線 -->
+      <line x1="150" y1="52" x2="470" y2="52" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="150" y1="82" x2="470" y2="82" stroke="#60a5fa" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="150" y1="99" x2="470" y2="99" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <line x1="150" y1="115" x2="470" y2="115" stroke="#f43f5e" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="150" y1="160" x2="470" y2="160" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4,3"/>
+      <!-- 標籤 -->
+      <text x="155" y="48" font-size="11" fill="#22c55e">0%（高點）</text>
+      <text x="155" y="78" font-size="11" fill="#60a5fa">38.2%</text>
+      <text x="155" y="95" font-size="11" fill="#f59e0b" font-weight="700">50%（最強支撐）</text>
+      <text x="155" y="111" font-size="11" fill="#f43f5e">61.8%（黃金比例）</text>
+      <text x="155" y="156" font-size="11" fill="#8b5cf6">100%（低點）</text>
+      <!-- 回撤K棒 -->
+      <rect x="148" y="66" width="10" height="24" fill="#22c55e" rx="1"/>
+      <rect x="164" y="76" width="10" height="24" fill="#22c55e" rx="1"/>
+      <rect x="180" y="84" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="196" y="92" width="10" height="20" fill="#22c55e" rx="1"/>
+      <!-- 止跌在61.8%後反彈 -->
+      <rect x="214" y="106" width="10" height="18" fill="#22c55e" rx="1"/>
+      <rect x="230" y="96" width="10" height="24" fill="#ef4444" rx="1"/>
+      <rect x="246" y="84" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="262" y="74" width="10" height="26" fill="#ef4444" rx="1"/>
+      <rect x="278" y="64" width="10" height="26" fill="#ef4444" rx="1"/>
+      <polygon points="222,128 218,142 226,142" fill="#22c55e"/>
+      <text x="230" y="140" font-size="11" fill="#22c55e">61.8% 止跌進場</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-y"><h4>怎麼畫 Fibonacci</h4>
+      <p style="margin:0;color:#c9d1d9">TradingView 左側工具欄 → 選「費波納契回撤」→ 從<strong>波段低點拉到高點</strong>（上漲趨勢）或高點到低點（下跌趨勢）</p>
+    </div>
+    <table class="signal-table">
+      <tr><th>位置</th><th>意義</th><th>操作</th></tr>
+      <tr><td><strong style="color:#60a5fa">38.2%</strong></td><td>淺回撤，多頭強勢</td><td>最積極進場點</td></tr>
+      <tr><td><strong style="color:#f59e0b">50%</strong></td><td>心理中間支撐</td><td>最常見止跌位</td></tr>
+      <tr><td><strong style="color:#f43f5e">61.8%</strong></td><td>黃金比例，最強支撐</td><td>最後機會，破了趨勢反轉</td></tr>
+    </table>
+    <div class="tag-row">
+      <span class="tag tag-r">搭配：Supertrend 仍綠才進</span>
+      <span class="tag tag-p">搭配：K棒止跌型態確認</span>
+    </div>
+  </div>
+</div>
+
+<!-- S15 Ichimoku -->
+<div class="card tool" id="s15">
+  <div class="ch"><div class="cn">15</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">一目均衡表（Ichimoku Cloud）</div>
+    <div class="csub">日本職業交易員必備：一張圖看懂趨勢、動能、支撐阻力</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- 雲層（上升） -->
+      <polygon points="60,120 160,100 260,75 360,60 440,55 440,75 360,80 260,100 160,125 60,145" fill="rgba(34,197,94,.12)" stroke="none"/>
+      <polyline points="60,120 160,100 260,75 360,60 440,55" stroke="#22c55e" stroke-width="1.2" fill="none"/>
+      <polyline points="60,145 160,125 260,100 360,80 440,75" stroke="#ef4444" stroke-width="1.2" fill="none"/>
+      <!-- 轉換線 -->
+      <polyline points="20,130 80,118 140,105 200,90 260,78 320,68 380,60 440,54" stroke="#60a5fa" stroke-width="1.5" fill="none"/>
+      <!-- 基準線 -->
+      <polyline points="20,145 80,135 140,122 200,108 260,94 320,82 380,72 440,65" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-dasharray="6,3"/>
+      <!-- K棒（在雲上） -->
+      <rect x="200" y="68" width="10" height="24" fill="#ef4444" rx="1"/>
+      <rect x="216" y="60" width="10" height="24" fill="#ef4444" rx="1"/>
+      <rect x="232" y="52" width="10" height="24" fill="#ef4444" rx="1"/>
+      <rect x="248" y="44" width="10" height="24" fill="#22c55e" rx="1"/>
+      <rect x="264" y="36" width="10" height="24" fill="#ef4444" rx="1"/>
+      <rect x="280" y="30" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="296" y="24" width="10" height="22" fill="#ef4444" rx="1"/>
+      <!-- 標籤 -->
+      <text x="14" y="118" font-size="10" fill="#60a5fa">轉換線</text>
+      <text x="14" y="145" font-size="10" fill="#f59e0b">基準線</text>
+      <text x="350" y="92" font-size="10" fill="#22c55e">雲上 = 多頭</text>
+      <!-- 進場說明 -->
+      <rect x="20" y="155" width="440" height="38" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="240" y="170" font-size="11" text-anchor="middle">轉換線（9日）穿越基準線（26日）向上 = 黃金交叉</text>
+      <text x="240" y="186" font-size="11" text-anchor="middle">K棒在雲層上方 + 雲層綠色 + 黃金交叉 = 最強進場訊號</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-p"><h4>五條線各自意義</h4>
+      <table class="signal-table" style="margin:4px 0">
+        <tr><td><strong style="color:#60a5fa">轉換線</strong></td><td>最近 9 根最高+最低÷2，短期方向</td></tr>
+        <tr><td><strong style="color:#f59e0b">基準線</strong></td><td>最近 26 根最高+最低÷2，中期趨勢</td></tr>
+        <tr><td><strong style="color:#22c55e">先行帶A</strong></td><td>轉換+基準÷2，雲層上緣（多頭時在上）</td></tr>
+        <tr><td><strong style="color:#f43f5e">先行帶B</strong></td><td>最近 52 根最高+最低÷2，雲層下緣</td></tr>
+        <tr><td><strong style="color:#c4b5fd">遲行帶</strong></td><td>收盤往左移 26 格，確認趨勢</td></tr>
+      </table>
+    </div>
+    <div class="bx-g"><h4>最簡單判讀法</h4>
+      <p style="margin:0;color:#c9d1d9">K棒在雲上 = 做多；K棒在雲下 = 做空；K棒在雲內 = 不動。<br>雲越厚 = 支撐阻力越強；雲越薄 = 突破機率越高。</p>
+    </div>
+  </div>
+</div>
+
+<!-- S16 ATR -->
+<div class="card tool" id="s16">
+  <div class="ch"><div class="cn">16</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">ATR — 波動率量化，科學設定停損</div>
+    <div class="csub">Average True Range：不靠感覺設停損，用數字決定風險</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- 主圖K棒 -->
+      <rect x="20" y="60" width="12" height="30" fill="#ef4444" rx="1"/>
+      <line x1="26" y1="50" x2="26" y2="64" stroke="#ef4444" stroke-width="1.5"/>
+      <line x1="26" y1="90" x2="26" y2="100" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="38" y="52" width="12" height="30" fill="#ef4444" rx="1"/>
+      <rect x="56" y="44" width="12" height="28" fill="#22c55e" rx="1"/>
+      <rect x="74" y="38" width="12" height="28" fill="#ef4444" rx="1"/>
+      <rect x="92" y="32" width="12" height="26" fill="#ef4444" rx="1"/>
+      <!-- 進場K棒 -->
+      <rect x="112" y="24" width="14" height="30" fill="#ef4444" rx="1"/>
+      <line x1="119" y1="14" x2="119" y2="28" stroke="#ef4444" stroke-width="2"/>
+      <!-- ATR計算圖示 -->
+      <line x1="119" y1="54" x2="119" y2="80" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <line x1="105" y1="54" x2="133" y2="54" stroke="#fbbf24" stroke-width="1.5"/>
+      <line x1="105" y1="80" x2="133" y2="80" stroke="#f43f5e" stroke-width="1.5"/>
+      <text x="138" y="52" font-size="11" fill="#fbbf24">進場點</text>
+      <text x="138" y="80" font-size="11" fill="#f43f5e">停損 = 進場 - 2×ATR</text>
+      <line x1="119" y1="54" x2="119" y2="80" stroke="#a78bfa" stroke-width="2.5"/>
+      <text x="80" y="70" font-size="11" fill="#a78bfa" text-anchor="middle">2×ATR</text>
+      <!-- ATR副圖 -->
+      <line x1="0" y1="120" x2="480" y2="120" stroke="#21262d"/>
+      <text x="10" y="134" font-size="10" fill="#8b949e">ATR(14)：</text>
+      <polyline points="20,170 50,165 80,158 110,150 140,145 170,148 200,155 230,162 260,168 290,165 320,158 350,150 380,145 420,142" fill="none" stroke="#a78bfa" stroke-width="1.8"/>
+      <text x="180" y="140" font-size="10" fill="#a78bfa">ATR 下降 = 波動縮小 → 停損可設更近</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-p"><h4>ATR 停損計算公式</h4>
+      <p style="margin:0;color:#c9d1d9">
+      <strong>做多停損</strong> = 進場價 − （ATR × 2）<br>
+      <strong>做空停損</strong> = 進場價 + （ATR × 2）<br><br>
+      係數 1.5 更激進（停損近），係數 3 更保守（停損遠）。<strong>一般用 2</strong>。
+      </p>
+    </div>
+    <div class="bx-b"><h4>ATR 的其他用途</h4>
+      <ul style="color:#c9d1d9">
+        <li>ATR 很高（波動大）→ 減小倉位，風險控制</li>
+        <li>ATR 突然放大 → 行情正在爆發，可追</li>
+        <li>ATR 持續縮小 → 盤整蓄力，配合 TTM Squeeze 找爆發點</li>
+      </ul>
+    </div>
+    <div class="tag-row">
+      <span class="tag tag-r">搭配：Supertrend（本身基於 ATR）</span>
+      <span class="tag tag-y">搭配：TTM Squeeze（ATR 收縮判斷）</span>
+    </div>
+  </div>
+</div>
+
+<!-- S17 StochRSI -->
+<div class="card tool" id="s17">
+  <div class="ch"><div class="cn">17</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">StochRSI — RSI 的 RSI，更快更靈敏</div>
+    <div class="csub">在 RSI 身上再套一層 KD，捕捉更早的轉折訊號</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- K棒 -->
+      <rect x="20" y="40" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="36" y="34" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="52" y="30" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="68" y="36" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="84" y="44" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="100" y="52" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="116" y="60" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="132" y="50" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="148" y="42" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="164" y="36" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="180" y="30" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="196" y="24" width="10" height="22" fill="#ef4444" rx="1"/>
+      <!-- 分隔 -->
+      <line x1="0" y1="94" x2="480" y2="94" stroke="#21262d"/>
+      <!-- StochRSI 區 -->
+      <line x1="0" y1="104" x2="480" y2="104" stroke="rgba(239,68,68,.3)" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <line x1="0" y1="178" x2="480" y2="178" stroke="rgba(34,197,94,.3)" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="460" y="102" font-size="10" fill="#ef4444" text-anchor="end">80</text>
+      <text x="460" y="177" font-size="10" fill="#22c55e" text-anchor="end">20</text>
+      <!-- StochRSI K線 -->
+      <polyline points="20,115 36,108 52,102 68,110 84,120 100,130 116,142 132,155 148,165 164,170 180,168 196,160 212,148 228,132 244,118 260,106 276,100 292,108 308,120 324,135 340,150 356,162 372,168 388,160 404,145 420,130" fill="none" stroke="#60a5fa" stroke-width="2"/>
+      <!-- StochRSI D線 -->
+      <polyline points="20,118 36,112 52,108 68,114 84,124 100,134 116,146 132,158 148,167 164,170 180,167 196,158 212,146 228,130 244,116 260,104 276,100 292,107 308,118 324,133 340,148 356,160 372,167 388,158 404,143 420,128" fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <!-- 黃金交叉點 -->
+      <circle cx="276" cy="100" r="5" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <polygon points="276,188 272,180 280,180" fill="#22c55e" opacity=".8"/>
+      <text x="282" y="186" font-size="10" fill="#22c55e">黃金交叉（超賣區）</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-b"><h4>StochRSI vs RSI 的差異</h4>
+      <p style="margin:0;color:#c9d1d9">
+      RSI(14) 要等 14 根才發訊號；StochRSI 在 RSI 上再做 KD，<strong>轉折訊號提前 2–4 根</strong>出現。<br>
+      代價是假訊號也更多，必須配合其他指標過濾。
+      </p>
+    </div>
+    <table class="signal-table">
+      <tr><th>訊號</th><th>條件</th><th>意義</th></tr>
+      <tr><td><strong style="color:#22c55e">黃金交叉</strong></td><td>K 線穿越 D 線向上，在 20 以下</td><td>超賣反彈，做多進場</td></tr>
+      <tr><td><strong style="color:#f43f5e">死亡交叉</strong></td><td>K 線穿越 D 線向下，在 80 以上</td><td>超買回落，減碼出場</td></tr>
+      <tr><td><strong style="color:#fbbf24">鈍化</strong></td><td>長時間在 80 以上</td><td>強勢趨勢，不輕易出場</td></tr>
+    </table>
+    <div class="tag-row">
+      <span class="tag tag-r">搭配：Supertrend 方向確認</span>
+      <span class="tag tag-b">搭配：OBV 背離驗證</span>
+    </div>
+  </div>
+</div>
+
+<!-- S18 Williams %R -->
+<div class="card tool" id="s18">
+  <div class="ch"><div class="cn">18</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">Williams %R — 超買超賣反轉偵測器</div>
+    <div class="csub">數值 0 到 -100，-80 以下超賣、-20 以上超買</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- 說明 -->
+      <text x="240" y="18" font-size="11" text-anchor="middle">Williams %R 數值範圍：0（最頂）→ -100（最底）</text>
+      <!-- 超買線 -20 -->
+      <line x1="20" y1="48" x2="460" y2="48" stroke="rgba(239,68,68,.5)" stroke-width="1" stroke-dasharray="5,3"/>
+      <text x="10" y="46" font-size="10" fill="#f43f5e" text-anchor="end">-20</text>
+      <text x="462" y="46" font-size="10" fill="#f43f5e">超買</text>
+      <!-- 中間線 -50 -->
+      <line x1="20" y1="108" x2="460" y2="108" stroke="rgba(139,92,246,.3)" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="10" y="107" font-size="10" fill="#a78bfa" text-anchor="end">-50</text>
+      <!-- 超賣線 -80 -->
+      <line x1="20" y1="168" x2="460" y2="168" stroke="rgba(34,197,94,.5)" stroke-width="1" stroke-dasharray="5,3"/>
+      <text x="10" y="167" font-size="10" fill="#22c55e" text-anchor="end">-80</text>
+      <text x="462" y="167" font-size="10" fill="#22c55e">超賣</text>
+      <!-- Williams %R 線 -->
+      <polyline points="20,60 50,48 70,38 90,45 110,55 130,68 150,80 170,100 190,120 210,145 230,168 250,175 270,168 290,155 310,138 330,118 350,95 370,72 390,52 410,42 430,48 450,60" fill="none" stroke="#a78bfa" stroke-width="2"/>
+      <!-- 超買區填色 -->
+      <polygon points="20,48 50,48 70,38 90,45 110,48 20,48" fill="rgba(239,68,68,.1)"/>
+      <!-- 超賣區填色 -->
+      <polygon points="210,168 230,168 250,175 270,168 210,168" fill="rgba(34,197,94,.1)"/>
+      <!-- 進出場標記 -->
+      <circle cx="430" cy="48" r="5" fill="none" stroke="#f43f5e" stroke-width="2"/>
+      <text x="435" y="44" font-size="10" fill="#f43f5e">出場</text>
+      <circle cx="250" cy="175" r="5" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <text x="256" y="186" font-size="10" fill="#22c55e">進場</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-p"><h4>Williams %R 核心邏輯</h4>
+      <p style="margin:0;color:#c9d1d9">衡量<strong>收盤價在最近 N 日高低區間的位置</strong>，反映多空力量。<br>
+      -20 以上（靠近 0）= 超買，準備出場或放空<br>
+      -80 以下（靠近 -100）= 超賣，尋找進場機會</p>
+    </div>
+    <div class="bx-g"><h4>進場技巧</h4>
+      <ul style="color:#c9d1d9">
+        <li>Williams %R 從 -80 以下<strong>回升到 -80 上方</strong>（離開超賣區）→ 進場</li>
+        <li>從 -20 以上<strong>跌回 -20 以下</strong>（離開超買區）→ 出場</li>
+        <li>在趨勢多頭中，%R 只跌到 -50 就反彈 = 強勢訊號</li>
+      </ul>
+    </div>
+    <div class="tag-row">
+      <span class="tag tag-r">搭配：RSI 雙重確認超買超賣</span>
+      <span class="tag tag-p">搭配：Supertrend 方向過濾</span>
+    </div>
+  </div>
+</div>
+
+<!-- S19 CMF 柴金資金流 -->
+<div class="card tool" id="s19">
+  <div class="ch"><div class="cn">19</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">CMF（柴金資金流）— 資金淨流入確認</div>
+    <div class="csub">Chaikin Money Flow：判斷資金是流入還是流出市場</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- 中線 -->
+      <line x1="20" y1="95" x2="460" y2="95" stroke="#30363d" stroke-width="1"/>
+      <text x="462" y="93" font-size="10">0</text>
+      <!-- +0.1 / -0.1 基準 -->
+      <line x1="20" y1="68" x2="460" y2="68" stroke="rgba(34,197,94,.3)" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <line x1="20" y1="122" x2="460" y2="122" stroke="rgba(239,68,68,.3)" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="462" y="66" font-size="10" fill="#22c55e">+0.1</text>
+      <text x="462" y="121" font-size="10" fill="#f43f5e">-0.1</text>
+      <!-- CMF 柱 -->
+      <rect x="24" y="95" width="12" height="18" rx="1" fill="rgba(239,68,68,.6)"/>
+      <rect x="40" y="95" width="12" height="12" rx="1" fill="rgba(239,68,68,.5)"/>
+      <rect x="56" y="95" width="12" height="8" rx="1" fill="rgba(239,68,68,.4)"/>
+      <rect x="72" y="87" width="12" height="8" rx="1" fill="rgba(34,197,94,.4)"/>
+      <rect x="88" y="82" width="12" height="13" rx="1" fill="rgba(34,197,94,.5)"/>
+      <rect x="104" y="74" width="12" height="21" rx="1" fill="rgba(34,197,94,.6)"/>
+      <rect x="120" y="65" width="12" height="30" rx="1" fill="rgba(34,197,94,.7)"/>
+      <rect x="136" y="56" width="12" height="39" rx="1" fill="#22c55e"/>
+      <rect x="152" y="50" width="12" height="45" rx="1" fill="#22c55e"/>
+      <rect x="168" y="52" width="12" height="43" rx="1" fill="#22c55e"/>
+      <rect x="184" y="60" width="12" height="35" rx="1" fill="rgba(34,197,94,.7)"/>
+      <rect x="200" y="68" width="12" height="27" rx="1" fill="rgba(34,197,94,.5)"/>
+      <rect x="216" y="78" width="12" height="17" rx="1" fill="rgba(34,197,94,.4)"/>
+      <rect x="232" y="90" width="12" height="5" rx="1" fill="rgba(34,197,94,.3)"/>
+      <rect x="248" y="95" width="12" height="10" rx="1" fill="rgba(239,68,68,.4)"/>
+      <rect x="264" y="95" width="12" height="18" rx="1" fill="rgba(239,68,68,.5)"/>
+      <!-- K棒（上方參考） -->
+      <text x="240" y="16" font-size="11" text-anchor="middle">CMF &gt; 0.1 = 資金明顯流入 → 做多訊號</text>
+      <text x="240" y="32" font-size="11" text-anchor="middle">CMF &lt; -0.1 = 資金明顯流出 → 減碼警示</text>
+      <!-- 說明 -->
+      <rect x="20" y="152" width="440" height="32" rx="5" fill="#161b22" stroke="#30363d"/>
+      <text x="240" y="165" font-size="11" text-anchor="middle">⚠ CMF 穿越 0 線由負轉正 = 多頭資金開始進場</text>
+      <text x="240" y="179" font-size="11" text-anchor="middle">CMF 持續在 +0.1 以上 = 大資金持續買入，趨勢強</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-b"><h4>CMF 計算原理</h4>
+      <p style="margin:0;color:#c9d1d9">每根K棒計算<strong>收盤在高低區間的位置</strong>（Money Flow Multiplier），乘以成交量後累積 20 日，結果介於 -1 到 +1 之間。正值代表資金淨流入，負值代表流出。</p>
+    </div>
+    <div class="bx-g"><h4>實戰判讀</h4>
+      <ul style="color:#c9d1d9">
+        <li>CMF &gt; +0.1 且上升 → 資金正在積極買進，可跟進</li>
+        <li>CMF 從負穿越 0 線向上 → 空方資金撤退，多方介入</li>
+        <li>股價創新高但 CMF 不創高 → 背離，主力出貨中（配合 OBV 確認）</li>
+      </ul>
+    </div>
+    <div class="tag-row">
+      <span class="tag tag-b">搭配：OBV 雙重量能確認</span>
+      <span class="tag tag-r">搭配：Supertrend 方向過濾</span>
+    </div>
+  </div>
+</div>
+
+<!-- S20 Volume Profile -->
+<div class="card tool" id="s20">
+  <div class="ch"><div class="cn">20</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">Volume Profile — 最真實的支撐阻力</div>
+    <div class="csub">顯示每個價位的成交量分布，POC 是最强的支撐阻力</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- K棒 -->
+      <rect x="20" y="60" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="36" y="52" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="52" y="44" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="68" y="50" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="84" y="42" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="100" y="48" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="116" y="54" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="132" y="62" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="148" y="70" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="164" y="76" width="10" height="22" fill="#22c55e" rx="1"/>
+      <!-- 右側 Volume Profile 橫條 -->
+      <text x="300" y="15" font-size="11" fill="#a78bfa" text-anchor="middle">成交量分布</text>
+      <!-- 各價位成交量橫條（從右往左延伸） -->
+      <rect x="310" y="36" width="20" height="8" rx="1" fill="rgba(139,92,246,.3)"/>
+      <rect x="310" y="46" width="35" height="8" rx="1" fill="rgba(139,92,246,.4)"/>
+      <rect x="310" y="56" width="55" height="8" rx="1" fill="rgba(139,92,246,.5)"/>
+      <rect x="310" y="66" width="80" height="8" rx="1" fill="rgba(139,92,246,.65)"/>
+      <rect x="310" y="76" width="60" height="8" rx="1" fill="rgba(139,92,246,.5)"/>
+      <rect x="310" y="86" width="90" height="8" rx="1" fill="rgba(139,92,246,.75)"/>
+      <!-- POC 最大量 -->
+      <rect x="310" y="96" width="130" height="10" rx="1" fill="#8b5cf6"/>
+      <line x1="200" y1="101" x2="440" y2="101" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="205" y="98" font-size="11" fill="#f59e0b" font-weight="700">POC（成交最集中）</text>
+      <rect x="310" y="108" width="70" height="8" rx="1" fill="rgba(139,92,246,.55)"/>
+      <rect x="310" y="118" width="45" height="8" rx="1" fill="rgba(139,92,246,.4)"/>
+      <rect x="310" y="128" width="30" height="8" rx="1" fill="rgba(139,92,246,.3)"/>
+      <rect x="310" y="138" width="15" height="8" rx="1" fill="rgba(139,92,246,.2)"/>
+      <!-- VAH / VAL -->
+      <line x1="200" y1="64" x2="440" y2="64" stroke="rgba(34,197,94,.6)" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="205" y="60" font-size="10" fill="#4ade80">VAH（70% 成交上緣）</text>
+      <line x1="200" y1="122" x2="440" y2="122" stroke="rgba(239,68,68,.6)" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="205" y="136" font-size="10" fill="#f43f5e">VAL（70% 成交下緣）</text>
+      <!-- 說明 -->
+      <rect x="20" y="155" width="440" height="38" rx="5" fill="#161b22" stroke="#30363d"/>
+      <text x="240" y="168" font-size="11" text-anchor="middle">POC = 最多人在這個價格成交，是最強支撐/阻力</text>
+      <text x="240" y="185" font-size="11" text-anchor="middle">價格回到 POC 附近 = 機構重新進場的關鍵位置</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-p"><h4>三個關鍵概念</h4>
+      <table class="signal-table" style="margin:4px 0">
+        <tr><td><strong style="color:#a78bfa">POC</strong></td><td>Point of Control，成交量最大的單一價位，最強支撐/阻力</td></tr>
+        <tr><td><strong style="color:#4ade80">VAH</strong></td><td>Value Area High，70% 成交量的上緣</td></tr>
+        <tr><td><strong style="color:#f43f5e">VAL</strong></td><td>Value Area Low，70% 成交量的下緣</td></tr>
+      </table>
+    </div>
+    <div class="bx-g"><h4>進場邏輯</h4>
+      <ul style="color:#c9d1d9">
+        <li>股價從上方<strong>回測 POC 支撐</strong>，出現止跌K → 進場</li>
+        <li>股價突破 VAH → 突破關鍵阻力，追漲</li>
+        <li>「低成交量區」（橫條短）股價過得快，高成交量區才是真正關卡</li>
+      </ul>
+    </div>
+    <p>TradingView 搜尋「<strong>Volume Profile Visible Range</strong>」，它會顯示當前畫面中的成交量分布。</p>
+  </div>
+</div>
+
+<!-- S21 相對強度 RS Line -->
+<div class="card tool" id="s21">
+  <div class="ch"><div class="cn">21</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">相對強度（RS Line）— 跑贏大盤才值得買</div>
+    <div class="csub">股票漲幅 ÷ 大盤漲幅，RS 線上升才是真強股</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="190" fill="#0d1117"/>
+      <!-- 大盤走勢 -->
+      <polyline points="20,120 60,115 100,108 140,110 180,105 220,100 260,96 300,92 340,88 380,84 420,82 460,80" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="462" y="78" font-size="10" fill="#6b7280">大盤</text>
+      <!-- 個股（強勢，跑贏大盤） -->
+      <polyline points="20,130 60,120 100,108 140,96 180,82 220,68 260,54 300,44 340,36 380,30 420,26 460,24" fill="none" stroke="#ef4444" stroke-width="2"/>
+      <text x="462" y="22" font-size="10" fill="#ef4444">個股</text>
+      <!-- RS 線（持續上升） -->
+      <polyline points="20,155 60,148 100,140 140,130 180,118 220,106 260,92 300,80 340,68 380,58 420,52 460,48" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+      <text x="462" y="46" font-size="10" fill="#22c55e">RS 線↗</text>
+      <text x="10" y="158" font-size="10" fill="#22c55e">RS↑</text>
+      <!-- 說明 -->
+      <rect x="20" y="160" width="440" height="24" rx="5" fill="rgba(34,197,94,.08)" stroke="rgba(34,197,94,.3)"/>
+      <text x="240" y="175" font-size="11" text-anchor="middle" fill="#4ade80">RS 線持續創新高 = 個股持續跑贏大盤 = 飆股特徵</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-g"><h4>RS Line 的關鍵原理</h4>
+      <p style="margin:0;color:#c9d1d9">RS Line = 個股股價 ÷ 大盤指數（台股用 TWII）<br>
+      RS 線上升 = 個股跑贏大盤 = 資金在往這支股票流入<br>
+      RS 線下降 = 即使股票在漲，也只是跟著大盤漲，沒有超額表現</p>
+    </div>
+    <div class="bx-b"><h4>TradingView 設定方法</h4>
+      <p style="margin:0;color:#c9d1d9">在指標搜尋「<strong>Relative Strength Comparison</strong>」→ 設定比較對象為 <strong>TWSE:TWII</strong>（台灣加權指數）</p>
+    </div>
+    <div class="bx-y"><h4>William O'Neil 的選股條件</h4>
+      <p style="margin:0;color:#c9d1d9">飆股在<strong>突破前</strong>，RS 線通常已先創新高（領先價格），代表主力已在進場。「RS 先行」是飆股最重要的特徵之一。</p>
+    </div>
+    <div class="tag-row">
+      <span class="tag tag-g">搭配：52週新高篩選</span>
+      <span class="tag tag-y">搭配：TTM Squeeze 找爆發點</span>
+    </div>
+  </div>
+</div>
+
+<!-- S22 Elder Ray -->
+<div class="card tool" id="s22">
+  <div class="ch"><div class="cn">22</div><div class="cm">
+    <span class="ctag">進階工具</span>
+    <div class="ctitle">Elder Ray — 多空力量的 X 光透視</div>
+    <div class="csub">Bull Power + Bear Power：量化多空雙方的真實力量</div>
+  </div></div>
+  <div class="diag">
+    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="480" height="200" fill="#0d1117"/>
+      <!-- K棒 -->
+      <rect x="20" y="50" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="36" y="44" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="52" y="38" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="68" y="44" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="84" y="38" width="10" height="22" fill="#ef4444" rx="1"/>
+      <rect x="100" y="44" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="116" y="50" width="10" height="22" fill="#22c55e" rx="1"/>
+      <rect x="132" y="58" width="10" height="22" fill="#22c55e" rx="1"/>
+      <!-- EMA(13) -->
+      <polyline points="20,62 50,58 80,52 110,54 140,60 170,65 200,68" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
+      <text x="70" y="40" font-size="10" fill="#60a5fa">EMA(13)</text>
+      <!-- 分隔 -->
+      <line x1="0" y1="90" x2="480" y2="90" stroke="#21262d"/>
+      <!-- Bull Power 區 -->
+      <text x="10" y="108" font-size="10" fill="#ef4444">多頭力量：</text>
+      <line x1="20" y1="115" x2="460" y2="115" stroke="#30363d"/>
+      <rect x="24" y="104" width="10" height="11" rx="1" fill="#ef4444" opacity=".6"/>
+      <rect x="40" y="100" width="10" height="15" rx="1" fill="#ef4444" opacity=".7"/>
+      <rect x="56" y="96" width="10" height="19" rx="1" fill="#ef4444" opacity=".8"/>
+      <rect x="72" y="99" width="10" height="16" rx="1" fill="#ef4444" opacity=".7"/>
+      <rect x="88" y="94" width="10" height="21" rx="1" fill="#ef4444" opacity=".8"/>
+      <rect x="104" y="104" width="10" height="11" rx="1" fill="#ef4444" opacity=".5"/>
+      <rect x="120" y="108" width="10" height="7" rx="1" fill="#ef4444" opacity=".4"/>
+      <rect x="136" y="112" width="10" height="3" rx="1" fill="#ef4444" opacity=".3"/>
+      <!-- Bear Power 區 -->
+      <text x="10" y="148" font-size="10" fill="#22c55e">空頭力量：</text>
+      <line x1="20" y1="145" x2="460" y2="145" stroke="#30363d"/>
+      <rect x="24" y="145" width="10" height="16" rx="1" fill="#22c55e" opacity=".5"/>
+      <rect x="40" y="145" width="10" height="12" rx="1" fill="#22c55e" opacity=".4"/>
+      <rect x="56" y="145" width="10" height="8" rx="1" fill="#22c55e" opacity=".35"/>
+      <rect x="72" y="145" width="10" height="12" rx="1" fill="#22c55e" opacity=".4"/>
+      <rect x="88" y="145" width="10" height="6" rx="1" fill="#22c55e" opacity=".3"/>
+      <rect x="104" y="145" width="10" height="16" rx="1" fill="#22c55e" opacity=".5"/>
+      <rect x="120" y="145" width="10" height="22" rx="1" fill="#22c55e" opacity=".6"/>
+      <rect x="136" y="145" width="10" height="28" rx="1" fill="#22c55e" opacity=".7"/>
+      <!-- 說明 -->
+      <rect x="180" y="92" width="290" height="100" rx="6" fill="#161b22" stroke="#30363d"/>
+      <text x="325" y="108" font-size="11" text-anchor="middle" font-weight="700">進場條件（三重濾網法）</text>
+      <text x="325" y="126" font-size="10" text-anchor="middle">① 週線趨勢向上（EMA 上升）</text>
+      <text x="325" y="142" font-size="10" text-anchor="middle" fill="#ef4444">② 多頭力量 &gt; 0（Bull Power 正值）</text>
+      <text x="325" y="158" font-size="10" text-anchor="middle" fill="#22c55e">③ 空頭力量由負轉正（回升）</text>
+      <text x="325" y="178" font-size="10" text-anchor="middle">三條件同時符合 = 最強進場點</text>
+    </svg>
+  </div>
+  <div class="cb">
+    <div class="bx-y"><h4>Elder Ray 兩個指標</h4>
+      <table class="signal-table" style="margin:4px 0">
+        <tr>
+          <td><strong style="color:#ef4444">Bull Power（多頭力量）</strong></td>
+          <td>當日最高價 − EMA(13)。正值 = 多頭強，多頭力量縮小是警訊</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#22c55e">Bear Power（空頭力量）</strong></td>
+          <td>當日最低價 − EMA(13)。負值 = 空頭有力，Bear Power 由負轉正是進場訊號</td>
+        </tr>
+      </table>
+    </div>
+    <div class="bx-r"><h4>Elder 三重濾網法（完整版）</h4>
+      <ol style="color:#c9d1d9">
+        <li><strong>週線 MACD 確認大趨勢</strong>方向（多 or 空）</li>
+        <li><strong>日線 Elder Ray</strong>等 Bear Power 由負轉正（回檔結束）</li>
+        <li><strong>買在 Bear Power 回升當日</strong>收盤或隔日開盤</li>
+      </ol>
+    </div>
+    <div class="tag-row">
+      <span class="tag tag-r">搭配：Supertrend 週線確認</span>
+      <span class="tag tag-b">搭配：OBV 量能配合</span>
     </div>
   </div>
 </div>
