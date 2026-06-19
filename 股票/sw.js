@@ -1,4 +1,4 @@
-const CACHE = 'guxue-v21';
+const CACHE = 'guxue-v22';
 const PAGES = [
   './index.html',
   './candlestick-patterns.html',
@@ -15,6 +15,7 @@ const PAGES = [
   './strategy-glossary.html',
   './tradingview-guide.html',
   './advanced-indicators.html',
+  './tv-indicators.html',
   './trade-journal.html',
   './manifest.json',
   './manifest-journal.json',
