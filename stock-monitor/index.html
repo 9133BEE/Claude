@@ -1056,5 +1056,8 @@ function updateCondLabels() {
   document.getElementById('cond3').textContent = isBuy ? '③ 買賣比下降 ≥ 35%'          : '③ 買賣比提升 ≥ 35%';
 }
 </script>
+<style>#back-top{position:fixed;bottom:24px;right:20px;z-index:998;width:44px;height:44px;border-radius:50%;background:#2962FF;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(41,98,255,.45);transition:background .15s}#back-top.show{display:flex}#back-top:hover{background:#1E53E5}</style>
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
+<script>window.addEventListener('scroll',function(){document.getElementById('back-top').classList.toggle('show',window.scrollY>280);});</script>
 </body>
 </html>

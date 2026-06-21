@@ -781,5 +781,8 @@ render();
 
 <!-- 交易日誌捷徑 -->
 <a href="trade-journal.html" class="jfab" style="position:fixed;top:64px;right:16px;z-index:9999;background:#e8a228;color:#000;font-weight:700;font-size:.78rem;padding:9px 16px;border-radius:22px;text-decoration:none;box-shadow:0 4px 16px rgba(232,162,40,.45);white-space:nowrap;line-height:1;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" fill="rgba(0,0,0,.25)"/><line x1="4" y1="4.5" x2="10" y2="4.5" stroke="#000" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="7" x2="8.5" y2="7" stroke="#000" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="9.5" x2="10" y2="9.5" stroke="#000" stroke-width="1.2" stroke-linecap="round"/></svg>交易日誌</a>
+<style>#back-top{position:fixed;bottom:24px;right:20px;z-index:998;width:44px;height:44px;border-radius:50%;background:#2962FF;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(41,98,255,.45);transition:background .15s}#back-top.show{display:flex}#back-top:hover{background:#1E53E5}</style>
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
+<script>window.addEventListener('scroll',function(){document.getElementById('back-top').classList.toggle('show',window.scrollY>280);});</script>
 </body>
 </html>
