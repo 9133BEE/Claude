@@ -534,53 +534,84 @@
 
     /* ── MOBILE ── */
     @media (max-width: 640px) {
+      /* Header: hamburger + title 同一行，controls 獨立在下方 */
       .header {
         height: auto;
-        flex-direction: column;
-        align-items: flex-start;
+        flex-wrap: wrap;
         padding: 10px 14px;
-        gap: 12px;
+        gap: 0;
+        row-gap: 10px;
+      }
+      .hamburger {
+        margin-right: 10px;
+        flex-shrink: 0;
       }
       .toolbar-title {
+        flex: 1;
         height: auto;
         border-right: none;
-        padding-right: 0;
-        margin-right: 0;
-        font-size: 21px;
-        border-bottom: 1px solid #2A2E39;
-        padding-bottom: 8px;
-        width: 100%;
+        border-bottom: none;
+        padding: 0;
+        margin: 0;
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
+      /* controls 佔滿整行，放到第二行 */
       .controls {
-        flex-wrap: wrap;
-        gap: 12px;
+        width: 100%;
+        flex-basis: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      /* op-symbol 隱藏，grid 只剩 ctrl-block×3 + btn */
+      .op-symbol { display: none; }
+      /* 方向(1) 日期新(2) 日期舊(3) 按鈕(4) → 2×2 */
+      .ctrl-block { width: 100%; }
+      .ctrl-select, input[type=date] { width: 100%; font-size: 16px; height: 38px; }
+      .ctrl-block-label { font-size: 11px; }
+      /* 按鈕對齊底部 */
+      .btn {
+        align-self: flex-end;
+        height: 38px;
+        font-size: 16px;
+        padding: 0 16px;
         width: 100%;
       }
-      .ctrl-block { flex: 1 1 120px; }
-      .ctrl-select, input[type=date] { width: 100%; }
-      .btn { flex: 0 0 auto; height: 36px; padding: 0 20px; }
-      .op-symbol { display: none; }
 
-      .cond-bar { padding: 12px 20px; }
-      .cond-row { gap: 13px; }
-      .cond-item { font-size: 16px; padding: 3px 10px; }
-      .layer-badge { font-size: 15px; }
-      .chk-item-bar { font-size: 16px; }
+      /* Condition bar: 每個 cond-item 折行清楚 */
+      .cond-bar { padding: 10px 14px; gap: 8px; }
+      .cond-row {
+        gap: 6px;
+        row-gap: 6px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      .layer-badge { font-size: 13px; padding: 3px 8px; flex-shrink: 0; }
+      .cond-item { font-size: 13px; padding: 3px 8px; }
+      .cond-sep { font-size: 13px; }
+      /* 第二層 checkbox 每個換行 */
+      .cond-row:last-child { flex-direction: column; gap: 5px; padding-left: 4px; }
+      .cond-row:last-child .layer-badge { margin-bottom: 2px; }
+      .chk-item-bar { font-size: 15px; gap: 8px; }
+      .chk-item-bar input[type=checkbox] { width: 17px; height: 17px; }
 
-      .meta { padding: 4px 14px; font-size: 16px; }
-      .result-count { padding: 6px 14px; }
+      .meta { padding: 5px 14px; font-size: 14px; }
+      .result-count { padding: 5px 14px; font-size: 14px; }
 
-      th { padding: 7px 10px; font-size: 16px; }
-      td { padding: 6px 10px; font-size: 19px; }
-      .stock-code { font-size: 21px; }
-      .stock-name { font-size: 16px; }
+      th { padding: 7px 8px; font-size: 14px; }
+      td { padding: 6px 8px; font-size: 17px; }
+      .stock-code { font-size: 19px; }
+      .stock-name { font-size: 14px; }
 
       .detail-header { height: auto; padding: 10px 14px; }
       .detail-title { font-size: 16px; }
-      .close-btn { height: 32px; padding: 0 12px; font-size: 19px; }
+      .close-btn { height: 32px; padding: 0 12px; font-size: 17px; }
       .detail-body { padding: 12px 14px; }
-      .month-table td { padding: 5px 10px; font-size: 18px; }
-      .month-table th { padding: 5px 10px; font-size: 15px; }
+      .month-table td { padding: 5px 8px; font-size: 16px; }
+      .month-table th { padding: 5px 8px; font-size: 13px; }
 
       .layer2 { padding: 10px 12px; }
     }
