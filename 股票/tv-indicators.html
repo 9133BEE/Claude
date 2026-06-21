@@ -5617,6 +5617,27 @@ a{color:#58a6ff;text-decoration:none}
       <span class="smc-sec-sub">BOS · CHoCH · HH/HL/LH/LL</span>
     </div>
     <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="160" fill="#0a0e14"/>
+          <polyline points="20,130 80,100 110,115 170,70 200,88 260,40" fill="none" stroke="#4ade80" stroke-width="2" stroke-linejoin="round"/>
+          <polyline points="260,40 295,62 322,46 352,82 382,66 422,106 462,90 500,125" fill="none" stroke="#f87171" stroke-width="2" stroke-linejoin="round"/>
+          <text x="22" y="145" font-size="9" fill="#6b7280">LL</text>
+          <text x="76" y="97" font-size="9" fill="#4ade80">HL</text>
+          <text x="166" y="66" font-size="9" fill="#4ade80">HH</text>
+          <text x="197" y="85" font-size="9" fill="#4ade80">HL</text>
+          <line x1="202" y1="88" x2="258" y2="42" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="206" y="60" font-size="9" fill="#4ade80" font-weight="bold">BOS ↑</text>
+          <line x1="262" y1="40" x2="352" y2="82" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="280" y="52" font-size="9" fill="#fbbf24" font-weight="bold">CHoCH</text>
+          <text x="318" y="43" font-size="9" fill="#f87171">LH</text>
+          <text x="349" y="80" font-size="9" fill="#f87171">LL</text>
+          <text x="379" y="63" font-size="9" fill="#f87171">LH</text>
+          <text x="459" y="104" font-size="9" fill="#f87171">LL</text>
+          <text x="388" y="90" font-size="9" fill="#f87171" font-weight="bold">BOS ↓</text>
+        </svg>
+        <div class="smc-diagram-label">綠色 = 上升結構（HH+HL）| 黃色 = CHoCH 警示轉換 | 紅色 = 下降結構（LH+LL）</div>
+      </div>
       <div class="smc-def">
         市場結構是 SMC 的<strong>地基</strong>，所有操作都從判斷當前結構開始。結構決定你是做多還是做空，其他概念（OB、FVG）只在結構方向內找進場點。
       </div>
@@ -5675,6 +5696,22 @@ a{color:#58a6ff;text-decoration:none}
       <span class="smc-sec-sub">機構掛單留下的痕跡</span>
     </div>
     <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="160" fill="#0a0e14"/>
+          <rect x="60" y="72" width="36" height="28" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1.2" rx="1"/>
+          <text x="58" y="67" font-size="9" fill="#22c55e" font-weight="bold">Bullish OB</text>
+          <polyline points="96,86 160,60 200,50 240,28" fill="none" stroke="#4ade80" stroke-width="2.2"/>
+          <text x="195" y="25" font-size="9" fill="#4ade80" font-weight="bold">BOS ↑</text>
+          <polyline points="240,28 290,55 320,80 340,86" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="285" y="50" font-size="9" fill="#9ca3af">回測 OB</text>
+          <polyline points="350,86 390,60 440,35 490,18" fill="none" stroke="#4ade80" stroke-width="2"/>
+          <text x="355" y="100" font-size="9" fill="#22c55e">↑ 進場</text>
+          <line x1="56" y1="100" x2="480" y2="100" stroke="#f87171" stroke-width="1" stroke-dasharray="3,2" opacity=".6"/>
+          <text x="400" y="113" font-size="9" fill="#f87171">SL — OB 低點下方</text>
+        </svg>
+        <div class="smc-diagram-label">多頭 OB = 起漲前最後一根陰線 | 回測 OB 進多 | SL 放 OB 低點下方</div>
+      </div>
       <div class="smc-def">
         OB 是機構在出發前<strong>最後一根反向K棒</strong>的區域。機構不能一次下完所有部位，所以會回來「補倉」，造成 OB 區域有支撐/壓力的效果。<strong>多頭 OB = 上漲前最後一根陰線的高低點範圍；空頭 OB = 下跌前最後一根陽線的高低點範圍。</strong>
       </div>
@@ -5735,6 +5772,32 @@ a{color:#58a6ff;text-decoration:none}
       <span class="smc-sec-sub">價格失衡區 / Imbalance</span>
     </div>
     <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="160" fill="#0a0e14"/>
+          <rect x="90" y="90" width="28" height="35" fill="#ef4444" rx="1"/>
+          <line x1="104" y1="82" x2="104" y2="90" stroke="#ef4444" stroke-width="1.5"/>
+          <line x1="104" y1="125" x2="104" y2="132" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="86" y="78" font-size="9" fill="#9ca3af">棒①高:90</text>
+          <rect x="155" y="30" width="28" height="80" fill="#22c55e" rx="1"/>
+          <line x1="169" y1="22" x2="169" y2="30" stroke="#22c55e" stroke-width="1.5"/>
+          <line x1="169" y1="110" x2="169" y2="118" stroke="#22c55e" stroke-width="1.5"/>
+          <text x="151" y="18" font-size="9" fill="#9ca3af">棒②</text>
+          <rect x="220" y="24" width="28" height="22" fill="#22c55e" rx="1"/>
+          <line x1="234" y1="16" x2="234" y2="24" stroke="#22c55e" stroke-width="1.5"/>
+          <line x1="234" y1="46" x2="234" y2="54" stroke="#22c55e" stroke-width="1.5"/>
+          <text x="216" y="62" font-size="9" fill="#9ca3af">棒③低:46</text>
+          <rect x="140" y="46" width="95" height="44" fill="rgba(251,191,36,.12)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,2" rx="2"/>
+          <text x="152" y="70" font-size="10" fill="#fbbf24" font-weight="bold">FVG 缺口</text>
+          <text x="152" y="82" font-size="8" fill="#fbbf24">①高～③低</text>
+          <polyline points="248,30 330,28 370,46 400,62 420,54" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="335" y="22" font-size="9" fill="#9ca3af">回填 FVG</text>
+          <line x1="140" y1="68" x2="238" y2="68" stroke="#fbbf24" stroke-width=".8" stroke-dasharray="2,3" opacity=".6"/>
+          <text x="244" y="71" font-size="8" fill="#fbbf24">50%</text>
+          <text x="375" y="78" font-size="9" fill="#4ade80">反彈 →</text>
+        </svg>
+        <div class="smc-diagram-label">FVG = 棒①高點 到 棒③低點之間空白 | 回填 50% 處常見反彈入場</div>
+      </div>
       <div class="smc-def">
         FVG 是三根K棒中間，<strong>第一根的高/低點與第三根的低/高點之間沒有交疊的空白區域</strong>。代表市場在此區段移動太快，買賣雙方沒有充分撮合，形成「不公平」的價格區間。市場有回填 FVG 的傾向。
       </div>
@@ -5792,6 +5855,26 @@ a{color:#58a6ff;text-decoration:none}
       <span class="smc-sec-sub">BSL · SSL · Stop Hunt · Sweep</span>
     </div>
     <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="160" fill="#0a0e14"/>
+          <line x1="40" y1="38" x2="480" y2="38" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="42" y="32" font-size="9" fill="#fbbf24" font-weight="bold">BSL — 前高 / 散戶停損區</text>
+          <line x1="40" y1="130" x2="480" y2="130" stroke="#60a5fa" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="42" y="145" font-size="9" fill="#60a5fa" font-weight="bold">SSL — 前低 / 散戶停損區</text>
+          <polyline points="50,85 90,70 130,95 170,60 210,90 250,55 270,38" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+          <polyline points="270,38 282,25 295,14" fill="none" stroke="#f87171" stroke-width="2"/>
+          <polyline points="295,14 308,34 325,58 345,80" fill="none" stroke="#4ade80" stroke-width="2.2"/>
+          <text x="296" y="11" font-size="9" fill="#f87171" font-weight="bold">掃 BSL</text>
+          <text x="258" y="54" font-size="8" fill="#f87171">Stop Hunt</text>
+          <line x1="282" y1="22" x2="350" y2="80" stroke="#fbbf24" stroke-width="1" stroke-dasharray="2,2"/>
+          <text x="318" y="46" font-size="9" fill="#fbbf24">CHoCH</text>
+          <polyline points="345,80 385,105 425,98 460,130" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+          <text x="450" y="124" font-size="9" fill="#60a5fa">SSL</text>
+          <text x="348" y="96" font-size="9" fill="#f87171">找空</text>
+        </svg>
+        <div class="smc-diagram-label">BSL 被掃（假突破）→ CHoCH 確認 → 找空頭 OB → 目標 SSL</div>
+      </div>
       <div class="smc-def">
         流動性是 SMC 的核心思維。機構需要大量對手單才能建倉，所以它們會主動去「<strong>掃</strong>」聚集在重要位置的散戶停損單，讓自己有足夠流動性完成建倉，然後反向走。<strong>掃流動性不是趨勢延續，而是機構在反向操作的前奏。</strong>
       </div>
@@ -5849,6 +5932,26 @@ a{color:#58a6ff;text-decoration:none}
       <span class="smc-sec-sub">在最合適的價位做交易</span>
     </div>
     <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="160" fill="#0a0e14"/>
+          <line x1="60" y1="18" x2="460" y2="18" stroke="#6b7280" stroke-width=".8" stroke-dasharray="2,3"/>
+          <line x1="60" y1="142" x2="460" y2="142" stroke="#6b7280" stroke-width=".8" stroke-dasharray="2,3"/>
+          <line x1="60" y1="80" x2="460" y2="80" stroke="#9ca3af" stroke-width="1.2" stroke-dasharray="5,3"/>
+          <text x="465" y="83" font-size="9" fill="#9ca3af">50%</text>
+          <rect x="60" y="18" width="400" height="62" fill="rgba(248,113,113,.06)" rx="2"/>
+          <text x="195" y="54" font-size="13" fill="#f87171" font-weight="bold" opacity=".7">PREMIUM</text>
+          <text x="188" y="68" font-size="9" fill="#f87171" opacity=".6">高於 50% — 找空</text>
+          <rect x="60" y="80" width="400" height="62" fill="rgba(34,197,94,.06)" rx="2"/>
+          <text x="190" y="113" font-size="13" fill="#4ade80" font-weight="bold" opacity=".7">DISCOUNT</text>
+          <text x="188" y="128" font-size="9" fill="#4ade80" opacity=".6">低於 50% — 找多</text>
+          <rect x="60" y="96" width="400" height="30" fill="rgba(139,92,246,.13)" rx="2"/>
+          <text x="195" y="115" font-size="9" fill="#c4b5fd" font-weight="bold">OTE 61.8%～79%（最優入場帶）</text>
+          <text x="62" y="14" font-size="9" fill="#9ca3af">Swing High</text>
+          <text x="62" y="157" font-size="9" fill="#9ca3af">Swing Low</text>
+        </svg>
+        <div class="smc-diagram-label">高於 50% = Premium（做空）| 低於 50% = Discount（做多）| 紫色帶 = OTE 最優入場區</div>
+      </div>
       <div class="smc-def">
         Premium &amp; Discount 是 SMC 判斷「現在價格貴不貴」的框架。用一段波動的最高點到最低點畫出 50% 中線（公平價值），<strong>高於 50% = 溢價區（Premium），低於 50% = 折價區（Discount）</strong>。機構在折價區買進、在溢價區賣出，永遠不追高殺低。
       </div>
@@ -5920,6 +6023,25 @@ a{color:#58a6ff;text-decoration:none}
       <span class="smc-sec-sub">流動性最明顯的蓄水池</span>
     </div>
     <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="160" fill="#0a0e14"/>
+          <line x1="40" y1="42" x2="480" y2="42" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="42" y="36" font-size="9" fill="#fbbf24" font-weight="bold">EQH — 等高（BSL 大量聚集）</text>
+          <polyline points="50,100 90,60 125,80 162,43 195,70 232,43 268,75 304,43" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+          <circle cx="162" cy="43" r="4" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+          <circle cx="232" cy="43" r="4" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+          <circle cx="304" cy="43" r="4" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+          <polyline points="304,43 326,28 348,16 360,10" fill="none" stroke="#f87171" stroke-width="2"/>
+          <text x="362" y="10" font-size="9" fill="#f87171" font-weight="bold">掃 EQH</text>
+          <polyline points="360,10 378,36 400,58 432,52 462,82 492,100" fill="none" stroke="#4ade80" stroke-width="2"/>
+          <text x="375" y="54" font-size="9" fill="#fbbf24">CHoCH</text>
+          <text x="398" y="76" font-size="9" fill="#f87171">找空 OB</text>
+          <line x1="40" y1="125" x2="480" y2="125" stroke="#60a5fa" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="42" y="140" font-size="9" fill="#60a5fa">EQL — 等低（SSL 聚集）目標</text>
+        </svg>
+        <div class="smc-diagram-label">EQH 被掃（Stop Hunt）→ CHoCH 確認 → 找空頭 OB 進場 → 目標 EQL</div>
+      </div>
       <div class="smc-def">
         EQH（Equal Highs）是兩個或以上接近相同價位的高點；EQL（Equal Lows）是兩個或以上接近相同價位的低點。這些位置上方/下方聚集了大量散戶的停損單（BSL/SSL），是機構最喜歡去掃的目標。<strong>等高/等低越多 = 流動性越大 = 被掃的機率越高。</strong>
       </div>
