@@ -169,6 +169,7 @@ a{color:#58a6ff;text-decoration:none}
 <div class="tab-bar">
   <button class="tab-btn active" id="tab-btn-tv" onclick="switchTab('tv')">📈 TV 指標</button>
   <button class="tab-btn" id="tab-btn-smc" onclick="switchTab('smc')">🔷 SMC 專頁</button>
+  <button class="tab-btn" id="tab-btn-fib" onclick="switchTab('fib')">🌀 Fibonacci</button>
 </div>
 
 <div id="tab-tv">
@@ -6115,6 +6116,574 @@ a{color:#58a6ff;text-decoration:none}
 </div><!-- end .smc-wrap -->
 </div><!-- end #tab-smc -->
 
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  Fibonacci 專頁                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="tab-fib" style="display:none">
+<div class="smc-wrap">
+
+  <div class="smc-intro">
+    <h2>🌀 斐波那契（Fibonacci）分析</h2>
+    <p>斐波那契數列（1, 1, 2, 3, 5, 8, 13...）中相鄰數字之比趨向<strong>黃金比例 0.618</strong>，這個比例在自然界、藝術、金融市場中無處不在。技術分析利用這些比例識別價格<strong>回撤支撐/阻力位</strong>與<strong>延伸獲利目標</strong>，搭配 SMC 的 Order Block、FVG 使用是最高勝率的組合之一。</p>
+    <div class="smc-tags">
+      <span class="smc-tag">黃金比例 0.618</span>
+      <span class="smc-tag">回撤位 Retracement</span>
+      <span class="smc-tag">延伸位 Extension</span>
+      <span class="smc-tag">黃金口袋 Golden Pocket</span>
+      <span class="smc-tag">多時框架 MTF</span>
+      <span class="smc-tag">Fib + OB 組合</span>
+    </div>
+  </div>
+
+  <!-- 1. 回撤位 -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">📐</span>
+      <span class="smc-sec-title">回撤位 — Fibonacci Retracement</span>
+      <span class="smc-sec-sub">0.236 · 0.382 · 0.5 · 0.618 · 0.786</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 215" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="215" fill="#0a0e14"/>
+          <!-- 水平 Fib 線 (A=y185 B=y25, range=160) -->
+          <!-- 0% 線 = y=25 -->
+          <line x1="260" y1="25" x2="500" y2="25" stroke="#6b7280" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="265" y="20" font-size="9" fill="#6b7280">0%（B 高點）</text>
+          <!-- 23.6% = y=63 -->
+          <line x1="260" y1="63" x2="500" y2="63" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="265" y="59" font-size="9" fill="#9ca3af">0.236</text>
+          <!-- 38.2% = y=86 -->
+          <line x1="260" y1="86" x2="500" y2="86" stroke="#67e8f9" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="265" y="82" font-size="9" fill="#67e8f9">0.382</text>
+          <!-- 50% = y=105 -->
+          <line x1="260" y1="105" x2="500" y2="105" stroke="#fbbf24" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="265" y="101" font-size="9" fill="#fbbf24">0.500</text>
+          <!-- 61.8% = y=124 (黃金) -->
+          <rect x="260" y="118" width="240" height="12" fill="rgba(74,222,128,.08)"/>
+          <line x1="260" y1="124" x2="500" y2="124" stroke="#4ade80" stroke-width="1.8" stroke-dasharray="3,2"/>
+          <text x="265" y="120" font-size="9" fill="#4ade80" font-weight="bold">0.618 ★ 黃金</text>
+          <!-- 78.6% = y=151 -->
+          <line x1="260" y1="151" x2="500" y2="151" stroke="#f87171" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="265" y="147" font-size="9" fill="#f87171">0.786</text>
+          <!-- 100% 線 = y=185 -->
+          <line x1="20" y1="185" x2="500" y2="185" stroke="#6b7280" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="265" y="198" font-size="9" fill="#6b7280">1.0（A 低點）</text>
+          <!-- 上升段 A→B -->
+          <polyline points="20,185 70,165 120,140 180,95 230,55 260,25" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="20" cy="185" r="4" fill="#4ade80"/>
+          <text x="5" y="183" font-size="10" fill="#4ade80" font-weight="bold">A</text>
+          <circle cx="260" cy="25" r="4" fill="#4ade80"/>
+          <text x="265" y="29" font-size="10" fill="#4ade80" font-weight="bold">B</text>
+          <!-- 回撤段 B→0.618 附近 -->
+          <polyline points="260,25 295,50 320,75 355,120 370,124" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-dasharray="4,2"/>
+          <!-- 從 0.618 反彈上去 -->
+          <polyline points="370,124 400,100 440,70 490,40" fill="none" stroke="#4ade80" stroke-width="2.2"/>
+          <circle cx="370" cy="124" r="5" fill="#4ade80" opacity=".85"/>
+          <text x="340" y="138" font-size="9" fill="#4ade80" font-weight="bold">↑ 支撐反彈</text>
+        </svg>
+        <div class="smc-diagram-label">上升趨勢回撤示意 | A = 起點低點（1.0）, B = 起點高點（0.0）| 0.618 是最常守住的黃金支撐</div>
+      </div>
+      <div class="smc-def">
+        回撤位是把一段波動（A→B）依黃金比例切割成多條<strong>水平線</strong>，預測價格回拉到哪裡後可能繼續原趨勢。理論基礎：市場不會無止境直線運動，資金在特定比例位置存在大量待成交訂單。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>五條主要回撤位</h4>
+          <ul>
+            <li><span class="p">0.236</span> — 淺回撤，強趨勢才停這裡，不常用</li>
+            <li><span class="g">0.382</span> — 常見支撐，趨勢強時多在此反彈</li>
+            <li><span class="y">0.500</span> — 非 Fib 比例，但市場習慣性在此整理</li>
+            <li><span class="g">0.618 ★</span> — 黃金比例，最重要的回撤支撐/阻力</li>
+            <li><span class="r">0.786</span> — 深回撤，越過此位趨勢可能已逆轉</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>各位意義</h4>
+          <ul>
+            <li>0.382 守住 = 趨勢<span class="g">極強</span>，可直接加碼</li>
+            <li>0.500 守住 = 趨勢<span class="g">中等偏強</span>，適合進場</li>
+            <li>0.618 守住 = 趨勢<span class="g">正常</span>，黃金入場區</li>
+            <li>跌破 0.618 → 看 0.786</li>
+            <li>跌破 0.786 → 結構可能已破，謹慎做多</li>
+            <li>跌破 1.0（A 點）= 趨勢<span class="r">終結</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 回撤位不是精確的「點」，而是「區間」。實務上 0.618 附近上下 0.5–1% 都算有效回測。不要等到精確碰線才進場，要看 K 線型態確認。</div>
+    </div>
+  </div>
+
+  <!-- 2. 如何正確畫 Fibonacci -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">✏️</span>
+      <span class="smc-sec-title">如何正確畫 Fibonacci</span>
+      <span class="smc-sec-sub">上升趨勢 vs 下降趨勢</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 170" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="170" fill="#0a0e14"/>
+          <!-- 分隔線 -->
+          <line x1="260" y1="0" x2="260" y2="170" stroke="#21262d" stroke-width="1"/>
+          <!-- 左半：上升趨勢 -->
+          <text x="30" y="15" font-size="10" fill="#4ade80" font-weight="bold">📈 上升趨勢</text>
+          <text x="10" y="28" font-size="8.5" fill="#6b7280">從 Swing Low（A）拉到 Swing High（B）</text>
+          <!-- A點 (低點) -->
+          <circle cx="30" cy="145" r="4" fill="#4ade80"/>
+          <text x="14" y="145" font-size="10" fill="#4ade80" font-weight="bold">A</text>
+          <text x="14" y="157" font-size="8" fill="#6b7280">低點</text>
+          <!-- B點 (高點) -->
+          <circle cx="220" cy="50" r="4" fill="#4ade80"/>
+          <text x="225" y="50" font-size="10" fill="#4ade80" font-weight="bold">B</text>
+          <text x="225" y="62" font-size="8" fill="#6b7280">高點</text>
+          <!-- 上升線 -->
+          <polyline points="30,145 80,125 130,95 180,68 220,50" fill="none" stroke="#4ade80" stroke-width="2"/>
+          <!-- 拖曳箭頭 -->
+          <line x1="30" y1="145" x2="218" y2="52" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <polygon points="218,52 210,62 224,62" fill="#fbbf24" transform="rotate(-55 218 52)"/>
+          <text x="90" y="108" font-size="9" fill="#fbbf24">拖曳方向 ↗</text>
+          <!-- 水平回撤線 (上升趨勢) -->
+          <line x1="20" y1="73" x2="245" y2="73" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="2,2" opacity=".7"/>
+          <line x1="20" y1="88" x2="245" y2="88" stroke="#67e8f9" stroke-width="0.8" stroke-dasharray="2,2" opacity=".7"/>
+          <line x1="20" y1="98" x2="245" y2="98" stroke="#fbbf24" stroke-width="0.8" stroke-dasharray="2,2" opacity=".7"/>
+          <line x1="20" y1="112" x2="245" y2="112" stroke="#4ade80" stroke-width="1.2" stroke-dasharray="3,2" opacity=".9"/>
+          <text x="2" y="72" font-size="7.5" fill="#9ca3af">.236</text>
+          <text x="2" y="87" font-size="7.5" fill="#67e8f9">.382</text>
+          <text x="2" y="97" font-size="7.5" fill="#fbbf24">.500</text>
+          <text x="2" y="111" font-size="7.5" fill="#4ade80">.618</text>
+          <!-- 右半：下降趨勢 -->
+          <text x="280" y="15" font-size="10" fill="#f87171" font-weight="bold">📉 下降趨勢</text>
+          <text x="268" y="28" font-size="8.5" fill="#6b7280">從 Swing High（A）拉到 Swing Low（B）</text>
+          <!-- A點 (高點) -->
+          <circle cx="285" cy="50" r="4" fill="#f87171"/>
+          <text x="268" y="50" font-size="10" fill="#f87171" font-weight="bold">A</text>
+          <text x="268" y="62" font-size="8" fill="#6b7280">高點</text>
+          <!-- B點 (低點) -->
+          <circle cx="480" cy="145" r="4" fill="#f87171"/>
+          <text x="486" y="145" font-size="10" fill="#f87171" font-weight="bold">B</text>
+          <text x="486" y="157" font-size="8" fill="#6b7280">低點</text>
+          <!-- 下降線 -->
+          <polyline points="285,50 330,72 370,95 420,120 480,145" fill="none" stroke="#f87171" stroke-width="2"/>
+          <!-- 拖曳箭頭 -->
+          <line x1="285" y1="50" x2="478" y2="143" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="350" y="78" font-size="9" fill="#fbbf24">拖曳方向 ↘</text>
+          <!-- 水平回撤線 (下降趨勢，回彈阻力) -->
+          <line x1="268" y1="124" x2="500" y2="124" stroke="#4ade80" stroke-width="1.2" stroke-dasharray="3,2" opacity=".9"/>
+          <line x1="268" y1="108" x2="500" y2="108" stroke="#fbbf24" stroke-width="0.8" stroke-dasharray="2,2" opacity=".7"/>
+          <line x1="268" y1="97" x2="500" y2="97" stroke="#67e8f9" stroke-width="0.8" stroke-dasharray="2,2" opacity=".7"/>
+          <line x1="268" y1="82" x2="500" y2="82" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="2,2" opacity=".7"/>
+          <text x="500" y="123" font-size="7.5" fill="#4ade80">.618</text>
+          <text x="500" y="107" font-size="7.5" fill="#fbbf24">.500</text>
+          <text x="500" y="96" font-size="7.5" fill="#67e8f9">.382</text>
+          <text x="500" y="81" font-size="7.5" fill="#9ca3af">.236</text>
+        </svg>
+        <div class="smc-diagram-label">左：上升趨勢從低點 A 拉到高點 B | 右：下降趨勢從高點 A 拉到低點 B</div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>上升趨勢畫法</h4>
+          <ul>
+            <li>找明顯的 <span class="g">Swing Low（A）</span> = 近期最低點</li>
+            <li>找後續的 <span class="g">Swing High（B）</span> = 最高點</li>
+            <li>在 TradingView 選「斐波那契回撤」</li>
+            <li>點擊 A（低點），拖曳到 B（高點）</li>
+            <li>生成的水平線即為<span class="g">回撤支撐</span></li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>下降趨勢畫法</h4>
+          <ul>
+            <li>找明顯的 <span class="r">Swing High（A）</span> = 近期最高點</li>
+            <li>找後續的 <span class="r">Swing Low（B）</span> = 最低點</li>
+            <li>點擊 A（高點），拖曳到 B（低點）</li>
+            <li>生成的水平線即為<span class="r">回彈阻力</span></li>
+            <li>常在 0.382–0.618 放空</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 常見錯誤：畫反方向（上升趨勢從高點拉到低點）會導致所有比例位都錯位。記住：永遠從<strong>波段起點</strong>拉到<strong>波段終點</strong>。</div>
+    </div>
+  </div>
+
+  <!-- 3. 黃金口袋 -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">💛</span>
+      <span class="smc-sec-title">黃金口袋 — Golden Pocket</span>
+      <span class="smc-sec-sub">0.618 ～ 0.65 最強回撤區</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="180" fill="#0a0e14"/>
+          <!-- 上升段 A→B -->
+          <polyline points="30,155 90,125 160,85 240,45 300,25" fill="none" stroke="#4ade80" stroke-width="2.5"/>
+          <circle cx="30" cy="155" r="3.5" fill="#4ade80"/>
+          <text x="14" y="155" font-size="9" fill="#4ade80" font-weight="bold">A</text>
+          <circle cx="300" cy="25" r="3.5" fill="#4ade80"/>
+          <text x="305" y="25" font-size="9" fill="#4ade80" font-weight="bold">B</text>
+          <!-- 標 B 到 A 總高度 130px (25→155) -->
+          <!-- 0.618 = 25 + 130*0.618 = 25+80 = 105 -->
+          <!-- 0.65 = 25 + 130*0.65 = 25+84 = 109 -->
+          <!-- 黃金口袋區域高亮 -->
+          <rect x="20" y="103" width="490" height="8" fill="rgba(251,191,36,.18)" rx="1"/>
+          <line x1="20" y1="105" x2="510" y2="105" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="20" y1="111" x2="510" y2="111" stroke="#fbbf24" stroke-width="1" stroke-dasharray="2,3" opacity=".7"/>
+          <text x="350" y="102" font-size="9" fill="#fbbf24" font-weight="bold">0.618</text>
+          <text x="350" y="120" font-size="9" fill="#fbbf24" opacity=".7">0.650</text>
+          <!-- 黃金口袋標籤 -->
+          <rect x="390" y="95" width="110" height="30" rx="4" fill="rgba(251,191,36,.15)" stroke="#fbbf24" stroke-width="1"/>
+          <text x="395" y="108" font-size="9" fill="#fbbf24" font-weight="bold">💛 Golden Pocket</text>
+          <text x="395" y="120" font-size="8" fill="#fbbf24" opacity=".8">機構最愛入場區</text>
+          <!-- 回撤下行 -->
+          <polyline points="300,25 330,45 355,72 375,105" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-dasharray="4,2"/>
+          <!-- 進場+反彈 -->
+          <circle cx="375" cy="105" r="5" fill="#fbbf24"/>
+          <polyline points="375,105 405,80 445,55 495,30" fill="none" stroke="#4ade80" stroke-width="2.2"/>
+          <text x="360" y="135" font-size="9" fill="#4ade80">↑ 在口袋買進</text>
+          <!-- SL 線 -->
+          <line x1="20" y1="155" x2="510" y2="155" stroke="#f87171" stroke-width="0.8" stroke-dasharray="2,3" opacity=".5"/>
+          <text x="340" y="152" font-size="8" fill="#f87171" opacity=".7">SL 參考：A 低點下方</text>
+          <!-- 0.382 上方參考 -->
+          <line x1="20" y1="56" x2="340" y2="56" stroke="#67e8f9" stroke-width="0.8" stroke-dasharray="2,3" opacity=".5"/>
+          <text x="345" y="59" font-size="8" fill="#67e8f9" opacity=".7">0.382</text>
+        </svg>
+        <div class="smc-diagram-label">黃金口袋（0.618～0.65）= Fibonacci 最強入場區 | 停損設在 A 低點下方</div>
+      </div>
+      <div class="smc-def">
+        黃金口袋（Golden Pocket）是 <strong>0.618 到 0.65</strong> 之間的窄小區間，被認為是機構資金最愛的<strong>買入/賣出區</strong>。0.618 是黃金比例，0.65 是 0.618 的倒數（1/1.618 ≈ 0.618，1/0.65 ≈ 1.538 接近 1.5），兩者共同形成強力磁吸區。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>上升趨勢 — 做多</h4>
+          <ul>
+            <li>等價格從高點回撤至 <span class="y">0.618–0.65</span> 區間</li>
+            <li>觀察 K 線：吞噬、錘頭、針形訊號</li>
+            <li>配合 SMC：找 OB 或 FVG 在此區重疊</li>
+            <li>進場：在口袋區下緣（0.618）買入</li>
+            <li>停損：A 低點下方 0.3–0.5%</li>
+            <li>目標：前高（B 點）或 1.272 延伸</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>下降趨勢 — 做空</h4>
+          <ul>
+            <li>等價格從低點反彈至 <span class="y">0.618–0.65</span> 阻力區</li>
+            <li>觀察 K 線：看跌吞噬、流星線</li>
+            <li>配合 SMC：找 Bearish OB 在此區</li>
+            <li>進場：在口袋區上緣（0.65）放空</li>
+            <li>停損：A 高點上方 0.3–0.5%</li>
+            <li>目標：前低（B 點）或 1.618 延伸</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">💡 黃金口袋 + Bullish Order Block 重疊 = 最高概率進場點。這是 SMC 交易者最常用的組合：先用大時框確認趨勢，再找 0.618 附近的 OB 做進場。</div>
+    </div>
+  </div>
+
+  <!-- 4. 延伸位 Extension -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">🎯</span>
+      <span class="smc-sec-title">延伸位 — Fibonacci Extension</span>
+      <span class="smc-sec-sub">1.272 · 1.414 · 1.618 · 2.618 獲利目標</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="220" fill="#0a0e14"/>
+          <!-- A=y180 B=y100, range=80, then C=0.618回撤 -->
+          <!-- A=起點低點 y=180, B=高點 y=60, C=0.618回撤 y=60+0.618*120=60+74=134 -->
+          <!-- Extension from A→B→C:
+               1.0 = B = y=60
+               1.272 = 60 - 0.272*120 = 60-33 = 27
+               1.414 = 60 - 0.414*120 = 60-50 = 10 (off screen, use y=10)
+               1.618 = 60 - 0.618*120 = 60-74 = -14 (off screen)
+               Actually let me re-scale.
+               
+               Let A=y=185, B=y=45, range=140
+               C (0.618 retracement) = 45 + 140*0.618 = 45+86 = 131
+               
+               Extensions above B (0% line = B = y=45):
+               1.0 = y=45 (B)
+               1.272 = y=45 - 0.272*140 = 45-38 = 7  — too close to top
+               
+               Let me use a more compact scale.
+               A=y=175, B=y=75, range=100
+               C=0.618 retrace = 75 + 100*0.618 = 75+62 = 137
+               
+               Extensions (above B):
+               1.272 = 75 - 0.272*100 = 75-27 = 48
+               1.414 = 75 - 0.414*100 = 75-41 = 34
+               1.618 = 75 - 0.618*100 = 75-62 = 13
+               2.618 = 75 - 1.618*100 = 75-162 = -87 (off screen)
+               
+               For SVG height 220, keep everything visible.
+               Let's use A=y=190, B=y=95, range=95
+               C=0.618 retrace = 95 + 95*0.618 = 95+59 = 154
+               
+               Extensions above B:
+               1.272 = 95 - 0.272*95 = 95-26 = 69
+               1.414 = 95 - 0.414*95 = 95-39 = 56
+               1.618 = 95 - 0.618*95 = 95-59 = 36
+               2.618 = 95 - 1.618*95 = 95-154 = too negative
+               
+               Let me use shorter range. A=y=195, B=y=120, range=75
+               C=0.618 retrace = 120 + 75*0.618 = 120+46 = 166
+               
+               Extensions above B (1.0):
+               1.272 = 120 - 0.272*75 = 120-20 = 100
+               1.414 = 120 - 0.414*75 = 120-31 = 89
+               1.618 = 120 - 0.618*75 = 120-46 = 74
+               2.618 = 120 - 1.618*75 = 120-121 = -1 ≈ 5 (very top)
+               
+               OK this works! Let me use these values.
+          -->
+          <!-- A = y=195, B = y=120, C = y=166 -->
+          <!-- 先畫上升 A→B -->
+          <polyline points="40,195 90,175 140,155 190,135 240,120" fill="none" stroke="#4ade80" stroke-width="2.2"/>
+          <circle cx="40" cy="195" r="4" fill="#4ade80"/>
+          <text x="22" y="195" font-size="10" fill="#4ade80" font-weight="bold">A</text>
+          <circle cx="240" cy="120" r="4" fill="#4ade80"/>
+          <text x="246" y="118" font-size="10" fill="#4ade80" font-weight="bold">B (1.0)</text>
+          <!-- 回撤 B→C -->
+          <polyline points="240,120 265,135 285,152 300,166" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-dasharray="4,2"/>
+          <circle cx="300" cy="166" r="4" fill="#fbbf24"/>
+          <text x="306" y="165" font-size="9" fill="#fbbf24" font-weight="bold">C (0.618)</text>
+          <!-- 延伸上漲 C→以上 -->
+          <polyline points="300,166 330,140 360,115 390,95 420,74 460,36" fill="none" stroke="#4ade80" stroke-width="2.2"/>
+          <!-- 延伸位水平線 -->
+          <!-- 1.272 = y=100 -->
+          <line x1="280" y1="100" x2="510" y2="100" stroke="#c4b5fd" stroke-width="1.2" stroke-dasharray="3,2"/>
+          <text x="350" y="97" font-size="9" fill="#c4b5fd">1.272 — 第一目標</text>
+          <!-- 1.414 = y=89 -->
+          <line x1="280" y1="89" x2="510" y2="89" stroke="#67e8f9" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="350" y="86" font-size="9" fill="#67e8f9">1.414</text>
+          <!-- 1.618 = y=74 -->
+          <line x1="280" y1="74" x2="510" y2="74" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="350" y="71" font-size="9" fill="#fbbf24" font-weight="bold">1.618 — 主目標 ★</text>
+          <!-- 2.618 ≈ y=5 -->
+          <line x1="280" y1="20" x2="510" y2="20" stroke="#f87171" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="350" y="17" font-size="9" fill="#f87171">2.618 — 極端目標</text>
+          <!-- B 基準線 -->
+          <line x1="20" y1="120" x2="510" y2="120" stroke="#4ade80" stroke-width="0.8" stroke-dasharray="2,3" opacity=".5"/>
+          <!-- 到達標記 -->
+          <circle cx="390" cy="95" r="4" fill="#c4b5fd" opacity=".9"/>
+          <circle cx="420" cy="74" r="5" fill="#fbbf24" opacity=".9"/>
+        </svg>
+        <div class="smc-diagram-label">A→B 上升段 | 回撤至 C（0.618）後繼續 | 延伸位為後續獲利目標</div>
+      </div>
+      <div class="smc-def">
+        延伸位（Extension）是在價格完成回撤後，預測後續走勢<strong>能到達多遠</strong>的工具。畫法：在 TradingView 選「斐波那契延伸」，依序點 A（起點）→ B（終點）→ C（回撤點），工具自動計算延伸目標。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>主要延伸位</h4>
+          <ul>
+            <li><span class="p">1.272</span> — 第一個常見目標，可分批止盈</li>
+            <li><span class="g">1.414</span> — 中間位，適合一半止盈</li>
+            <li><span class="y">1.618 ★</span> — 黃金延伸，主要獲利目標</li>
+            <li><span class="r">2.618</span> — 極端走勢才到，趨勢極強時</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>實戰止盈策略</h4>
+          <ul>
+            <li>進場後 <span class="p">1.272</span> 止盈 30%（降低風險）</li>
+            <li><span class="g">1.414</span> 再止盈 30%，移動停損至成本</li>
+            <li><span class="y">1.618</span> 止盈剩餘倉位（主目標）</li>
+            <li>趨勢強才繼續持有到 <span class="r">2.618</span></li>
+            <li>搭配 SMC 流動性分析設目標更準確</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">💡 1.618 是最常被大資金設定獲利目標的位置，因為機構用 Fibonacci 計算波段目標是業界慣例。價格到達 1.618 後通常會有較大阻力，留意止盈。</div>
+    </div>
+  </div>
+
+  <!-- 5. 多時框架應用 -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">🕐</span>
+      <span class="smc-sec-title">多時框架 Fibonacci（MTF Fib）</span>
+      <span class="smc-sec-sub">大時框 Fib 比小時框更強</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        相同的 Fibonacci 比例，在<strong>越大的時框架畫出</strong>，支撐/阻力效力越強。日線 0.618 比 1 小時線 0.618 可靠得多，因為更多的參與者和交易系統都在參考它。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>MTF 應用流程</h4>
+          <ul>
+            <li><strong>週線/日線</strong>：畫大波段 Fib，確認重要 0.618 區間</li>
+            <li><strong>4H/1H</strong>：找小波段 Fib，看是否與大時框位重疊</li>
+            <li><strong>15M/5M</strong>：看進場訊號（K 線確認）</li>
+            <li>兩個時框的 Fib 位重疊 = <span class="g">Confluence 共振</span></li>
+            <li>三個時框都在同一位 = <span class="g">極強支撐</span></li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>時框參考表</h4>
+          <ul>
+            <li><span class="p">週線 Fib</span> — 月線級別方向，超強支撐</li>
+            <li><span class="g">日線 Fib</span> — 做波段的主要 Fib，最常用</li>
+            <li><span class="y">4H Fib</span> — 中線操作，搭配日線使用</li>
+            <li><span class="p">1H Fib</span> — 日內交易主時框</li>
+            <li>15M/5M — 精確進場，不單獨依賴</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 避免在單一時框看到 0.618 就進場。一定要先確認更大時框的趨勢方向，Fib 回撤只能順勢使用，逆趨勢的 0.618 不是機會而是陷阱。</div>
+    </div>
+  </div>
+
+  <!-- 6. Fib + SMC 組合 -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">⚡</span>
+      <span class="smc-sec-title">Fib + SMC 組合應用</span>
+      <span class="smc-sec-sub">Order Block · FVG · 流動性 共振</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-diagram">
+        <svg viewBox="0 0 520 175" xmlns="http://www.w3.org/2000/svg">
+          <rect width="520" height="175" fill="#0a0e14"/>
+          <!-- 上升 A→B -->
+          <polyline points="20,155 90,125 170,88 250,55 310,35" fill="none" stroke="#4ade80" stroke-width="2"/>
+          <circle cx="20" cy="155" r="3" fill="#4ade80"/>
+          <text x="4" y="155" font-size="9" fill="#4ade80">A</text>
+          <circle cx="310" cy="35" r="3" fill="#4ade80"/>
+          <text x="316" y="33" font-size="9" fill="#4ade80">B</text>
+          <!-- 0.618 線 A=155 B=35, range=120, 0.618=35+74=109 -->
+          <line x1="10" y1="109" x2="510" y2="109" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,2" opacity=".8"/>
+          <text x="430" y="106" font-size="9" fill="#4ade80">0.618</text>
+          <!-- OB 框 (Bullish OB 在 0.618 附近) -->
+          <rect x="145" y="103" width="50" height="20" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1.5" rx="2"/>
+          <text x="148" y="97" font-size="9" fill="#22c55e" font-weight="bold">Bullish OB</text>
+          <!-- FVG 框 -->
+          <rect x="210" y="95" width="45" height="15" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="1" rx="2" stroke-dasharray="2,2"/>
+          <text x="212" y="91" font-size="8" fill="#a78bfa">FVG</text>
+          <!-- 回撤路徑 B→OB/0.618 -->
+          <polyline points="310,35 340,62 365,90 375,109" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-dasharray="4,2"/>
+          <!-- 進場反彈 -->
+          <circle cx="375" cy="109" r="5" fill="#fbbf24"/>
+          <polyline points="375,109 410,82 450,55 500,28" fill="none" stroke="#4ade80" stroke-width="2.2"/>
+          <text x="355" y="130" font-size="9" fill="#fbbf24" font-weight="bold">↑ 三重共振進場</text>
+          <!-- 標籤說明 -->
+          <rect x="15" y="10" width="130" height="38" rx="4" fill="rgba(34,197,94,.1)" stroke="#22c55e" stroke-width="0.8"/>
+          <text x="20" y="23" font-size="8.5" fill="#22c55e">① 0.618 Fib 回撤位</text>
+          <text x="20" y="33" font-size="8.5" fill="#22c55e">② Bullish OB 在同區</text>
+          <text x="20" y="43" font-size="8.5" fill="#a78bfa">③ FVG 填補需求</text>
+        </svg>
+        <div class="smc-diagram-label">Fib 0.618 + Bullish OB + FVG 三重共振 = 最高概率做多點</div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>Fib + OB 組合</h4>
+          <ul>
+            <li>Bullish OB 恰好位於 <span class="g">0.618 回撤區</span> = 雙重確認</li>
+            <li>OB 是機構掛單，0.618 是機構參考位</li>
+            <li>兩者重疊 = 機構在同一區域的訂單密度最高</li>
+            <li>進場：OB 上緣買入，停損 OB 下方</li>
+            <li>目標：前高 B 點，或 1.618 延伸</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>Fib + FVG 組合</h4>
+          <ul>
+            <li>FVG（公平價值缺口）在 0.618 附近 = 強力磁吸</li>
+            <li>FVG 通常會被「填補」，填補後繼續原趨勢</li>
+            <li>0.618 + FVG 重疊 = 價格必回此區的機率極高</li>
+            <li>進場：FVG 50% 中位或下緣買入</li>
+            <li>搭配 OB = 三重共振，最高勝率</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>Fib + 流動性</h4>
+          <ul>
+            <li>0.618 下方若有 EQL（等低流動性）= 先掃流動性再反彈</li>
+            <li>價格會先跌破 0.618 去獵停損，然後快速反彈</li>
+            <li>這種假突破 = SMC 中的「Liquidity Grab」</li>
+            <li>看到快速刺穿 0.618 又拉回 = 做多機會</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>Fib + 市場結構</h4>
+          <ul>
+            <li>在大時框<span class="g">上升結構</span>中，用 Fib 找回撤進場</li>
+            <li>CHoCH 後第一次用 Fib 回撤 = 風險較高</li>
+            <li>BOS 確認後的 Fib 回撤 = 安全進場</li>
+            <li>0.618 回撤若出現 CHoCH = 方向轉換警示，出場</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">💡 最強進場組合：大時框結構向上 + 0.618 Fib 回撤 + Bullish OB 重疊 + 小時框 BOS 確認。這四個條件同時成立的機會不多，但每次出現都是高概率交易。</div>
+    </div>
+  </div>
+
+  <!-- 7. TradingView 設置 -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">⚙️</span>
+      <span class="smc-sec-title">TradingView Fibonacci 設置</span>
+      <span class="smc-sec-sub">工具位置 · 自定義位 · 推薦設定</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>如何開啟工具</h4>
+          <ul>
+            <li>左側工具列 → 尺規圖示 → 「斐波那契回撤」</li>
+            <li>快捷鍵：<span class="y">Alt + F</span>（部分版本）</li>
+            <li>延伸位：左側工具 → 「斐波那契延伸」</li>
+            <li>畫好後雙擊可進入設置面板</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>建議加入的 Fib 位</h4>
+          <ul>
+            <li>預設已有 0, 0.236, 0.382, 0.5, 0.618, 0.786, 1</li>
+            <li>手動加入 <span class="y">0.65</span> = 黃金口袋上界</li>
+            <li>手動加入 <span class="p">0.705</span> = 部分分析師使用</li>
+            <li>延伸位加入：1.272, 1.414, 1.618, 2.0, 2.618</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>顏色建議</h4>
+          <ul>
+            <li>0.236 → 灰色（次要）</li>
+            <li>0.382 → 青色（常用）</li>
+            <li>0.500 → 黃色（中位）</li>
+            <li>0.618 → <span class="g">綠色加粗</span>（最重要）</li>
+            <li>0.65 → 金色（黃金口袋上界）</li>
+            <li>0.786 → 紅色（深回撤警示）</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>實用腳本推薦</h4>
+          <ul>
+            <li>搜尋「Auto Fibonacci」— 自動識別波段畫 Fib</li>
+            <li>搜尋「Golden Pocket」— 自動標記 0.618–0.65 區</li>
+            <li>搜尋「Fibonacci Zones」— 多時框 Fib 顯示</li>
+            <li>LuxAlgo 系列 — 整合 SMC + Fib 全套工具</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ TradingView 的「斐波那契回撤」和「斐波那契延伸」是兩個不同工具。回撤用於找<strong>進場點</strong>（A→B 兩點），延伸用於找<strong>目標位</strong>（A→B→C 三點）。兩者都要學會才能完整運用。</div>
+    </div>
+  </div>
+
+</div><!-- end .smc-wrap -->
+</div><!-- end #tab-fib -->
+
+
 <div class="chip-popup" id="chipPopup">
   <button class="cp-close" onclick="closePopup()">✕</button>
   <div class="cp-name" id="cpName"></div>
@@ -6124,11 +6693,10 @@ a{color:#58a6ff;text-decoration:none}
 
 <script>
 function switchTab(tab){
-  var isTV = tab==='tv';
-  document.getElementById('tab-tv').style.display = isTV ? '' : 'none';
-  document.getElementById('tab-smc').style.display = isTV ? 'none' : '';
-  document.getElementById('tab-btn-tv').classList.toggle('active', isTV);
-  document.getElementById('tab-btn-smc').classList.toggle('active', !isTV);
+  ['tv','smc','fib'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = tab===t ? '' : 'none';
+    document.getElementById('tab-btn-'+t).classList.toggle('active', tab===t);
+  });
 }
 function filt(cat,btn){
   document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
