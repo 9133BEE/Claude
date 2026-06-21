@@ -93,20 +93,20 @@ a{color:#58a6ff;text-decoration:none}
 </div>
 <div class="hero">
   <h1>TradingView 指標大全</h1>
-  <p>33 個核心指標完整解析 — 設定值、判讀方式、最佳搭配，一張卡片看懂一個指標</p>
+  <p>52 個核心指標完整解析 — 設定值、判讀方式、最佳搭配，一張卡片看懂一個指標</p>
   <div class="badges">
-    <span class="badge b-trend">趨勢類 11</span>
-    <span class="badge b-mom">動量類 10</span>
-    <span class="badge b-vol">量能類 7</span>
-    <span class="badge b-vola">波動類 5</span>
+    <span class="badge b-trend">趨勢類 16</span>
+    <span class="badge b-mom">動量類 18</span>
+    <span class="badge b-vol">量能類 10</span>
+    <span class="badge b-vola">波動類 8</span>
   </div>
 </div>
 <div class="filters">
-  <button class="fb on" onclick="filt('all',this)">全部 33</button>
-  <button class="fb t" onclick="filt('trend',this)">趨勢類 11</button>
-  <button class="fb m" onclick="filt('mom',this)">動量類 10</button>
-  <button class="fb v" onclick="filt('vol',this)">量能類 7</button>
-  <button class="fb w" onclick="filt('vola',this)">波動類 5</button>
+  <button class="fb on" onclick="filt('all',this)">全部 52</button>
+  <button class="fb t" onclick="filt('trend',this)">趨勢類 16</button>
+  <button class="fb m" onclick="filt('mom',this)">動量類 18</button>
+  <button class="fb v" onclick="filt('vol',this)">量能類 10</button>
+  <button class="fb w" onclick="filt('vola',this)">波動類 8</button>
 </div>
 <div class="grid">
 
@@ -2384,6 +2384,790 @@ a{color:#58a6ff;text-decoration:none}
       <div class="nc-tip-lbl">⚠ 注意：</div>
       <div class="nc-tip-text">Force Index 的絕對數值因個股成交量差異而無法跨股比較，只能看方向和背離，不看數值大小</div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ 趨勢類（續2）═══ -->
+
+<!-- c34 TEMA -->
+<div class="card trend" id="c34">
+  <div class="nc-head"><span class="nc-tag">趨勢類</span>
+    <div class="nc-title">TEMA &nbsp;三重指數移動平均線</div>
+    <div class="nc-sub">Triple EMA — 比 DEMA 更快，延遲幾乎消除</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <rect x="30" y="70" width="9" height="14" fill="#22c55e" rx="1"/><rect x="50" y="78" width="9" height="16" fill="#22c55e" rx="1"/><rect x="70" y="90" width="9" height="18" fill="#22c55e" rx="1"/><rect x="90" y="82" width="9" height="14" fill="#ef4444" rx="1"/><rect x="110" y="60" width="9" height="14" fill="#ef4444" rx="1"/><rect x="130" y="44" width="9" height="12" fill="#ef4444" rx="1"/><rect x="150" y="32" width="9" height="12" fill="#ef4444" rx="1"/>
+      <polyline points="20,110 100,100 150,110 200,80 300,50 420,28 460,20" fill="none" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5,3" opacity=".8"/>
+      <polyline points="20,108 100,96 150,108 200,74 300,42 420,20 460,14" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4,3"/>
+      <polyline points="20,106 100,92 150,106 200,68 300,36 420,14 460,8" fill="none" stroke="#f87171" stroke-width="2.2"/>
+      <text x="390" y="12" font-size="13" fill="#f87171" font-weight="700">TEMA</text>
+      <text x="390" y="24" font-size="12" fill="#f59e0b">DEMA</text>
+      <text x="390" y="36" font-size="12" fill="#6b7280">EMA</text>
+      <text x="240" y="14" font-size="12" fill="#c9d1d9" text-anchor="middle">速度：TEMA &gt; DEMA &gt; EMA</text>
+    </svg>
+    <div class="nc-concept">TEMA = <strong>3×EMA − 3×EMA(EMA) + EMA(EMA(EMA))</strong>，三重去除延遲。反應速度最快，對急漲急跌行情捕捉能力最強，但在震盪盤中假訊號也最多。適合短線捕捉快速趨勢。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">建議設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">8 / 21</span>（短線）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">TEMA 急速向上</span>：強勢動能</li><li><span class="g">TEMA 轉頭向下</span>：動能衰退</li><li>比 EMA 早 2~3 根給訊號</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>短線交易優先 TEMA 訊號</li><li>需 ADX&gt;30 才有效</li><li>斜率比交叉更重要</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'ADX','TEMA 假訊號極多，ADX&gt;30 是使用 TEMA 的前提。','c4')">ADX</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'EMA','TEMA 穿越 EMA 是強勢趨勢的早期確認，兩者同向才操作。','c2')">EMA</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','TEMA 訊號需量能配合，量縮時 TEMA 交叉可信度極低。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">TEMA 極其敏感，盤整行情中幾乎每根 K 棒都會產生交叉，不建議初學者單獨使用</div></div>
+  </div>
+</div>
+
+<!-- c35 HMA -->
+<div class="card trend" id="c35">
+  <div class="nc-head"><span class="nc-tag">趨勢類</span>
+    <div class="nc-title">HMA &nbsp;霍爾移動平均線</div>
+    <div class="nc-sub">Hull Moving Average — 快速又平滑，Hull 1980 年代的發明</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <rect x="30" y="98" width="9" height="14" fill="#22c55e" rx="1"/><rect x="50" y="88" width="9" height="14" fill="#ef4444" rx="1"/><rect x="70" y="76" width="9" height="13" fill="#ef4444" rx="1"/><rect x="90" y="62" width="9" height="13" fill="#ef4444" rx="1"/><rect x="110" y="50" width="9" height="12" fill="#22c55e" rx="1"/><rect x="130" y="38" width="9" height="12" fill="#ef4444" rx="1"/>
+      <polyline points="20,118 80,104 150,86 220,70 300,58 380,46 460,36" fill="none" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5,3" opacity=".7"/>
+      <polyline points="20,114 80,96 150,76 220,58 300,42 380,28 460,20" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+      <text x="390" y="18" font-size="13" fill="#22c55e" font-weight="700">HMA</text>
+      <text x="390" y="34" font-size="12" fill="#6b7280">SMA</text>
+      <text x="240" y="14" font-size="12" fill="#c9d1d9" text-anchor="middle">平滑 + 快速，幾乎無延遲</text>
+    </svg>
+    <div class="nc-concept">HMA = <strong>WMA(2×WMA(n/2) − WMA(n), √n)</strong>，透過加速和平滑雙重處理，幾乎消除延遲的同時保持平滑曲線。是目前最常被提及的「兼顧速度與平滑」的均線之一。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">建議設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">週期 9 / 20 / 55</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">HMA 轉色/向上</span>：多頭確認</li><li><span class="g">HMA 轉色/向下</span>：空頭確認</li><li>比 EMA 更早反映趨勢轉折</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>HMA 顏色變化即換手訊號</li><li>適合 1H-4H 波段操作</li><li>比 TEMA 在震盪盤更穩定</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','HMA 轉頭時 RSI 同步確認方向，雙重確認進出場時機。','c9')">RSI</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'ATR','ATR 設停損幅度，HMA 提供方向，是完整的進場框架。','c22')">ATR</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','HMA 方向改變時搭配量能確認，避免低量假訊號。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">HMA 在 TradingView 需自行搜尋腳本，預設指標庫中無 HMA，請確認使用的版本計算公式正確</div></div>
+  </div>
+</div>
+
+<!-- c36 VWMA -->
+<div class="card trend" id="c36">
+  <div class="nc-head"><span class="nc-tag">趨勢類</span>
+    <div class="nc-title">VWMA &nbsp;成交量加權移動平均線</div>
+    <div class="nc-sub">Volume Weighted MA — 大量的 K 棒對均線影響更大</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <rect x="20" y="110" width="14" height="30" fill="#22c55e" rx="1" opacity=".4"/>
+      <rect x="42" y="100" width="14" height="40" fill="#ef4444" rx="1" opacity=".5"/>
+      <rect x="64" y="80" width="14" height="60" fill="#ef4444" rx="1" opacity=".8"/>
+      <rect x="86" y="76" width="14" height="64" fill="#ef4444" rx="1"/>
+      <rect x="108" y="94" width="14" height="46" fill="#22c55e" rx="1" opacity=".6"/>
+      <rect x="130" y="100" width="14" height="40" fill="#ef4444" rx="1" opacity=".5"/>
+      <polyline points="20,100 70,90 110,78 160,72 220,62 300,50 400,38 460,30" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="5,3" opacity=".7"/>
+      <polyline points="20,96 70,82 110,70 160,62 220,50 300,36 400,26 460,18" fill="none" stroke="#60a5fa" stroke-width="2.2"/>
+      <text x="400" y="16" font-size="13" fill="#60a5fa" font-weight="700">VWMA</text>
+      <text x="400" y="28" font-size="12" fill="#6b7280">SMA</text>
+      <text x="78" y="72" font-size="12" fill="#f87171" text-anchor="middle">爆量日權重↑</text>
+    </svg>
+    <div class="nc-concept">VWMA 給<strong>成交量大的日子更高權重</strong>。爆量長紅那天的收盤價對 VWMA 的影響遠大於縮量小黑。機構大量進出的日子決定了 VWMA 的走向，比 SMA 更能反映「有意義的」價格。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">建議設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">週期 20</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">VWMA &gt; SMA</span>：大量日偏多</li><li><span class="g">VWMA &lt; SMA</span>：大量日偏空</li><li>VWMA 上揚代表法人方向向上</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>VWMA 與 SMA 分叉代表量能偏向</li><li>法人操盤股使用 VWMA 更準</li><li>搭配 OBV 確認方向</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'OBV','VWMA 和 OBV 都強調量能的重要性，兩者同向代表資金流向明確。','c17')">OBV</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'VWAP','VWMA 看多日均線，VWAP 看日內基準，兩者搭配覆蓋不同時間維度。','c19')">VWAP</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','VWMA 本身已納入量能，再看量能趨勢方向是否與 VWMA 一致。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">成交量異常日（除權息）的爆量會嚴重拉偏 VWMA，需在這類特殊日前後謹慎解讀</div></div>
+  </div>
+</div>
+
+<!-- c37 Alligator -->
+<div class="card trend" id="c37">
+  <div class="nc-head"><span class="nc-tag">趨勢類</span>
+    <div class="nc-title">Alligator &nbsp;鱷魚指標</div>
+    <div class="nc-sub">Bill Williams 的三線系統 — 判斷市場是否在「睡覺」</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <!-- 糾纏期（睡覺）-->
+      <rect x="10" y="15" width="100" height="120" fill="rgba(106,112,128,.06)"/>
+      <text x="60" y="14" font-size="12" fill="#6b7280" text-anchor="middle">睡覺（盤整）</text>
+      <!-- 三線糾纚 -->
+      <polyline points="14,78 60,75 110,72" fill="none" stroke="#22c55e" stroke-width="2" opacity=".7"/>
+      <polyline points="14,80 60,77 110,74" fill="none" stroke="#ef4444" stroke-width="2" opacity=".7"/>
+      <polyline points="14,82 60,79 110,76" fill="none" stroke="#60a5fa" stroke-width="2" opacity=".7"/>
+      <!-- 張嘴爆發 -->
+      <line x1="110" y1="10" x2="110" y2="140" stroke="#30363d" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="130" y="14" font-size="12" fill="#4ade80">張嘴（趨勢啟動）</text>
+      <!-- 三線分開 -->
+      <polyline points="110,72 200,52 300,32 400,18 460,12" fill="none" stroke="#22c55e" stroke-width="2"/>
+      <polyline points="110,75 200,60 300,42 400,28 460,22" fill="none" stroke="#ef4444" stroke-width="2"/>
+      <polyline points="110,78 200,68 300,52 400,38 460,32" fill="none" stroke="#60a5fa" stroke-width="2"/>
+      <text x="420" y="10" font-size="12" fill="#22c55e">下顎</text>
+      <text x="420" y="22" font-size="12" fill="#ef4444">牙齒</text>
+      <text x="420" y="34" font-size="12" fill="#60a5fa">嘴唇</text>
+    </svg>
+    <div class="nc-concept">鱷魚指標包含<strong>藍線（下顎13/8）、紅線（牙齒8/5）、綠線（嘴唇5/3）</strong>三條位移 SMMA。三線糾纏代表「鱷魚睡覺」（盤整）；三線大幅張開代表「鱷魚醒來進食」（強趨勢）。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">13/8 · 8/5 · 5/3</span>（週期/位移）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">三線張開向上</span>：多頭趨勢</li><li><span class="g">三線糾纏</span>：盤整，不操作</li><li>三線張開向下：空頭趨勢</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>搭配 Fractals 找進場點</li><li>搭配 AO 確認動能</li><li>三線收斂後等待張嘴再進</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Awesome Oscillator','AO 和鱷魚是 Bill Williams 系統的標配，鱷魚給方向，AO 給動能。','c39')">AO</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','鱷魚三線張嘴搭配 MACD 金叉，雙重確認趨勢啟動訊號。','c3')">MACD</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'ADX','ADX&gt;25 確認鱷魚「真正在吃東西」，避免假突破。','c4')">ADX</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">鱷魚指標的核心在於判斷「現在有沒有趨勢」，三線糾纏時務必空手等待，不強行操作</div></div>
+  </div>
+</div>
+
+<!-- c38 STC -->
+<div class="card trend" id="c38">
+  <div class="nc-head"><span class="nc-tag">趨勢類</span>
+    <div class="nc-title">Schaff Trend Cycle &nbsp;沙夫趨勢週期</div>
+    <div class="nc-sub">STC — MACD + 隨機化，更快速的趨勢確認指標</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <rect x="0" y="10" width="480" height="28" fill="rgba(239,68,68,.07)"/>
+      <rect x="0" y="112" width="480" height="28" fill="rgba(34,197,94,.07)"/>
+      <line x1="10" y1="38" x2="470" y2="38" stroke="rgba(239,68,68,.4)" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <line x1="10" y1="112" x2="470" y2="112" stroke="rgba(34,197,94,.4)" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <text x="12" y="26" font-size="13" fill="#f87171" font-weight="700">75</text>
+      <text x="12" y="126" font-size="13" fill="#4ade80" font-weight="700">25</text>
+      <polyline points="20,118 70,105 120,70 170,25 210,18 250,38 300,75 350,108 400,128 440,115 470,90" fill="none" stroke="#22c55e" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="120" cy="70" r="8" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="130" y="64" font-size="13" fill="#4ade80" font-weight="700">穿越 25 做多</text>
+      <circle cx="300" cy="75" r="8" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="2"/>
+      <text x="310" y="70" font-size="13" fill="#f87171" font-weight="700">跌破 75 出場</text>
+    </svg>
+    <div class="nc-concept">STC 對 MACD 套用隨機化處理，訊號比 MACD 快 1~3 根且更清晰。值域 0~100，<strong>穿越 25</strong> 是做多訊號，<strong>跌破 75</strong> 是出場訊號。適合搭配趨勢過濾使用。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">23 / 50 / 10</span>（快/慢/週期）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">穿越 25 向上</span>：做多訊號</li><li><span class="g">跌破 75 向下</span>：出場訊號</li><li>比 MACD 訊號快 1~3 根</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>STC 在 25 以下底部區進場</li><li>搭配均線過濾假訊號</li><li>適合 1H/4H 時間框架</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','STC 是 MACD 的升級版，兩者同步確認時訊號最強。','c3')">MACD</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'EMA','EMA 多頭排列時 STC 穿越 25，是最佳進場組合。','c2')">EMA</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','STC 穿越 25 時量放大，確認真實趨勢啟動。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">STC 雖比 MACD 快，但訊號「到達上限 100 後維持在高位」時不代表持續上漲，需動態追蹤</div></div>
+  </div>
+</div>
+
+<!-- ═══ 動量類（續2）═══ -->
+
+<!-- c39 AO -->
+<div class="card mom" id="c39">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">Awesome Oscillator &nbsp;絕妙震盪器</div>
+    <div class="nc-sub">AO — Bill Williams 設計，34 vs 5 根 SMA 的動量差</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#2a3140" stroke-width="1"/>
+      <text x="12" y="72" font-size="13" fill="#6b7280">0</text>
+      <!-- 負柱綠（台股空方）-->
+      <rect x="20" y="75" width="12" height="24" fill="#22c55e" rx="1" opacity=".7"/>
+      <rect x="38" y="75" width="12" height="18" fill="#22c55e" rx="1" opacity=".65"/>
+      <rect x="56" y="75" width="12" height="10" fill="#22c55e" rx="1" opacity=".55"/>
+      <!-- 正柱紅（台股多方）-->
+      <rect x="74" y="58" width="12" height="17" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="92" y="46" width="12" height="29" fill="#ef4444" rx="1" opacity=".85"/>
+      <rect x="110" y="38" width="12" height="37" fill="#ef4444" rx="1"/>
+      <rect x="128" y="42" width="12" height="33" fill="#ef4444" rx="1" opacity=".9"/>
+      <rect x="146" y="52" width="12" height="23" fill="#ef4444" rx="1" opacity=".75"/>
+      <!-- 轉色提示 -->
+      <rect x="164" y="66" width="12" height="9" fill="#ef4444" rx="1" opacity=".5"/>
+      <rect x="182" y="75" width="12" height="12" fill="#22c55e" rx="1" opacity=".6"/>
+      <!-- Twin Peaks 訊號標 -->
+      <circle cx="74" cy="62" r="7" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="88" y="56" font-size="13" fill="#4ade80" font-weight="700">碟形進場</text>
+      <text x="130" y="26" font-size="12" fill="#f87171">柱縮 = 動能衰退</text>
+    </svg>
+    <div class="nc-concept">AO = <strong>5根K棒中點均值 − 34根K棒中點均值</strong>。柱轉紅（台股：多方動能）代表短期動能超越長期；柱縮短代表動能衰退。<strong>碟形（三連柱先縮後增）</strong>是 Bill Williams 的黃金進場訊號。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">5 / 34</span>（快/慢中點 SMA）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">正區柱增大</span>：多頭動能加速</li><li><span class="g">負區柱縮小</span>：空頭動能衰退</li><li>穿越 0 軸：多空力道切換</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>碟形：正區三連柱中間最短</li><li>Twin Peaks：雙頂/底背離</li><li>穿越 0：趨勢確認訊號</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Alligator','AO 和鱷魚是 Bill Williams 系統的標配，鱷魚給方向，AO 確認動能。','c37')">鱷魚</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','AO 和 MACD 都衡量動能差，兩者同步確認時訊號最強。','c3')">MACD</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','AO 碟形訊號配合量放大，是強力的動能啟動確認。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">AO 使用中點（高+低÷2）而非收盤價計算，與 MACD 略有差異，但訊號邏輯相似，可互補使用</div></div>
+  </div>
+</div>
+
+<!-- c40 PPO -->
+<div class="card mom" id="c40">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">PPO &nbsp;價格振盪器（百分比）</div>
+    <div class="nc-sub">Percentage Price Oscillator — MACD 的百分比版本，可跨股比較</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#2a3140" stroke-width="1"/>
+      <text x="12" y="72" font-size="13" fill="#6b7280">0%</text>
+      <rect x="20" y="55" width="12" height="20" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="38" y="44" width="12" height="31" fill="#ef4444" rx="1" opacity=".85"/>
+      <rect x="56" y="38" width="12" height="37" fill="#ef4444" rx="1"/>
+      <rect x="74" y="46" width="12" height="29" fill="#ef4444" rx="1" opacity=".8"/>
+      <rect x="92" y="58" width="12" height="17" fill="#ef4444" rx="1" opacity=".6"/>
+      <rect x="110" y="70" width="12" height="5" fill="#ef4444" rx="1" opacity=".4"/>
+      <rect x="128" y="75" width="12" height="15" fill="#22c55e" rx="1" opacity=".6"/>
+      <rect x="146" y="75" width="12" height="22" fill="#22c55e" rx="1" opacity=".7"/>
+      <polyline points="20,62 60,44 100,52 140,78 200,82 280,72 360,60 440,52" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round"/>
+      <polyline points="20,66 60,48 100,58 140,82 200,86 280,76 360,64 440,56" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5,3" stroke-linecap="round"/>
+      <text x="12" y="36" font-size="12" fill="#f87171">+2%</text>
+      <text x="12" y="118" font-size="12" fill="#4ade80">−2%</text>
+      <text x="390" y="50" font-size="13" fill="#60a5fa" font-weight="700">PPO</text>
+      <text x="390" y="62" font-size="12" fill="#f87171">Signal</text>
+    </svg>
+    <div class="nc-concept">PPO = <strong>(EMA12 − EMA26) ÷ EMA26 × 100%</strong>，是 MACD 除以慢線得到的百分比版本。可以<strong>跨不同股票比較</strong>動能強弱（MACD 的絕對值因股價高低而不同，PPO 是百分比所以可比較）。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">12 / 26 / 9</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">PPO &gt; 0</span>：多頭動能</li><li><span class="g">PPO &lt; 0</span>：空頭動能</li><li>訊號邏輯與 MACD 完全相同</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>可比較不同股票的動能強弱</li><li>高價股和低價股均適用</li><li>背離訊號與 MACD 相同</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','PPO 和 MACD 訊號相同，差別只在有無標準化。高股價用 PPO 比較準確。','c3')">MACD</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','PPO 金叉搭配 RSI 超賣，雙重確認進場訊號。','c9')">RSI</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','PPO 訊號配合量能確認，避免無量假突破。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">PPO 和 MACD 的唯一差別在於標準化，若只操作單一股票，兩者效果完全相同</div></div>
+  </div>
+</div>
+
+<!-- c41 CMO -->
+<div class="card mom" id="c41">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">CMO &nbsp;錢德動量震盪器</div>
+    <div class="nc-sub">Chande Momentum Oscillator — RSI 的改良版，對稱於 0 軸</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <rect x="0" y="10" width="480" height="28" fill="rgba(239,68,68,.06)"/>
+      <rect x="0" y="112" width="480" height="28" fill="rgba(34,197,94,.06)"/>
+      <line x1="10" y1="38" x2="470" y2="38" stroke="rgba(239,68,68,.4)" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#2a3140" stroke-width="1"/>
+      <line x1="10" y1="112" x2="470" y2="112" stroke="rgba(34,197,94,.4)" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <text x="12" y="26" font-size="13" fill="#f87171" font-weight="700">+50</text>
+      <text x="16" y="72" font-size="13" fill="#6b7280">0</text>
+      <text x="12" y="126" font-size="13" fill="#4ade80" font-weight="700">−50</text>
+      <polyline points="20,80 70,62 120,32 165,18 210,42 255,75 300,108 350,128 400,112 450,80 470,62" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="165" cy="18" r="8" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="2"/>
+      <text x="175" y="13" font-size="13" fill="#f87171" font-weight="700">出場</text>
+      <circle cx="350" cy="128" r="8" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width="2"/>
+      <text x="360" y="123" font-size="13" fill="#4ade80" font-weight="700">進場</text>
+    </svg>
+    <div class="nc-concept">CMO = <strong>(N日漲幅和 − N日跌幅和) ÷ (N日漲幅和 + N日跌幅和) × 100</strong>，值域 −100 到 +100，以 0 為中軸。比 RSI 更對稱，<strong>±50 為超買超賣標準</strong>；絕對值越大趨勢越強。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">週期 9 或 14</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">+50 以上</span>：強勢超買</li><li><span class="g">−50 以下</span>：強勢超賣</li><li>穿越 0：多空力道轉換</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>CMO 背離訊號高可信度</li><li>CMO 絕對值衡量趨勢強度</li><li>結合趨勢方向使用勝率更高</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','CMO 和 RSI 測量相同概念，CMO 對稱更美觀。兩者同時超賣確認力度最強。','c9')">RSI</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','CMO 穿越 0 搭配 MACD 金叉，雙重動能確認，強力進場訊號。','c3')">MACD</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','CMO 超賣反彈配合量放大，確認真實買盤介入。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">CMO 的 ±50 超買超賣閾值在強趨勢市場可能長期偏離，不宜逆勢硬做均值回歸</div></div>
+  </div>
+</div>
+
+<!-- c42 KST -->
+<div class="card mom" id="c42">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">KST &nbsp;知道真相指標</div>
+    <div class="nc-sub">Know Sure Thing — 四個週期 ROC 加權合成，衡量長中短期動量</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="12" y="72" font-size="13" fill="#60a5fa">0</text>
+      <polyline points="20,80 80,60 160,30 230,50 300,75 370,105 440,122 470,110" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+      <polyline points="20,82 80,64 160,36 230,56 300,80 370,110 440,126 470,116" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5,3" stroke-linecap="round"/>
+      <circle cx="80" cy="60" r="7" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="90" y="54" font-size="13" fill="#4ade80" font-weight="700">KST&gt;Signal 做多</text>
+      <circle cx="300" cy="75" r="7" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="2"/>
+      <text x="310" y="70" font-size="13" fill="#f87171" font-weight="700">KST&lt;Signal 出場</text>
+      <text x="400" y="108" font-size="13" fill="#22c55e" font-weight="700">KST</text>
+      <text x="400" y="120" font-size="12" fill="#f87171">Signal</text>
+    </svg>
+    <div class="nc-concept">KST 結合 <strong>10/13/14/15 根 ROC 分別加上各自的 SMA 後加權合成</strong>，同時考慮短中長三個週期的動量。KST 穿越 Signal 線（KST 的 9 日 SMA）是主要進出場訊號。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">10/13/14/15 × 10/13/14/15</span> · Signal 9</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">KST &gt; Signal</span>：多頭動能</li><li><span class="g">KST &lt; Signal</span>：空頭動能</li><li>KST 穿越 0：大趨勢轉換</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>週線 KST 比日線更可靠</li><li>背離訊號比 ROC 更穩定</li><li>適合長線投資者使用</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'ROC','KST 是多個 ROC 的加權合成，理解 ROC 才能深入理解 KST。','c12')">ROC</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'SMA','KST 確認動量方向後，均線多頭排列才進場，提高勝率。','c1')">SMA</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','KST 和 MACD 均衡量動能，兩者同步轉正是強力進場訊號。','c3')">MACD</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">KST 是較慢的長線指標，日線操作反應不夠即時，建議在週線上使用效果最佳</div></div>
+  </div>
+</div>
+
+<!-- c43 TSI -->
+<div class="card mom" id="c43">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">TSI &nbsp;真實強弱指數</div>
+    <div class="nc-sub">True Strength Index — 雙重平滑的動量指標，對趨勢轉折敏感</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <rect x="0" y="10" width="480" height="28" fill="rgba(239,68,68,.06)"/>
+      <rect x="0" y="112" width="480" height="28" fill="rgba(34,197,94,.06)"/>
+      <line x1="10" y1="38" x2="470" y2="38" stroke="rgba(239,68,68,.4)" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#2a3140" stroke-width="1"/>
+      <line x1="10" y1="112" x2="470" y2="112" stroke="rgba(34,197,94,.4)" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <text x="12" y="26" font-size="13" fill="#f87171" font-weight="700">+25</text>
+      <text x="12" y="126" font-size="13" fill="#4ade80" font-weight="700">−25</text>
+      <polyline points="20,78 70,58 120,28 165,18 210,45 255,75 305,108 355,128 405,110 455,75" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+      <polyline points="20,80 70,62 120,32 165,22 210,50 255,80 305,112 355,132 405,115 455,80" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5,3" stroke-linecap="round"/>
+      <circle cx="70" cy="58" r="7" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="80" y="52" font-size="13" fill="#4ade80" font-weight="700">TSI穿Signal</text>
+      <text x="360" y="128" font-size="13" fill="#60a5fa" font-weight="700">TSI</text>
+      <text x="360" y="140" font-size="12" fill="#f87171">Signal</text>
+    </svg>
+    <div class="nc-concept">TSI 對<strong>每日價格變動量做雙重 EMA 平滑</strong>，值域 −100 到 +100。正值偏多，負值偏空；TSI 穿越 Signal 線（TSI 的 EMA）是進出場時機。適合中長線趨勢跟蹤。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">25 / 13 / 7</span>（長/短/Signal EMA）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">TSI &gt; 0</span>：多頭動能，偏多</li><li><span class="g">TSI &lt; 0</span>：空頭動能，偏空</li><li>TSI 穿 Signal：進出場時機</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>TSI 背離訊號可靠性高</li><li>比 RSI 對趨勢追蹤更準確</li><li>適合日線/週線波段操作</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','TSI 和 RSI 同步超賣時，找底部反彈的訊號最強。','c9')">RSI</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'EMA','TSI 在正區時 EMA 多頭排列，確認大方向一致再進場。','c2')">EMA</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','TSI 穿 Signal 時量配合，確認趨勢轉換的真實性。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">TSI 的雙重平滑使訊號較慢，不適合當沖；最適合用在日線以上的趨勢確認</div></div>
+  </div>
+</div>
+
+<!-- c44 Fisher Transform -->
+<div class="card mom" id="c44">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">Fisher Transform &nbsp;費雪變換</div>
+    <div class="nc-sub">把價格分佈轉換為常態分佈，使極端值更突出</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#2a3140" stroke-width="1"/>
+      <text x="12" y="72" font-size="13" fill="#6b7280">0</text>
+      <!-- Fisher 線（尖銳峰值）-->
+      <polyline points="20,76 60,70 100,50 140,22 170,14 195,28 220,52 250,75 285,100 320,122 350,134 380,126 410,105 440,82 470,74" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Trigger 線 -->
+      <polyline points="20,77 60,72 100,54 140,26 170,18 195,32 220,56 250,78 285,104 320,125 350,136 380,129 410,108 440,85 470,77" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-dasharray="5,3" stroke-linecap="round"/>
+      <!-- 峰值出場 -->
+      <circle cx="170" cy="14" r="8" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="2"/>
+      <text x="180" y="9" font-size="13" fill="#f87171" font-weight="700">極端峰值=轉折</text>
+      <!-- 谷值進場 -->
+      <circle cx="350" cy="134" r="8" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width="2"/>
+      <text x="360" y="130" font-size="13" fill="#4ade80" font-weight="700">極端谷值=進場</text>
+      <text x="400" y="80" font-size="13" fill="#f59e0b" font-weight="700">Fisher</text>
+      <text x="400" y="92" font-size="12" fill="#60a5fa">Trigger</text>
+    </svg>
+    <div class="nc-concept">Fisher Transform 把價格位置轉換為<strong>常態分佈的標準差值</strong>，使超買超賣的極端點更加突出和尖銳。指標出現極端峰值（通常 ±2 以上）後快速轉向，是高可靠性的<strong>轉折點訊號</strong>。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">週期 9</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">極端正峰值後轉頭</span>：出場</li><li><span class="g">極端負谷值後轉頭</span>：進場</li><li>Fisher 穿越 Trigger：換手</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>極端值 ±2 以上才是訊號</li><li>與 RSI 搭配雙重確認</li><li>對短期轉折點非常敏感</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','Fisher 峰值搭配 RSI 超買，是非常強的頂部確認組合。','c9')">RSI</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','Fisher 轉折點搭配爆量，確認主力換手的可信度最高。','c16')">成交量</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'KD','Fisher 和 KD 都善於捕捉轉折，兩者同步確認可靠性大幅提升。','c10')">KD</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">Fisher Transform 不是看絕對值而是看「從極端值轉頭的時機」，極端值本身不是訊號，轉向才是</div></div>
+  </div>
+</div>
+
+<!-- c45 Bull Bear Power -->
+<div class="card mom" id="c45">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">Bull Bear Power &nbsp;多空力道</div>
+    <div class="nc-sub">Elder 指標 — 分別衡量多方（高點）與空方（低點）的控制力</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#2a3140" stroke-width="1"/>
+      <text x="12" y="72" font-size="13" fill="#6b7280">0</text>
+      <!-- Bull Power 正柱（紅）-->
+      <rect x="20" y="55" width="10" height="20" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="36" y="46" width="10" height="29" fill="#ef4444" rx="1" opacity=".85"/>
+      <rect x="52" y="40" width="10" height="35" fill="#ef4444" rx="1"/>
+      <rect x="68" y="50" width="10" height="25" fill="#ef4444" rx="1" opacity=".8"/>
+      <rect x="84" y="62" width="10" height="13" fill="#ef4444" rx="1" opacity=".6"/>
+      <!-- Bear Power 負柱（綠）-->
+      <rect x="100" y="75" width="10" height="18" fill="#22c55e" rx="1" opacity=".6"/>
+      <rect x="116" y="75" width="10" height="26" fill="#22c55e" rx="1" opacity=".7"/>
+      <rect x="132" y="75" width="10" height="32" fill="#22c55e" rx="1" opacity=".8"/>
+      <rect x="148" y="75" width="10" height="24" fill="#22c55e" rx="1" opacity=".7"/>
+      <rect x="164" y="75" width="10" height="14" fill="#22c55e" rx="1" opacity=".55"/>
+      <!-- 轉為多方 -->
+      <rect x="180" y="60" width="10" height="15" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="196" y="50" width="10" height="25" fill="#ef4444" rx="1" opacity=".85"/>
+      <text x="12" y="38" font-size="13" fill="#f87171">Bull Power（高點−EMA）</text>
+      <text x="12" y="130" font-size="13" fill="#4ade80">Bear Power（低點−EMA）</text>
+    </svg>
+    <div class="nc-concept"><strong>Bull Power = 高點 − EMA</strong>（多方把價格推高於均線多少）；<strong>Bear Power = 低點 − EMA</strong>（空方把價格壓低於均線多少）。兩者均為正且上升代表多頭強勢；Bear Power 為正代表市場完全由多方控制。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">建議設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">EMA 13</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">Bull Power 上升</span>：多方加碼</li><li><span class="g">Bear Power 轉正</span>：完全多頭</li><li>Bull 下降：即使上漲也要小心</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>Bull 頂背離：出場預警</li><li>Bear 底背離：進場預警</li><li>搭配 EMA 確認大方向</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'EMA','EMA 上升且 Bear Power 為負但在上升，是 Elder 系統的標準進場條件。','c2')">EMA</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','Bull Power 上升配合量放大，代表多方真正在掌控市場。','c16')">成交量</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','MACD 金叉搭配 Bear Power 底背離，是 Elder 系統最強的進場訊號。','c3')">MACD</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">Bull Power 為負代表連高點都在均線之下，是非常弱勢的訊號，此時不應做多</div></div>
+  </div>
+</div>
+
+<!-- c46 RVI -->
+<div class="card mom" id="c46">
+  <div class="nc-head"><span class="nc-tag">動量類</span>
+    <div class="nc-title">RVI &nbsp;相對活力指數</div>
+    <div class="nc-sub">Relative Vigor Index — 收盤偏高低（活力）vs 日內波動的比值</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#2a3140" stroke-width="1"/>
+      <text x="12" y="72" font-size="13" fill="#6b7280">0</text>
+      <!-- RVI 線 綠 -->
+      <polyline points="20,78 70,60 130,32 190,50 250,75 310,100 370,120 430,105 470,80" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Signal 線 紅虛 -->
+      <polyline points="20,80 70,64 130,38 190,56 250,80 310,105 370,124 430,109 470,85" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5,3" stroke-linecap="round"/>
+      <!-- 金叉 -->
+      <circle cx="70" cy="60" r="7" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="80" y="54" font-size="13" fill="#4ade80" font-weight="700">RVI 穿 Signal</text>
+      <!-- 死叉 -->
+      <circle cx="250" cy="75" r="7" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="2"/>
+      <text x="260" y="70" font-size="13" fill="#f87171" font-weight="700">死叉出場</text>
+      <text x="395" y="100" font-size="13" fill="#22c55e" font-weight="700">RVI</text>
+      <text x="395" y="112" font-size="12" fill="#f87171">Signal</text>
+    </svg>
+    <div class="nc-concept">RVI 計算<strong>收盤價相對於日內高低區間的位置</strong>，再平滑化處理。收盤接近高點代表多方活力強（正值），接近低點代表空方活力強（負值）。RVI 穿越 Signal 線（4根RVI的對稱加權均值）是進出場訊號。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">週期 10</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">RVI &gt; 0</span>：多方收盤佔優</li><li><span class="g">RVI &lt; 0</span>：空方收盤佔優</li><li>穿越 Signal：進出場訊號</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>RVI 比 RSI 更重視收盤位置</li><li>RVI 背離是高可信度訊號</li><li>適合趨勢跟蹤類操作</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','RVI 和 RSI 同步確認多空方向，比單獨使用任一指標更可靠。','c9')">RSI</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','RVI 穿 Signal 搭配 MACD 金叉，雙重動能確認，強力進場組合。','c3')">MACD</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','RVI 強勢配合量放大，確認多方收盤佔優有量能支撐。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">RVI 在 TradingView 上有時顯示為 Relative Vigor Index，需確認所用腳本的計算週期</div></div>
+  </div>
+</div>
+
+<!-- ═══ 量能類（續2）═══ -->
+
+<!-- c47 Chaikin Oscillator -->
+<div class="card vol" id="c47">
+  <div class="nc-head"><span class="nc-tag">量能類</span>
+    <div class="nc-title">Chaikin Oscillator &nbsp;蔡金震盪器</div>
+    <div class="nc-sub">A/D Line 的 MACD 版本，捕捉資金流向的動能變化</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="12" y="72" font-size="13" fill="#60a5fa">0</text>
+      <rect x="20" y="55" width="12" height="20" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="38" y="44" width="12" height="31" fill="#ef4444" rx="1" opacity=".85"/>
+      <rect x="56" y="36" width="12" height="39" fill="#ef4444" rx="1"/>
+      <rect x="74" y="46" width="12" height="29" fill="#ef4444" rx="1" opacity=".8"/>
+      <rect x="92" y="62" width="12" height="13" fill="#ef4444" rx="1" opacity=".55"/>
+      <rect x="110" y="75" width="12" height="14" fill="#22c55e" rx="1" opacity=".6"/>
+      <rect x="128" y="75" width="12" height="24" fill="#22c55e" rx="1" opacity=".7"/>
+      <rect x="146" y="75" width="12" height="32" fill="#22c55e" rx="1" opacity=".8"/>
+      <rect x="164" y="75" width="12" height="20" fill="#22c55e" rx="1" opacity=".65"/>
+      <rect x="182" y="75" width="12" height="8" fill="#22c55e" rx="1" opacity=".5"/>
+      <rect x="200" y="60" width="12" height="15" fill="#ef4444" rx="1" opacity=".7"/>
+      <circle cx="20" cy="55" r="7" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="30" y="48" font-size="13" fill="#4ade80" font-weight="700">穿越 0 資金流入</text>
+      <circle cx="110" cy="75" r="7" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="2"/>
+      <text x="120" y="70" font-size="13" fill="#f87171" font-weight="700">跌破 0 資金流出</text>
+    </svg>
+    <div class="nc-concept">Chaikin Oscillator = <strong>A/D Line 的 3 日 EMA − 10 日 EMA</strong>，是資金流向的動能指標。穿越 0 向上代表資金流入加速；跌破 0 代表資金流出加速。比 A/D 更早發現趨勢轉變。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">3 / 10</span>（快/慢 EMA）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">穿越 0 向上</span>：資金流入加速</li><li><span class="g">跌破 0 向下</span>：資金流出加速</li><li>比 A/D 訊號提早 1~3 根</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>CO 頂背離：主力偷偷出貨</li><li>CO 底背離：主力悄悄吸籌</li><li>與股價方向確認趨勢可靠性</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'A/D Line','Chaikin Oscillator 是 A/D 的動能版本，兩者一起用可同時看方向和動能。','c18')">A/D Line</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'CMF','CO 和 CMF 都衡量資金流向，CO 更靈敏，CMF 更穩定，互補使用。','c32')">CMF</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','CO 看資金動能，MACD 看價格動能，兩者同步是最強進場確認。','c3')">MACD</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">Chaikin Oscillator 對除權息等量能異常日敏感，這類日期附近的訊號需謹慎解讀</div></div>
+  </div>
+</div>
+
+<!-- c48 PVT -->
+<div class="card vol" id="c48">
+  <div class="nc-head"><span class="nc-tag">量能類</span>
+    <div class="nc-title">PVT &nbsp;價量趨勢指標</div>
+    <div class="nc-sub">Price Volume Trend — 依漲跌幅比例計算的 OBV 升級版</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <!-- 股價線（淡）-->
+      <polyline points="20,90 80,82 140,75 200,70 260,65 320,72 380,60 440,52" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3" opacity=".6"/>
+      <!-- PVT 線（比 OBV 更精細）-->
+      <polyline points="20,115 80,105 140,92 200,80 260,68 320,78 380,60 440,44" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- OBV 比較線（台股藍）-->
+      <polyline points="20,118 80,108 140,96 200,84 260,72 320,82 380,65 440,50" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-dasharray="4,3" opacity=".7"/>
+      <!-- 背離標示 -->
+      <line x1="320" y1="10" x2="320" y2="140" stroke="#30363d" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="330" y="26" font-size="13" fill="#4ade80">PVT 繼續升</text>
+      <text x="330" y="38" font-size="13" fill="#6b7280">股價回測</text>
+      <text x="14" y="90" font-size="12" fill="#6b7280">股價</text>
+      <text x="14" y="115" font-size="12" fill="#22c55e" font-weight="700">PVT</text>
+      <text x="14" y="130" font-size="12" fill="#60a5fa">OBV</text>
+    </svg>
+    <div class="nc-concept">PVT 依當日<strong>漲跌幅百分比</strong>乘以成交量累積，比 OBV 更精確（OBV 不論漲多或漲少都加同等量，PVT 則按幅度加減）。PVT 趨勢比 OBV 更能反映真實的資金流動比例。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">無需設定</span>（可加 EMA 平滑）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">PVT 持續上升</span>：資金流入</li><li><span class="g">PVT 持續下降</span>：資金流出</li><li>PVT 背離比 OBV 更精確</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>PVT 比 OBV 更適合高波動股</li><li>背離：股價新高但 PVT 未新高</li><li>搭配成交量趨勢確認</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'OBV','PVT 是 OBV 的改良版，兩者比較可發現哪些漲跌有實質量能支撐。','c17')">OBV</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'CMF','PVT 看長期資金累積，CMF 看近期 20 日資金流向，兩者搭配覆蓋不同時間。','c32')">CMF</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','PVT 已含量能資訊，搭配觀察量能趨勢確認 PVT 的可信度。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">PVT 的絕對值無意義，重要的是趨勢和背離。PVT 在高波動股票上比 OBV 更有參考價值</div></div>
+  </div>
+</div>
+
+<!-- c49 Volume Oscillator -->
+<div class="card vol" id="c49">
+  <div class="nc-head"><span class="nc-tag">量能類</span>
+    <div class="nc-title">Volume Oscillator &nbsp;成交量震盪器</div>
+    <div class="nc-sub">短期均量與長期均量的差，判斷量能動向</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <line x1="10" y1="75" x2="470" y2="75" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="12" y="72" font-size="13" fill="#60a5fa">0</text>
+      <rect x="20" y="55" width="14" height="20" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="42" y="44" width="14" height="31" fill="#ef4444" rx="1" opacity=".85"/>
+      <rect x="64" y="36" width="14" height="39" fill="#ef4444" rx="1"/>
+      <rect x="86" y="52" width="14" height="23" fill="#ef4444" rx="1" opacity=".75"/>
+      <rect x="108" y="67" width="14" height="8" fill="#ef4444" rx="1" opacity=".5"/>
+      <rect x="130" y="75" width="14" height="16" fill="#22c55e" rx="1" opacity=".6"/>
+      <rect x="152" y="75" width="14" height="26" fill="#22c55e" rx="1" opacity=".75"/>
+      <rect x="174" y="75" width="14" height="20" fill="#22c55e" rx="1" opacity=".65"/>
+      <rect x="196" y="75" width="14" height="9" fill="#22c55e" rx="1" opacity=".5"/>
+      <rect x="218" y="60" width="14" height="15" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="240" y="46" width="14" height="29" fill="#ef4444" rx="1" opacity=".85"/>
+      <text x="44" y="28" font-size="13" fill="#f87171" text-anchor="middle">短均量&gt;長均量</text>
+      <text x="152" y="130" font-size="13" fill="#4ade80" text-anchor="middle">短均量&lt;長均量</text>
+      <text x="248" y="40" font-size="12" fill="#f87171">再度放量</text>
+    </svg>
+    <div class="nc-concept">Volume Oscillator = <strong>短期均量（5日）− 長期均量（20日）</strong>或以百分比表示。正值代表近期量能高於長期水準（活躍），負值代表量能萎縮（沉寂）。突破訊號配合正的 VO 才可信。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">建議設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">短 5 日 · 長 20 日</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">VO &gt; 0</span>：近期量能活躍</li><li><span class="g">VO &lt; 0</span>：量能萎縮中</li><li>VO 穿越 0：量能趨勢切換</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>股價突破搭配 VO&gt;0 才可信</li><li>VO 持續下降=行情即將結束</li><li>VO 從底部回升=量能復甦</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','Volume Oscillator 是成交量的相對衡量工具，搭配原始量柱一起看最完整。','c16')">成交量</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'MACD','MACD 金叉搭配 VO&gt;0，量價雙重確認，進場可信度最高。','c3')">MACD</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'OBV','VO 看量能活躍度，OBV 看資金累積，兩者配合判斷量的「質與量」。','c17')">OBV</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">VO 只看量不看價，需結合價格訊號才有意義；量能孤立上升但股價下跌，代表恐慌賣出非進場訊號</div></div>
+  </div>
+</div>
+
+<!-- ═══ 波動類（續）═══ -->
+
+<!-- c50 Historical Volatility -->
+<div class="card vola" id="c50">
+  <div class="nc-head"><span class="nc-tag">波動類</span>
+    <div class="nc-title">Historical Volatility &nbsp;歷史波動率</div>
+    <div class="nc-sub">HV — 衡量過去 N 日實際年化波動率，是期權定價基礎</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <!-- HV 低期 -->
+      <rect x="10" y="10" width="120" height="132" fill="rgba(34,197,94,.04)"/>
+      <text x="70" y="22" font-size="12" fill="#4ade80" text-anchor="middle">低波動（底部蓄勢）</text>
+      <!-- HV 高峰 -->
+      <rect x="200" y="10" width="130" height="132" fill="rgba(239,68,68,.04)"/>
+      <text x="265" y="22" font-size="12" fill="#f87171" text-anchor="middle">高波動（行情爆發）</text>
+      <!-- HV 線 -->
+      <polyline points="14,120 70,115 130,108 170,96 210,60 260,28 320,44 370,80 430,102 460,110" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- 隱含波動率（期權）虛線 -->
+      <polyline points="14,112 70,108 130,102 170,88 210,48 260,20 320,38 370,72 430,95 460,104" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-dasharray="5,3" stroke-linecap="round"/>
+      <line x1="130" y1="10" x2="130" y2="140" stroke="#30363d" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="330" y1="10" x2="330" y2="140" stroke="#30363d" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="408" y="100" font-size="13" fill="#fbbf24" font-weight="700">HV</text>
+      <text x="408" y="112" font-size="12" fill="#a78bfa">IV（期權）</text>
+    </svg>
+    <div class="nc-concept">HV 計算過去 N 日<strong>對數收益率的標準差，再年化</strong>（×√252）。HV 低代表市場平靜，期權費便宜；HV 高代表波動劇烈，期權費昂貴。HV 從低轉高是大行情啟動的前兆。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">建議設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">週期 21</span>（月)</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">HV 急升</span>：市場劇烈波動中</li><li><span class="g">HV 極低</span>：行情蓄勢，即將爆發</li><li>HV 轉升：波動率擴張啟動</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>HV 極低後等待方向突破</li><li>期權交易者必看 HV vs IV</li><li>HV 比 ATR 更適合跨股比較</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'ATR','HV 是年化波動率（百分比），ATR 是絕對波動幅度（元）。HV 適合跨股比較，ATR 適合設停損。','c22')">ATR</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'布林通道','布林通道帶寬和 HV 高度相關，HV 低時布林帶也窄，兩者互相驗證。','c21')">布林通道</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'成交量','HV 急升時量能通常也放大，兩者共同確認行情進入高波動期。','c16')">成交量</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">HV 是「後視鏡」指標，描述已發生的波動；期權交易需要的是隱含波動率（IV），兩者不同</div></div>
+  </div>
+</div>
+
+<!-- c51 Choppiness Index -->
+<div class="card vola" id="c51">
+  <div class="nc-head"><span class="nc-tag">波動類</span>
+    <div class="nc-title">Choppiness Index &nbsp;混沌度指標</div>
+    <div class="nc-sub">判斷市場是在「趨勢中」還是「隨機震盪中」</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <!-- 混沌區 -->
+      <rect x="0" y="20" width="480" height="45" fill="rgba(239,68,68,.05)"/>
+      <!-- 趨勢區 -->
+      <rect x="0" y="105" width="480" height="35" fill="rgba(34,197,94,.05)"/>
+      <line x1="10" y1="38" x2="470" y2="38" stroke="rgba(239,68,68,.5)" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="10" y1="65" x2="470" y2="65" stroke="#2a3140" stroke-width="1"/>
+      <line x1="10" y1="105" x2="470" y2="105" stroke="rgba(34,197,94,.5)" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="14" y="26" font-size="13" fill="#f87171" font-weight="700">61.8（隨機盤整）</text>
+      <text x="14" y="62" font-size="13" fill="#6b7280">50</text>
+      <text x="14" y="118" font-size="13" fill="#4ade80" font-weight="700">38.2（強趨勢）</text>
+      <polyline points="20,35 70,32 120,38 180,45 230,65 280,90 330,108 380,100 430,80 460,60" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="340" y="26" font-size="13" fill="#f87171">震盪盤（不操作）</text>
+      <text x="360" y="118" font-size="13" fill="#4ade80">強趨勢行情</text>
+    </svg>
+    <div class="nc-concept">Choppiness Index 使用 ATR 相對於高低範圍的比值計算，值域 0~100。<strong>低於 38.2</strong> 代表強趨勢（類似斐波那契 38.2%），<strong>高於 61.8</strong> 代表隨機震盪。用來決定「現在是否適合追趨勢」。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">預設設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">週期 14</span> · 閾值 38.2 / 61.8</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">高於 61.8</span>：隨機盤整，不追</li><li><span class="g">低於 38.2</span>：強趨勢，可追</li><li>從高向低轉：趨勢即將形成</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>CI &lt; 38.2 才使用趨勢指標</li><li>CI &gt; 61.8 改用震盪指標</li><li>是最佳的「市場狀態過濾器」</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'ADX','ADX 和 CI 都判斷趨勢強度，ADX&gt;25 且 CI&lt;38.2 是最強的趨勢確認組合。','c4')">ADX</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'SMA','CI&lt;38.2 時啟用均線系統，CI&gt;61.8 時停用，有效過濾假訊號。','c1')">SMA</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','CI&gt;61.8 時改用 RSI 超買超賣操作，CI&lt;38.2 時改跟趨勢。','c9')">RSI</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">CI 是「市場狀態分類器」而非買賣訊號，需搭配其他指標使用，單獨使用 CI 不提供進出場方向</div></div>
+  </div>
+</div>
+
+<!-- c52 Envelope -->
+<div class="card vola" id="c52">
+  <div class="nc-head"><span class="nc-tag">波動類</span>
+    <div class="nc-title">Envelope &nbsp;均線包絡帶</div>
+    <div class="nc-sub">MA ± 固定百分比 — 最簡單的波動通道，找超漲超跌</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="150" fill="#0a0e14"/>
+      <!-- 包絡帶填色 -->
+      <polygon points="20,32 120,28 240,24 360,28 460,34 460,86 360,80 240,74 120,78 20,82" fill="rgba(245,158,11,.06)"/>
+      <!-- 上軌 +% -->
+      <polyline points="20,32 120,28 240,24 360,28 460,34" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="5,3"/>
+      <!-- 下軌 −% -->
+      <polyline points="20,82 120,78 240,74 360,80 460,86" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-dasharray="5,3"/>
+      <!-- 中軌 MA -->
+      <polyline points="20,57 120,53 240,49 360,54 460,60" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+      <!-- 股價觸碰下軌進場 -->
+      <rect x="120" y="95" width="9" height="14" fill="#22c55e" rx="1"/>
+      <circle cx="124" cy="95" r="9" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="136" y="89" font-size="13" fill="#4ade80" font-weight="700">觸下軌超跌進場</text>
+      <!-- 股價觸碰上軌出場 -->
+      <rect x="300" y="20" width="9" height="12" fill="#ef4444" rx="1"/>
+      <circle cx="304" cy="24" r="9" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="2"/>
+      <text x="316" y="18" font-size="13" fill="#f87171" font-weight="700">觸上軌超漲出場</text>
+      <text x="430" y="32" font-size="12" fill="#fbbf24">+%</text>
+      <text x="430" y="57" font-size="12" fill="#f59e0b">MA</text>
+      <text x="430" y="84" font-size="12" fill="#fbbf24">−%</text>
+    </svg>
+    <div class="nc-concept">Envelope 在 MA 上下<strong>固定百分比</strong>（如 ±2.5%）畫出帶狀通道。比布林通道簡單：帶寬固定不變，不隨波動率調整。股價觸碰上軌為超漲出場；觸碰下軌為超跌進場，適合穩定週期性股票。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">建議設定</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">MA 20 · 偏移 ±2.5%</span>（依股性調整）</span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">判讀</div><ul class="nc-list"><li><span class="r">觸上軌</span>：超漲，考慮出場</li><li><span class="g">觸下軌</span>：超跌，尋找進場</li><li>中軌（MA）是核心均衡位</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進階用法</div><ul class="nc-list"><li>穩定股調小偏移（±1.5%）</li><li>波動大股調大偏移（±5%）</li><li>比布林更適合均值回歸策略</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配指標</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'布林通道','布林帶寬隨波動調整，Envelope 固定。波動率低時兩者接近，波動高時布林更寬。','c21')">布林通道</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'RSI','觸下軌且 RSI&lt;30，雙重超跌確認，是強力均值回歸進場點。','c9')">RSI</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'KD','觸上軌且 KD 超買死叉，雙重確認出場時機，特別適合區間震盪股。','c10')">KD</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">固定百分比偏移不適用於高波動股（常被突破），需依個股歷史波動率客製化偏移比例</div></div>
   </div>
 </div>
 
