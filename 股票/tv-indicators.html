@@ -25,12 +25,14 @@ a{color:#58a6ff;text-decoration:none}
 .badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .b-trend::before{background:#3b82f6}.b-mom::before{background:#f43f5e}
 .b-vol::before{background:#22c55e}.b-vola::before{background:#f59e0b}
+.b-smc::before{background:#8b5cf6}
 
 /* ── Filters ── */
 .filters{display:flex;gap:2px;padding:10px 16px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
 .fb{background:none;border:none;color:#6b7280;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.82rem;transition:color .15s,background .15s;font-family:inherit}
 .fb:hover{color:#c9d1d9;background:#161b22}
 .fb.on{color:#e6edf3;background:#161b22;font-weight:600}
+.fb.s.on{color:#c4b5fd}
 
 /* ── Cards ── */
 .grid{max-width:1120px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,490px),1fr));gap:16px}
@@ -82,6 +84,11 @@ a{color:#58a6ff;text-decoration:none}
 .cp-desc{font-size:.8rem;color:#8b949e;line-height:1.6}
 .cp-link{display:none}
 .cp-close{position:absolute;top:8px;right:10px;background:none;border:none;color:#6b7280;font-size:.9rem;cursor:pointer;line-height:1}
+.card.smc{border-left:2px solid #8b5cf6}
+.card.smc .nc-tag{color:#c4b5fd}
+.nc-stars{font-size:.82rem;letter-spacing:2px;margin-top:7px}
+.nc-stars .s{color:#f59e0b}
+.nc-stars .e{color:#30363d}
 .hidden{display:none!important}
 
 @media(max-width:600px){
@@ -104,20 +111,22 @@ a{color:#58a6ff;text-decoration:none}
 </div>
 <div class="hero">
   <h1>TradingView 指標大全</h1>
-  <p>100 個核心指標完整解析 — 設定值、判讀方式、最佳搭配，一張卡片看懂一個指標</p>
+  <p>108 個核心指標完整解析 — 設定值、判讀方式、最佳搭配，一張卡片看懂一個指標</p>
   <div class="badges">
     <span class="badge b-trend">趨勢類 31</span>
     <span class="badge b-mom">動量類 35</span>
     <span class="badge b-vol">量能類 18</span>
     <span class="badge b-vola">波動類 16</span>
+    <span class="badge b-smc">SMC 類 8</span>
   </div>
 </div>
 <div class="filters">
-  <button class="fb on" onclick="filt('all',this)">全部 100</button>
+  <button class="fb on" onclick="filt('all',this)">全部 108</button>
   <button class="fb t" onclick="filt('trend',this)">趨勢類 31</button>
   <button class="fb m" onclick="filt('mom',this)">動量類 35</button>
   <button class="fb v" onclick="filt('vol',this)">量能類 18</button>
   <button class="fb w" onclick="filt('vola',this)">波動類 16</button>
+  <button class="fb s" onclick="filt('smc',this)">SMC 類 8</button>
 </div>
 <div class="grid">
 
@@ -5131,6 +5140,400 @@ a{color:#58a6ff;text-decoration:none}
   </div>
 </div>
 
+<!-- ═══ SMC 智慧資金概念 ═══ -->
+
+<!-- c101 SMC Overview -->
+<div class="card smc" id="c101">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">SMC &nbsp;智慧資金概念</div>
+    <div class="nc-sub">Smart Money Concepts — 機構交易者的行為邏輯，散戶生存指南</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- 散戶被掃 → 機構進場 → 趨勢啟動 三段示意 -->
+      <text x="80" y="18" font-size="11" fill="#6b7280" text-anchor="middle">① 流動性獵殺</text>
+      <text x="240" y="18" font-size="11" fill="#6b7280" text-anchor="middle">② 機構佈倉</text>
+      <text x="400" y="18" font-size="11" fill="#6b7280" text-anchor="middle">③ 趨勢啟動</text>
+      <!-- 散戶止損帶（低點假突破）-->
+      <line x1="10" y1="110" x2="160" y2="110" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="10" y="107" font-size="11" fill="#6b7280">散戶止損區</text>
+      <!-- 假突破 -->
+      <polyline points="20,90 50,85 80,82 110,80 130,78 145,115 150,108 155,100 165,85 185,70" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="145" cy="115" r="8" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="2"/>
+      <text x="100" y="135" font-size="11" fill="#f87171" text-anchor="middle">Stop Hunt</text>
+      <!-- 機構佈倉（OB 區）-->
+      <rect x="155" y="80" width="40" height="25" fill="rgba(139,92,246,.15)" stroke="#8b5cf6" stroke-width="1.5" rx="2"/>
+      <text x="175" y="96" font-size="10" fill="#c4b5fd" text-anchor="middle">OB</text>
+      <!-- FVG -->
+      <rect x="200" y="62" width="30" height="18" fill="rgba(245,158,11,.1)" stroke="#f59e0b" stroke-width="1.5" rx="1" stroke-dasharray="4,3"/>
+      <text x="215" y="74" font-size="10" fill="#fbbf24" text-anchor="middle">FVG</text>
+      <!-- 趨勢上漲 -->
+      <polyline points="195,85 220,68 255,52 290,40 330,28 380,18 440,10" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- BOS -->
+      <line x1="195" y1="78" x2="350" y2="78" stroke="rgba(34,197,94,.4)" stroke-width="1" stroke-dasharray="5,3"/>
+      <text x="270" y="75" font-size="11" fill="#4ade80" text-anchor="middle">BOS</text>
+      <text x="400" y="14" font-size="11" fill="#4ade80" font-weight="700">趨勢啟動</text>
+    </svg>
+    <div class="nc-concept">SMC 認為市場由<strong>機構（Smart Money）主導</strong>，先<strong>獵殺散戶止損（Stop Hunt）</strong>後再以有利價格佈倉，然後推動趨勢。核心工具：Market Structure（市場結構）、Order Block（OB 訂單區塊）、FVG（公允價值缺口）、Liquidity（流動性）。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">核心框架</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">結構 → 流動性 → 佈倉區 → 進場</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">SMC 四大支柱</div><ul class="nc-list"><li><span class="r">Market Structure</span>：BOS / CHoCH</li><li><span class="r">Liquidity</span>：等高等低/流動性</li><li><span class="r">Order Block</span>：機構佈倉蠟燭</li><li><span class="r">FVG</span>：公允價值缺口</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">SMC vs 傳統技術分析</div><ul class="nc-list"><li>傳統：看型態、指標</li><li>SMC：看機構<strong>行為痕跡</strong></li><li>傳統：支撐壓力用來買賣</li><li>SMC：支撐壓力用來被掃後進場</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">核心概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','BOS（結構突破）和 CHoCH（結構轉換）判斷趨勢方向，是 SMC 的基礎。','c102')">市場結構</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Order Block','機構最後一根反向蠟燭，回測時是最佳進場點。','c104')">OB 訂單區塊</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'FVG','三根蠟燭形成的價格缺口，機構快速推進的痕跡。','c103')">FVG 價值缺口</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">SMC 是一套解讀框架，不是單一指標，需完整學習 Market Structure → Liquidity → POI（Point of Interest）的邏輯鏈才能有效應用</div></div>
+  </div>
+</div>
+
+<!-- c102 Market Structure -->
+<div class="card smc" id="c102">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">Market Structure &nbsp;市場結構</div>
+    <div class="nc-sub">BOS 結構突破 + CHoCH 結構轉換 — SMC 判斷趨勢方向的基礎</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- 多頭結構：HH HL HH HL -->
+      <text x="10" y="14" font-size="11" fill="#4ade80" font-weight="700">多頭結構</text>
+      <!-- HL → HH → HL → HH -->
+      <polyline points="10,130 50,100 90,115 140,75 180,92 230,50 265,68 310,30" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="50" y="98" font-size="10" fill="#4ade80">HL</text>
+      <text x="90" y="113" font-size="10" fill="#4ade80">HL</text>
+      <text x="140" y="73" font-size="10" fill="#f87171">HH</text>
+      <text x="230" y="48" font-size="10" fill="#f87171">HH</text>
+      <!-- BOS 箭頭 -->
+      <line x1="140" y1="80" x2="230" y2="80" stroke="rgba(34,197,94,.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="185" y="77" font-size="11" fill="#4ade80" text-anchor="middle" font-weight="700">BOS ↑</text>
+      <!-- CHoCH 轉換 -->
+      <text x="340" y="14" font-size="11" fill="#f87171" font-weight="700">CHoCH（轉勢）</text>
+      <polyline points="310,30 340,50 360,38 390,70 420,55 450,95 470,80" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="390" y1="70" x2="460" y2="70" stroke="rgba(239,68,68,.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="425" y="67" font-size="11" fill="#f87171" text-anchor="middle" font-weight="700">CHoCH ↓</text>
+      <text x="425" y="80" font-size="10" fill="#6b7280" text-anchor="middle">HL 被跌破</text>
+      <!-- 分隔線 -->
+      <line x1="305" y1="10" x2="305" y2="155" stroke="#21262d" stroke-width="1"/>
+    </svg>
+    <div class="nc-concept"><strong>BOS（Break of Structure）</strong>：前高被突破（多頭 BOS）或前低被跌破（空頭 BOS），確認趨勢延續。<strong>CHoCH（Change of Character）</strong>：多頭結構中 HL 被跌破，代表結構轉換，趨勢可能由多轉空。這是 SMC 一切分析的起點。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">操作邏輯</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">CHoCH 確認 → 等回測 OB/FVG → 進場</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">多頭結構</div><ul class="nc-list"><li>HH（Higher High）不斷創高</li><li>HL（Higher Low）不斷墊高</li><li><span class="r">BOS 向上</span>：趨勢延續訊號</li><li>HL 被跌破 = CHoCH 轉空</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">空頭結構</div><ul class="nc-list"><li>LH（Lower High）不斷降低</li><li>LL（Lower Low）不斷創低</li><li><span class="g">BOS 向下</span>：空頭延續訊號</li><li>LH 被突破 = CHoCH 轉多</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Order Block','CHoCH 後的第一個 OB 是最強進場點，等價格回測 OB 進場。','c104')">OB 訂單區塊</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'FVG','BOS 後常留下 FVG，填補 FVG 時是趨勢延續的進場機會。','c103')">FVG</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Liquidity','了解流動性在哪，才能預測 CHoCH 發生的位置。','c106')">流動性</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">BOS 和 CHoCH 必須在同一個時間框架內判斷；不同時間框架的結構方向不同，需先確認「以哪個 TF 為主」</div></div>
+  </div>
+</div>
+
+<!-- c103 FVG -->
+<div class="card smc" id="c103">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">FVG &nbsp;公允價值缺口</div>
+    <div class="nc-sub">Fair Value Gap — 三根蠟燭急速推進後留下的不平衡缺口</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- 上漲 FVG 示意 -->
+      <text x="120" y="14" font-size="12" fill="#4ade80" text-anchor="middle" font-weight="700">看漲 FVG</text>
+      <!-- 三根蠟燭 -->
+      <!-- 蠟燭1（前蠟燭）-->
+      <rect x="50" y="85" width="18" height="40" fill="#22c55e" rx="1"/>
+      <line x1="59" y1="78" x2="59" y2="128" stroke="#22c55e" stroke-width="1.5"/>
+      <!-- 蠟燭2（推進蠟燭，非常大）-->
+      <rect x="80" y="45" width="20" height="60" fill="#22c55e" rx="1"/>
+      <line x1="90" y1="38" x2="90" y2="108" stroke="#22c55e" stroke-width="1.5"/>
+      <!-- FVG 區域（蠟燭1最高 到 蠟燭3最低）-->
+      <rect x="115" y="78" width="50" height="22" fill="rgba(34,197,94,.12)" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,3" rx="2"/>
+      <text x="140" y="92" font-size="11" fill="#4ade80" text-anchor="middle" font-weight="700">FVG</text>
+      <!-- 蠟燭3（後蠟燭）-->
+      <rect x="115" y="55" width="18" height="23" fill="#22c55e" rx="1"/>
+      <line x1="124" y1="48" x2="124" y2="100" stroke="#22c55e" stroke-width="1.5"/>
+      <!-- 回測 FVG 進場 -->
+      <polyline points="130,55 165,75 185,88 200,86 215,75 240,62 280,48 320,35 380,22 440,12" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="200" cy="86" r="9" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width="2"/>
+      <text x="200" y="110" font-size="11" fill="#4ade80" text-anchor="middle" font-weight="700">回測進場</text>
+      <!-- 標示 -->
+      <line x1="68" y1="85" x2="115" y2="85" stroke="rgba(34,197,94,.4)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="50" y="76" font-size="10" fill="#6b7280">C1 高</text>
+      <line x1="133" y1="100" x2="115" y2="100" stroke="rgba(34,197,94,.4)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="50" y="101" font-size="10" fill="#6b7280">C3 低</text>
+      <!-- 看跌 FVG -->
+      <text x="380" y="14" font-size="12" fill="#f87171" text-anchor="middle" font-weight="700">看跌 FVG</text>
+      <rect x="320" y="40" width="18" height="38" fill="#ef4444" rx="1"/>
+      <rect x="348" y="65" width="20" height="58" fill="#ef4444" rx="1"/>
+      <rect x="375" y="72" width="18" height="32" fill="#ef4444" rx="1"/>
+      <rect x="340" y="78" width="35" height="16" fill="rgba(239,68,68,.12)" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3" rx="2"/>
+      <text x="357" y="89" font-size="11" fill="#f87171" text-anchor="middle" font-weight="700">FVG</text>
+    </svg>
+    <div class="nc-concept">FVG 是由<strong>三根連續蠟燭</strong>形成：蠟燭1的最高（低）與蠟燭3的最低（高）之間存在<strong>不重疊的缺口</strong>，代表機構急速推進造成的「不平衡」。市場有填補 FVG 的傾向，<strong>價格回測 FVG 中點（50%）是精確進場點</strong>。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">進場邏輯</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">FVG 50% 中點回測 + 蠟燭確認</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">看漲 FVG（Bullish FVG）</div><ul class="nc-list"><li>C1 最高 ＜ C3 最低 = 缺口存在</li><li><span class="r">等價格回調到 FVG 中點</span></li><li>蠟燭確認未破底 → 做多</li><li>止損：FVG 底部以下</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">看跌 FVG（Bearish FVG）</div><ul class="nc-list"><li>C1 最低 ＞ C3 最高 = 缺口存在</li><li><span class="g">等價格反彈到 FVG 中點</span></li><li>蠟燭確認未破頂 → 做空</li><li>止損：FVG 頂部以上</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Order Block','FVG 和 OB 常常重疊或相鄰，兩者同時出現的區域是最強 POI。','c104')">OB 訂單區塊</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','FVG 要在趨勢方向（BOS 後）找，逆勢的 FVG 不做。','c102')">市場結構</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Premium/Discount','在 Discount 區的 FVG 做多，在 Premium 區的 FVG 做空。','c107')">溢折價區間</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">並非所有 FVG 都會被填補。強趨勢中的 FVG 可能永遠不填補，「市場填 FVG」是傾向而非必然，不可強制等待</div></div>
+  </div>
+</div>
+
+<!-- c104 Order Block -->
+<div class="card smc" id="c104">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">OB &nbsp;訂單區塊</div>
+    <div class="nc-sub">Order Block — 機構在推動趨勢前的最後佈倉蠟燭</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- 看漲 OB（上漲前最後一根下跌蠟燭）-->
+      <text x="120" y="14" font-size="12" fill="#4ade80" text-anchor="middle" font-weight="700">看漲 OB</text>
+      <!-- 下跌段 -->
+      <polyline points="20,40 45,55 70,70 90,85" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+      <!-- OB 蠟燭（最後一根紅蠟燭，但這是機構佈局的訂單區塊）-->
+      <rect x="85" y="85" width="20" height="30" fill="#ef4444" rx="1" opacity=".9"/>
+      <line x1="95" y1="80" x2="95" y2="120" stroke="#ef4444" stroke-width="1.5"/>
+      <rect x="85" y="85" width="20" height="30" fill="none" stroke="#8b5cf6" stroke-width="2.5" rx="2"/>
+      <text x="95" y="138" font-size="10" fill="#c4b5fd" text-anchor="middle" font-weight="700">OB</text>
+      <!-- FVG 缺口 -->
+      <rect x="110" y="72" width="30" height="13" fill="rgba(245,158,11,.12)" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" rx="1"/>
+      <text x="125" y="81" font-size="9" fill="#fbbf24" text-anchor="middle">FVG</text>
+      <!-- 上漲 -->
+      <polyline points="108,85 130,65 160,48 200,35 250,25 310,18 380,14 450,10" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- 回測 OB 進場 -->
+      <polyline points="160,48 175,60 185,78 195,85 210,80 230,70 270,55 320,40 380,28" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-dasharray="5,3"/>
+      <circle cx="195" cy="85" r="9" fill="rgba(139,92,246,.2)" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="195" y="108" font-size="11" fill="#c4b5fd" text-anchor="middle" font-weight="700">回測 OB 進場</text>
+      <!-- OB 高低區 -->
+      <line x1="108" y1="85" x2="240" y2="85" stroke="rgba(139,92,246,.35)" stroke-width="1" stroke-dasharray="5,3"/>
+      <line x1="108" y1="115" x2="240" y2="115" stroke="rgba(139,92,246,.35)" stroke-width="1" stroke-dasharray="5,3"/>
+      <!-- 看跌 OB -->
+      <text x="400" y="14" font-size="12" fill="#f87171" text-anchor="middle" font-weight="700">看跌 OB</text>
+      <polyline points="330,130 360,115 390,100" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+      <rect x="385" y="82" width="20" height="18" fill="#22c55e" rx="1" opacity=".9"/>
+      <rect x="385" y="82" width="20" height="18" fill="none" stroke="#8b5cf6" stroke-width="2.5" rx="2"/>
+      <text x="395" y="72" font-size="10" fill="#c4b5fd" text-anchor="middle" font-weight="700">OB</text>
+      <polyline points="403,90 430,110 455,128 475,142" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div class="nc-concept">OB 是機構在發動大趨勢前<strong>最後一根反向蠟燭</strong>。看漲 OB = 上漲行情前的最後一根<strong>紅色蠟燭</strong>；看跌 OB = 下跌行情前的最後一根<strong>綠色蠟燭</strong>。當價格回測 OB 區域時，是機構<strong>以更好價格再次進場的機會</strong>，也是散戶的最精確進場點。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">進場標準</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">OB 50%（中點）或 OB 低點附近 + 確認蠟燭</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">有效 OB 條件</div><ul class="nc-list"><li>OB 之後有 BOS（結構突破）</li><li>OB 尚未被完全「打穿」</li><li><span class="r">OB 越大 / 移動越快 = 越有效</span></li><li>OB 和 FVG 重疊更強</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">進場與停損</div><ul class="nc-list"><li>進場：價格回測 OB 50% 附近</li><li>確認：等看漲/跌蠟燭確認</li><li>止損：OB 的另一側</li><li><span class="g">目標：下一個流動性/高低點</span></li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'FVG','OB 旁邊常有 FVG，兩者重疊的區域稱為 Confluence（共振），是最強 POI。','c103')">FVG</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','OB 必須在正確的市場結構方向下使用，逆結構的 OB 不做。','c102')">市場結構</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Premium/Discount','在 Discount 區找 OB 做多，在 Premium 區找 OB 做空，提升勝率。','c107')">溢折價</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">OB 被完全穿越（價格跌破看漲 OB 底部）代表 OB 失效，需立即止損；不要因為「相信機構」而加碼扛單</div></div>
+  </div>
+</div>
+
+<!-- c105 Propulsion Block / Breaker Block -->
+<div class="card smc" id="c105">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">PB &nbsp;推進區塊 / 破壞區塊</div>
+    <div class="nc-sub">Propulsion / Breaker Block — OB 被穿越後角色互換</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- Breaker Block 示意 -->
+      <text x="240" y="14" font-size="12" fill="#a78bfa" text-anchor="middle" font-weight="700">Breaker Block（原 OB 被打穿 → 角色互換）</text>
+      <!-- 原看漲 OB -->
+      <rect x="60" y="90" width="22" height="32" fill="#ef4444" rx="1" opacity=".7"/>
+      <rect x="60" y="90" width="22" height="32" fill="none" stroke="#8b5cf6" stroke-width="2" rx="2"/>
+      <text x="71" y="85" font-size="10" fill="#c4b5fd" text-anchor="middle">原 OB</text>
+      <!-- 上漲後失敗 -->
+      <polyline points="82,90 110,72 140,58 165,52 180,50 195,55 210,72 225,90 240,108 250,122 260,118" fill="none" stroke="#e6edf3" stroke-width="1.8" opacity=".5" stroke-linecap="round"/>
+      <!-- 跌破 OB，角色反轉 -->
+      <line x1="60" y1="122" x2="300" y2="122" stroke="rgba(239,68,68,.4)" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <circle cx="255" cy="122" r="8" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="2"/>
+      <text x="255" y="140" font-size="11" fill="#f87171" text-anchor="middle">跌破！OB 失效</text>
+      <!-- 反轉後原 OB 成為壓力（Breaker Block）-->
+      <rect x="60" y="90" width="22" height="32" fill="rgba(239,68,68,.12)" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3" rx="2"/>
+      <text x="71" y="130" font-size="10" fill="#f87171" text-anchor="middle" font-weight="700">BB</text>
+      <!-- 反彈測試 Breaker -->
+      <polyline points="260,118 285,105 300,94 315,100 320,110 330,125 360,140 400,148 440,152" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-dasharray="6,3"/>
+      <circle cx="300" cy="94" r="8" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="2"/>
+      <text x="300" y="76" font-size="11" fill="#f87171" text-anchor="middle" font-weight="700">回測 BB 做空</text>
+      <polyline points="315,100 355,120 400,135 450,148" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div class="nc-concept">PB（Propulsion Block / Breaker Block）：當一個 OB 被完全打穿後，<strong>原本的支撐變成壓力，原本的壓力變成支撐</strong>（角色互換）。看漲 OB 被跌破 → 成為 Bearish Breaker Block（壓力）；看跌 OB 被突破 → 成為 Bullish Breaker Block（支撐）。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">應用邏輯</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">OB 被打穿 → 記錄位置 → 等反彈回測 → 反向進場</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">Breaker Block 特徵</div><ul class="nc-list"><li>原 OB 被完全穿越（非假突破）</li><li><span class="r">反彈到原 OB 區域受阻</span></li><li>反向蠟燭確認後進場</li><li>角色互換後成為強力 POI</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">vs 普通 OB</div><ul class="nc-list"><li>普通 OB：第一次回測</li><li>Breaker Block：OB 失效後重新利用</li><li>BB 的成功率有時高於原 OB</li><li><span class="g">BB 失效代表趨勢非常強</span></li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Order Block','PB 是 OB 的延伸概念，先理解 OB 才能正確應用 Breaker Block。','c104')">OB 訂單區塊</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','BB 要在對應的市場結構中使用，確認趨勢方向。','c102')">市場結構</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Liquidity','BB 常常和流動性獵殺一起出現，先掃流動性再形成 BB。','c106')">流動性</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">Breaker Block 需要 OB「完全被穿越」而非「刺穿後回收」（那依然是有效 OB）；用收盤價判斷是否完全突破更嚴謹</div></div>
+  </div>
+</div>
+
+<!-- c106 Liquidity -->
+<div class="card smc" id="c106">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">Liquidity &nbsp;流動性</div>
+    <div class="nc-sub">等高 / 等低點聚集的止損叢 — 機構必須先掃才能以好價格進場</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- 等高點（BSL）-->
+      <text x="240" y="14" font-size="11" fill="#6b7280" text-anchor="middle">Buy Side Liquidity（等高）= 散戶做空者的止損</text>
+      <line x1="60" y1="50" x2="280" y2="50" stroke="rgba(34,197,94,.4)" stroke-width="1.5" stroke-dasharray="8,4"/>
+      <circle cx="80" cy="50" r="5" fill="#22c55e" opacity=".6"/>
+      <circle cx="140" cy="50" r="5" fill="#22c55e" opacity=".6"/>
+      <circle cx="200" cy="50" r="5" fill="#22c55e" opacity=".6"/>
+      <circle cx="265" cy="50" r="5" fill="#22c55e" opacity=".6"/>
+      <text x="296" y="47" font-size="10" fill="#4ade80">BSL</text>
+      <!-- 等低點（SSL）-->
+      <line x1="60" y1="120" x2="280" y2="120" stroke="rgba(239,68,68,.4)" stroke-width="1.5" stroke-dasharray="8,4"/>
+      <circle cx="80" cy="120" r="5" fill="#ef4444" opacity=".6"/>
+      <circle cx="150" cy="120" r="5" fill="#ef4444" opacity=".6"/>
+      <circle cx="220" cy="120" r="5" fill="#ef4444" opacity=".6"/>
+      <circle cx="265" cy="120" r="5" fill="#ef4444" opacity=".6"/>
+      <text x="296" y="117" font-size="10" fill="#f87171">SSL</text>
+      <!-- 先掃 SSL 再上漲 -->
+      <polyline points="60,80 100,90 140,95 180,100 220,105 250,122 265,128 270,122 275,105 300,85 340,65 380,48 420,35 450,28" fill="none" stroke="#e6edf3" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+      <circle cx="262" cy="128" r="8" fill="rgba(239,68,68,.15)" stroke="#ef4444" stroke-width="2"/>
+      <text x="262" y="148" font-size="11" fill="#f87171" text-anchor="middle">先掃 SSL</text>
+      <circle cx="295" cy="85" r="8" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="2"/>
+      <text x="328" y="82" font-size="11" fill="#4ade80" font-weight="700">反轉上衝 BSL</text>
+    </svg>
+    <div class="nc-concept"><strong>Buy Side Liquidity（BSL）</strong>：等高點附近的做空者止損訂單（多方流動性）。<strong>Sell Side Liquidity（SSL）</strong>：等低點附近的做多者止損訂單（空方流動性）。機構需要「掃流動性」來以好價格成交自己的大單，<strong>先掃 SSL 後反轉上漲</strong>是典型的機構操作模式。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">獵殺邏輯</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">等低被掃 → OB/FVG 進場 → 目標等高</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">流動性識別</div><ul class="nc-list"><li>等高（BSL）：做空者止損</li><li>等低（SSL）：做多者止損</li><li>趨勢線觸及點：聚集大量止損</li><li>前高前低：重要流動性位置</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">交易應用</div><ul class="nc-list"><li><span class="r">掃 SSL 後看漲 OB/FVG 做多</span></li><li><span class="g">掃 BSL 後看跌 OB/FVG 做空</span></li><li>以「目標下一個流動性」設獲利</li><li>等掃完流動性再進場</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Order Block','掃完流動性後立刻出現 OB 進場點，是最高品質的 SMC 進場。','c104')">OB 訂單區塊</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','流動性獵殺常發生在 CHoCH 之前，先掃流動性再轉換結構。','c102')">市場結構</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'FVG','掃流動性後留下 FVG，填 FVG 時是二次進場機會。','c103')">FVG</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">不是所有等高等低都會被掃，高波動期或新聞消息期流動性行為會失常；需搭配時間週期（亞洲盤/歐洲盤/美洲盤）判斷</div></div>
+  </div>
+</div>
+
+<!-- c107 Premium Discount -->
+<div class="card smc" id="c107">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">Premium / Discount &nbsp;溢價 / 折價區間</div>
+    <div class="nc-sub">波段 50% 以上為溢價（賣），以下為折價（買）— 提高進場品質</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- 整體波段區間 -->
+      <line x1="30" y1="20" x2="460" y2="20" stroke="rgba(239,68,68,.5)" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="14" y="17" font-size="11" fill="#f87171">High</text>
+      <line x1="30" y1="140" x2="460" y2="140" stroke="rgba(34,197,94,.5)" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="14" y="137" font-size="11" fill="#4ade80">Low</text>
+      <!-- 50% 中點 -->
+      <line x1="30" y1="80" x2="460" y2="80" stroke="rgba(245,158,11,.7)" stroke-width="2" stroke-dasharray="8,4"/>
+      <text x="14" y="77" font-size="11" fill="#fbbf24" font-weight="700">EQ</text>
+      <!-- Premium 區（上方）-->
+      <rect x="30" y="20" width="430" height="60" fill="rgba(239,68,68,.05)"/>
+      <text x="245" y="55" font-size="13" fill="#f87171" text-anchor="middle" font-weight="700">Premium（溢價）＝ 找做空 POI</text>
+      <!-- Discount 區（下方）-->
+      <rect x="30" y="80" width="430" height="60" fill="rgba(34,197,94,.05)"/>
+      <text x="245" y="115" font-size="13" fill="#4ade80" text-anchor="middle" font-weight="700">Discount（折價）＝ 找做多 POI</text>
+      <!-- Fibonacci 參考 -->
+      <text x="398" y="77" font-size="10" fill="#fbbf24">50% Fib</text>
+      <text x="398" y="50" font-size="10" fill="#f87171">62~79% = OTE</text>
+    </svg>
+    <div class="nc-concept">以波段的高低點為邊界，<strong>50% 以上為 Premium（溢價）區</strong>，價格偏貴，找做空 POI；<strong>50% 以下為 Discount（折價）區</strong>，價格偏便宜，找做多 POI。<strong>OTE（Optimal Trade Entry）</strong>在 62%~79% Fibonacci 區域，是最佳進場區。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">最佳進場</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">Discount 區（62~79%）找 OB/FVG 做多</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">做多條件</div><ul class="nc-list"><li>大結構多頭（BOS 向上）</li><li><span class="r">價格回調至 Discount 區</span></li><li>Discount 區內有 OB 或 FVG</li><li>OTE 62~79% 區域進場</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">做空條件</div><ul class="nc-list"><li>大結構空頭（BOS 向下）</li><li><span class="g">價格反彈至 Premium 區</span></li><li>Premium 區內有 OB 或 FVG</li><li>OTE 62~79% 區域進場</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Order Block','Discount 區的 OB 比任何區域的 OB 品質都高，是最佳 SMC 進場。','c104')">OB 訂單區塊</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Fibonacci','OTE 62~79% 對應 Fibonacci 0.618~0.786，兩者完美重疊。','c40')">Fibonacci</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'FVG','Discount 區的 FVG 是做多 POI，填 FVG 時進場。','c103')">FVG</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">Premium/Discount 的參考波段需清楚定義（從哪個高點到哪個低點），不同人定義的波段不同會產生分歧</div></div>
+  </div>
+</div>
+
+<!-- c108 Equal Highs/Lows -->
+<div class="card smc" id="c108">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">EQH/EQL &nbsp;等高等低</div>
+    <div class="nc-sub">Equal Highs/Lows — 流動性聚集的雙頂雙底，準備被機構掃除</div>
+  </div>
+  <div class="nc-visual">
+    <svg width="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect width="480" height="160" fill="#0a0e14"/>
+      <!-- EQH 示意（雙頂 = 流動性）-->
+      <text x="140" y="14" font-size="12" fill="#f87171" text-anchor="middle" font-weight="700">EQH（等高）= 流動性池</text>
+      <!-- 兩個相同高點 -->
+      <line x1="20" y1="45" x2="240" y2="45" stroke="rgba(239,68,68,.5)" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="246" y="42" font-size="10" fill="#f87171">≈ 相同高點</text>
+      <!-- 雙頂形態 -->
+      <polyline points="20,100 60,75 90,47 110,70 140,90 165,75 200,47 215,65 230,90 250,100" fill="none" stroke="#e6edf3" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+      <circle cx="90" cy="47" r="6" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="2"/>
+      <circle cx="200" cy="47" r="6" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="2"/>
+      <!-- 突破掃流動性 -->
+      <polyline points="250,100 270,82 290,58 310,42 325,40 328,30 320,42 290,70 280,100" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="325" cy="35" r="8" fill="rgba(239,68,68,.2)" stroke="#ef4444" stroke-width="2"/>
+      <text x="350" y="30" font-size="11" fill="#f87171" font-weight="700">掃 EQH！</text>
+      <text x="350" y="42" font-size="11" fill="#6b7280">止損被觸發</text>
+      <!-- 掃完反轉 -->
+      <polyline points="290,70 310,90 340,110 370,128 420,140 460,148" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="370" y="120" font-size="11" fill="#4ade80" font-weight="700">反轉下跌</text>
+    </svg>
+    <div class="nc-concept">EQH（Equal Highs）和 EQL（Equal Lows）是<strong>兩個或多個幾乎相同的高低點</strong>。這些位置聚集了大量的突破做多止損（EQH）或突破做空止損（EQL）。機構會先<strong>刺穿這些位置（掃流動性）</strong>後反向操作，形成假突破後急速反轉的行情。</div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">識別標準</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">誤差 5~10 ticks 以內的高低點視為等高/低</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">EQH 應用（做空）</div><ul class="nc-list"><li>EQH 被突破後快速回落</li><li><span class="r">突破 EQH 後找 OB/FVG 做空</span></li><li>止損：EQH 的最高刺穿點以上</li><li>目標：SSL（等低點）</li></ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">EQL 應用（做多）</div><ul class="nc-list"><li>EQL 被跌穿後快速回升</li><li><span class="g">跌穿 EQL 後找 OB/FVG 做多</span></li><li>止損：EQL 的最低刺穿點以下</li><li>目標：BSL（等高點）</li></ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Liquidity','EQH/EQL 就是流動性的具體形式，掃流動性的核心概念。','c106')">流動性</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Order Block','EQH/EQL 被掃後，立刻看 OB 進場是最精確的 SMC 交易。','c104')">OB 訂單區塊</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','EQH/EQL 被掃後往往伴隨 CHoCH，確認趨勢轉換。','c102')">市場結構</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">EQH/EQL 的「等高等低」是相對概念，絕對價位完全相同不常見；實際操作允許一定誤差，但過鬆的標準會使訊號失去意義</div></div>
+  </div>
+</div>
+
 </div><!-- end .grid -->
 
 <div class="chip-popup" id="chipPopup">
@@ -5170,6 +5573,27 @@ function closePopup(){
 }
 document.addEventListener('click',function(e){
   if(popOpen&&!document.getElementById('chipPopup').contains(e.target))closePopup();
+});
+const STARS={
+  c1:5,c2:5,c3:5,c4:4,c5:4,c6:3,c7:3,c8:5,c9:5,c10:5,
+  c11:4,c12:4,c13:3,c14:3,c15:3,c16:5,c17:4,c18:4,c19:3,c20:3,
+  c21:5,c22:4,c23:3,c24:3,c25:4,c26:3,c27:3,c28:3,c29:3,c30:4,
+  c31:3,c32:4,c33:4,c34:3,c35:3,c36:3,c37:3,c38:3,c39:4,c40:4,
+  c41:3,c42:3,c43:3,c44:3,c45:3,c46:3,c47:3,c48:3,c49:3,c50:3,
+  c51:3,c52:3,c53:3,c54:3,c55:3,c56:2,c57:2,c58:2,c59:3,c60:3,
+  c61:2,c62:2,c63:3,c64:2,c65:3,c66:3,c67:3,c68:3,c69:3,c70:2,
+  c71:3,c72:3,c73:2,c74:3,c75:3,c76:3,c77:2,c78:4,c79:4,c80:5,
+  c81:3,c82:4,c83:3,c84:3,c85:3,c86:4,c87:2,c88:3,c89:2,c90:3,
+  c91:3,c92:2,c93:3,c94:3,c95:4,c96:3,c97:2,c98:2,c99:4,c100:2,
+  c101:4,c102:4,c103:4,c104:5,c105:3,c106:4,c107:3,c108:3
+};
+document.querySelectorAll('.card[id]').forEach(function(card){
+  var n=STARS[card.id]||3;
+  var el=document.createElement('div');
+  el.className='nc-stars';
+  el.innerHTML='<span class="s">'+'★'.repeat(n)+'</span><span class="e">'+'★'.repeat(5-n)+'</span>';
+  var head=card.querySelector('.nc-head');
+  if(head)head.appendChild(el);
 });
 </script>
 </body>
