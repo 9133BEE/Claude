@@ -1701,7 +1701,9 @@ const FAV_DOC = doc(db, 'settings', 'favorites');
 window._syncFavCloud = async ids => {
   try { await setDoc(FAV_DOC, { ids }); } catch {}
 };
+</script>
 
+<script>
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
   document.getElementById('sb-overlay').classList.add('open');
