@@ -100,6 +100,48 @@ a{color:#58a6ff;text-decoration:none}
   .hero h1{font-size:1.3rem}
   .topbar a{display:none}.topbar a:first-of-type{display:inline}
 }
+
+/* ── Tab Bar ── */
+.tab-bar{display:flex;gap:0;background:#161b22;border-bottom:2px solid #21262d;padding:0 20px;position:sticky;top:0;z-index:110}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:12px 20px;font-size:.9rem;font-weight:600;color:#6b7280;cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s;white-space:nowrap}
+.tab-btn:hover{color:#c9d1d9}
+.tab-btn.active{color:#e6edf3;border-bottom-color:#8b5cf6}
+
+/* ── SMC Panel ── */
+.smc-wrap{max-width:1000px;margin:0 auto;padding:32px 20px 60px}
+.smc-intro{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:24px 28px;margin-bottom:32px}
+.smc-intro h2{font-size:1.3rem;font-weight:700;color:#c4b5fd;margin-bottom:8px}
+.smc-intro p{color:#8b949e;font-size:.9rem;line-height:1.8;word-break:break-word}
+.smc-intro .smc-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.smc-intro .smc-tag{font-size:.78rem;padding:3px 10px;border-radius:4px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:#c4b5fd}
+.smc-section{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:20px;overflow:hidden}
+.smc-sec-head{padding:18px 24px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.smc-sec-head:hover{background:#1c2128}
+.smc-sec-icon{font-size:1.3rem;flex-shrink:0}
+.smc-sec-title{font-size:1rem;font-weight:700;color:#e6edf3}
+.smc-sec-sub{font-size:.8rem;color:#6b7280;margin-left:auto;white-space:nowrap}
+.smc-sec-body{padding:0 24px 22px}
+.smc-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.smc-box{background:#0d1117;border:1px solid #21262d;border-radius:7px;padding:16px 18px}
+.smc-box h4{font-size:.8rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.smc-box ul{list-style:none;padding:0}
+.smc-box li{font-size:.86rem;color:#8b949e;padding:5px 0;border-bottom:1px solid #1a1f27;line-height:1.65;word-break:break-word}
+.smc-box li:last-child{border-bottom:none}
+.smc-box li::before{content:'›  ';color:#6b7280}
+.smc-box .g{color:#4ade80}.smc-box .r{color:#f87171}.smc-box .p{color:#c4b5fd}.smc-box .y{color:#fbbf24}
+.smc-note{margin-top:14px;background:rgba(139,92,246,.07);border-left:3px solid #8b5cf6;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.84rem;color:#8b949e;line-height:1.7;word-break:break-word}
+.smc-def{margin-top:14px;font-size:.88rem;color:#8b949e;line-height:1.85;word-break:break-word}
+.smc-def strong{color:#c9d1d9}
+.smc-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.smc-chip{font-size:.8rem;padding:4px 12px;border-radius:4px;background:#0d1117;border:1px solid #30363d;color:#8b949e}
+.smc-divider{height:1px;background:#21262d;margin:16px 0}
+@media(max-width:640px){
+  .smc-row{grid-template-columns:1fr}
+  .smc-wrap{padding:16px 12px 40px}
+  .smc-sec-body{padding:0 14px 16px}
+  .smc-sec-head{padding:14px 16px}
+  .tab-btn{padding:10px 14px;font-size:.82rem}
+}
 </style>
 </head>
 <body>
@@ -120,6 +162,13 @@ a{color:#58a6ff;text-decoration:none}
     <span class="badge b-smc">SMC 類 8</span>
   </div>
 </div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-btn-tv" onclick="switchTab('tv')">📈 TV 指標</button>
+  <button class="tab-btn" id="tab-btn-smc" onclick="switchTab('smc')">🔷 SMC 專頁</button>
+</div>
+
+<div id="tab-tv">
 <div class="filters">
   <button class="fb on" onclick="filt('all',this)">全部 108</button>
   <button class="fb t" onclick="filt('trend',this)">趨勢類 31</button>
@@ -5535,6 +5584,411 @@ a{color:#58a6ff;text-decoration:none}
 </div>
 
 </div><!-- end .grid -->
+</div><!-- end #tab-tv -->
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  SMC 專頁                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="tab-smc" style="display:none">
+<div class="smc-wrap">
+
+  <div class="smc-intro">
+    <h2>🔷 Smart Money Concept（SMC）</h2>
+    <p>SMC 是一套追蹤「機構資金（聰明錢）」足跡的交易方法，由 ICT（Inner Circle Trader）體系演變而來。核心邏輯：大資金不像散戶追漲殺跌，而是系統性地<strong>製造流動性 → 引誘散戶入場 → 在最佳區域吸籌或出貨</strong>。學 SMC 就是學看懂機構在哪裡留下痕跡，然後跟著它們的方向交易。</p>
+    <div class="smc-tags">
+      <span class="smc-tag">市場結構 BOS/CHoCH</span>
+      <span class="smc-tag">訂單區塊 OB</span>
+      <span class="smc-tag">公平價值缺口 FVG</span>
+      <span class="smc-tag">流動性掃蕩</span>
+      <span class="smc-tag">Premium &amp; Discount</span>
+      <span class="smc-tag">Breaker Block</span>
+      <span class="smc-tag">等高/等低 EQH/EQL</span>
+    </div>
+  </div>
+
+  <!-- 1. Market Structure -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">📊</span>
+      <span class="smc-sec-title">市場結構 — Market Structure</span>
+      <span class="smc-sec-sub">BOS · CHoCH · HH/HL/LH/LL</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        市場結構是 SMC 的<strong>地基</strong>，所有操作都從判斷當前結構開始。結構決定你是做多還是做空，其他概念（OB、FVG）只在結構方向內找進場點。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>關鍵術語</h4>
+          <ul>
+            <li><span class="g">HH（Higher High）</span> — 高點比上一個高點更高</li>
+            <li><span class="g">HL（Higher Low）</span> — 低點比上一個低點更高</li>
+            <li><span class="r">LH（Lower High）</span> — 高點比上一個高點更低</li>
+            <li><span class="r">LL（Lower Low）</span> — 低點比上一個低點更低</li>
+            <li><span class="g">上升結構</span> — HH + HL 交替出現</li>
+            <li><span class="r">下降結構</span> — LH + LL 交替出現</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>BOS vs CHoCH</h4>
+          <ul>
+            <li><span class="p">BOS（Break of Structure）</span> — 順勢突破前高/前低，趨勢延續訊號</li>
+            <li><span class="y">CHoCH（Change of Character）</span> — 逆勢突破結構，趨勢可能反轉的第一個訊號</li>
+            <li>BOS = 進場加碼機會</li>
+            <li>CHoCH = 警示當前方向可能改變，先觀察</li>
+            <li>CHoCH 後出現反向 BOS = 確認趨勢轉換</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>多時框架判讀（MTF）</h4>
+          <ul>
+            <li>先看<strong>高時框架</strong>（日/週）確認大方向</li>
+            <li>再看<strong>中時框架</strong>（4H/1H）找結構</li>
+            <li>用<strong>低時框架</strong>（15M/5M）找精確進場</li>
+            <li>三個時框方向一致 = 最強訊號</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>TradingView 工具</h4>
+          <ul>
+            <li>手動：用畫線工具標 Swing High / Swing Low</li>
+            <li>腳本：搜尋「SMC」或「Market Structure」</li>
+            <li>推薦：「LuxAlgo Smart Money Concepts」</li>
+            <li>推薦：「ICT Market Structure」</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 結構判斷要看「實體收盤」而非影線突破，影線假突破很常見。做短線時結構也要參考更高時框架，避免逆勢。</div>
+    </div>
+  </div>
+
+  <!-- 2. Order Block -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">🟪</span>
+      <span class="smc-sec-title">訂單區塊 — Order Block（OB）</span>
+      <span class="smc-sec-sub">機構掛單留下的痕跡</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        OB 是機構在出發前<strong>最後一根反向K棒</strong>的區域。機構不能一次下完所有部位，所以會回來「補倉」，造成 OB 區域有支撐/壓力的效果。<strong>多頭 OB = 上漲前最後一根陰線的高低點範圍；空頭 OB = 下跌前最後一根陽線的高低點範圍。</strong>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>多頭 OB（Bullish OB）</h4>
+          <ul>
+            <li>找上漲段起點前的<strong>最後一根陰線</strong></li>
+            <li>該陰線的「高點到低點」為 OB 區間</li>
+            <li>價格回測 OB 時尋找做多</li>
+            <li>要搭配 BOS 確認（上漲已突破結構）</li>
+            <li><span class="g">進場：回測 OB 低點附近</span></li>
+            <li><span class="r">停損：OB 低點下方</span></li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>空頭 OB（Bearish OB）</h4>
+          <ul>
+            <li>找下跌段起點前的<strong>最後一根陽線</strong></li>
+            <li>該陽線的「高點到低點」為 OB 區間</li>
+            <li>價格回測 OB 時尋找做空</li>
+            <li>要搭配 BOS 確認（下跌已突破結構）</li>
+            <li><span class="r">進場：回測 OB 高點附近</span></li>
+            <li><span class="g">停損：OB 高點上方</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>OB 品質篩選</h4>
+          <ul>
+            <li><span class="y">★★★</span> OB 出發前有 FVG 留下 = 最強</li>
+            <li><span class="y">★★</span> OB 出發後直接 BOS = 有效</li>
+            <li><span class="y">★</span> 只是反向K棒但無 BOS = 風險高</li>
+            <li>回測越快越有力</li>
+            <li>回測多次的 OB 效力遞減</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>TradingView 工具</h4>
+          <ul>
+            <li>手動：矩形框選 OB 高低點</li>
+            <li>「LuxAlgo SMC」會自動標 OB</li>
+            <li>「ICT Order Block Finder」</li>
+            <li>顏色建議：多頭 OB 藍色、空頭 OB 紅色</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ OB 不是每次都會被精確回測，有時只回測到 OB 50% 處就反彈。可以先在 OB 區間分批進場，不要等到低點才全部押注。</div>
+    </div>
+  </div>
+
+  <!-- 3. FVG -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">⬜</span>
+      <span class="smc-sec-title">公平價值缺口 — Fair Value Gap（FVG）</span>
+      <span class="smc-sec-sub">價格失衡區 / Imbalance</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        FVG 是三根K棒中間，<strong>第一根的高/低點與第三根的低/高點之間沒有交疊的空白區域</strong>。代表市場在此區段移動太快，買賣雙方沒有充分撮合，形成「不公平」的價格區間。市場有回填 FVG 的傾向。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>識別方式</h4>
+          <ul>
+            <li>三根K棒：第1棒 → 第2棒（跳動大棒）→ 第3棒</li>
+            <li><span class="g">多頭 FVG</span>：第3棒低點 &gt; 第1棒高點 = 上方有缺口</li>
+            <li><span class="r">空頭 FVG</span>：第3棒高點 &lt; 第1棒低點 = 下方有缺口</li>
+            <li>缺口越大 = 失衡越嚴重，回填機率越高</li>
+            <li>高時框架 FVG 比低時框架更重要</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>交易策略</h4>
+          <ul>
+            <li>等價格回測進入 FVG 區域</li>
+            <li><span class="g">多頭 FVG：</span>回測進入缺口下半部做多</li>
+            <li><span class="r">空頭 FVG：</span>回測進入缺口上半部做空</li>
+            <li>FVG 中點（50%）是常見反應位</li>
+            <li>FVG 被完全填滿後失效</li>
+            <li>OB + FVG 重疊 = IFVG，訊號最強</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>Optimal Trade Entry（OTE）</h4>
+          <ul>
+            <li>FVG 的 37% ~ 62% 區間（費波那契）</li>
+            <li>這個區間是機構最常進場的「最優入場點」</li>
+            <li>進場在此區間 → 停損小、獲利空間大</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>TradingView 工具</h4>
+          <ul>
+            <li>手動：用矩形框選缺口區間</li>
+            <li>「LuxAlgo SMC」自動標 FVG</li>
+            <li>「ICT Fair Value Gap」腳本</li>
+            <li>建議用半透明填色區分多/空 FVG</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 並非所有 FVG 都會被完全填滿。趨勢強勁時（例如大陽線連續上漲），FVG 可能只填一半甚至不填。要搭配結構判斷再決定是否用 FVG 進場。</div>
+    </div>
+  </div>
+
+  <!-- 4. Liquidity -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">💧</span>
+      <span class="smc-sec-title">流動性 — Liquidity</span>
+      <span class="smc-sec-sub">BSL · SSL · Stop Hunt · Sweep</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        流動性是 SMC 的核心思維。機構需要大量對手單才能建倉，所以它們會主動去「<strong>掃</strong>」聚集在重要位置的散戶停損單，讓自己有足夠流動性完成建倉，然後反向走。<strong>掃流動性不是趨勢延續，而是機構在反向操作的前奏。</strong>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>流動性聚集位置</h4>
+          <ul>
+            <li><span class="p">BSL（Buy-Side Liquidity）</span> — 前高、整數關卡、EQH 上方的停損堆積（散戶空單）</li>
+            <li><span class="p">SSL（Sell-Side Liquidity）</span> — 前低、整數關卡、EQL 下方的停損堆積（散戶多單）</li>
+            <li>支撐下方 = SSL（散戶停損區）</li>
+            <li>壓力上方 = BSL（散戶停損區）</li>
+            <li>相鄰的多個高點/低點 = 大量流動性</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>掃流動性後怎麼操作</h4>
+          <ul>
+            <li>價格突破前高 <strong>→ 掃 BSL → 反轉下跌</strong> = 可找空</li>
+            <li>價格跌破前低 <strong>→ 掃 SSL → 反轉上漲</strong> = 可找多</li>
+            <li>掃完後看有沒有出現 CHoCH 確認反轉</li>
+            <li>掃完後找最近的 OB 或 FVG 作為進場依據</li>
+            <li>掃幅越深（假突破距離越大）= 反轉力道越強</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>Stop Hunt（獵殺停損）判斷</h4>
+          <ul>
+            <li>突破後<strong>收盤回到突破前</strong> = 假突破 / Stop Hunt</li>
+            <li>影線長但實體收回 = 典型 Stop Hunt K棒</li>
+            <li>突破後成交量大但無法持續 = 流動性被吸收</li>
+            <li>此時反向進場勝率最高</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>TradingView 工具</h4>
+          <ul>
+            <li>手動標前高前低作為流動性目標</li>
+            <li>「Liquidity Levels」腳本自動標 BSL/SSL</li>
+            <li>「ICT Concepts」包含流動性視覺化</li>
+            <li>觀察成交量配合判斷掃流動性真偽</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 流動性掃蕩是 SMC 最難的部分，因為很難事先知道「這次突破是真還是假」。建議等影線收回才進場，雖然進點差一點但安全很多。</div>
+    </div>
+  </div>
+
+  <!-- 5. Premium & Discount -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">⚖️</span>
+      <span class="smc-sec-title">溢價與折價 — Premium &amp; Discount</span>
+      <span class="smc-sec-sub">在最合適的價位做交易</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        Premium &amp; Discount 是 SMC 判斷「現在價格貴不貴」的框架。用一段波動的最高點到最低點畫出 50% 中線（公平價值），<strong>高於 50% = 溢價區（Premium），低於 50% = 折價區（Discount）</strong>。機構在折價區買進、在溢價區賣出，永遠不追高殺低。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>操作原則</h4>
+          <ul>
+            <li><span class="g">做多</span>：等價格回到 Discount 區（50% 以下）再買</li>
+            <li><span class="r">做空</span>：等價格反彈到 Premium 區（50% 以上）再空</li>
+            <li>在 50% 附近交易 = 公平價值進場，風報比最佳</li>
+            <li>追高做多 = 在 Premium 區買，不是 SMC 的做法</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>搭配費波那契</h4>
+          <ul>
+            <li>61.8%（黃金比例）= 最常見的 OTE 回測位</li>
+            <li>70.5% = ICT 特定的 OTE 入場區間上緣</li>
+            <li>79% = OTE 入場區間下緣（接近最低）</li>
+            <li>OTE 區間（61.8%~79%）= 最佳進場帶</li>
+            <li>搭配 OB 或 FVG 在 OTE 進場 = 三重確認</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ Discount/Premium 的「起點終點」選取很主觀，新手常選錯。建議從結構明確的 Swing High 到 Swing Low 量起，不要隨意選任意兩點。</div>
+    </div>
+  </div>
+
+  <!-- 6. Breaker Block -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">💥</span>
+      <span class="smc-sec-title">破壞區塊 &amp; 緩解區塊 — Breaker &amp; Mitigation Block</span>
+      <span class="smc-sec-sub">OB 失效後的進化形態</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        當一個 OB <strong>被有效突破（而非回測）</strong>，它就從支撐/壓力翻轉成反向的支撐/壓力，稱為 Breaker Block。<strong>Mitigation Block</strong> 則是 OB 被突破前，機構已先回來「緩解」部分部位的區域，突破後同樣反轉角色。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>Breaker Block</h4>
+          <ul>
+            <li>原本的多頭 OB 被向下有效突破 → 變成<span class="r">空頭 Breaker</span></li>
+            <li>原本的空頭 OB 被向上有效突破 → 變成<span class="g">多頭 Breaker</span></li>
+            <li>等價格回測 Breaker Block 區域時進場</li>
+            <li>Breaker 通常比原始 OB 更乾淨（機構不再保護舊倉位）</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>Mitigation Block</h4>
+          <ul>
+            <li>機構在 OB 首次被測試時<strong>先行了結部分部位</strong>的區域</li>
+            <li>OB 被突破後，Mitigation Block 承接反向角色</li>
+            <li>識別：OB 回測時有明顯小反彈再繼續突破</li>
+            <li>那個「小反彈的高/低點」就是 Mitigation Block</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ Breaker Block 的有效性判斷很考驗經驗。「有效突破」要看收盤確認，不是影線破就算。剛開始學習時先專注 OB，熟練後再加入 Breaker。</div>
+    </div>
+  </div>
+
+  <!-- 7. Equal Highs / Equal Lows -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">〰️</span>
+      <span class="smc-sec-title">等高/等低 — Equal Highs &amp; Equal Lows（EQH/EQL）</span>
+      <span class="smc-sec-sub">流動性最明顯的蓄水池</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        EQH（Equal Highs）是兩個或以上接近相同價位的高點；EQL（Equal Lows）是兩個或以上接近相同價位的低點。這些位置上方/下方聚集了大量散戶的停損單（BSL/SSL），是機構最喜歡去掃的目標。<strong>等高/等低越多 = 流動性越大 = 被掃的機率越高。</strong>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>識別標準</h4>
+          <ul>
+            <li>兩個高點差距 &lt; 0.1% 即可視為等高（視時框）</li>
+            <li>三個以上等高/等低更有意義</li>
+            <li>時間間隔越長的等高/等低流動性越大</li>
+            <li>看起來像「雙頂/雙底」的型態通常是 EQH/EQL</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>交易應用</h4>
+          <ul>
+            <li><span class="r">EQH 被掃</span> → 等 CHoCH 出現 → 找空頭 OB/FVG 進空</li>
+            <li><span class="g">EQL 被掃</span> → 等 CHoCH 出現 → 找多頭 OB/FVG 進多</li>
+            <li>掃完後<strong>不要立即追</strong>，等確認訊號</li>
+            <li>目標：對面的 EQH/EQL 或 Premium/Discount 區</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 等高等低是「相對」概念，不需要絕對相同。識別時用眼睛判斷「市場參與者會在哪裡放停損」，而不是嚴格的數學計算。</div>
+    </div>
+  </div>
+
+  <!-- SMC 整合操作流程 -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">🗺️</span>
+      <span class="smc-sec-title">SMC 完整交易流程</span>
+      <span class="smc-sec-sub">從宏觀到微觀的操作步驟</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>做多流程</h4>
+          <ul>
+            <li>① 高時框架確認<span class="g">上升結構（HH+HL）</span></li>
+            <li>② 等待價格回調進入 Discount 區（50% 以下）</li>
+            <li>③ 尋找<span class="g">多頭 OB</span> 或 <span class="g">多頭 FVG</span> 在折價區</li>
+            <li>④ 確認 EQL 已被掃 or CHoCH 出現</li>
+            <li>⑤ 低時框架找具體進場 K棒（OTE 61.8%~79%）</li>
+            <li>⑥ 停損放在 OB 低點下方，目標前高 / BSL</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>做空流程</h4>
+          <ul>
+            <li>① 高時框架確認<span class="r">下降結構（LH+LL）</span></li>
+            <li>② 等待價格反彈進入 Premium 區（50% 以上）</li>
+            <li>③ 尋找<span class="r">空頭 OB</span> 或 <span class="r">空頭 FVG</span> 在溢價區</li>
+            <li>④ 確認 EQH 已被掃 or CHoCH 出現</li>
+            <li>⑤ 低時框架找具體進場 K棒（OTE 61.8%~79%）</li>
+            <li>⑥ 停損放在 OB 高點上方，目標前低 / SSL</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-chip-row">
+        <span class="smc-chip">結構先行</span>
+        <span class="smc-chip">只在高時框方向內做單</span>
+        <span class="smc-chip">等掃流動性確認</span>
+        <span class="smc-chip">OB + FVG 雙確認</span>
+        <span class="smc-chip">OTE 進場</span>
+        <span class="smc-chip">流動性作為目標</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .smc-wrap -->
+</div><!-- end #tab-smc -->
 
 <div class="chip-popup" id="chipPopup">
   <button class="cp-close" onclick="closePopup()">✕</button>
@@ -5544,6 +5998,13 @@ a{color:#58a6ff;text-decoration:none}
 </div>
 
 <script>
+function switchTab(tab){
+  var isTV = tab==='tv';
+  document.getElementById('tab-tv').style.display = isTV ? '' : 'none';
+  document.getElementById('tab-smc').style.display = isTV ? 'none' : '';
+  document.getElementById('tab-btn-tv').classList.toggle('active', isTV);
+  document.getElementById('tab-btn-smc').classList.toggle('active', !isTV);
+}
 function filt(cat,btn){
   document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
