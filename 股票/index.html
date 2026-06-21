@@ -549,6 +549,12 @@ a { color: inherit; text-decoration: none; }
 .sb-item { display: block; padding: 7px 16px; font-size: 13px; color: #9AA3B2; text-decoration: none; }
 .sb-item:hover { background: #252931; color: #D1D4DC; }
 .sb-item.sb-active { color: #D1D4DC; font-weight: 600; }
+.sb-section-title{cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.sb-section-title:hover{color:#c9d1d9}
+.sb-arrow{font-size:10px;opacity:.55;transition:transform .2s;flex-shrink:0}
+.sb-section-title.closed .sb-arrow{transform:rotate(-90deg)}
+.sb-group{overflow:hidden;max-height:600px;transition:max-height .25s ease}
+.sb-group.closed{max-height:0}
 .sb-hamburger { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.15); border-radius: 4px; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 10px; line-height: 1; flex-shrink: 0; margin-right: 12px; }
 .sb-hamburger:hover { background: rgba(0,0,0,.4); }
 </style>
@@ -562,26 +568,33 @@ a { color: inherit; text-decoration: none; }
     <button class="sb-close" onclick="closeSidebar()">✕</button>
   </div>
   <nav class="sb-nav">
-    <div class="sb-section-title">工具</div>
-    <a class="sb-item" href="../stock-monitor/">外資籌碼篩選</a>
-    <a class="sb-item" href="trade-journal.html">交易日誌</a>
-    <div class="sb-section-title">學習筆記</div>
-    <a class="sb-item sb-active" href="index.html">首頁</a>
-    <a class="sb-item" href="strategy-glossary.html">策略筆記</a>
-    <a class="sb-item" href="candlestick-patterns.html">K線形態</a>
-
-    <div class="sb-section-title">TradingView</div>
-    <a class="sb-item" href="tradingview-guide.html">TV 指南</a>
-    <a class="sb-item" href="tv-indicators.html">TV 指標 &amp; SMC</a>
-    <a class="sb-item" href="advanced-indicators.html">進階指標精解</a>
-    <div class="sb-section-title">課程</div>
-    <a class="sb-item" href="stock-course.html">台股課程</a>
-    <a class="sb-item" href="stock-glossary.html">股票名詞</a>
-    <a class="sb-item" href="stock-quiz.html">股票測驗</a>
-    <a class="sb-item" href="futures-course.html">期貨課程</a>
-    <a class="sb-item" href="futures-glossary.html">期貨名詞</a>
-    <a class="sb-item" href="us-stock-course.html">美股課程</a>
-    <a class="sb-item" href="us-futures-course.html">美期課程</a>
+    <div class="sb-section-title" onclick="toggleSbGroup(this)">工具 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group">
+      <a class="sb-item" href="../stock-monitor/">外資籌碼篩選</a>
+      <a class="sb-item" href="trade-journal.html">交易日誌</a>
+    </div>
+    <div class="sb-section-title" onclick="toggleSbGroup(this)">學習筆記 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group">
+      <a class="sb-item sb-active" href="index.html">首頁</a>
+      <a class="sb-item" href="strategy-glossary.html">策略筆記</a>
+      <a class="sb-item" href="candlestick-patterns.html">K線形態</a>
+    </div>
+    <div class="sb-section-title" onclick="toggleSbGroup(this)">TradingView <span class="sb-arrow">▾</span></div>
+    <div class="sb-group">
+      <a class="sb-item" href="tradingview-guide.html">TV 指南</a>
+      <a class="sb-item" href="tv-indicators.html">TV 指標 &amp; SMC</a>
+      <a class="sb-item" href="advanced-indicators.html">進階指標精解</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">課程 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="stock-course.html">台股課程</a>
+      <a class="sb-item" href="stock-glossary.html">股票名詞</a>
+      <a class="sb-item" href="stock-quiz.html">股票測驗</a>
+      <a class="sb-item" href="futures-course.html">期貨課程</a>
+      <a class="sb-item" href="futures-glossary.html">期貨名詞</a>
+      <a class="sb-item" href="us-stock-course.html">美股課程</a>
+      <a class="sb-item" href="us-futures-course.html">美期課程</a>
+    </div>
   </nav>
 </div>
 
@@ -1718,5 +1731,6 @@ function closeSidebar() {
 <style>#back-top{position:fixed;bottom:24px;right:20px;z-index:998;width:44px;height:44px;border-radius:50%;background:#2962FF;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(41,98,255,.45);transition:background .15s}#back-top.show{display:flex}#back-top:hover{background:#1E53E5}</style>
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
 <script>window.addEventListener('scroll',function(){document.getElementById('back-top').classList.toggle('show',window.scrollY>280);});</script>
+<script>function toggleSbGroup(el){el.classList.toggle('closed');var g=el.nextElementSibling;if(g&&g.classList.contains('sb-group'))g.classList.toggle('closed');}</script>
 </body>
 </html>
