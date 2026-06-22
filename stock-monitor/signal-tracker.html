@@ -223,7 +223,6 @@
       border-bottom: 1px solid #2A2E39;
       border-top: 1px solid #2A2E39;
       background: #1a1e2a;
-      position: sticky; top: 110px; z-index: 10;
     }
     .level-group-count {
       margin-left: auto;
@@ -233,7 +232,7 @@
     /* ── TABLE ── */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
-    thead { position: sticky; top: 143px; z-index: 5; }
+    thead { position: sticky; top: 0; z-index: 5; }
     th {
       background: #1E222D; padding: 8px 12px;
       color: #787B86; font-weight: 500; font-size: 12px;
@@ -644,14 +643,57 @@
     <button class="btn" id="run-btn" onclick="runScreener()">執行篩選</button>
   </div>
 
-  <!-- Signal Level Reference -->
-  <div class="ref-section">
+  <!-- 篩選條件：永遠顯示 -->
+  <div class="filter-bar" style="margin:0 16px 0;border-radius:0;border-left:none;border-right:none;border-top:none;">
+    <div class="filter-bar-title" id="cond-filter-label">篩選條件（賣超場景）</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div class="filter-checks" style="flex:1;min-width:260px">
+        <label class="filter-check">
+          <input type="checkbox" id="chk-pct35" checked onchange="applyFilters()">
+          <span id="chk-pct35-label">買張增幅 ≥ 35%（排除觀察級，只保留有效訊號以上）</span>
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" id="chk-counter" checked onchange="applyFilters()">
+          <span id="chk-counter-label">賣張增幅 ＜ 買張增幅 × 50%（對方未同步放量）</span>
+        </label>
+      </div>
+      <div style="flex-shrink:0">
+        <div class="filter-sub-label">顯示訊號等級</div>
+        <div class="level-checks">
+          <label class="level-check">
+            <input type="checkbox" id="lv-watch" checked onchange="applyFilters()">
+            <span class="level-badge badge-watch" style="font-size:11px">觀察 20–35%</span>
+          </label>
+          <label class="level-check">
+            <input type="checkbox" id="lv-valid" checked onchange="applyFilters()">
+            <span class="level-badge badge-valid" style="font-size:11px">有效訊號 35–60%</span>
+          </label>
+          <label class="level-check">
+            <input type="checkbox" id="lv-strong" checked onchange="applyFilters()">
+            <span class="level-badge badge-strong" style="font-size:11px">強力訊號 60–100%</span>
+          </label>
+          <label class="level-check">
+            <input type="checkbox" id="lv-ultra" checked onchange="applyFilters()">
+            <span class="level-badge badge-ultra" style="font-size:11px">極強訊號 ＞100%</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 說明參考：單一收合區塊 -->
+  <div class="ref-section" style="margin:0 16px 12px">
     <div class="ref-title collapsed" onclick="toggleRef(this)">
-      訊號等級對照表
+      說明參考（訊號等級 ／ 操作條件 ／ 失效地雷）
       <span class="ref-toggle" style="transform:rotate(-90deg)">▾</span>
     </div>
-    <div class="ref-body collapsed">
-      <div class="level-grid">
+    <div class="ref-body collapsed" style="background:#131722">
+
+      <!-- 訊號等級對照表 -->
+      <div style="padding:10px 10px 0">
+        <div style="font-size:11px;font-weight:700;color:#787B86;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">訊號等級對照表</div>
+      </div>
+      <div class="level-grid" style="margin:0 10px 10px;border-radius:4px;overflow:hidden">
         <div class="level-card">
           <div class="level-badge badge-watch">觀察（雜訊）</div>
           <div class="level-range" id="range-watch">買張增幅 20% – 35%</div>
@@ -677,70 +719,28 @@
           <div class="level-pos">積極進場（6–8成）</div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Conditions -->
-  <div class="cond-section">
-    <div class="filter-bar">
-      <div class="filter-bar-title" id="cond-filter-label">篩選條件（賣超場景）</div>
-      <div class="filter-checks">
-        <label class="filter-check">
-          <input type="checkbox" id="chk-pct35" checked onchange="applyFilters()">
-          <span id="chk-pct35-label">買張增幅 ≥ 35%（排除觀察級，只保留有效訊號以上）</span>
-        </label>
-        <label class="filter-check">
-          <input type="checkbox" id="chk-counter" checked onchange="applyFilters()">
-          <span id="chk-counter-label">賣張增幅 ＜ 買張增幅 × 50%（對方未同步放量）</span>
-        </label>
+      <!-- 操作條件 -->
+      <div class="cond-box" style="margin:0 10px 10px;border-radius:4px">
+        <div class="cond-box-title">操作條件（人工確認）</div>
+        <div class="cond-line">
+          <div class="cond-dot dot-stop"></div>
+          <span><strong style="color:#F23645">停損</strong>：低於訊號日最低點 1–2% 無條件出場，情緒不得插手</span>
+        </div>
+        <div class="cond-line">
+          <div class="cond-dot dot-add"></div>
+          <span><strong style="color:#F0B90B">加碼（任一）</strong>：外資連續 2 日轉買超 ／ 投信加入買超 ／ 融券加速增加</span>
+        </div>
+        <div class="cond-line">
+          <div class="cond-dot dot-exit"></div>
+          <span><strong style="color:#089981">出場</strong>：外資賣張重新大增 ／ 股價跌破 5 日均線且量增 ／ 訊號日最低點被跌破</span>
+        </div>
       </div>
-      <div class="filter-divider"></div>
-      <div class="filter-sub-label">顯示訊號等級</div>
-      <div class="level-checks">
-        <label class="level-check">
-          <input type="checkbox" id="lv-watch" checked onchange="applyFilters()">
-          <span class="level-badge badge-watch" style="font-size:11px">觀察 20–35%</span>
-        </label>
-        <label class="level-check">
-          <input type="checkbox" id="lv-valid" checked onchange="applyFilters()">
-          <span class="level-badge badge-valid" style="font-size:11px">有效訊號 35–60%</span>
-        </label>
-        <label class="level-check">
-          <input type="checkbox" id="lv-strong" checked onchange="applyFilters()">
-          <span class="level-badge badge-strong" style="font-size:11px">強力訊號 60–100%</span>
-        </label>
-        <label class="level-check">
-          <input type="checkbox" id="lv-ultra" checked onchange="applyFilters()">
-          <span class="level-badge badge-ultra" style="font-size:11px">極強訊號 ＞100%</span>
-        </label>
-      </div>
-    </div>
-    <div class="cond-box">
-      <div class="cond-box-title">操作條件（人工確認）</div>
-      <div class="cond-line">
-        <div class="cond-dot dot-stop"></div>
-        <span><strong style="color:#F23645">停損</strong>：低於訊號日最低點 1–2% 無條件出場，情緒不得插手</span>
-      </div>
-      <div class="cond-line">
-        <div class="cond-dot dot-add"></div>
-        <span><strong style="color:#F0B90B">加碼（任一）</strong>：外資連續 2 日轉買超 ／ 投信加入買超 ／ 融券加速增加</span>
-      </div>
-      <div class="cond-line">
-        <div class="cond-dot dot-exit"></div>
-        <span><strong style="color:#089981">出場</strong>：外資賣張重新大增 ／ 股價跌破 5 日均線且量增 ／ 訊號日最低點被跌破</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Mine Warnings -->
-  <div class="mine-section">
-    <div class="ref-section" style="margin:0">
-      <div class="ref-title" onclick="toggleRef(this)" id="mine-toggle">
-        ⚠️ 訊號失效的五個地雷（點擊展開）
-        <span class="ref-toggle" style="transform:rotate(-90deg)">▾</span>
-      </div>
-      <div class="ref-body collapsed" id="mine-body">
-        <div class="mine-grid" style="padding:10px;background:#131722">
+      <!-- 地雷 -->
+      <div style="padding:0 10px 10px">
+        <div style="font-size:11px;font-weight:700;color:#787B86;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">訊號失效的五個地雷</div>
+        <div class="mine-grid">
           <div class="mine-card">
             <div class="mine-title">⚠️ 地雷一：大盤系統性崩跌</div>
             <div class="mine-body">聯準會急升息、地緣衝突、美股崩跌期間，外資買張增加可能只是程式交易或對沖操作，與個股看法無關。先確認大盤環境。</div>
@@ -763,6 +763,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
