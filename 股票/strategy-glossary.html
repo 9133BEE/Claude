@@ -261,7 +261,7 @@ a{color:inherit;text-decoration:none}
 
 <div class="source-bar">
   <button class="src-btn" id="aiFltBtn" onclick="filterSource('ai',this)">🤖 AI分析</button>
-  <button class="src-btn" id="userFltBtn" onclick="filterSource('user',this)">🌱 肥料</button>
+  <button class="src-btn" id="userFltBtn" onclick="filterSource('user',this)">📊 自選分析策略</button>
 </div>
 
 <div class="filter-bar">
@@ -1010,7 +1010,7 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
     <div class="sc-meta">
       <div class="sc-badges">
         <span class="badge badge-chip">籌碼分析</span>
-        <span class="badge badge-user">肥料筆記</span>
+        <span class="badge badge-user">自選分析策略</span>
       </div>
       <div class="sc-name">外資買賣張數背離訊號</div>
       <div class="sc-en">Foreign Investor Volume Divergence Signal</div>
@@ -1288,7 +1288,7 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
-<!-- 🌱 肥料：第二層籌碼確認 -->
+<!-- 📊 自選分析策略：第二層籌碼確認 -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="sc" data-cat="chip" data-source="user" data-keywords="第二層 籌碼確認 投信 大股東 融券 軋空 法人 買超 轉讓 肥料">
   <div class="sc-head" onclick="toggle(this)">
@@ -1296,7 +1296,7 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
     <div class="sc-meta">
       <div class="sc-badges">
         <span class="badge badge-chip">籌碼分析</span>
-        <span class="badge badge-user">肥料筆記</span>
+        <span class="badge badge-user">自選分析策略</span>
       </div>
       <div class="sc-name">第二層籌碼確認</div>
       <div class="sc-en">Layer 2 — Institutional Cross-Validation</div>
@@ -1336,7 +1336,7 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
-<!-- 🌱 肥料：撐壓的本質與局限（Instagram 交易日記 EP.36） -->
+<!-- 📊 自選分析策略：撐壓的本質與局限（Instagram 交易日記 EP.36） -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="sc" data-cat="foundation" data-source="user" data-keywords="支撐 阻力 撐壓 主力 技術分析 基礎 決策工具 不保證 洗盤 肥料">
   <div class="sc-head" onclick="toggle(this)">
@@ -1344,7 +1344,7 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
     <div class="sc-meta">
       <div class="sc-badges">
         <span class="badge badge-foundation">基礎工具</span>
-        <span class="badge badge-user">肥料筆記</span>
+        <span class="badge badge-user">自選分析策略</span>
       </div>
       <div class="sc-name">撐壓的本質與局限</div>
       <div class="sc-en">Support &amp; Resistance — Reality Check</div>
@@ -1411,6 +1411,220 @@ M頭目標價 = 頸線價格 − (M頂部 − 頸線)
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 自選：築底型態 — D+0賣超但雙日買張大於D-2 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="chip" data-source="user" data-keywords="外資 買張 賣超 築底 D+1 進場 累計 籌碼 自選 建倉">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🏗️</div>
+    <div class="sc-meta">
+      <div class="sc-badges">
+        <span class="badge badge-chip">籌碼分析</span>
+        <span class="badge badge-user">自選分析策略</span>
+      </div>
+      <div class="sc-name">築底型態 — D+0賣超但累積買張回升</div>
+      <div class="sc-en">Bottom Building: D+0 Net Sell + (D+0+D-1 Buy ＞ D-2 Buy)</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">D+0 雖然外資賣超，但把 D+0 與 D-1 的買張加總，若高於 D-2 的買張，代表機構正在悄悄墊高買量、分批建倉，屬於多日築底訊號，隔日（D+1）可觀察進場。</div>
+  <div class="sc-body collapsed">
+
+    <div class="diag">
+      <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="560" height="200" fill="#f8fafc" rx="8"/>
+
+        <!-- 標題 -->
+        <text x="280" y="16" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="700">築底型態：D+0+D-1 買張加總 ＞ D-2 買張</text>
+
+        <!-- D-2 欄 -->
+        <text x="95" y="34" text-anchor="middle" fill="#64748b" font-size="8.5" font-weight="600">D-2（基準日）</text>
+        <rect x="68" y="38" width="22" height="70" fill="#3b82f6" opacity=".55" rx="2"/>
+        <text x="79" y="116" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張</text>
+        <text x="79" y="125" text-anchor="middle" fill="#3b82f6" font-size="7.5">5000</text>
+        <rect x="96" y="48" width="22" height="60" fill="#dc2626" opacity=".5" rx="2"/>
+        <text x="107" y="116" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張</text>
+        <text x="107" y="125" text-anchor="middle" fill="#dc2626" font-size="7.5">6500</text>
+        <rect x="62" y="136" width="72" height="14" fill="#fee2e2" rx="3"/>
+        <text x="98" y="146" text-anchor="middle" fill="#dc2626" font-size="7.5" font-weight="700">賣超（基準）</text>
+
+        <!-- D-1 欄 -->
+        <text x="235" y="34" text-anchor="middle" fill="#64748b" font-size="8.5" font-weight="600">D-1（前日）</text>
+        <rect x="208" y="26" width="22" height="82" fill="#3b82f6" opacity=".7" rx="2"/>
+        <text x="219" y="116" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張</text>
+        <text x="219" y="125" text-anchor="middle" fill="#3b82f6" font-size="7.5">6000↑</text>
+        <rect x="236" y="40" width="22" height="68" fill="#dc2626" opacity=".5" rx="2"/>
+        <text x="247" y="116" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張</text>
+        <text x="247" y="125" text-anchor="middle" fill="#dc2626" font-size="7.5">7500</text>
+        <rect x="202" y="136" width="72" height="14" fill="#fee2e2" rx="3"/>
+        <text x="238" y="146" text-anchor="middle" fill="#dc2626" font-size="7.5" font-weight="700">仍賣超</text>
+
+        <!-- D+0 欄 -->
+        <text x="375" y="34" text-anchor="middle" fill="#64748b" font-size="8.5" font-weight="600">D+0（訊號日）</text>
+        <rect x="348" y="18" width="22" height="90" fill="#3b82f6" rx="2"/>
+        <text x="359" y="116" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張</text>
+        <text x="359" y="125" text-anchor="middle" fill="#3b82f6" font-size="7.5">5500↑</text>
+        <rect x="376" y="38" width="22" height="70" fill="#dc2626" opacity=".5" rx="2"/>
+        <text x="387" y="116" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張</text>
+        <text x="387" y="125" text-anchor="middle" fill="#dc2626" font-size="7.5">7000</text>
+        <rect x="342" y="136" width="72" height="14" fill="#fee2e2" rx="3"/>
+        <text x="378" y="146" text-anchor="middle" fill="#dc2626" font-size="7.5" font-weight="700">仍賣超</text>
+
+        <!-- 關鍵公式 -->
+        <rect x="430" y="25" width="118" height="55" fill="#dcfce7" rx="5" stroke="#16a34a" stroke-width="1"/>
+        <text x="489" y="40" text-anchor="middle" fill="#15803d" font-size="8" font-weight="700">✔ 關鍵條件</text>
+        <text x="489" y="53" text-anchor="middle" fill="#166534" font-size="8">D-1買張 + D+0買張</text>
+        <text x="489" y="65" text-anchor="middle" fill="#166534" font-size="8">= 11500 ＞ D-2買張</text>
+        <text x="489" y="77" text-anchor="middle" fill="#15803d" font-size="8" font-weight="700">5000 → 築底成立</text>
+
+        <!-- D+1 箭頭 -->
+        <rect x="430" y="120" width="118" height="30" fill="#dbeafe" rx="5" stroke="#2563eb" stroke-width="1"/>
+        <text x="489" y="137" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="700">D+1 觀察進場 ↑</text>
+
+        <!-- 趨勢箭頭（買張遞增） -->
+        <polyline points="79,38 219,26 359,18" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3" opacity=".8"/>
+        <text x="195" y="14" text-anchor="middle" fill="#3b82f6" font-size="8">買張持續墊高 →</text>
+      </svg>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">📋 型態定義</div>
+      <ul>
+        <li><strong>條件一</strong>：D+0 外資呈<strong>賣超</strong>（買張 &lt; 賣張）</li>
+        <li><strong>條件二</strong>：D+0 買張 ＋ D-1 買張 之和 ＞ D-2 的買張</li>
+        <li><strong>邏輯</strong>：即使每天淨賣，但兩天的累積買量比前天的單日買量更大，說明機構正在<strong>分批拉高買量建倉</strong></li>
+        <li><strong>進場</strong>：D+1 開盤後觀察，若再度出現買張放大可進場</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">🔍 為什麼有效</div>
+      <ul>
+        <li>外資賣超 = 對外的「數字」看起來是賣，但買張在偷偷增加</li>
+        <li>機構不想推高股價，所以掛更多賣單壓盤，但同時偷買 → 經典的「掩護建倉」手法</li>
+        <li>D+0+D-1 買張和 ＞ D-2 買張，代表兩天累積買量在放大，底部正在被悄悄墊高</li>
+        <li>通常 1–2 天後買張會超過賣張，出現轉為買超的訊號，就是強勢確認</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">⚠️ 注意事項</div>
+      <ul>
+        <li>需要有 D-2 的歷史資料做基準比較</li>
+        <li>若大盤整體走弱，築底訊號效果打折，要加上大盤過濾</li>
+        <li>搭配第二層確認（投信同向、大股東無申報轉讓）勝率更高</li>
+        <li>單純只看條件二成立但條件一不符（D+0 本就買超）= 普通買超，非此型態</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 自選：急拉型態 — D+0賣超但買張大幅高於D-1 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="sc" data-cat="chip" data-source="user" data-keywords="外資 買張 賣超 急拉 突破 D+1 進場 放量 籌碼 自選 大幅">
+  <div class="sc-head" onclick="toggle(this)">
+    <div class="sc-icon">🚀</div>
+    <div class="sc-meta">
+      <div class="sc-badges">
+        <span class="badge badge-chip">籌碼分析</span>
+        <span class="badge badge-user">自選分析策略</span>
+      </div>
+      <div class="sc-name">急拉型態 — D+0賣超但買張大幅高於D-1</div>
+      <div class="sc-en">Surge Pattern: D+0 Net Sell + Buy Lots Spike vs D-1</div>
+    </div>
+    <span class="toggle-arrow">›</span>
+  </div>
+  <div class="sc-short">D+0 外資賣超，但當日買張比 D-1 大幅增加（通常 ≥ 50% 以上），顯示有大資金突然湧入買方，即使賣單更多，但短期積壓的買壓將在 D+1 爆發，屬於急拉前的籌碼訊號。</div>
+  <div class="sc-body collapsed">
+
+    <div class="diag">
+      <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+        <rect width="480" height="200" fill="#f8fafc" rx="8"/>
+
+        <!-- 標題 -->
+        <text x="240" y="16" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="700">急拉型態：D+0 買張大幅突增（仍賣超）</text>
+
+        <!-- D-1 欄 -->
+        <text x="100" y="34" text-anchor="middle" fill="#64748b" font-size="8.5" font-weight="600">D-1（前日）</text>
+        <rect x="73" y="55" width="26" height="55" fill="#3b82f6" opacity=".6" rx="2"/>
+        <text x="86" y="118" text-anchor="middle" fill="#3b82f6" font-size="7.5">買張 4000</text>
+        <rect x="105" y="42" width="26" height="68" fill="#dc2626" opacity=".5" rx="2"/>
+        <text x="118" y="118" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張 5500</text>
+        <rect x="68" y="130" width="70" height="14" fill="#fee2e2" rx="3"/>
+        <text x="103" y="140" text-anchor="middle" fill="#dc2626" font-size="7.5" font-weight="700">賣超 -1500</text>
+        <text x="103" y="160" text-anchor="middle" fill="#64748b" font-size="7">「普通賣超」</text>
+
+        <!-- D+0 欄（買張爆量） -->
+        <text x="255" y="34" text-anchor="middle" fill="#64748b" font-size="8.5" font-weight="600">D+0（訊號日）</text>
+        <rect x="218" y="13" width="26" height="97" fill="#3b82f6" rx="2"/>
+        <text x="231" y="118" text-anchor="middle" fill="#3b82f6" font-size="7.5" font-weight="700">買張 8000↑↑</text>
+        <rect x="250" y="28" width="26" height="82" fill="#dc2626" opacity=".5" rx="2"/>
+        <text x="263" y="118" text-anchor="middle" fill="#dc2626" font-size="7.5">賣張 9000</text>
+        <rect x="210" y="130" width="76" height="14" fill="#fee2e2" rx="3"/>
+        <text x="248" y="140" text-anchor="middle" fill="#dc2626" font-size="7.5" font-weight="700">賣超 -1000</text>
+        <!-- 買張漲幅標籤 -->
+        <rect x="210" y="152" width="76" height="16" fill="#dbeafe" rx="3"/>
+        <text x="248" y="163" text-anchor="middle" fill="#1d4ed8" font-size="8" font-weight="700">買張 +100% ↑↑</text>
+
+        <!-- 箭頭（D-1→D+0 買張大增） -->
+        <line x1="100" y1="55" x2="218" y2="13" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2"/>
+        <text x="155" y="25" text-anchor="middle" fill="#1d4ed8" font-size="8" font-weight="700">買張暴增！</text>
+
+        <!-- 說明框 -->
+        <rect x="330" y="20" width="138" height="80" fill="#dcfce7" rx="5" stroke="#16a34a" stroke-width="1"/>
+        <text x="399" y="37" text-anchor="middle" fill="#15803d" font-size="8.5" font-weight="700">✔ 急拉訊號</text>
+        <text x="399" y="50" text-anchor="middle" fill="#166534" font-size="8">賣超縮小（-1500→-1000）</text>
+        <text x="399" y="63" text-anchor="middle" fill="#166534" font-size="8">買張暴增 +100%</text>
+        <text x="399" y="76" text-anchor="middle" fill="#166534" font-size="8">賣超只是掩護</text>
+        <text x="399" y="89" text-anchor="middle" fill="#15803d" font-size="8" font-weight="700">大資金正在吃貨</text>
+
+        <!-- D+1 框 -->
+        <rect x="330" y="130" width="138" height="30" fill="#dbeafe" rx="5" stroke="#2563eb" stroke-width="1"/>
+        <text x="399" y="149" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="700">D+1 急拉進場機會 ↑</text>
+      </svg>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">📋 型態定義</div>
+      <ul>
+        <li><strong>條件一</strong>：D+0 外資呈<strong>賣超</strong>（買張 &lt; 賣張）</li>
+        <li><strong>條件二</strong>：D+0 買張 比 D-1 買張<strong>大幅增加</strong>（建議門檻：≥ 50% 以上）</li>
+        <li><strong>加分項</strong>：同時賣超量比 D-1 縮小（說明賣壓在減弱）</li>
+        <li><strong>進場</strong>：D+1 開盤觀察量縮整理後進場，或突破前日高點確認後追入</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">🔍 為什麼有效</div>
+      <ul>
+        <li>買張大幅增加代表有資金在<strong>積極吃單</strong>，即使賣張更多，市場的「買壓」正在積累</li>
+        <li>賣超縮小 = 賣方在退場，買方在進場 → 籌碼正在轉移</li>
+        <li>這種型態通常在主力準備拉抬前出現：先悄悄買夠，D+1 才開始漲</li>
+        <li>與築底型態不同：築底是多日累積，此型態是<strong>單日爆發性</strong>的買量異常</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-title">⚠️ 注意事項</div>
+      <ul>
+        <li>買張大增但股價<strong>大跌</strong>時需謹慎 → 可能是接刀，主力未必護盤</li>
+        <li>需排除除息、大股東轉讓等造成的假訊號（量大但非主動買入）</li>
+        <li>搭配外資連續 3 日賣超後首次出現此型態，效果最強</li>
+        <li>量越大（買張增幅越高）訊號越強，建議門檻 ≥ 50%，＞ 100% 最強</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="toggle-btn" onclick="toggle(this.previousElementSibling.previousElementSibling)">
+    <span class="toggle-arrow">›</span><span>展開詳細</span>
+  </div>
+</div>
 </div><!-- /container -->
 
 <script>
@@ -1482,7 +1696,7 @@ function filter(cat, btn) {
   applyAll();
 }
 
-/* ── 來源篩選（AI分析 / 肥料） ── */
+/* ── 來源篩選（AI分析 / 自選分析策略） ── */
 function filterSource(source, btn) {
   showStarred = false;
   document.getElementById('starFltBtn').classList.remove('active');
@@ -1523,7 +1737,7 @@ function applyAll() {
 
 /* ── 初始化：注入星號按鈕 + 建立跳轉選單 ── */
 (function init() {
-  const catLabel = {theory:'核心理論',indicator:'技術指標',pattern:'型態辨識',foundation:'基礎工具',chip:'籌碼分析',user:'肥料筆記'};
+  const catLabel = {theory:'核心理論',indicator:'技術指標',pattern:'型態辨識',foundation:'基礎工具',chip:'籌碼分析',user:'自選分析策略'};
   const groups = {};
 
   document.querySelectorAll('.sc').forEach((sc, i) => {
