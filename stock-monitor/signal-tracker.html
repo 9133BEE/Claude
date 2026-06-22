@@ -648,6 +648,14 @@
           <input type="checkbox" id="chk-counter" checked onchange="applyFilters()">
           <span id="chk-counter-label">賣張增幅 ＜ 買張增幅 × 50%（對方未同步放量）</span>
         </label>
+        <div class="filter-check" style="align-items:center">
+          <span id="vol-filter-label" style="white-space:nowrap">買張（當日）</span>
+          <span style="color:#787B86;margin:0 6px">＞</span>
+          <input type="number" id="vol-min" value="" placeholder="不限" min="0" step="100"
+            style="width:86px;background:#131722;border:1px solid #2A2E39;border-radius:4px;padding:2px 8px;color:#D1D4DC;font-size:13px;font-family:inherit;outline:none;"
+            oninput="applyFilters()">
+          <span style="color:#787B86;margin-left:6px;white-space:nowrap">張</span>
+        </div>
       </div>
       <div style="flex-shrink:0">
         <div class="filter-sub-label">顯示訊號等級</div>
@@ -930,6 +938,7 @@ function updateCondDisplay() {
   const ctr = isBuy ? '買張' : '賣張';
   document.getElementById('chk-pct35-label').textContent   = `${sig}增幅 ≥ 35%（排除觀察級，只保留有效訊號以上）`;
   document.getElementById('chk-counter-label').textContent = `${ctr}增幅 ＜ ${sig}增幅 × 50%（對方未同步放量）`;
+  document.getElementById('vol-filter-label').textContent  = `${sig}（當日）`;
   // ref table labels
   const prefix = isBuy ? '賣張增幅' : '買張增幅';
   document.getElementById('range-watch').textContent  = `${prefix} 20% – 35%`;
@@ -1083,9 +1092,14 @@ function applyFilters() {
 
   const chkPct35   = document.getElementById('chk-pct35')?.checked;
   const chkCounter = document.getElementById('chk-counter')?.checked;
+  const volMin     = parseInt(document.getElementById('vol-min')?.value) || 0;
 
   if (chkPct35)   results = results.filter(r => r.signalPct >= 0.35);
   if (chkCounter) results = results.filter(r => r.counterPct < r.signalPct * 0.5);
+  if (volMin > 0) {
+    const isBuy = filterType === 'buy';
+    results = results.filter(r => (isBuy ? r.sellA : r.buyA) >= volMin);
+  }
 
   const activeLevels = new Set(
     ['ultra','strong','valid','watch'].filter(k => document.getElementById('lv-'+k)?.checked)
@@ -1204,19 +1218,22 @@ function sortBy(col) {
 // ══════════════════════════════════════
 //  DETAIL PANEL
 // ══════════════════════════════════════
-async function showDetail(code) {
+async function showDetail(code, nameOverride) {
   const r = currentResults.find(x => x.code === code);
-  if (!r) return;
-  const [dA] = currentDates;
+  const displayName = nameOverride || (r ? r.name : code);
 
-  document.getElementById('detail-title').textContent = `${r.code} ${r.name}`;
+  document.getElementById('detail-title').textContent = `${code} ${displayName}`;
   document.getElementById('detail-body').innerHTML =
-    `<div class="status-box"><div class="status-icon">⏳</div><div class="status-msg">載入近1個月資料…</div></div>`;
+    `<div class="status-box"><div class="status-icon">⏳</div><div class="status-msg">載入近2個月資料…</div></div>`;
   document.getElementById('detail-panel').classList.add('open');
 
-  const dADate = new Date(+dA.slice(0,4), +dA.slice(4,6)-1, +dA.slice(6,8), 12);
-  const prev21 = tradingDates(21, dADate);
-  const allDates = [dA, ...prev21];
+  const baseStr = (currentDates[0] && currentDates[0].length === 8) ? currentDates[0] : (() => {
+    const n = new Date();
+    return `${n.getFullYear()}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getDate()).padStart(2,'0')}`;
+  })();
+  const dADate = new Date(+baseStr.slice(0,4), +baseStr.slice(4,6)-1, +baseStr.slice(6,8), 12);
+  const prev42 = tradingDates(42, dADate);
+  const allDates = [baseStr, ...prev42];
   const missing = allDates.filter(dt => !allData[dt]);
   const BATCH = 4;
   for (let i = 0; i < missing.length; i += BATCH) {
@@ -1236,11 +1253,10 @@ async function showDetail(code) {
   const maxBuy  = Math.max(...rows.map(d => d.buy));
   const maxSell = Math.max(...rows.map(d => d.sell));
 
-  const cfg = LEVEL_CFG[r.levelKey];
+  const badgeHtml = r ? (()=>{ const cfg=LEVEL_CFG[r.levelKey]; return `<span class="level-badge ${cfg.cls}" style="font-size:12px;margin-right:8px">${cfg.label} +${Math.round(r.signalPct*100)}%</span>`; })() : '';
   document.getElementById('detail-body').innerHTML = `
     <div class="info-box">
-      <span class="level-badge ${cfg.cls}" style="font-size:12px;margin-right:8px">${cfg.label} +${Math.round(r.signalPct*100)}%</span>
-      近1個月 <strong style="color:#dde3ed">${rows.length}</strong> 個交易日｜單位：張（1張＝1,000股）
+      ${badgeHtml}近2個月 <strong style="color:#dde3ed">${rows.length}</strong> 個交易日｜單位：張（1張＝1,000股）
     </div>
     <div style="overflow-x:auto">
       <table class="month-table">
@@ -1394,9 +1410,9 @@ function renderWlItem(item) {
   return `<div class="wl-item" id="wl-item-${id}" style="${exitedStyle}">
 
     <!-- ① 股票資訊 -->
-    <div class="wl-stock-info">
+    <div class="wl-stock-info" onclick="showDetail('${item.code}','${item.name}')" style="cursor:pointer" title="查看近2個月買賣張">
       <div class="wl-code">${item.code}</div>
-      <div class="wl-name">${item.name}</div>
+      <div class="wl-name" style="text-decoration:underline dotted rgba(91,155,245,.5)">${item.name}</div>
       <div class="wl-meta" style="margin-top:6px">
         <span class="level-badge ${cfg.cls}" style="font-size:11px">${cfg.label}</span>
       </div>
