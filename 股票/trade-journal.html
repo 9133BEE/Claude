@@ -1112,32 +1112,37 @@ async function refreshLivePrices() {
   if (!openTrades.length) return;
   let winning = 0;
   for (const t of openTrades) {
-    const el = document.getElementById(`live-${t.id}`);
-    if (!el) continue;
     const price = await fetchLivePrice(t.ticker);
+
+    // always update card header regardless of expanded state
+    const hEl = document.getElementById(`hpnl-${t.id}`);
     if (price === null) {
-      el.innerHTML = `<span class="live-loading">⚠ 無法取得 ${esc(t.ticker)} 價格（非交易日或代號錯誤）</span>`;
+      const el = document.getElementById(`live-${t.id}`);
+      if (el) el.innerHTML = `<span class="live-loading">⚠ 無法取得 ${esc(t.ticker)} 價格</span>`;
       continue;
     }
     const entry = parseFloat(t.entryPrice) || 0;
     const pnlPct = entry > 0 ? (price - entry) / entry * 100 : 0;
     const pnlCls = pnlPct > 0 ? 'bull' : pnlPct < 0 ? 'bear' : 'neu';
     const pnlStr = (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(2) + '%';
-    const stop = t.stopLoss ? parseFloat(t.stopLoss) : null;
-    const tgt  = t.target   ? parseFloat(t.target)   : null;
-    const stopDist = stop ? ((price - stop) / price * 100) : null;
-    const tgtDist  = tgt  ? ((tgt - price) / price * 100)  : null;
-    // update header P&L
-    const hEl = document.getElementById(`hpnl-${t.id}`);
     if (hEl) { hEl.textContent = pnlStr; hEl.className = `tc-pnl ${pnlCls}`; }
-    el.className = `live-bar${stop && price <= stop ? ' warn' : ''}`;
-    el.innerHTML = `<div class="live-row">
-      <div class="live-item"><span class="live-lbl">最新收盤</span><span class="live-val neu">${price.toFixed(1)}</span></div>
-      <div class="live-item"><span class="live-lbl">損益</span><span class="live-val ${pnlCls}">${pnlStr}</span></div>
-      ${tgtDist !== null ? `<div class="live-item"><span class="live-lbl">距目標</span><span class="live-val ${tgtDist > 0 ? 'neu' : 'bull'}">${tgtDist > 0 ? '+' : ''}${tgtDist.toFixed(1)}%</span></div>` : ''}
-      ${stopDist !== null ? `<div class="live-item"><span class="live-lbl">距停損</span><span class="live-val ${stopDist < 0 ? 'danger' : 'safe'}">${stopDist < 0 ? '' : '+'}${stopDist.toFixed(1)}%</span></div>` : ''}
-      <span class="live-ts">${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}</span>
-    </div>`;
+
+    // update card body only if expanded (element visible in DOM)
+    const el = document.getElementById(`live-${t.id}`);
+    if (el) {
+      const stop = t.stopLoss ? parseFloat(t.stopLoss) : null;
+      const tgt  = t.target   ? parseFloat(t.target)   : null;
+      const stopDist = stop ? ((price - stop) / price * 100) : null;
+      const tgtDist  = tgt  ? ((tgt - price) / price * 100)  : null;
+      el.className = `live-bar${stop && price <= stop ? ' warn' : ''}`;
+      el.innerHTML = `<div class="live-row">
+        <div class="live-item"><span class="live-lbl">最新收盤</span><span class="live-val neu">${price.toFixed(1)}</span></div>
+        <div class="live-item"><span class="live-lbl">損益</span><span class="live-val ${pnlCls}">${pnlStr}</span></div>
+        ${tgtDist !== null ? `<div class="live-item"><span class="live-lbl">距目標</span><span class="live-val ${tgtDist > 0 ? 'neu' : 'bull'}">${tgtDist > 0 ? '+' : ''}${tgtDist.toFixed(1)}%</span></div>` : ''}
+        ${stopDist !== null ? `<div class="live-item"><span class="live-lbl">距停損</span><span class="live-val ${stopDist < 0 ? 'danger' : 'safe'}">${stopDist < 0 ? '' : '+'}${stopDist.toFixed(1)}%</span></div>` : ''}
+        <span class="live-ts">${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>`;
+    }
     if (pnlPct > 0) winning++;
   }
   const kSub4 = document.getElementById('kSub4');
