@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>台股監控</title>
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; }
+
+    /* Nav */
+    .nav { display: flex; background: #161b22; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 10; }
+    .nav-btn { flex: 1; padding: 14px 4px; text-align: center; cursor: pointer; border: none; background: none; color: #8b949e; font-size: 13px; border-bottom: 2px solid transparent; transition: all .2s; }
+    .nav-btn.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+
+    /* Tabs */
+    .tab { display: none; padding: 14px; min-height: calc(100vh - 50px); }
+    .tab.active { display: block; }
+
+    /* Input row */
+    .input-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    input { flex: 1; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 9px 12px; color: #e6edf3; font-size: 14px; outline: none; }
+    input:focus { border-color: #58a6ff; }
+    .btn { background: #238636; border: none; border-radius: 6px; padding: 9px 16px; color: white; cursor: pointer; font-size: 13px; white-space: nowrap; font-weight: 500; }
+    .btn:active { opacity: .8; }
+    .btn-ghost { background: #21262d; }
+    .btn-danger { background: #da3633; padding: 5px 9px; font-size: 12px; }
+    .btn-full { flex: 1; text-align: center; font-size: 14px; padding: 11px; }
+
+    /* Stock card */
+    .stock-card { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+    .stock-card:hover { border-color: #58a6ff; }
+    .stock-name { font-weight: 600; font-size: 15px; }
+    .stock-code { font-size: 11px; color: #8b949e; margin-top: 2px; }
+    .stock-right { display: flex; align-items: center; gap: 10px; }
+    .price-block { text-align: right; }
+    .price-val { font-size: 17px; font-weight: 700; }
+    .price-chg { font-size: 12px; margin-top: 2px; }
+    .up { color: #3fb950; }
+    .down { color: #f85149; }
+    .flat { color: #8b949e; }
+
+    /* Empty / loading */
+    .empty { text-align: center; padding: 48px 16px; color: #8b949e; }
+    .empty-icon { font-size: 36px; margin-bottom: 8px; }
+
+    /* Section label */
+    .section-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: .6px; margin: 16px 0 8px; }
+
+    /* Info box */
+    .info-box { background: #161b22; border-left: 3px solid #58a6ff; padding: 11px 13px; border-radius: 4px; margin-bottom: 14px; font-size: 13px; color: #8b949e; line-height: 1.6; }
+
+    /* Chart containers */
+    .chart-block { margin-bottom: 6px; }
+    .chart-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; padding-left: 2px; }
+    #c-main  { width: 100%; height: 280px; }
+    #c-vol   { width: 100%; height: 70px; }
+    #c-macd  { width: 100%; height: 90px; }
+    #c-rsi   { width: 100%; height: 70px; }
+    #c-kd    { width: 100%; height: 70px; }
+
+    /* Legend */
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+    .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #8b949e; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Screener table */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #161b22; padding: 9px 8px; text-align: right; color: #8b949e; font-weight: 500; white-space: nowrap; }
+    th:first-child { text-align: left; }
+    td { padding: 10px 8px; border-bottom: 1px solid #21262d; text-align: right; white-space: nowrap; }
+    td:first-child { text-align: left; }
+    tr:hover td { background: #1c2128; }
+    tr { cursor: pointer; }
+
+    /* Badge */
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .badge-sell { background: rgba(248,81,73,.15); color: #f85149; border: 1px solid rgba(248,81,73,.3); }
+    .badge-buy  { background: rgba(63,185,80,.15); color: #3fb950; border: 1px solid rgba(63,185,80,.3); }
+
+    .pos { color: #3fb950; }
+    .neg { color: #f85149; }
+
+    /* Stock header in analysis */
+    .stock-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #30363d; }
+    .stock-header-name { font-size: 18px; font-weight: 700; }
+    .stock-header-sub { font-size: 12px; color: #8b949e; margin-top: 3px; }
+    .stock-header-price { text-align: right; }
+    .stock-header-price .price-val { font-size: 22px; }
+
+    /* Result count */
+    .result-count { font-size: 12px; color: #8b949e; margin-bottom: 10px; }
+
+    /* Screener date */
+    .screener-meta { font-size: 11px; color: #8b949e; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchTab('watchlist', this)">自選股</button>
+  <button class="nav-btn" onclick="switchTab('analysis', this)">個股分析</button>
+  <button class="nav-btn" onclick="switchTab('screener', this)">外資篩選</button>
+</nav>
+
+<!-- ═══ 自選股 ═══ -->
+<div id="tab-watchlist" class="tab active">
+  <div class="input-row">
+    <input id="wl-input" placeholder="輸入股票代號（如 2330）" onkeypress="if(event.key==='Enter')addStock()">
+    <button class="btn" onclick="addStock()">新增</button>
+    <button class="btn btn-ghost" onclick="renderWatchlist()">↻</button>
+  </div>
+  <div id="wl-list"></div>
+</div>
+
+<!-- ═══ 個股分析 ═══ -->
+<div id="tab-analysis" class="tab">
+  <div class="input-row">
+    <input id="an-input" placeholder="輸入股票代號" onkeypress="if(event.key==='Enter')loadAnalysis()">
+    <button class="btn" onclick="loadAnalysis()">查詢</button>
+  </div>
+  <div id="an-container">
+    <div class="info-box">
+      輸入股票代號查看 K 線圖與所有技術指標<br>
+      <span style="font-size:11px">MA5／MA20／MA60 · 布林通道 · MACD · RSI · KD</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 外資篩選 ═══ -->
+<div id="tab-screener" class="tab">
+  <div class="info-box">
+    <strong>篩選條件：</strong>當日為外資賣超，但外資買進量大於前兩個交易日<br>
+    <span style="font-size:11px">信號：外資雖然淨賣，但買進力道持續放大（可能悄悄佈局）</span>
+  </div>
+  <div class="input-row">
+    <button class="btn btn-full" onclick="runScreener()">▶ 執行篩選</button>
+  </div>
+  <div id="sc-meta" class="screener-meta"></div>
+  <div id="sc-container"><div class="empty"><div class="empty-icon">🔍</div>點擊執行篩選開始</div></div>
+</div>
+
+<script>
+// ══════════════════════════════════
+// State
+// ══════════════════════════════════
+let watchlist = JSON.parse(localStorage.getItem('wl') || '["2330","0050","2317"]');
+let activeCharts = {};
+
+// ══════════════════════════════════
+// Navigation
+// ══════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════
+// API helpers
+// ══════════════════════════════════
+const PROXY = 'https://corsproxy.io/?url=';
+
+async function apiFetch(url) {
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error();
+    return await r.json();
+  } catch {
+    try {
+      const r = await fetch(PROXY + encodeURIComponent(url), { cache: 'no-store' });
+      const raw = await r.json();
+      return typeof raw === 'string' ? JSON.parse(raw) : (raw.contents ? JSON.parse(raw.contents) : raw);
+    } catch { return null; }
+  }
+}
+
+// TWSE MIS real-time quote
+async function fetchQuote(code) {
+  // Try TSE first, then OTC
+  for (const ex of ['tse', 'otc']) {
+    const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${ex}_${code}.tw&json=1&delay=0`;
+    const d = await apiFetch(url);
+    if (d && d.msgArray && d.msgArray.length > 0 && d.msgArray[0].z !== undefined) {
+      const s = d.msgArray[0];
+      const price = parseFloat(s.z !== '-' && s.z ? s.z : s.y);
+      const prev  = parseFloat(s.y);
+      const chg   = price - prev;
+      return {
+        code: s.c, name: s.n, price, prev,
+        change: chg, changePct: chg / prev * 100,
+        high: parseFloat(s.h), low: parseFloat(s.l), open: parseFloat(s.o),
+        volume: parseInt((s.v || '0').replace(/,/g, '')),
+      };
+    }
+  }
+  return null;
+}
+
+// TWSE monthly OHLCV
+async function fetchMonthly(code, yyyymm01) {
+  const url = `https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=${yyyymm01}&stockNo=${code}`;
+  const d = await apiFetch(url);
+  if (!d || d.stat !== 'OK' || !d.data) return [];
+  return d.data.map(row => {
+    const parts = row[0].split('/');
+    const year = parseInt(parts[0]) + 1911;
+    const time = `${year}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+    return {
+      time,
+      open:   parseFloat(row[3].replace(/,/g, '')),
+      high:   parseFloat(row[4].replace(/,/g, '')),
+      low:    parseFloat(row[5].replace(/,/g, '')),
+      close:  parseFloat(row[6].replace(/,/g, '')),
+      volume: parseInt(row[1].replace(/,/g, '')),
+    };
+  }).filter(d => !isNaN(d.close));
+}
+
+async function fetchHistory(code, months = 6) {
+  const all = [];
+  const now = new Date();
+  for (let i = 0; i < months; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const str = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}01`;
+    const rows = await fetchMonthly(code, str);
+    all.push(...rows);
+    await sleep(250);
+  }
+  return all.sort((a, b) => a.time < b.time ? -1 : 1);
+}
+
+// TWSE T86 institutional investors (all stocks, one day)
+async function fetchT86(yyyymmdd) {
+  const url = `https://www.twse.com.tw/fund/T86?response=json&date=${yyyymmdd}&selectType=ALL`;
+  const d = await apiFetch(url);
+  if (!d || d.stat !== 'OK' || !d.data) return null;
+  const map = {};
+  d.data.forEach(row => {
+    const code = row[0].trim();
+    const buy  = parseInt(row[2].replace(/,/g, '')) || 0;
+    const sell = parseInt(row[3].replace(/,/g, '')) || 0;
+    const net  = parseInt(row[4].replace(/,/g, '')) || 0;
+    map[code] = { name: row[1].trim(), buy, sell, net };
+  });
+  return map;
+}
+
+// Get last N trading dates (skip weekends; holidays may still slip through)
+function tradingDates(n) {
+  const result = [];
+  const d = new Date();
+  while (result.length < n) {
+    d.setDate(d.getDate() - 1);
+    if (d.getDay() !== 0 && d.getDay() !== 6)
+      result.push(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
+  }
+  return result;
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ══════════════════════════════════
+// Watchlist Tab
+// ══════════════════════════════════
+function saveWL() { localStorage.setItem('wl', JSON.stringify(watchlist)); }
+
+async function addStock() {
+  const el = document.getElementById('wl-input');
+  const code = el.value.trim();
+  if (!code) return;
+  if (!watchlist.includes(code)) { watchlist.push(code); saveWL(); }
+  el.value = '';
+  renderWatchlist();
+}
+
+function removeStock(code) {
+  watchlist = watchlist.filter(c => c !== code);
+  saveWL();
+  renderWatchlist();
+}
+
+async function renderWatchlist() {
+  const el = document.getElementById('wl-list');
+  if (!watchlist.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div>尚未新增自選股</div>';
+    return;
+  }
+  el.innerHTML = '<div class="empty">載入中…</div>';
+  const quotes = await Promise.all(watchlist.map(c => fetchQuote(c)));
+  el.innerHTML = quotes.map((q, i) => {
+    const code = watchlist[i];
+    if (!q) return `
+      <div class="stock-card">
+        <div><div class="stock-name">${code}</div><div class="stock-code">無法取得資料</div></div>
+        <button class="btn btn-danger" onclick="event.stopPropagation();removeStock('${code}')">✕</button>
+      </div>`;
+    const cls = q.change > 0 ? 'up' : q.change < 0 ? 'down' : 'flat';
+    const sign = q.change > 0 ? '+' : '';
+    return `
+      <div class="stock-card" onclick="goAnalysis('${q.code}')">
+        <div>
+          <div class="stock-name">${q.name}</div>
+          <div class="stock-code">${q.code} · 量 ${q.volume.toLocaleString()}</div>
+        </div>
+        <div class="stock-right">
+          <div class="price-block">
+            <div class="price-val ${cls}">${q.price.toFixed(2)}</div>
+            <div class="price-chg ${cls}">${sign}${q.change.toFixed(2)} (${sign}${q.changePct.toFixed(2)}%)</div>
+          </div>
+          <button class="btn btn-danger" onclick="event.stopPropagation();removeStock('${q.code}')">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function goAnalysis(code) {
+  document.getElementById('an-input').value = code;
+  const btns = document.querySelectorAll('.nav-btn');
+  switchTab('analysis', btns[1]);
+  loadAnalysis(code);
+}
+
+// ══════════════════════════════════
+// Technical Indicators
+// ══════════════════════════════════
+function sma(arr, p) {
+  return arr.map((_, i) => {
+    if (i < p - 1) return null;
+    return arr.slice(i - p + 1, i + 1).reduce((a, b) => a + b, 0) / p;
+  });
+}
+
+function ema(arr, p) {
+  const k = 2 / (p + 1);
+  let prev = null;
+  return arr.map((v, i) => {
+    if (i < p - 1) return null;
+    if (prev === null) {
+      prev = arr.slice(0, p).reduce((a, b) => a + b, 0) / p;
+      return prev;
+    }
+    prev = v * k + prev * (1 - k);
+    return prev;
+  });
+}
+
+function rsi(closes, p = 14) {
+  const gains = [], losses = [];
+  for (let i = 1; i < closes.length; i++) {
+    const d = closes[i] - closes[i-1];
+    gains.push(d > 0 ? d : 0);
+    losses.push(d < 0 ? -d : 0);
+  }
+  const result = [null];
+  let ag = gains.slice(0, p).reduce((a, b) => a + b, 0) / p;
+  let al = losses.slice(0, p).reduce((a, b) => a + b, 0) / p;
+  for (let i = 0; i < gains.length; i++) {
+    if (i < p - 1) { result.push(null); continue; }
+    if (i === p - 1) { result.push(100 - 100 / (1 + ag / (al || .001))); continue; }
+    ag = (ag * (p-1) + gains[i]) / p;
+    al = (al * (p-1) + losses[i]) / p;
+    result.push(100 - 100 / (1 + ag / (al || .001)));
+  }
+  return result;
+}
+
+function macd(closes, fast = 12, slow = 26, sig = 9) {
+  const ef = ema(closes, fast), es = ema(closes, slow);
+  const ml = closes.map((_, i) => ef[i] != null && es[i] != null ? ef[i] - es[i] : null);
+  const vals = ml.filter(v => v != null);
+  const se = ema(vals, sig);
+  let si = 0;
+  const sl = ml.map(v => v == null ? null : (se[si++] ?? null));
+  const hist = ml.map((v, i) => v != null && sl[i] != null ? v - sl[i] : null);
+  return { macd: ml, signal: sl, hist };
+}
+
+function bb(closes, p = 20, k = 2) {
+  const m = sma(closes, p);
+  return closes.map((_, i) => {
+    if (m[i] == null) return { u: null, m: null, l: null };
+    const sl = closes.slice(i - p + 1, i + 1);
+    const sd = Math.sqrt(sl.reduce((s, v) => s + (v - m[i]) ** 2, 0) / p);
+    return { u: m[i] + k * sd, m: m[i], l: m[i] - k * sd };
+  });
+}
+
+function kd(data, p = 9) {
+  let k = 50, d = 50;
+  const ks = [], ds = [];
+  data.forEach((_, i) => {
+    if (i < p - 1) { ks.push(null); ds.push(null); return; }
+    const sl = data.slice(i - p + 1, i + 1);
+    const H = Math.max(...sl.map(x => x.high));
+    const L = Math.min(...sl.map(x => x.low));
+    const rsv = H === L ? 50 : (data[i].close - L) / (H - L) * 100;
+    k = k * 2/3 + rsv * 1/3;
+    d = d * 2/3 + k   * 1/3;
+    ks.push(k); ds.push(d);
+  });
+  return { k: ks, d: ds };
+}
+
+// ══════════════════════════════════
+// Analysis Tab
+// ══════════════════════════════════
+async function loadAnalysis(code) {
+  code = code || document.getElementById('an-input').value.trim();
+  if (!code) return;
+
+  // Destroy old charts
+  Object.values(activeCharts).forEach(c => { try { c.remove(); } catch {} });
+  activeCharts = {};
+
+  const el = document.getElementById('an-container');
+  el.innerHTML = '<div class="empty">載入 K 線資料中，約 10 秒…</div>';
+
+  const [quote, history] = await Promise.all([fetchQuote(code), fetchHistory(code, 6)]);
+
+  if (!history.length) {
+    el.innerHTML = '<div class="empty">無法取得資料，請確認代號是否正確</div>';
+    return;
+  }
+
+  const closes = history.map(d => d.close);
+  const times  = history.map(d => d.time);
+
+  const ma5  = sma(closes, 5);
+  const ma20 = sma(closes, 20);
+  const ma60 = sma(closes, 60);
+  const bbs  = bb(closes);
+  const md   = macd(closes);
+  const rs   = rsi(closes);
+  const kds  = kd(history);
+
+  const cls = quote ? (quote.change > 0 ? 'up' : quote.change < 0 ? 'down' : 'flat') : '';
+  const sign = quote && quote.change > 0 ? '+' : '';
+
+  el.innerHTML = `
+    ${quote ? `
+    <div class="stock-header">
+      <div>
+        <div class="stock-header-name">${quote.name}</div>
+        <div class="stock-header-sub">${quote.code} · 今日量 ${quote.volume.toLocaleString()}</div>
+      </div>
+      <div class="stock-header-price">
+        <div class="price-val ${cls}">${quote.price.toFixed(2)}</div>
+        <div class="price-chg ${cls}">${sign}${quote.change.toFixed(2)} (${sign}${quote.changePct.toFixed(2)}%)</div>
+      </div>
+    </div>` : `<div style="font-weight:700;margin-bottom:12px;">${code}</div>`}
+
+    <div class="chart-block">
+      <div class="section-label">K 線 ｜ MA ｜ 布林通道</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#f0b90b"></span>MA5</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4fc3f7"></span>MA20</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#ce93d8"></span>MA60</span>
+        <span class="legend-item"><span class="legend-dot" style="background:rgba(239,83,80,.6)"></span>布林±2σ</span>
+      </div>
+      <div id="c-main"></div>
+    </div>
+
+    <div class="chart-block">
+      <div class="section-label">成交量</div>
+      <div id="c-vol"></div>
+    </div>
+
+    <div class="chart-block">
+      <div class="section-label">MACD (12, 26, 9)</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#4fc3f7"></span>MACD</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#f0b90b"></span>Signal</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#3fb950"></span>Histogram</span>
+      </div>
+      <div id="c-macd"></div>
+    </div>
+
+    <div class="chart-block">
+      <div class="section-label">RSI (14)</div>
+      <div id="c-rsi"></div>
+    </div>
+
+    <div class="chart-block">
+      <div class="section-label">KD (9, 3, 3)</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#f0b90b"></span>K</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4fc3f7"></span>D</span>
+      </div>
+      <div id="c-kd"></div>
+    </div>
+  `;
+
+  const BASE = {
+    layout: { background: { color: '#0d1117' }, textColor: '#8b949e' },
+    grid: { vertLines: { color: '#21262d' }, horzLines: { color: '#21262d' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    timeScale: { borderColor: '#30363d', timeVisible: true, fixLeftEdge: true },
+    rightPriceScale: { borderColor: '#30363d' },
+    handleScroll: true, handleScale: true,
+  };
+
+  const toSeries = (vals, offset = 0) =>
+    vals.map((v, i) => v != null ? { time: times[i + offset], value: v } : null).filter(Boolean);
+
+  // Main chart
+  const cMain = LightweightCharts.createChart(document.getElementById('c-main'), { ...BASE, height: 280 });
+  activeCharts.main = cMain;
+  const cs = cMain.addCandlestickSeries({ upColor:'#3fb950', downColor:'#f85149', borderUpColor:'#3fb950', borderDownColor:'#f85149', wickUpColor:'#3fb950', wickDownColor:'#f85149' });
+  cs.setData(history);
+
+  const addLine = (chart, vals, color, lw = 1, style = 0) => {
+    const s = chart.addLineSeries({ color, lineWidth: lw, lineStyle: style, lastValueVisible: false, priceLineVisible: false });
+    s.setData(toSeries(vals));
+    return s;
+  };
+
+  addLine(cMain, ma5, '#f0b90b');
+  addLine(cMain, ma20, '#4fc3f7');
+  addLine(cMain, ma60, '#ce93d8');
+
+  const bbU = bbs.map(b => b.u), bbL = bbs.map(b => b.l);
+  addLine(cMain, bbU, 'rgba(239,83,80,.5)', 1, 2);
+  addLine(cMain, bbL, 'rgba(239,83,80,.5)', 1, 2);
+
+  // Volume chart
+  const cVol = LightweightCharts.createChart(document.getElementById('c-vol'), { ...BASE, height: 70 });
+  activeCharts.vol = cVol;
+  const vs = cVol.addHistogramSeries({ priceFormat: { type: 'volume' }, lastValueVisible: false });
+  vs.setData(history.map(d => ({ time: d.time, value: d.volume, color: d.close >= d.open ? '#3fb950' : '#f85149' })));
+
+  // MACD chart
+  const cMacd = LightweightCharts.createChart(document.getElementById('c-macd'), { ...BASE, height: 90 });
+  activeCharts.macd = cMacd;
+  addLine(cMacd, md.macd, '#4fc3f7');
+  addLine(cMacd, md.signal, '#f0b90b');
+  const hs = cMacd.addHistogramSeries({ lastValueVisible: false });
+  hs.setData(md.hist.map((v, i) => v != null ? { time: times[i], value: v, color: v >= 0 ? '#3fb950' : '#f85149' } : null).filter(Boolean));
+
+  // RSI chart
+  const cRsi = LightweightCharts.createChart(document.getElementById('c-rsi'), { ...BASE, height: 70 });
+  activeCharts.rsi = cRsi;
+  addLine(cRsi, rs, '#ce93d8');
+  // Overbought/oversold lines
+  const ob = cRsi.addLineSeries({ color: 'rgba(248,81,73,.4)', lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false });
+  const os = cRsi.addLineSeries({ color: 'rgba(63,185,80,.4)', lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false });
+  ob.setData([{ time: times[0], value: 70 }, { time: times[times.length-1], value: 70 }]);
+  os.setData([{ time: times[0], value: 30 }, { time: times[times.length-1], value: 30 }]);
+
+  // KD chart
+  const cKd = LightweightCharts.createChart(document.getElementById('c-kd'), { ...BASE, height: 70 });
+  activeCharts.kd = cKd;
+  addLine(cKd, kds.k, '#f0b90b');
+  addLine(cKd, kds.d, '#4fc3f7');
+
+  // Sync timescales
+  const allCharts = [cMain, cVol, cMacd, cRsi, cKd];
+  allCharts.forEach(c1 => {
+    c1.timeScale().subscribeVisibleLogicalRangeChange(r => {
+      if (!r) return;
+      allCharts.filter(c2 => c2 !== c1).forEach(c2 => c2.timeScale().setVisibleLogicalRange(r));
+    });
+  });
+  cMain.timeScale().fitContent();
+}
+
+// ══════════════════════════════════
+// Screener Tab
+// ══════════════════════════════════
+async function runScreener() {
+  const meta = document.getElementById('sc-meta');
+  const el   = document.getElementById('sc-container');
+
+  const dates = tradingDates(3);
+  meta.textContent = `比較日期：${fmt8(dates[0])}（今）vs ${fmt8(dates[1])} vs ${fmt8(dates[2])}`;
+  el.innerHTML = '<div class="empty">取得第 1 天資料中…</div>';
+
+  const d0 = await fetchT86(dates[0]);
+  el.innerHTML = '<div class="empty">取得第 2 天資料中…</div>';
+  await sleep(400);
+  const d1 = await fetchT86(dates[1]);
+  el.innerHTML = '<div class="empty">取得第 3 天資料中…</div>';
+  await sleep(400);
+  const d2 = await fetchT86(dates[2]);
+
+  if (!d0) {
+    el.innerHTML = '<div class="empty">⚠️ 資料取得失敗<br><span style="font-size:12px">可能今日尚未收盤、假日或 API 暫時無法使用</span></div>';
+    return;
+  }
+
+  const results = [];
+  Object.entries(d0).forEach(([code, today]) => {
+    const yd  = d1?.[code];
+    const dbd = d2?.[code];
+    if (!yd || !dbd) return;
+    if (today.net < 0 && today.buy > yd.buy && today.buy > dbd.buy) {
+      results.push({ code, ...today, ydBuy: yd.buy, dbdBuy: dbd.buy });
+    }
+  });
+
+  results.sort((a, b) => b.buy - a.buy);
+
+  if (!results.length) {
+    el.innerHTML = '<div class="empty">今日無符合條件個股</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="result-count">共 ${results.length} 檔符合條件，點擊查看個股分析</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>股票</th>
+            <th>今買進</th>
+            <th>今賣出</th>
+            <th>買賣超</th>
+            <th>昨買進</th>
+            <th>前日買進</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${results.map(r => `
+            <tr onclick="goAnalysis('${r.code}')">
+              <td>
+                <div style="font-weight:600">${r.code}</div>
+                <div style="font-size:11px;color:#8b949e">${r.name}</div>
+              </td>
+              <td class="pos">${r.buy.toLocaleString()}</td>
+              <td class="neg">${r.sell.toLocaleString()}</td>
+              <td><span class="badge badge-sell">${r.net.toLocaleString()}</span></td>
+              <td>${r.ydBuy.toLocaleString()}</td>
+              <td>${r.dbdBuy.toLocaleString()}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function fmt8(s) {
+  return `${s.slice(0,4)}/${s.slice(4,6)}/${s.slice(6,8)}`;
+}
+
+// ══════════════════════════════════
+// Init
+// ══════════════════════════════════
+renderWatchlist();
+</script>
+</body>
+</html>
