@@ -422,6 +422,8 @@ canvas{display:block;width:100%}
     <button class="fpill" onclick="setStat('open',this)">持倉中</button>
     <button class="fpill" onclick="setStat('win',this)">獲利</button>
     <button class="fpill" onclick="setStat('loss',this)">虧損</button>
+    <span style="width:1px;height:18px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
+    <button class="fpill" id="etfToggle" onclick="excludeETF=!excludeETF;this.classList.toggle('on',excludeETF);renderAll()">不含 ETF</button>
   </div>
   <div class="fbar-row">
     <span class="fbar-lbl">期間</span>
@@ -580,7 +582,7 @@ let trades=[], editId=null, closeId=null;
 let selR=[], selM=[], cSelM=[], selEK=[], selXK=[], curTT='actual';
 let selMA=[], selBB=[], selKD=[], selRSI=[], selBias=[], selVol=[];
 let entryImgFile=null, exitImgFile=null, existingEUrl=null, existingXUrl=null;
-let curType='all', curStat='all', curDate='all';
+let curType='all', curStat='all', curDate='all', excludeETF=false;
 let customFrom='', customTo='';
 
 /* ── image helpers ── */
@@ -678,12 +680,14 @@ window.applyCustomDate=()=>{
   renderAll();
 };
 function typeOf(t){ return t.type||'actual'; }
+function isETF(ticker){ return /^00\d/.test(ticker||''); }
 function getFiltered(){
   return trades.filter(t=>{
     const tyOk=curType==='all'||typeOf(t)===curType;
     const stOk=curStat==='all'||t.status===curStat;
     const dtOk=inDate(t.entryDate);
-    return tyOk&&stOk&&dtOk;
+    const etfOk=!excludeETF||!isETF(t.ticker);
+    return tyOk&&stOk&&dtOk&&etfOk;
   });
 }
 
