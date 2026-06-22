@@ -507,6 +507,16 @@
     #back-top.show { display: flex; }
     #back-top:hover { background: #1E53E5; }
 
+    /* ── AUTO SIGNAL STATUS ── */
+    .auto-sigs { display: flex; flex-direction: column; gap: 5px; }
+    .auto-sig { font-size: 12px; color: #9AA3B2; line-height: 1.4; }
+    .auto-sig.sig-triggered { color: #F23645; font-weight: 600; }
+    .auto-sig.sig-ok        { color: #089981; }
+    .auto-sig.sig-unknown   { color: #4a4f5e; }
+    .auto-sig.sig-loading   { color: #787B86; }
+    .auto-sig small         { opacity: .75; font-weight: 400; }
+    .sig-ts { font-size: 10px; color: #4a4f5e; margin-left: 6px; font-weight: 400; }
+
     /* ── FILTER CHECKBOXES ── */
     .filter-bar {
       background: #1E222D; border: 1px solid #2A2E39; border-radius: 6px;
@@ -791,6 +801,7 @@
     <span class="wl-title">自選清單</span>
     <span class="wl-count" id="wl-total-count"></span>
     <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-sm" onclick="refreshSignals()" title="清除快取，重新偵測所有訊號">↻ 重新偵測</button>
       <button class="btn-sm" onclick="openAddModal()">＋ 手動新增</button>
       <button class="btn-sm" onclick="clearDoneItems()" style="color:#787B86">清除已出場</button>
     </div>
@@ -892,6 +903,8 @@ let rawResults = [];
 let currentResults = [];
 let currentDates = ['', ''];
 let sortCol = 'signalPct'; let sortAsc = false;
+const signalCache = {}; // { itemId: { s1, s2, s3 } }  — in-memory only
+const priceCache  = {}; // { code: [{close, low, vol}] }
 
 const LEVEL_CFG = {
   ultra:  { label: '極強訊號', cls: 'badge-ultra',  pos: '積極進場（6–8成）', min: 1.00 },
@@ -1331,10 +1344,11 @@ function toggleSave(code, name, levelKey, date) {
     saveWatchlist(list);
     if (btn) { btn.textContent = '存入'; btn.classList.remove('saved'); }
   } else {
+    const r = currentResults.find(x => x.code === code);
     list.unshift({ id: Date.now(), code, name, levelKey, date,
       entry: '', stopLow: '', note: '',
-      exits: { e1: false, e2: false, e3: false },
-      adds:  { a1: false, a2: false, a3: false },
+      signalSellVol: r ? r.sellA : 0,
+      adds: { a1: false, a2: false, a3: false },
       exited: false
     });
     saveWatchlist(list);
@@ -1390,15 +1404,17 @@ function renderWatchlist() {
       </div>
     </div>`;
   }).join('');
+
+  // 渲染完畢後非同步偵測出場訊號
+  if (list.some(x => !x.exited)) detectAllSignals(list);
 }
 
 function renderWlItem(item) {
   const cfg = LEVEL_CFG[item.levelKey] || LEVEL_CFG.valid;
-  const anyExitTriggered = item.exits.e1 || item.exits.e2 || item.exits.e3;
-  const borderColor = anyExitTriggered ? 'border-left: 3px solid #F23645;' : '';
   const exitedStyle = item.exited ? 'opacity:.5;' : '';
+  const id = item.id;
 
-  return `<div class="wl-item" style="${borderColor}${exitedStyle}">
+  return `<div class="wl-item" id="wl-item-${id}" style="${exitedStyle}">
     <!-- 股票資訊 -->
     <div class="wl-stock-info">
       <div class="wl-code">${item.code}</div>
@@ -1414,27 +1430,21 @@ function renderWlItem(item) {
       <div class="wl-section-label">停損設置</div>
       <div class="stop-box">
         低於訊號日最低點 1–2% 無條件出場
-        ${item.stopLow ? `<div class="stop-price">最低點：${item.stopLow}</div>` : ''}
+        ${item.stopLow ? `<div class="stop-price">低點：${item.stopLow}</div>` : '<div style="font-size:11px;color:#4a4f5e;margin-top:2px">（未設定低點）</div>'}
         ${item.entry   ? `<div style="font-size:12px;color:#787B86;margin-top:2px">進場：${item.entry}</div>` : ''}
       </div>
     </div>
 
-    <!-- 出場訊號 -->
+    <!-- 出場訊號（自動偵測） -->
     <div>
-      <div class="wl-section-label">出場訊號（任一觸發即出）</div>
-      <div class="exit-checks">
-        <label class="exit-check ${item.exits.e1?'triggered':''}">
-          <input type="checkbox" ${item.exits.e1?'checked':''} onchange="toggleCheck('${item.id}','exits','e1',this.checked)">
-          <span>外資賣張重新大增（訊號二觸發）</span>
-        </label>
-        <label class="exit-check ${item.exits.e2?'triggered':''}">
-          <input type="checkbox" ${item.exits.e2?'checked':''} onchange="toggleCheck('${item.id}','exits','e2',this.checked)">
-          <span>股價跌破 5 日均線且量增</span>
-        </label>
-        <label class="exit-check ${item.exits.e3?'triggered':''}">
-          <input type="checkbox" ${item.exits.e3?'checked':''} onchange="toggleCheck('${item.id}','exits','e3',this.checked)">
-          <span>訊號日最低點被跌破</span>
-        </label>
+      <div class="wl-section-label">
+        出場訊號（自動偵測）
+        <span class="sig-ts" id="sig-ts-${id}"></span>
+      </div>
+      <div class="auto-sigs">
+        <div id="sig-s1-${id}" class="auto-sig sig-loading">⏳ 外資賣張重新大增</div>
+        <div id="sig-s2-${id}" class="auto-sig sig-loading">⏳ 股價跌破5日均線且量增</div>
+        <div id="sig-s3-${id}" class="auto-sig sig-loading">⏳ 訊號日最低點被跌破</div>
       </div>
     </div>
 
@@ -1443,15 +1453,15 @@ function renderWlItem(item) {
       <div class="wl-section-label">加碼條件（任一滿足）</div>
       <div class="add-checks">
         <label class="add-check">
-          <input type="checkbox" ${item.adds.a1?'checked':''} onchange="toggleCheck('${item.id}','adds','a1',this.checked)">
+          <input type="checkbox" ${(item.adds||{}).a1?'checked':''} onchange="toggleCheck('${id}','adds','a1',this.checked)">
           <span>外資連續 2 日轉為買超</span>
         </label>
         <label class="add-check">
-          <input type="checkbox" ${item.adds.a2?'checked':''} onchange="toggleCheck('${item.id}','adds','a2',this.checked)">
+          <input type="checkbox" ${(item.adds||{}).a2?'checked':''} onchange="toggleCheck('${id}','adds','a2',this.checked)">
           <span>投信加入買超行列</span>
         </label>
         <label class="add-check">
-          <input type="checkbox" ${item.adds.a3?'checked':''} onchange="toggleCheck('${item.id}','adds','a3',this.checked)">
+          <input type="checkbox" ${(item.adds||{}).a3?'checked':''} onchange="toggleCheck('${id}','adds','a3',this.checked)">
           <span>融券加速增加（軋空燃料）</span>
         </label>
       </div>
@@ -1460,19 +1470,16 @@ function renderWlItem(item) {
     <!-- 狀態標記 -->
     <div>
       <div class="wl-section-label">持倉狀態</div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9AA3B2;cursor:pointer">
-          <input type="checkbox" ${item.exited?'checked':''} style="accent-color:#089981;width:13px;height:13px"
-            onchange="markExited('${item.id}',this.checked)">
-          <span>已出場 / 已平倉</span>
-        </label>
-        ${anyExitTriggered ? '<div style="font-size:11px;color:#F23645;margin-top:2px">⚠️ 出場訊號已觸發</div>' : ''}
-      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9AA3B2;cursor:pointer">
+        <input type="checkbox" ${item.exited?'checked':''} style="accent-color:#089981;width:13px;height:13px"
+          onchange="markExited('${id}',this.checked)">
+        <span>已出場 / 已平倉</span>
+      </label>
     </div>
 
     <!-- 刪除 -->
     <div style="text-align:right">
-      <button class="delete-btn" onclick="deleteItem('${item.id}')" title="刪除">✕</button>
+      <button class="delete-btn" onclick="deleteItem('${id}')" title="刪除">✕</button>
     </div>
   </div>`;
 }
@@ -1486,11 +1493,154 @@ function toggleCheck(id, group, key, val) {
   const list = loadWatchlist();
   const item = list.find(x => String(x.id) === String(id));
   if (!item) return;
+  if (!item[group]) item[group] = {};
   item[group][key] = val;
-  if (group === 'exits' && val) {
-    // auto-suggest exited if any exit triggered
-  }
   saveWatchlist(list);
+  // no full re-render — just save
+}
+
+// ══════════════════════════════════════
+//  EXIT SIGNAL DETECTION
+// ══════════════════════════════════════
+
+async function fetchLatestT86() {
+  const now = new Date();
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    if (d.getDay() === 0 || d.getDay() === 6) continue;
+    const ds = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const data = await fetchT86(ds);
+    if (data) return data;
+  }
+  return null;
+}
+
+async function fetchPriceData(code) {
+  if (priceCache[code]) return priceCache[code];
+  const now = new Date();
+  const yyyymm01 = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}01`;
+  const roc = now.getFullYear() - 1911;
+  const mm  = String(now.getMonth()+1).padStart(2,'0');
+  const parseRows = rows => rows.map(r => ({
+    close: parseFloat((r[6]||'').replace(/,/g,'')),
+    low:   parseFloat((r[5]||'').replace(/,/g,'')),
+    vol:   parseInt((r[1]||'').replace(/,/g,''))
+  })).filter(r => !isNaN(r.close) && r.close > 0);
+
+  // TSE
+  const tse = await apiFetch(`https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=${yyyymm01}&stockNo=${code}&_=${Date.now()}`);
+  if (tse?.stat === 'OK' && tse?.data?.length) {
+    const rows = parseRows(tse.data);
+    if (rows.length) { priceCache[code] = rows; return rows; }
+  }
+  // OTC
+  const otc = await apiFetch(`https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&d=${roc}%2F${mm}%2F01&stkno=${code}&_=${Date.now()}`);
+  if (otc?.aaData?.length) {
+    const rows = parseRows(otc.aaData);
+    if (rows.length) { priceCache[code] = rows; return rows; }
+  }
+  return null;
+}
+
+async function detectExitSignals(item, latestT86) {
+  const res = { s1: null, s2: null, s3: null };
+
+  // ① 外資賣張重新大增（訊號二觸發）
+  if (latestT86?.[item.code]) {
+    const todaySell = latestT86[item.code].sell;
+    if (item.signalSellVol > 0) {
+      const pct = (todaySell - item.signalSellVol) / item.signalSellVol;
+      res.s1 = {
+        triggered: pct >= 0.35,
+        detail: `今 ${todaySell.toLocaleString()} 張 / 訊號日 ${item.signalSellVol.toLocaleString()} 張（${pct>=0?'+':''}${Math.round(pct*100)}%）`
+      };
+    } else {
+      res.s1 = { triggered: false, detail: `今 ${todaySell.toLocaleString()} 張（無訊號日基準可比對）`, unknown: true };
+    }
+  } else {
+    res.s1 = { triggered: false, detail: '無法取得今日外資資料', unknown: true };
+  }
+
+  // ② 股價跌破5日均線且量增  ③ 訊號日最低點被跌破
+  const prices = await fetchPriceData(item.code);
+  if (prices && prices.length >= 2) {
+    const last  = prices[prices.length - 1];
+    const prev  = prices[prices.length - 2];
+    const last5 = prices.slice(-5);
+    const ma5   = last5.reduce((s, r) => s + r.close, 0) / last5.length;
+    const volUp = last.vol > prev.vol;
+    res.s2 = {
+      triggered: last.close < ma5 && volUp,
+      detail: `收 ${last.close} / 5MA ${ma5.toFixed(1)}（${last.close < ma5 ? '跌破' : '站上'}）/ 量${volUp ? '↑' : '↓'}`
+    };
+    const stopLow = parseFloat(item.stopLow);
+    if (stopLow > 0) {
+      res.s3 = {
+        triggered: last.close < stopLow,
+        detail: `收 ${last.close} / 訊號日低 ${stopLow}（${last.close < stopLow ? '已跌破' : '未跌破'}）`
+      };
+    } else {
+      res.s3 = { triggered: false, detail: '未設定訊號日低點', unknown: true };
+    }
+  } else {
+    res.s2 = { triggered: false, detail: '無法取得股價資料', unknown: true };
+    res.s3 = { triggered: false, detail: '無法取得股價資料', unknown: true };
+  }
+  return res;
+}
+
+function updateItemSignalDOM(id, sigs) {
+  const update = (elId, label, sig) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (!sig) { el.textContent = `⏳ ${label}`; el.className = 'auto-sig sig-loading'; return; }
+    const detail = sig.detail ? `：<small>${sig.detail}</small>` : '';
+    if (sig.unknown) {
+      el.innerHTML = `⚪ ${label}${detail}`;
+      el.className = 'auto-sig sig-unknown';
+    } else if (sig.triggered) {
+      el.innerHTML = `🔴 ${label}${detail}`;
+      el.className = 'auto-sig sig-triggered';
+    } else {
+      el.innerHTML = `🟢 ${label}${detail}`;
+      el.className = 'auto-sig sig-ok';
+    }
+  };
+  update(`sig-s1-${id}`, '外資賣張重新大增', sigs.s1);
+  update(`sig-s2-${id}`, '股價跌破5日均線且量增', sigs.s2);
+  update(`sig-s3-${id}`, '訊號日最低點被跌破', sigs.s3);
+  const tsEl = document.getElementById(`sig-ts-${id}`);
+  if (tsEl) tsEl.textContent = `偵測於 ${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;
+  // 若有出場訊號觸發，加紅色左邊框
+  const anyTriggered = sigs.s1?.triggered || sigs.s2?.triggered || sigs.s3?.triggered;
+  const itemEl = document.getElementById(`wl-item-${id}`);
+  if (itemEl) itemEl.style.borderLeft = anyTriggered ? '3px solid #F23645' : '';
+}
+
+async function detectAllSignals(list) {
+  let latestT86 = null;
+  try { latestT86 = await fetchLatestT86(); } catch {}
+  for (const item of list) {
+    if (item.exited) continue;
+    if (!signalCache[item.id]) {
+      try {
+        signalCache[item.id] = await detectExitSignals(item, latestT86);
+      } catch {
+        signalCache[item.id] = {
+          s1: { triggered: false, detail: '偵測失敗', unknown: true },
+          s2: { triggered: false, detail: '偵測失敗', unknown: true },
+          s3: { triggered: false, detail: '偵測失敗', unknown: true }
+        };
+      }
+    }
+    updateItemSignalDOM(item.id, signalCache[item.id]);
+  }
+}
+
+function refreshSignals() {
+  Object.keys(signalCache).forEach(k => delete signalCache[k]);
+  Object.keys(priceCache).forEach(k => delete priceCache[k]);
   renderWatchlist();
 }
 
@@ -1530,8 +1680,8 @@ function confirmAdd() {
   const list = loadWatchlist();
   list.unshift({ id: Date.now(), code, name: name||code, levelKey: level, date,
     entry, stopLow: stop, note,
-    exits: { e1: false, e2: false, e3: false },
-    adds:  { a1: false, a2: false, a3: false },
+    signalSellVol: 0,
+    adds: { a1: false, a2: false, a3: false },
     exited: false
   });
   saveWatchlist(list);
