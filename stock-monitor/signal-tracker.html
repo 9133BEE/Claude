@@ -303,14 +303,14 @@
     .date-group-body { overflow: hidden; }
     .date-group.collapsed .date-group-body { display: none; }
 
-    /* watchlist item */
+    /* watchlist item — 4欄：股票資訊 | 停損+持倉 | 出場訊號 | 刪除 */
     .wl-item {
       background: #1E222D;
       border-bottom: 1px solid #2A2E39;
-      padding: 12px 16px;
+      padding: 14px 16px;
       display: grid;
-      grid-template-columns: 180px 1fr 1fr 1fr 200px 32px;
-      gap: 12px;
+      grid-template-columns: 155px 1fr 1.6fr 28px;
+      gap: 18px;
       align-items: start;
     }
     .wl-item:hover { background: #222736; }
@@ -320,38 +320,13 @@
     .wl-meta { font-size: 12px; color: #4a4f5e; margin-top: 4px; display: flex; gap: 8px; align-items: center; }
 
     .wl-section-label {
-      font-size: 10px; font-weight: 700; color: #787B86;
-      text-transform: uppercase; letter-spacing: .07em;
+      font-size: 10px; font-weight: 700; color: #4a4f5e;
+      text-transform: uppercase; letter-spacing: .08em;
       margin-bottom: 6px;
     }
 
-    .exit-checks { display: flex; flex-direction: column; gap: 5px; }
-    .exit-check {
-      display: flex; align-items: flex-start; gap: 6px;
-      font-size: 12px; color: #9AA3B2;
-      cursor: pointer; user-select: none;
-    }
-    .exit-check input[type=checkbox] {
-      width: 13px; height: 13px;
-      accent-color: #F23645;
-      cursor: pointer; flex-shrink: 0; margin-top: 1px;
-    }
-    .exit-check.triggered { color: #F23645; }
-    .exit-check input:checked + span { text-decoration: line-through; opacity: .7; }
-
-    .add-checks { display: flex; flex-direction: column; gap: 5px; }
-    .add-check {
-      display: flex; align-items: flex-start; gap: 6px;
-      font-size: 12px; color: #9AA3B2;
-      cursor: pointer; user-select: none;
-    }
-    .add-check input[type=checkbox] {
-      width: 13px; height: 13px;
-      accent-color: #F0B90B;
-      cursor: pointer; flex-shrink: 0; margin-top: 1px;
-    }
-
-    .stop-box { font-size: 12px; color: #9AA3B2; }
+    .wl-mid { display: flex; flex-direction: column; gap: 14px; }
+    .stop-box { font-size: 12px; color: #9AA3B2; line-height: 1.6; }
     .stop-price { font-size: 15px; font-weight: 700; color: #F23645; margin-top: 4px; }
 
     .delete-btn {
@@ -451,10 +426,12 @@
       .level-grid { grid-template-columns: 1fr 1fr; }
       .mine-grid { grid-template-columns: 1fr 1fr; }
       .wl-item {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto auto auto;
+        grid-template-columns: 1fr 24px;
+        gap: 10px;
       }
-      .wl-item > *:last-child { grid-column: 2; grid-row: 1; justify-self: end; }
+      .wl-item > *:nth-child(2) { grid-column: 1 / 2; }
+      .wl-item > *:nth-child(3) { grid-column: 1 / 2; }
+      .wl-item > *:last-child   { grid-column: 2; grid-row: 1; justify-self: end; }
     }
 
     /* ── DETAIL PANEL ── */
@@ -508,14 +485,14 @@
     #back-top:hover { background: #1E53E5; }
 
     /* ── AUTO SIGNAL STATUS ── */
-    .auto-sigs { display: flex; flex-direction: column; gap: 5px; }
-    .auto-sig { font-size: 12px; color: #9AA3B2; line-height: 1.4; }
+    .auto-sigs { display: flex; flex-direction: column; gap: 7px; }
+    .auto-sig { font-size: 12.5px; color: #9AA3B2; line-height: 1.45; }
     .auto-sig.sig-triggered { color: #F23645; font-weight: 600; }
     .auto-sig.sig-ok        { color: #089981; }
     .auto-sig.sig-unknown   { color: #4a4f5e; }
-    .auto-sig.sig-loading   { color: #787B86; }
-    .auto-sig small         { opacity: .75; font-weight: 400; }
-    .sig-ts { font-size: 10px; color: #4a4f5e; margin-left: 6px; font-weight: 400; }
+    .auto-sig.sig-loading   { color: #4a4f5e; }
+    .auto-sig small         { font-size: 11px; opacity: .7; font-weight: 400; }
+    .sig-ts { font-size: 10px; color: #363A45; font-weight: 400; }
 
     /* ── FILTER CHECKBOXES ── */
     .filter-bar {
@@ -1415,30 +1392,45 @@ function renderWlItem(item) {
   const id = item.id;
 
   return `<div class="wl-item" id="wl-item-${id}" style="${exitedStyle}">
-    <!-- 股票資訊 -->
+
+    <!-- ① 股票資訊 -->
     <div class="wl-stock-info">
       <div class="wl-code">${item.code}</div>
       <div class="wl-name">${item.name}</div>
-      <div class="wl-meta">
+      <div class="wl-meta" style="margin-top:6px">
         <span class="level-badge ${cfg.cls}" style="font-size:11px">${cfg.label}</span>
       </div>
-      ${item.note ? `<div style="font-size:11px;color:#4a4f5e;margin-top:4px">${item.note}</div>` : ''}
+      ${item.note ? `<div style="font-size:11px;color:#4a4f5e;margin-top:6px;line-height:1.5">${item.note}</div>` : ''}
     </div>
 
-    <!-- 停損資訊 -->
-    <div>
-      <div class="wl-section-label">停損設置</div>
-      <div class="stop-box">
-        低於訊號日最低點 1–2% 無條件出場
-        ${item.stopLow ? `<div class="stop-price">低點：${item.stopLow}</div>` : '<div style="font-size:11px;color:#4a4f5e;margin-top:2px">（未設定低點）</div>'}
-        ${item.entry   ? `<div style="font-size:12px;color:#787B86;margin-top:2px">進場：${item.entry}</div>` : ''}
+    <!-- ② 停損設置 + 持倉狀態（同欄堆疊） -->
+    <div class="wl-mid">
+      <div>
+        <div class="wl-section-label">停損設置</div>
+        <div class="stop-box">
+          低於訊號日低點 1–2% 無條件出場
+          ${item.stopLow
+            ? `<div class="stop-price">${item.stopLow}</div>`
+            : `<div style="font-size:11px;color:#363A45;margin-top:3px">— 未設定</div>`}
+          ${item.entry
+            ? `<div style="font-size:12px;color:#787B86;margin-top:3px">進場 ${item.entry}</div>`
+            : ''}
+        </div>
+      </div>
+      <div>
+        <div class="wl-section-label">持倉狀態</div>
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#9AA3B2;cursor:pointer">
+          <input type="checkbox" ${item.exited?'checked':''} style="accent-color:#089981;width:13px;height:13px"
+            onchange="markExited('${id}',this.checked)">
+          <span>已出場 / 已平倉</span>
+        </label>
       </div>
     </div>
 
-    <!-- 出場訊號（自動偵測） -->
+    <!-- ③ 出場訊號（自動偵測，右側） -->
     <div>
-      <div class="wl-section-label">
-        出場訊號（自動偵測）
+      <div class="wl-section-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>出場訊號（自動偵測）</span>
         <span class="sig-ts" id="sig-ts-${id}"></span>
       </div>
       <div class="auto-sigs">
@@ -1448,39 +1440,11 @@ function renderWlItem(item) {
       </div>
     </div>
 
-    <!-- 加碼條件 -->
+    <!-- ④ 刪除 -->
     <div>
-      <div class="wl-section-label">加碼條件（任一滿足）</div>
-      <div class="add-checks">
-        <label class="add-check">
-          <input type="checkbox" ${(item.adds||{}).a1?'checked':''} onchange="toggleCheck('${id}','adds','a1',this.checked)">
-          <span>外資連續 2 日轉為買超</span>
-        </label>
-        <label class="add-check">
-          <input type="checkbox" ${(item.adds||{}).a2?'checked':''} onchange="toggleCheck('${id}','adds','a2',this.checked)">
-          <span>投信加入買超行列</span>
-        </label>
-        <label class="add-check">
-          <input type="checkbox" ${(item.adds||{}).a3?'checked':''} onchange="toggleCheck('${id}','adds','a3',this.checked)">
-          <span>融券加速增加（軋空燃料）</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 狀態標記 -->
-    <div>
-      <div class="wl-section-label">持倉狀態</div>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9AA3B2;cursor:pointer">
-        <input type="checkbox" ${item.exited?'checked':''} style="accent-color:#089981;width:13px;height:13px"
-          onchange="markExited('${id}',this.checked)">
-        <span>已出場 / 已平倉</span>
-      </label>
-    </div>
-
-    <!-- 刪除 -->
-    <div style="text-align:right">
       <button class="delete-btn" onclick="deleteItem('${id}')" title="刪除">✕</button>
     </div>
+
   </div>`;
 }
 
