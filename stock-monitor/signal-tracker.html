@@ -551,6 +551,11 @@
     /* ── SIGNAL CELL ── */
     .signal-cell { white-space: nowrap; }
     .signal-pct { font-size: 11px; color: #787B86; margin-top: 2px; }
+
+    /* ── SORT ── */
+    th { cursor: pointer; }
+    th.th-active { color: #D1D4DC !important; background: #252931; }
+    th:last-child { cursor: default; }
   </style>
 </head>
 <body>
@@ -1121,14 +1126,26 @@ function renderResults(results, dA, dB, filterType) {
   levelOrder.forEach(k => groups[k] = []);
   results.forEach(r => { if (groups[r.levelKey]) groups[r.levelKey].push(r); });
 
+  // sort helper
+  const si = col => sortCol === col ? (sortAsc ? ' ↑' : ' ↓') : '';
+  const thCls = col => sortCol === col ? 'th-active' : '';
+
   let html = `<div class="result-meta">
-    ${fmt8(dA)} vs ${fmt8(dB)}｜共 <strong>${results.length}</strong> 檔符合篩選條件｜點擊股票查看近1個月資料
+    ${fmt8(dA)} vs ${fmt8(dB)}｜共 <strong>${results.length}</strong> 檔符合篩選條件｜點擊欄位標題排序
   </div>`;
 
   levelOrder.forEach(lk => {
-    const group = groups[lk];
+    let group = groups[lk];
     if (!group.length) return;
     const cfg = LEVEL_CFG[lk];
+
+    // sort within group
+    group = [...group].sort((a, b) => {
+      if (sortCol === 'code') return sortAsc ? a.code.localeCompare(b.code) : b.code.localeCompare(a.code);
+      const va = a[sortCol] ?? 0, vb = b[sortCol] ?? 0;
+      return sortAsc ? va - vb : vb - va;
+    });
+
     html += `
     <div class="level-group">
       <div class="level-group-header">
@@ -1139,16 +1156,16 @@ function renderResults(results, dA, dB, filterType) {
       <div class="table-wrap">
         <table>
           <thead><tr>
-            <th class="text-left">股票</th>
-            <th>訊號</th>
-            <th class="text-right col-a">${sA} 買張</th>
-            <th class="text-right col-a">${sA} 賣張</th>
-            <th class="text-right col-a">${sA} 淨</th>
-            <th class="text-right col-b">${sB} 買張</th>
-            <th class="text-right col-b">${sB} 賣張</th>
-            <th class="text-right highlight">${isBuy ? '賣張增幅' : '買張增幅'}</th>
-            <th class="text-right" style="color:#5a7a96">${isBuy ? '買張增幅' : '賣張增幅'}</th>
-            <th class="text-right">買賣比(新)</th>
+            <th class="text-left ${thCls('code')}" onclick="sortBy('code')">股票${si('code')}</th>
+            <th class="${thCls('signalPct')}" onclick="sortBy('signalPct')">訊號${si('signalPct')}</th>
+            <th class="text-right col-a ${thCls('buyA')}" onclick="sortBy('buyA')">${sA} 買張${si('buyA')}</th>
+            <th class="text-right col-a ${thCls('sellA')}" onclick="sortBy('sellA')">${sA} 賣張${si('sellA')}</th>
+            <th class="text-right col-a ${thCls('netA')}" onclick="sortBy('netA')">${sA} 淨${si('netA')}</th>
+            <th class="text-right col-b ${thCls('buyB')}" onclick="sortBy('buyB')">${sB} 買張${si('buyB')}</th>
+            <th class="text-right col-b ${thCls('sellB')}" onclick="sortBy('sellB')">${sB} 賣張${si('sellB')}</th>
+            <th class="text-right highlight ${thCls('signalPct')}" onclick="sortBy('signalPct')">${isBuy ? '賣張增幅' : '買張增幅'}${si('signalPct')}</th>
+            <th class="text-right ${thCls('counterPct')}" style="color:#5a7a96" onclick="sortBy('counterPct')">${isBuy ? '買張增幅' : '賣張增幅'}${si('counterPct')}</th>
+            <th class="text-right ${thCls('ratioA')}" onclick="sortBy('ratioA')">買賣比(新)${si('ratioA')}</th>
             <th class="text-right">操作</th>
           </tr></thead>
           <tbody>
@@ -1186,6 +1203,12 @@ function renderResults(results, dA, dB, filterType) {
   });
 
   el.innerHTML = html;
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = false; }
+  renderResults(currentResults, currentDates[0], currentDates[1], document.getElementById('filter-type').value);
 }
 
 // ══════════════════════════════════════
