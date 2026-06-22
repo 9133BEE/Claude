@@ -966,6 +966,7 @@ function renderTable(results, dA, dB) {
             <th class="text-right col-b" onclick="sortBy('sellB')">${sB} 賣張↕</th>
             <th class="text-right" onclick="sortBy('buyDiff')">買張差↕</th>
             <th class="text-right" onclick="sortBy('buyPct')">買張增幅↕</th>
+            <th class="text-right" onclick="sortBy('sellPct')">賣張增幅↕</th>
             <th class="text-right" onclick="sortBy('ratioA')">買賣比(新)↕</th>
             <th class="text-right sorted" onclick="sortBy('ratioPct')">買賣比升幅↕</th>
           </tr>
@@ -986,6 +987,7 @@ function renderTable(results, dA, dB) {
               <td class="text-right col-b">${r.sellB.toLocaleString()}</td>
               <td class="text-right diff-pos">+${r.buyDiff.toLocaleString()}</td>
               <td class="text-right highlight">+${Math.round(r.buyPct*100)}%</td>
+              <td class="text-right" style="color:${r.sellPct>0?'#f87171':'#8b949e'}">${r.sellPct>0?'+':''}${Math.round(r.sellPct*100)}%</td>
               <td class="text-right" style="color:${r.ratioA>=1?'#f0b90b':'#dde3ed'};font-weight:700">${r.ratioA.toFixed(2)}</td>
               <td class="text-right">
                 <div class="pct-bar">
