@@ -50,6 +50,19 @@ input,select,textarea,button{font-family:inherit}
   box-shadow:0 0 6px var(--green);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── LIVE PRICE BAR ── */
+.live-bar{margin:10px 0 4px;background:rgba(91,155,245,.06);border:1px solid rgba(91,155,245,.15);
+  border-radius:8px;padding:10px 14px;transition:border-color .2s,background .2s}
+.live-bar.warn{background:rgba(224,85,85,.06);border-color:rgba(224,85,85,.25)}
+.live-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.live-item{display:flex;flex-direction:column;gap:2px}
+.live-lbl{font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text4)}
+.live-val{font-size:1rem;font-weight:700}
+.live-val.bull{color:var(--red)}.live-val.bear{color:var(--green)}.live-val.neu{color:var(--text2)}
+.live-val.safe{color:var(--text3)}.live-val.danger{color:var(--red)}
+.live-ts{margin-left:auto;font-size:.65rem;color:var(--text4);white-space:nowrap}
+.live-loading{font-size:.78rem;color:var(--text4)}
 .img-loading{display:flex;align-items:center;gap:8px;padding:10px 0;color:var(--text2);font-size:.8rem}
 .img-loading::before{content:'';width:14px;height:14px;border:2px solid var(--border2);
   border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
@@ -337,7 +350,7 @@ canvas{display:block;width:100%}
     <div class="sync-dot"></div>
     <span>即時同步</span>
   </div>
-  <button class="nav-refresh" onclick="load()" title="重新整理">↻</button>
+  <button class="nav-refresh" onclick="Object.keys(livePriceCache).forEach(k=>delete livePriceCache[k]);load()" title="重新整理">↻</button>
   <span class="nav-pill" id="navPill"></span>
 </nav>
 
@@ -721,6 +734,7 @@ function renderAll(){
 
   drawChart(closed);
   renderList(all);
+  setTimeout(refreshLivePrices, 50);
 }
 
 function tx(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
@@ -832,7 +846,8 @@ function cardHtml(t){
     ${t.exitPrice?`<div class="pf"><label>出場價</label><span class="pv ${p2>=0?'bull':'bear'}">${t.exitPrice}</span></div>`:''}
     ${rV?`<div class="pf"><label>R 值</label><span class="pv ${p2>=0?'bull':'bear'}">${rV}</span></div>`:''}
     ${days?`<div class="pf"><label>持有</label><span class="pv">${days}</span></div>`:''}
-  </div>`;
+  </div>
+  ${t.status==='open'?`<div class="live-bar" id="live-${t.id}"><span class="live-loading">⏳ 載入即時價格…</span></div>`:''}` ;
 
   const hasTech=t.entryKbar?.length||t.entryMA?.length||t.entryBB?.length||t.entryKD?.length||t.entryRSI?.length||t.entryBias?.length||t.entryVol?.length;
   const techTags=[
@@ -1050,6 +1065,77 @@ window.openClose=id=>{
   buildPk('cMPk',MISTAKES,cSelM,true);
   document.getElementById('closeOv').classList.add('open');
 };
+
+/* ── LIVE PRICE SYNC ── */
+const LIVE_PROXY = 'https://corsproxy.io/?url=';
+const livePriceCache = {};
+
+async function apiFetchLP(url) {
+  try {
+    const r = await fetch(LIVE_PROXY + encodeURIComponent(url));
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+async function fetchLivePrice(ticker) {
+  if (livePriceCache[ticker] !== undefined) return livePriceCache[ticker];
+  const now = new Date();
+  const yyyymm01 = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}01`;
+  const roc = now.getFullYear() - 1911;
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+
+  // Try TSE
+  const tse = await apiFetchLP(`https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=${yyyymm01}&stockNo=${ticker}`);
+  if (tse?.stat === 'OK' && tse?.data?.length) {
+    const p = parseFloat((tse.data[tse.data.length-1][6]||'').replace(/,/g,''));
+    if (!isNaN(p)) { livePriceCache[ticker]=p; return p; }
+  }
+
+  // Try OTC
+  const otc = await apiFetchLP(`https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&d=${roc}%2F${mm}%2F01&stkno=${ticker}`);
+  if (otc?.aaData?.length) {
+    const p = parseFloat((otc.aaData[otc.aaData.length-1][6]||'').replace(/,/g,''));
+    if (!isNaN(p)) { livePriceCache[ticker]=p; return p; }
+  }
+
+  livePriceCache[ticker] = null;
+  return null;
+}
+
+async function refreshLivePrices() {
+  const openTrades = trades.filter(t => t.status === 'open');
+  if (!openTrades.length) return;
+  let winning = 0;
+  for (const t of openTrades) {
+    const el = document.getElementById(`live-${t.id}`);
+    if (!el) continue;
+    const price = await fetchLivePrice(t.ticker);
+    if (price === null) {
+      el.innerHTML = `<span class="live-loading">⚠ 無法取得 ${esc(t.ticker)} 價格（非交易日或代號錯誤）</span>`;
+      continue;
+    }
+    const entry = parseFloat(t.entryPrice) || 0;
+    const pnlPct = entry > 0 ? (price - entry) / entry * 100 : 0;
+    const pnlCls = pnlPct > 0 ? 'bull' : pnlPct < 0 ? 'bear' : 'neu';
+    const pnlStr = (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(2) + '%';
+    const stop = t.stopLoss ? parseFloat(t.stopLoss) : null;
+    const tgt  = t.target   ? parseFloat(t.target)   : null;
+    const stopDist = stop ? ((price - stop) / price * 100) : null;
+    const tgtDist  = tgt  ? ((tgt - price) / price * 100)  : null;
+    el.className = `live-bar${stop && price <= stop ? ' warn' : ''}`;
+    el.innerHTML = `<div class="live-row">
+      <div class="live-item"><span class="live-lbl">最新收盤</span><span class="live-val neu">${price.toFixed(1)}</span></div>
+      <div class="live-item"><span class="live-lbl">損益</span><span class="live-val ${pnlCls}">${pnlStr}</span></div>
+      ${tgtDist !== null ? `<div class="live-item"><span class="live-lbl">距目標</span><span class="live-val ${tgtDist > 0 ? 'neu' : 'bull'}">${tgtDist > 0 ? '+' : ''}${tgtDist.toFixed(1)}%</span></div>` : ''}
+      ${stopDist !== null ? `<div class="live-item"><span class="live-lbl">距停損</span><span class="live-val ${stopDist < 0 ? 'danger' : 'safe'}">${stopDist < 0 ? '' : '+'}${stopDist.toFixed(1)}%</span></div>` : ''}
+      <span class="live-ts">${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>`;
+    if (pnlPct > 0) winning++;
+  }
+  const kSub4 = document.getElementById('kSub4');
+  if (kSub4 && openTrades.length > 0) kSub4.textContent = `${winning}/${openTrades.length} 筆獲利中`;
+}
 
 load();
 window.addEventListener('resize',()=>{drawChart(trades.filter(t=>t.status!=='open'));});
