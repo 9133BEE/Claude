@@ -507,6 +507,51 @@
     }
     #back-top.show { display: flex; }
     #back-top:hover { background: #1E53E5; }
+
+    /* ── FILTER CHECKBOXES ── */
+    .filter-bar {
+      background: #1E222D; border: 1px solid #2A2E39; border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .filter-bar-title {
+      font-size: 11px; font-weight: 700; color: #787B86;
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-bottom: 8px;
+    }
+    .filter-checks { display: flex; flex-direction: column; gap: 0; }
+    .filter-check {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: #D1D4DC;
+      cursor: pointer; user-select: none;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(42,46,57,.8);
+    }
+    .filter-check:last-child { border-bottom: none; }
+    .filter-check input[type=checkbox] {
+      width: 15px; height: 15px; accent-color: #2962FF;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .filter-check input:checked + span { color: #7BA3F8; }
+    .level-checks { display: flex; flex-wrap: wrap; gap: 8px; }
+    .level-check {
+      display: flex; align-items: center; gap: 6px;
+      cursor: pointer; user-select: none;
+    }
+    .level-check input[type=checkbox] {
+      width: 14px; height: 14px; accent-color: #2962FF;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .filter-divider {
+      height: 1px; background: #2A2E39; margin: 8px 0 10px;
+    }
+    .filter-sub-label {
+      font-size: 11px; color: #787B86; margin-bottom: 7px;
+      font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    }
+
+    /* ── SIGNAL CELL ── */
+    .signal-cell { white-space: nowrap; }
+    .signal-pct { font-size: 11px; color: #787B86; margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -601,11 +646,11 @@
 
   <!-- Signal Level Reference -->
   <div class="ref-section">
-    <div class="ref-title" onclick="toggleRef(this)">
+    <div class="ref-title collapsed" onclick="toggleRef(this)">
       訊號等級對照表
-      <span class="ref-toggle">▾</span>
+      <span class="ref-toggle" style="transform:rotate(-90deg)">▾</span>
     </div>
-    <div class="ref-body">
+    <div class="ref-body collapsed">
       <div class="level-grid">
         <div class="level-card">
           <div class="level-badge badge-watch">觀察（雜訊）</div>
@@ -637,19 +682,37 @@
 
   <!-- Conditions -->
   <div class="cond-section">
-    <div class="cond-box">
-      <div class="cond-box-title" id="cond-filter-label">篩選條件（賣超場景）</div>
-      <div class="cond-line">
-        <div class="cond-dot" style="background:#2962FF"></div>
-        <span id="cond-f1">① 買張增幅 ≥ 20%（起算門檻，包含觀察級）</span>
+    <div class="filter-bar">
+      <div class="filter-bar-title" id="cond-filter-label">篩選條件（賣超場景）</div>
+      <div class="filter-checks">
+        <label class="filter-check">
+          <input type="checkbox" id="chk-pct35" checked onchange="applyFilters()">
+          <span id="chk-pct35-label">買張增幅 ≥ 35%（排除觀察級，只保留有效訊號以上）</span>
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" id="chk-counter" checked onchange="applyFilters()">
+          <span id="chk-counter-label">賣張增幅 ＜ 買張增幅 × 50%（對方未同步放量）</span>
+        </label>
       </div>
-      <div class="cond-line">
-        <div class="cond-dot" style="background:#2962FF"></div>
-        <span id="cond-f2">② 賣張增幅 ＜ 買張增幅 × 50%（賣方未同步放量）</span>
-      </div>
-      <div class="cond-line">
-        <div class="cond-dot" style="background:#2962FF"></div>
-        <span id="cond-f3">③ 買賣比提升 ≥ 20%（相對買力改善）</span>
+      <div class="filter-divider"></div>
+      <div class="filter-sub-label">顯示訊號等級</div>
+      <div class="level-checks">
+        <label class="level-check">
+          <input type="checkbox" id="lv-watch" checked onchange="applyFilters()">
+          <span class="level-badge badge-watch" style="font-size:11px">觀察 20–35%</span>
+        </label>
+        <label class="level-check">
+          <input type="checkbox" id="lv-valid" checked onchange="applyFilters()">
+          <span class="level-badge badge-valid" style="font-size:11px">有效訊號 35–60%</span>
+        </label>
+        <label class="level-check">
+          <input type="checkbox" id="lv-strong" checked onchange="applyFilters()">
+          <span class="level-badge badge-strong" style="font-size:11px">強力訊號 60–100%</span>
+        </label>
+        <label class="level-check">
+          <input type="checkbox" id="lv-ultra" checked onchange="applyFilters()">
+          <span class="level-badge badge-ultra" style="font-size:11px">極強訊號 ＞100%</span>
+        </label>
       </div>
     </div>
     <div class="cond-box">
@@ -819,6 +882,7 @@
 // ══════════════════════════════════════
 const PROXY = 'https://corsproxy.io/?url=';
 let allData = {};
+let rawResults = [];
 let currentResults = [];
 let currentDates = ['', ''];
 let sortCol = 'signalPct'; let sortAsc = false;
@@ -866,21 +930,18 @@ function switchTab(name) {
 function updateCondDisplay() {
   const isBuy = document.getElementById('filter-type').value === 'buy';
   document.getElementById('cond-filter-label').textContent = isBuy ? '篩選條件（買超場景）' : '篩選條件（賣超場景）';
-  document.getElementById('cond-f1').textContent = isBuy
-    ? '① 賣張增幅 ≥ 20%（外資買超時賣方仍在放量，起算門檻）'
-    : '① 買張增幅 ≥ 20%（起算門檻，包含觀察級）';
-  document.getElementById('cond-f2').textContent = isBuy
-    ? '② 買張增幅 ＜ 賣張增幅 × 50%（買方未同步放量）'
-    : '② 賣張增幅 ＜ 買張增幅 × 50%（賣方未同步放量）';
-  document.getElementById('cond-f3').textContent = isBuy
-    ? '③ 買賣比下降 ≥ 20%（相對賣壓加重）'
-    : '③ 買賣比提升 ≥ 20%（相對買力改善）';
-  // update ref table labels
+  const sig = isBuy ? '賣張' : '買張';
+  const ctr = isBuy ? '買張' : '賣張';
+  document.getElementById('chk-pct35-label').textContent   = `${sig}增幅 ≥ 35%（排除觀察級，只保留有效訊號以上）`;
+  document.getElementById('chk-counter-label').textContent = `${ctr}增幅 ＜ ${sig}增幅 × 50%（對方未同步放量）`;
+  // ref table labels
   const prefix = isBuy ? '賣張增幅' : '買張增幅';
   document.getElementById('range-watch').textContent  = `${prefix} 20% – 35%`;
   document.getElementById('range-valid').textContent  = `${prefix} 35% – 60%`;
   document.getElementById('range-strong').textContent = `${prefix} 60% – 100%`;
   document.getElementById('range-ultra').textContent  = `${prefix} ＞ 100%（翻倍）`;
+  // re-filter if results exist
+  if (rawResults.length) applyFilters();
 }
 
 // ══════════════════════════════════════
@@ -983,18 +1044,16 @@ async function runScreener() {
     const ratioB   = rB.buy / rB.sell;
     const ratioPct = (ratioA - ratioB) / ratioB;
 
-    let signalPct;
+    // 只套最低門檻 20%，其餘條件由 checkbox 控制
+    let signalPct, counterPct;
     if (filterType === 'sell') {
-      if (buyPct  < 0.20)            return; // 低於觀察門檻
-      if (sellPct >= buyPct * 0.5)   return; // ② 賣方也在放量
-      if (ratioPct < 0.20)           return; // ③ 比例未改善
-      signalPct = buyPct;
+      signalPct  = buyPct;
+      counterPct = sellPct;
     } else {
-      if (sellPct  < 0.20)           return;
-      if (buyPct  >= sellPct * 0.5)  return;
-      if (ratioPct > -0.20)          return;
-      signalPct = sellPct;
+      signalPct  = sellPct;
+      counterPct = buyPct;
     }
+    if (signalPct < 0.20) return;
 
     const levelKey = getLevel(signalPct);
     if (!levelKey) return;
@@ -1003,19 +1062,42 @@ async function runScreener() {
       buyA: rA.buy, sellA: rA.sell, netA: rA.net,
       buyB: rB.buy, sellB: rB.sell,
       buyDiff, sellDiff, buyPct, sellPct,
-      ratioA, ratioB, ratioPct, signalPct, levelKey });
+      ratioA, ratioB, ratioPct, signalPct, counterPct, levelKey });
   });
 
   results.sort((a, b) => b.signalPct - a.signalPct);
-  currentResults = results;
+  rawResults = results;
   currentDates = [dA, dB];
-  renderResults(results, dA, dB, filterType);
+  applyFilters();
   btn.disabled = false; btn.textContent = '執行篩選';
 }
 
 function setStatus(msg) {
   document.getElementById('screener-results').innerHTML =
     `<div class="status-box"><div class="status-icon">⏳</div><div class="status-msg">${msg}</div></div>`;
+}
+
+// ══════════════════════════════════════
+//  APPLY FILTERS (checkbox-driven)
+// ══════════════════════════════════════
+function applyFilters() {
+  if (!rawResults.length) return;
+  const filterType = document.getElementById('filter-type').value;
+  let results = [...rawResults];
+
+  const chkPct35   = document.getElementById('chk-pct35')?.checked;
+  const chkCounter = document.getElementById('chk-counter')?.checked;
+
+  if (chkPct35)   results = results.filter(r => r.signalPct >= 0.35);
+  if (chkCounter) results = results.filter(r => r.counterPct < r.signalPct * 0.5);
+
+  const activeLevels = new Set(
+    ['ultra','strong','valid','watch'].filter(k => document.getElementById('lv-'+k)?.checked)
+  );
+  results = results.filter(r => activeLevels.has(r.levelKey));
+
+  currentResults = results;
+  renderResults(results, currentDates[0], currentDates[1], filterType);
 }
 
 // ══════════════════════════════════════
@@ -1057,15 +1139,15 @@ function renderResults(results, dA, dB, filterType) {
         <table>
           <thead><tr>
             <th class="text-left">股票</th>
+            <th>訊號</th>
             <th class="text-right col-a">${sA} 買張</th>
             <th class="text-right col-a">${sA} 賣張</th>
             <th class="text-right col-a">${sA} 淨</th>
             <th class="text-right col-b">${sB} 買張</th>
             <th class="text-right col-b">${sB} 賣張</th>
-            <th class="text-right">${isBuy ? '賣張增幅' : '買張增幅'}</th>
-            <th class="text-right">${isBuy ? '買張增幅' : '賣張增幅'}</th>
+            <th class="text-right highlight">${isBuy ? '賣張增幅' : '買張增幅'}</th>
+            <th class="text-right" style="color:#5a7a96">${isBuy ? '買張增幅' : '賣張增幅'}</th>
             <th class="text-right">買賣比(新)</th>
-            <th class="text-right">訊號增幅</th>
             <th class="text-right">操作</th>
           </tr></thead>
           <tbody>
@@ -1076,17 +1158,18 @@ function renderResults(results, dA, dB, filterType) {
                   <div class="stock-code">${r.code}</div>
                   <div class="stock-name">${r.name}</div>
                 </td>
+                <td class="signal-cell">
+                  <span class="level-badge ${cfg.cls}" style="font-size:11px">${cfg.label}</span>
+                  <div class="signal-pct">+${Math.round(r.signalPct*100)}%</div>
+                </td>
                 <td class="text-right col-a pos">${r.buyA.toLocaleString()}</td>
                 <td class="text-right col-a neg">${r.sellA.toLocaleString()}</td>
                 <td class="text-right"><span class="net-badge ${r.netA<0?'net-sell':'net-buy'}">${r.netA.toLocaleString()}</span></td>
                 <td class="text-right col-b">${r.buyB.toLocaleString()}</td>
                 <td class="text-right col-b">${r.sellB.toLocaleString()}</td>
-                <td class="text-right ${isBuy?'highlight':''}">+${Math.round((isBuy?r.sellPct:r.buyPct)*100)}%</td>
-                <td class="text-right ${!isBuy?'':''}">+${Math.round((!isBuy?r.sellPct:r.buyPct)*100)}%</td>
+                <td class="text-right highlight">+${Math.round(r.signalPct*100)}%</td>
+                <td class="text-right" style="color:#5a7a96">+${Math.round(r.counterPct*100)}%</td>
                 <td class="text-right" style="color:${r.ratioA>=1?'#f0b90b':'#dde3ed'};font-weight:700">${r.ratioA.toFixed(2)}</td>
-                <td class="text-right">
-                  <span class="level-badge ${cfg.cls}" style="font-size:12px">+${Math.round(r.signalPct*100)}%</span>
-                </td>
                 <td class="text-right">
                   <button class="save-btn ${saved?'saved':''}" id="savebtn-${r.code}"
                     onclick="event.stopPropagation();toggleSave('${r.code}','${r.name}','${r.levelKey}','${currentDates[0]}')">
