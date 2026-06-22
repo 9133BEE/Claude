@@ -880,7 +880,7 @@ function cardHtml(t){
       <div class="tc-date">${dStr}</div>
     </div>
     <div class="tcr">
-      <div class="tc-pnl ${pCls}">${pStr}</div>
+      <div class="tc-pnl ${pCls}" id="hpnl-${t.id}">${pStr}</div>
       <div class="tc-badges">${statBadge}${typBadge}${rV?`<span class="badge" style="color:var(--text4);border-color:var(--border)">${rV}</span>`:''}</div>
     </div>
   </div>
@@ -1123,6 +1123,9 @@ async function refreshLivePrices() {
     const tgt  = t.target   ? parseFloat(t.target)   : null;
     const stopDist = stop ? ((price - stop) / price * 100) : null;
     const tgtDist  = tgt  ? ((tgt - price) / price * 100)  : null;
+    // update header P&L
+    const hEl = document.getElementById(`hpnl-${t.id}`);
+    if (hEl) { hEl.textContent = pnlStr; hEl.className = `tc-pnl ${pnlCls}`; }
     el.className = `live-bar${stop && price <= stop ? ' warn' : ''}`;
     el.innerHTML = `<div class="live-row">
       <div class="live-item"><span class="live-lbl">最新收盤</span><span class="live-val neu">${price.toFixed(1)}</span></div>
