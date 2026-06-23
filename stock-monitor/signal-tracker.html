@@ -622,6 +622,7 @@
       <select id="filter-type" class="ctrl-select" onchange="updateCondDisplay()">
         <option value="sell">賣超（外資賣超時買張大增）</option>
         <option value="buy">買超（外資買超時賣張大增）</option>
+        <option value="bottom">築底訊號（賣超但買張築底）</option>
       </select>
     </div>
     <div class="ctrl-block">
@@ -906,6 +907,14 @@ function getLevel(pct) {
   if (pct >= 0.20) return 'watch';
   return null;
 }
+// 築底模式等級：以買賣比改善幅度為基準
+function getBottomLevel(ratioPct) {
+  if (ratioPct >= 0.30) return 'ultra';
+  if (ratioPct >= 0.15) return 'strong';
+  if (ratioPct >= 0.05) return 'valid';
+  if (ratioPct >= 0)    return 'watch';
+  return null;
+}
 
 // ── DATES INIT ──
 (function() {
@@ -933,20 +942,31 @@ function switchTab(name) {
 //  CONDITION DISPLAY UPDATE
 // ══════════════════════════════════════
 function updateCondDisplay() {
-  const isBuy = document.getElementById('filter-type').value === 'buy';
-  document.getElementById('cond-filter-label').textContent = isBuy ? '篩選條件（買超場景）' : '篩選條件（賣超場景）';
-  const sig = isBuy ? '賣張' : '買張';
-  const ctr = isBuy ? '買張' : '賣張';
-  document.getElementById('chk-pct35-label').textContent   = `${sig}增幅 ≥ 35%（排除觀察級，只保留有效訊號以上）`;
-  document.getElementById('chk-counter-label').textContent = `${ctr}增幅 ＜ ${sig}增幅 × 50%（對方未同步放量）`;
-  document.getElementById('vol-filter-label').textContent  = `${sig}（當日）`;
-  // ref table labels
-  const prefix = isBuy ? '賣張增幅' : '買張增幅';
-  document.getElementById('range-watch').textContent  = `${prefix} 20% – 35%`;
-  document.getElementById('range-valid').textContent  = `${prefix} 35% – 60%`;
-  document.getElementById('range-strong').textContent = `${prefix} 60% – 100%`;
-  document.getElementById('range-ultra').textContent  = `${prefix} ＞ 100%（翻倍）`;
-  // re-filter if results exist
+  const ft = document.getElementById('filter-type').value;
+  const isBottom = ft === 'bottom';
+  const isBuy = ft === 'buy';
+  document.getElementById('cond-filter-label').textContent =
+    isBottom ? '篩選條件（築底場景）' : (isBuy ? '篩選條件（買超場景）' : '篩選條件（賣超場景）');
+  if (isBottom) {
+    document.getElementById('chk-pct35-label').textContent   = '賣張縮量 ≥ 10%（空方力道確認減弱）';
+    document.getElementById('chk-counter-label').textContent = '買張回升（新日期買張 > 舊日期）';
+    document.getElementById('vol-filter-label').textContent  = '買張（當日）';
+    document.getElementById('range-watch').textContent  = '買賣比改善 0% – 5%';
+    document.getElementById('range-valid').textContent  = '買賣比改善 5% – 15%';
+    document.getElementById('range-strong').textContent = '買賣比改善 15% – 30%';
+    document.getElementById('range-ultra').textContent  = '買賣比改善 ＞ 30%';
+  } else {
+    const sig = isBuy ? '賣張' : '買張';
+    const ctr = isBuy ? '買張' : '賣張';
+    document.getElementById('chk-pct35-label').textContent   = `${sig}增幅 ≥ 35%（排除觀察級，只保留有效訊號以上）`;
+    document.getElementById('chk-counter-label').textContent = `${ctr}增幅 ＜ ${sig}增幅 × 50%（對方未同步放量）`;
+    document.getElementById('vol-filter-label').textContent  = `${sig}（當日）`;
+    const prefix = isBuy ? '賣張增幅' : '買張增幅';
+    document.getElementById('range-watch').textContent  = `${prefix} 20% – 35%`;
+    document.getElementById('range-valid').textContent  = `${prefix} 35% – 60%`;
+    document.getElementById('range-strong').textContent = `${prefix} 60% – 100%`;
+    document.getElementById('range-ultra').textContent  = `${prefix} ＞ 100%（翻倍）`;
+  }
   if (rawResults.length) applyFilters();
 }
 
@@ -1051,18 +1071,25 @@ async function runScreener() {
     const ratioPct = (ratioA - ratioB) / ratioB;
 
     // 只套最低門檻 20%，其餘條件由 checkbox 控制
-    let signalPct, counterPct;
-    if (filterType === 'sell') {
-      signalPct  = buyPct;
+    let signalPct, counterPct, levelKey;
+    if (filterType === 'bottom') {
+      // 築底訊號：賣超 + 買賣比改善 + 賣張縮量 + 買張不大幅下滑
+      if (rA.net >= 0)    return;  // 必須是賣超
+      if (sellPct >= 0)   return;  // 賣張必須縮量
+      if (buyPct < -0.10) return;  // 買張不能大幅下滑（超過10%）
+      if (buyPct >= 0.35) return;  // 排除已觸發買張大增訊號的個股
+      if (ratioPct < 0)   return;  // 買賣比必須改善
+      signalPct  = ratioPct;
       counterPct = sellPct;
+      levelKey   = getBottomLevel(ratioPct);
+      if (!levelKey) return;
     } else {
-      signalPct  = sellPct;
-      counterPct = buyPct;
+      if (filterType === 'sell') { signalPct = buyPct;  counterPct = sellPct; }
+      else                       { signalPct = sellPct; counterPct = buyPct; }
+      if (signalPct < 0.20) return;
+      levelKey = getLevel(signalPct);
+      if (!levelKey) return;
     }
-    if (signalPct < 0.20) return;
-
-    const levelKey = getLevel(signalPct);
-    if (!levelKey) return;
 
     results.push({ code, name: rA.name,
       buyA: rA.buy, sellA: rA.sell, netA: rA.net,
@@ -1095,11 +1122,17 @@ function applyFilters() {
   const chkCounter = document.getElementById('chk-counter')?.checked;
   const volMin     = parseInt(document.getElementById('vol-min')?.value) || 0;
 
-  if (chkPct35)   results = results.filter(r => r.signalPct >= 0.35);
-  if (chkCounter) results = results.filter(r => r.counterPct < r.signalPct * 0.5);
-  if (volMin > 0) {
-    const isBuy = filterType === 'buy';
-    results = results.filter(r => (isBuy ? r.sellA : r.buyA) >= volMin);
+  if (filterType === 'bottom') {
+    if (chkPct35)   results = results.filter(r => r.counterPct <= -0.10);  // 賣張縮量≥10%
+    if (chkCounter) results = results.filter(r => r.buyPct > 0);            // 買張回升
+    if (volMin > 0) results = results.filter(r => r.buyA >= volMin);
+  } else {
+    if (chkPct35)   results = results.filter(r => r.signalPct >= 0.35);
+    if (chkCounter) results = results.filter(r => r.counterPct < r.signalPct * 0.5);
+    if (volMin > 0) {
+      const isBuy = filterType === 'buy';
+      results = results.filter(r => (isBuy ? r.sellA : r.buyA) >= volMin);
+    }
   }
 
   const activeLevels = new Set(
@@ -1122,6 +1155,7 @@ function renderResults(results, dA, dB, filterType) {
   }
 
   const isBuy = filterType === 'buy';
+  const isBottom = filterType === 'bottom';
   const sA = fmt8(dA).slice(5);
   const sB = fmt8(dB).slice(5);
   const savedCodes = getWatchlistCodes();
@@ -1168,8 +1202,8 @@ function renderResults(results, dA, dB, filterType) {
             <th class="text-right col-a ${thCls('netA')}" onclick="sortBy('netA')">${sA} 淨${si('netA')}</th>
             <th class="text-right col-b ${thCls('buyB')}" onclick="sortBy('buyB')">${sB} 買張${si('buyB')}</th>
             <th class="text-right col-b ${thCls('sellB')}" onclick="sortBy('sellB')">${sB} 賣張${si('sellB')}</th>
-            <th class="text-right highlight ${thCls('signalPct')}" onclick="sortBy('signalPct')">${isBuy ? '賣張增幅' : '買張增幅'}${si('signalPct')}</th>
-            <th class="text-right ${thCls('counterPct')}" style="color:#5a7a96" onclick="sortBy('counterPct')">${isBuy ? '買張增幅' : '賣張增幅'}${si('counterPct')}</th>
+            <th class="text-right highlight ${thCls('signalPct')}" onclick="sortBy('signalPct')">${isBottom ? '買賣比改善' : (isBuy ? '賣張增幅' : '買張增幅')}${si('signalPct')}</th>
+            <th class="text-right ${thCls('counterPct')}" style="color:#5a7a96" onclick="sortBy('counterPct')">${isBottom ? '賣張縮量' : (isBuy ? '買張增幅' : '賣張增幅')}${si('counterPct')}</th>
             <th class="text-right ${thCls('ratioA')}" onclick="sortBy('ratioA')">買賣比(新)${si('ratioA')}</th>
             <th class="text-right">操作</th>
           </tr></thead>
@@ -1191,7 +1225,7 @@ function renderResults(results, dA, dB, filterType) {
                 <td class="text-right col-b">${r.buyB.toLocaleString()}</td>
                 <td class="text-right col-b">${r.sellB.toLocaleString()}</td>
                 <td class="text-right highlight">+${Math.round(r.signalPct*100)}%</td>
-                <td class="text-right" style="color:#5a7a96">+${Math.round(r.counterPct*100)}%</td>
+                <td class="text-right" style="color:#5a7a96">${isBottom ? Math.round(r.counterPct*100)+'%' : '+'+Math.round(r.counterPct*100)+'%'}</td>
                 <td class="text-right" style="color:${r.ratioA>=1?'#f0b90b':'#dde3ed'};font-weight:700">${r.ratioA.toFixed(2)}</td>
                 <td class="text-right">
                   <button class="save-btn ${saved?'saved':''}" id="savebtn-${r.code}"
