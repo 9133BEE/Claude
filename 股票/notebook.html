@@ -65,7 +65,44 @@
       border-color: #2962FF; box-shadow: 0 0 0 2px rgba(41,98,255,.15);
     }
     .field-textarea { resize: vertical; line-height: 1.65; min-height: 110px; }
-    .form-actions { display: flex; justify-content: flex-end; margin-top: 12px; gap: 8px; }
+
+    /* ── IMAGE UPLOAD ── */
+    .img-section { margin-top: 10px; }
+    .img-upload-area {
+      border: 1.5px dashed #2A2E39; border-radius: 6px;
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .img-upload-area:hover { border-color: #2962FF; background: rgba(41,98,255,.04); }
+    .img-upload-area.drag-over { border-color: #2962FF; background: rgba(41,98,255,.08); }
+    .img-upload-icon { font-size: 22px; flex-shrink: 0; }
+    .img-upload-text { font-size: 13px; color: #787B86; }
+    .img-upload-text strong { color: #7BA3F8; }
+    #img-file-input { display: none; }
+
+    /* image preview grid */
+    .img-preview-grid {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+    }
+    .img-preview-wrap {
+      position: relative; width: 80px; height: 80px;
+      border-radius: 5px; overflow: hidden;
+      border: 1px solid #2A2E39;
+    }
+    .img-preview-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .img-preview-del {
+      position: absolute; top: 2px; right: 2px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(0,0,0,.7); border: none;
+      color: #fff; font-size: 10px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .img-preview-del:hover { background: #F23645; }
+
+    .form-actions { display: flex; justify-content: flex-end; margin-top: 12px; gap: 8px; align-items: center; }
+    .img-size-warn { font-size: 11px; color: #F0B90B; flex: 1; }
     .btn-save {
       background: #2962FF; border: none; border-radius: 4px;
       padding: 0 22px; height: 36px; color: #fff;
@@ -121,6 +158,9 @@
     .tag-chip     { background: rgba(240,185,11,.12); color: #F0B90B; border: 1px solid rgba(240,185,11,.25); }
     .tag-strategy { background: rgba(124,58,237,.12); color: #a78bfa; border: 1px solid rgba(124,58,237,.25); }
     .tag-review   { background: rgba(242,54,69,.12); color: #F23645; border: 1px solid rgba(242,54,69,.25); }
+    .note-img-badge {
+      font-size: 11px; color: #4a4f5e; flex-shrink: 0; white-space: nowrap;
+    }
     .note-title {
       font-size: 14px; font-weight: 600; color: #D1D4DC;
       flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -140,16 +180,61 @@
       max-height: 0; overflow: hidden; transition: max-height .28s ease;
       border-top: 0px solid #2A2E39;
     }
-    .note-item.expanded .note-body { max-height: 800px; border-top-width: 1px; }
+    .note-item.expanded .note-body { max-height: 2000px; border-top-width: 1px; }
     .note-body-inner {
       padding: 14px 16px; font-size: 14px; color: #9AA3B2;
       line-height: 1.75; white-space: pre-wrap; word-break: break-word;
     }
-    .note-empty {
-      text-align: center; padding: 60px 24px; color: #4a4f5e;
+    .note-imgs {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 0 16px 14px;
     }
+    .note-img-thumb {
+      width: 90px; height: 90px; border-radius: 5px; overflow: hidden;
+      border: 1px solid #2A2E39; cursor: pointer;
+      transition: border-color .12s, transform .12s;
+      flex-shrink: 0;
+    }
+    .note-img-thumb:hover { border-color: #2962FF; transform: scale(1.04); }
+    .note-img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .note-empty { text-align: center; padding: 60px 24px; color: #4a4f5e; }
     .note-empty-icon { font-size: 48px; margin-bottom: 14px; }
     .note-empty-msg { font-size: 15px; color: #787B86; }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,.88); align-items: center; justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-img {
+      max-width: 90vw; max-height: 90vh;
+      object-fit: contain; border-radius: 4px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.6);
+    }
+    .lightbox-close {
+      position: absolute; top: 16px; right: 20px;
+      background: rgba(255,255,255,.12); border: none; color: #fff;
+      font-size: 22px; cursor: pointer; width: 40px; height: 40px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,.25); }
+    .lightbox-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.12); border: none; color: #fff;
+      font-size: 24px; cursor: pointer; width: 44px; height: 44px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .lightbox-nav:hover { background: rgba(255,255,255,.25); }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+    .lightbox-counter {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      font-size: 13px; color: rgba(255,255,255,.5);
+    }
 
     /* ── SIDEBAR ── */
     .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 999; }
@@ -161,19 +246,12 @@
       display: flex; flex-direction: column;
     }
     .sidebar.open { left: 0; }
-    .sb-head {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px; border-bottom: 1px solid #2A2E39; flex-shrink: 0;
-    }
+    .sb-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #2A2E39; flex-shrink: 0; }
     .sb-logo { font-size: 17px; font-weight: 700; color: #D1D4DC; }
     .sb-close { background: none; border: none; color: #787B86; font-size: 16px; cursor: pointer; padding: 0; }
     .sb-close:hover { color: #D1D4DC; }
     .sb-nav { padding: 8px 0 24px; }
-    .sb-section-title {
-      font-size: 11px; font-weight: 700; color: #787B86; letter-spacing: .08em;
-      text-transform: uppercase; padding: 14px 16px 5px;
-      cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;
-    }
+    .sb-section-title { font-size: 11px; font-weight: 700; color: #787B86; letter-spacing: .08em; text-transform: uppercase; padding: 14px 16px 5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
     .sb-section-title:hover { color: #c9d1d9; }
     .sb-arrow { font-size: 10px; opacity: .55; transition: transform .2s; flex-shrink: 0; }
     .sb-section-title.closed .sb-arrow { transform: rotate(-90deg); }
@@ -183,7 +261,6 @@
     .sb-item:hover { background: #252931; color: #D1D4DC; }
     .sb-item.sb-active { color: #D1D4DC; font-weight: 600; }
 
-    /* ── BACK TOP ── */
     #back-top {
       position: fixed; bottom: 20px; right: 16px; z-index: 998;
       width: 40px; height: 40px; border-radius: 50%;
@@ -199,10 +276,20 @@
       .form-card { padding: 14px; }
       .form-row { flex-direction: column; }
       .form-field.field-date, .form-field.field-type { flex: 1; }
+      .note-img-thumb { width: 72px; height: 72px; }
     }
   </style>
 </head>
 <body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation();lightboxNav(-1)">‹</button>
+  <img class="lightbox-img" id="lightbox-img" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();lightboxNav(1)">›</button>
+  <div class="lightbox-counter" id="lightbox-counter"></div>
+</div>
 
 <!-- SIDEBAR OVERLAY -->
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
@@ -293,9 +380,22 @@
     </div>
     <div class="form-field" style="margin-bottom:0">
       <span class="field-label">內容</span>
-      <textarea id="note-content" class="field-textarea" placeholder="寫下你的想法、觀察、心得...&#10;&#10;可以記錄：今日大盤走勢、個股分析重點、進出場理由、學習心得..."></textarea>
+      <textarea id="note-content" class="field-textarea" placeholder="寫下你的想法、觀察、心得..."></textarea>
     </div>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="img-section">
+      <span class="field-label" style="display:block;margin-bottom:6px">圖片（選填）</span>
+      <div class="img-upload-area" id="img-upload-area" onclick="document.getElementById('img-file-input').click()">
+        <span class="img-upload-icon">🖼</span>
+        <div class="img-upload-text">點擊上傳圖片，或將圖片<strong>拖曳</strong>到此處<br><span style="font-size:11px;color:#4a4f5e">支援 JPG、PNG、GIF、WebP；每張壓縮後儲存</span></div>
+      </div>
+      <input type="file" id="img-file-input" accept="image/*" multiple>
+      <div class="img-preview-grid" id="img-preview-grid"></div>
+    </div>
+
     <div class="form-actions">
+      <span class="img-size-warn" id="size-warn"></span>
       <button class="btn-clear" onclick="clearForm()">清除</button>
       <button class="btn-save" onclick="saveNote()">儲存筆記</button>
     </div>
@@ -324,14 +424,85 @@
 const TYPE_LABELS = { market:'市場觀察', technical:'技術分析', stock:'個股研究', chip:'籌碼分析', strategy:'交易策略', review:'事後檢討' };
 let notes = JSON.parse(localStorage.getItem('stock_notebook') || '[]');
 let currentFilter = 'all';
+let pendingImages = []; // { dataUrl }
 
+// ── INIT ────────────────────────────────────────────────────────────────
 function init() {
   const today = new Date();
   document.getElementById('note-date').value =
     today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  setupDragDrop();
+  document.getElementById('img-file-input').addEventListener('change', function(e) {
+    processFiles(Array.from(e.target.files));
+    e.target.value = '';
+  });
   renderNotes();
 }
 
+// ── IMAGE PROCESSING ────────────────────────────────────────────────────
+function setupDragDrop() {
+  const area = document.getElementById('img-upload-area');
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag-over'); });
+  area.addEventListener('dragleave', () => area.classList.remove('drag-over'));
+  area.addEventListener('drop', e => {
+    e.preventDefault(); area.classList.remove('drag-over');
+    processFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+  });
+}
+
+function processFiles(files) {
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => compressImage(e.target.result, compressed => {
+      pendingImages.push({ dataUrl: compressed });
+      renderPreview();
+      checkSizeWarn();
+    });
+    reader.readAsDataURL(file);
+  });
+}
+
+function compressImage(dataUrl, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 1200;
+    let w = img.width, h = img.height;
+    if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+    if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    cb(canvas.toDataURL('image/jpeg', 0.75));
+  };
+  img.src = dataUrl;
+}
+
+function renderPreview() {
+  const grid = document.getElementById('img-preview-grid');
+  grid.innerHTML = pendingImages.map((img, i) => `
+    <div class="img-preview-wrap">
+      <img src="${img.dataUrl}" alt="">
+      <button class="img-preview-del" onclick="removePending(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removePending(i) {
+  pendingImages.splice(i, 1);
+  renderPreview();
+  checkSizeWarn();
+}
+
+function checkSizeWarn() {
+  const totalKB = pendingImages.reduce((s, img) => s + Math.round(img.dataUrl.length * 0.75 / 1024), 0);
+  const warn = document.getElementById('size-warn');
+  if (totalKB > 3000) {
+    warn.textContent = `⚠ 圖片約 ${Math.round(totalKB/1024)}MB，localStorage 容量有限，建議減少張數`;
+  } else {
+    warn.textContent = pendingImages.length ? `${pendingImages.length} 張圖片（約 ${totalKB}KB）` : '';
+  }
+}
+
+// ── SAVE / DELETE ────────────────────────────────────────────────────────
 function saveNote() {
   const date    = document.getElementById('note-date').value;
   const title   = document.getElementById('note-title').value.trim();
@@ -340,8 +511,16 @@ function saveNote() {
   if (!date)    { alert('請選擇日期'); return; }
   if (!title)   { alert('請輸入標題'); return; }
   if (!content) { alert('請輸入筆記內容'); return; }
-  notes.unshift({ id: Date.now(), date, title, type, content });
-  localStorage.setItem('stock_notebook', JSON.stringify(notes));
+
+  const note = { id: Date.now(), date, title, type, content, images: pendingImages.map(i => i.dataUrl) };
+  try {
+    notes.unshift(note);
+    localStorage.setItem('stock_notebook', JSON.stringify(notes));
+  } catch(e) {
+    notes.shift();
+    alert('儲存失敗，localStorage 空間不足。請嘗試減少圖片數量或刪除舊筆記。');
+    return;
+  }
   clearForm();
   renderNotes();
 }
@@ -349,6 +528,9 @@ function saveNote() {
 function clearForm() {
   document.getElementById('note-title').value = '';
   document.getElementById('note-content').value = '';
+  pendingImages = [];
+  renderPreview();
+  document.getElementById('size-warn').textContent = '';
 }
 
 function deleteNote(id) {
@@ -358,6 +540,7 @@ function deleteNote(id) {
   renderNotes();
 }
 
+// ── TOGGLE ───────────────────────────────────────────────────────────────
 function toggleNote(id) {
   const item = document.getElementById('ni-' + id);
   if (!item) return;
@@ -367,12 +550,42 @@ function toggleNote(id) {
   else        { item.classList.add('expanded');    body.style.maxHeight = body.scrollHeight + 'px'; }
 }
 
+// ── FILTER ───────────────────────────────────────────────────────────────
 function filterNotes(type, btn) {
   currentFilter = type;
   document.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b.dataset.type === type));
   renderNotes();
 }
 
+// ── LIGHTBOX ─────────────────────────────────────────────────────────────
+let _lbImages = [];
+let _lbIdx = 0;
+
+function openLightbox(images, idx) {
+  _lbImages = images; _lbIdx = idx;
+  document.getElementById('lightbox-img').src = images[idx];
+  document.getElementById('lightbox-counter').textContent = images.length > 1 ? `${idx+1} / ${images.length}` : '';
+  document.getElementById('lightbox').classList.add('open');
+  document.querySelector('.lightbox-prev').style.display = images.length > 1 ? 'flex' : 'none';
+  document.querySelector('.lightbox-next').style.display = images.length > 1 ? 'flex' : 'none';
+}
+
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+function lightboxNav(dir) {
+  _lbIdx = (_lbIdx + dir + _lbImages.length) % _lbImages.length;
+  document.getElementById('lightbox-img').src = _lbImages[_lbIdx];
+  document.getElementById('lightbox-counter').textContent = `${_lbIdx+1} / ${_lbImages.length}`;
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') lightboxNav(-1);
+  if (e.key === 'ArrowRight') lightboxNav(1);
+});
+
+// ── RENDER ───────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
@@ -380,7 +593,6 @@ function esc(s) {
 function renderNotes() {
   const list = document.getElementById('notes-list');
   const filtered = currentFilter === 'all' ? notes : notes.filter(n => n.type === currentFilter);
-
   document.getElementById('note-count').textContent = notes.length + ' 篇筆記';
 
   if (!filtered.length) {
@@ -391,21 +603,37 @@ function renderNotes() {
     return;
   }
 
-  list.innerHTML = filtered.map(n => `
+  list.innerHTML = filtered.map(n => {
+    const imgs = n.images || [];
+    const imgBadge = imgs.length ? `<span class="note-img-badge">🖼 ${imgs.length}</span>` : '';
+    const imgGrid = imgs.length ? `<div class="note-imgs">${imgs.map((src, i) =>
+      `<div class="note-img-thumb" onclick="event.stopPropagation();openLightbox(noteImgs(${n.id}),${i})">
+        <img src="${src}" alt="圖片${i+1}">
+      </div>`).join('')}</div>` : '';
+    return `
     <div class="note-item" id="ni-${n.id}">
       <div class="note-header" onclick="toggleNote(${n.id})">
         <span class="note-date">${esc(n.date)}</span>
         <span class="note-type-tag tag-${esc(n.type)}">${TYPE_LABELS[n.type] || esc(n.type)}</span>
+        ${imgBadge}
         <span class="note-title">${esc(n.title)}</span>
         <button class="note-del" onclick="event.stopPropagation();deleteNote(${n.id})" title="刪除">✕</button>
         <span class="note-chevron">›</span>
       </div>
       <div class="note-body">
         <div class="note-body-inner">${esc(n.content)}</div>
+        ${imgGrid}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
+function noteImgs(id) {
+  const n = notes.find(x => x.id === id);
+  return n ? (n.images || []) : [];
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────────────────────
 function openSidebar()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); }
 function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); }
 function toggleSbGroup(el) { el.classList.toggle('closed'); var g = el.nextElementSibling; if (g && g.classList.contains('sb-group')) g.classList.toggle('closed'); }
