@@ -442,10 +442,37 @@ document.addEventListener('keydown', e => {
 
 load();
 
+// ── MIGRATE LOCALSTORAGE → FIRESTORE (一次性) ────────────────────────────
+async function migrateLocalStorage() {
+  const MIGRATED_KEY = 'stock_notebook_migrated';
+  if (localStorage.getItem(MIGRATED_KEY)) return;
+  const old = JSON.parse(localStorage.getItem('stock_notebook') || '[]');
+  if (!old.length) { localStorage.setItem(MIGRATED_KEY, '1'); return; }
+
+  setSyncStatus('loading', `搬移舊筆記 (${old.length} 篇)…`);
+  let ok = 0;
+  for (const n of old) {
+    try {
+      await addDoc(collection(db, COL), {
+        date:      n.date    || '',
+        title:     n.title   || '（無標題）',
+        type:      n.type    || 'market',
+        content:   n.content || '',
+        images:    n.images  || [],
+        createdAt: Timestamp.fromMillis(n.id || Date.now()),
+      });
+      ok++;
+    } catch(e) { /* 單筆失敗就跳過 */ }
+  }
+  localStorage.setItem(MIGRATED_KEY, '1');
+  setSyncStatus('ok', `已搬移 ${ok} 篇舊筆記`);
+}
+
 // ── LOAD FROM FIRESTORE ───────────────────────────────────────────────────
 async function load() {
   setSyncStatus('loading', '連線中');
   try {
+    await migrateLocalStorage();
     const snap = await getDocs(query(collection(db, COL), orderBy('createdAt', 'desc')));
     notes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     setSyncStatus('ok', '已同步');
