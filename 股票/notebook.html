@@ -471,6 +471,15 @@ async function migrateLocalStorage() {
 // ── LOAD FROM FIRESTORE ───────────────────────────────────────────────────
 async function load() {
   setSyncStatus('loading', '連線中');
+
+  // 立刻先顯示 localStorage 的筆記（避免空白等待）
+  const localRaw = JSON.parse(localStorage.getItem('stock_notebook') || '[]');
+  if (localRaw.length) {
+    notes = localRaw.map(n => ({ ...n, _local: true }));
+    renderNotes();
+    setSyncStatus('loading', `本機 ${localRaw.length} 篇，同步中…`);
+  }
+
   try {
     await migrateLocalStorage();
     const snap = await getDocs(query(collection(db, COL), orderBy('createdAt', 'desc')));
@@ -478,9 +487,15 @@ async function load() {
     setSyncStatus('ok', '已同步');
     renderNotes();
   } catch(e) {
-    setSyncStatus('err', '連線失敗');
-    document.getElementById('notes-list').innerHTML =
-      `<div class="note-empty"><div class="note-empty-icon">⚠️</div><div class="note-empty-msg">載入失敗：${e.message}</div></div>`;
+    setSyncStatus('err', '連線失敗，顯示本機資料');
+    // 連 Firebase 失敗時繼續顯示 localStorage 的資料
+    if (localRaw.length) {
+      notes = localRaw.map(n => ({ ...n, id: String(n.id) }));
+      renderNotes();
+    } else {
+      document.getElementById('notes-list').innerHTML =
+        `<div class="note-empty"><div class="note-empty-icon">⚠️</div><div class="note-empty-msg">連線失敗：${e.message}</div></div>`;
+    }
   }
 }
 
