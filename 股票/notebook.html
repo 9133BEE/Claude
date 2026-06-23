@@ -29,6 +29,14 @@
     .toolbar-title { font-size: 17px; font-weight: 700; color: #1C1C1E; flex-shrink: 0; }
     .toolbar-title span { color: #8E8E93; font-weight: 400; font-size: 13px; margin-left: 6px; }
     .header-spacer { flex: 1; }
+    .sync-status {
+      font-size: 11px; color: #8E8E93; display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #C7C7CC; flex-shrink: 0; }
+    .sync-dot.ok { background: #34C759; }
+    .sync-dot.err { background: #FF3B30; }
+    .sync-dot.loading { background: #FF9500; animation: pulse .8s ease-in-out infinite alternate; }
+    @keyframes pulse { from { opacity: .4; } to { opacity: 1; } }
     .note-count-badge {
       font-size: 12px; color: #8E8E93; background: #F2F2F7;
       border: 1px solid #E5E5EA; border-radius: 4px; padding: 3px 10px;
@@ -100,14 +108,15 @@
     .img-preview-del:hover { background: #FF3B30; }
 
     .form-actions { display: flex; justify-content: flex-end; margin-top: 14px; gap: 8px; align-items: center; }
-    .img-size-warn { font-size: 11px; color: #FF9500; flex: 1; }
+    .form-status { font-size: 11px; color: #FF9500; flex: 1; }
     .btn-save {
       background: #2962FF; border: none; border-radius: 6px;
       padding: 0 22px; height: 36px; color: #fff;
       font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
-      transition: background .15s;
+      transition: background .15s; min-width: 90px;
     }
-    .btn-save:hover { background: #1E53E5; }
+    .btn-save:disabled { background: #C7C7CC; cursor: default; }
+    .btn-save:not(:disabled):hover { background: #1E53E5; }
     .btn-cancel-edit {
       background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 6px;
       padding: 0 14px; height: 36px; color: #8E8E93;
@@ -120,15 +129,11 @@
       background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 6px;
       padding: 0 14px; height: 36px; color: #8E8E93;
       font-size: 14px; cursor: pointer; font-family: inherit;
-      transition: background .15s;
     }
     .btn-clear:hover { background: #E5E5EA; color: #1C1C1E; }
 
     /* ── FILTER BAR ── */
-    .filter-bar {
-      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
+    .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
     .filter-label { font-size: 12px; color: #8E8E93; flex-shrink: 0; }
     .filter-chip {
       padding: 4px 12px; border-radius: 100px; font-size: 12px;
@@ -146,32 +151,21 @@
       box-shadow: 0 1px 3px rgba(0,0,0,.04);
     }
     .note-item:hover { border-color: #C7C7CC; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
-    .note-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 14px; cursor: pointer; user-select: none;
-    }
+    .note-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; user-select: none; }
     .note-date {
       font-size: 11px; font-weight: 600; color: #8E8E93;
       background: #F2F2F7; border-radius: 4px; padding: 2px 8px;
       white-space: nowrap; flex-shrink: 0;
     }
-    .note-type-tag {
-      font-size: 11px; font-weight: 700; padding: 2px 7px;
-      border-radius: 4px; white-space: nowrap; flex-shrink: 0;
-    }
+    .note-type-tag { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
     .tag-market   { background: rgba(41,98,255,.08);  color: #2962FF;  border: 1px solid rgba(41,98,255,.2); }
     .tag-technical{ background: rgba(0,122,255,.08);  color: #007AFF;  border: 1px solid rgba(0,122,255,.2); }
     .tag-stock    { background: rgba(52,199,89,.08);  color: #34C759;  border: 1px solid rgba(52,199,89,.2); }
     .tag-chip     { background: rgba(255,149,0,.1);   color: #FF9500;  border: 1px solid rgba(255,149,0,.2); }
     .tag-strategy { background: rgba(175,82,222,.08); color: #AF52DE;  border: 1px solid rgba(175,82,222,.2); }
     .tag-review   { background: rgba(255,59,48,.08);  color: #FF3B30;  border: 1px solid rgba(255,59,48,.2); }
-    .note-img-badge {
-      font-size: 11px; color: #C7C7CC; flex-shrink: 0; white-space: nowrap;
-    }
-    .note-title {
-      font-size: 14px; font-weight: 600; color: #1C1C1E;
-      flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
+    .note-img-badge { font-size: 11px; color: #C7C7CC; flex-shrink: 0; white-space: nowrap; }
+    .note-title { font-size: 14px; font-weight: 600; color: #1C1C1E; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .note-actions { display: flex; gap: 2px; flex-shrink: 0; }
     .note-edit, .note-del {
       background: none; border: none; font-size: 13px;
@@ -182,79 +176,37 @@
     .note-edit:hover { background: #F2F2F7; color: #2962FF; }
     .note-del { color: #C7C7CC; }
     .note-del:hover { background: #FFF0EF; color: #FF3B30; }
-    .note-chevron {
-      font-size: 14px; color: #C7C7CC; flex-shrink: 0;
-      display: inline-block; transition: transform .22s;
-    }
+    .note-chevron { font-size: 14px; color: #C7C7CC; flex-shrink: 0; display: inline-block; transition: transform .22s; }
     .note-item.expanded .note-chevron { transform: rotate(90deg); color: #2962FF; }
-    .note-body {
-      max-height: 0; overflow: hidden; transition: max-height .28s ease;
-      border-top: 0px solid #E5E5EA;
-    }
+    .note-body { max-height: 0; overflow: hidden; transition: max-height .28s ease; border-top: 0px solid #E5E5EA; }
     .note-item.expanded .note-body { max-height: 2000px; border-top-width: 1px; }
-    .note-body-inner {
-      padding: 14px 16px; font-size: 14px; color: #3C3C43;
-      line-height: 1.75; white-space: pre-wrap; word-break: break-word;
-    }
-    .note-imgs {
-      display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 14px;
-    }
-    .note-img-thumb {
-      width: 90px; height: 90px; border-radius: 6px; overflow: hidden;
-      border: 1px solid #E5E5EA; cursor: pointer; flex-shrink: 0;
-      transition: border-color .12s, transform .12s;
-    }
+    .note-body-inner { padding: 14px 16px; font-size: 14px; color: #3C3C43; line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+    .note-imgs { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 14px; }
+    .note-img-thumb { width: 90px; height: 90px; border-radius: 6px; overflow: hidden; border: 1px solid #E5E5EA; cursor: pointer; flex-shrink: 0; transition: border-color .12s, transform .12s; }
     .note-img-thumb:hover { border-color: #2962FF; transform: scale(1.04); }
     .note-img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .note-empty { text-align: center; padding: 60px 24px; }
     .note-empty-icon { font-size: 48px; margin-bottom: 14px; }
     .note-empty-msg { font-size: 15px; color: #8E8E93; }
+    .list-loading { text-align: center; padding: 40px; color: #8E8E93; font-size: 14px; }
 
     /* ── LIGHTBOX ── */
-    .lightbox {
-      display: none; position: fixed; inset: 0; z-index: 2000;
-      background: rgba(0,0,0,.82); align-items: center; justify-content: center;
-    }
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.82); align-items: center; justify-content: center; }
     .lightbox.open { display: flex; }
-    .lightbox-img {
-      max-width: 90vw; max-height: 90vh;
-      object-fit: contain; border-radius: 6px;
-      box-shadow: 0 8px 40px rgba(0,0,0,.5);
-    }
-    .lightbox-close {
-      position: absolute; top: 16px; right: 20px;
-      background: rgba(255,255,255,.15); border: none; color: #fff;
-      font-size: 20px; cursor: pointer; width: 40px; height: 40px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      transition: background .15s;
-    }
+    .lightbox-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 6px; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
+    .lightbox-close { position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,.15); border: none; color: #fff; font-size: 20px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .lightbox-close:hover { background: rgba(255,255,255,.3); }
-    .lightbox-nav {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      background: rgba(255,255,255,.15); border: none; color: #fff;
-      font-size: 26px; cursor: pointer; width: 44px; height: 44px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      transition: background .15s;
-    }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.15); border: none; color: #fff; font-size: 26px; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .lightbox-nav:hover { background: rgba(255,255,255,.3); }
     .lightbox-prev { left: 16px; }
     .lightbox-next { right: 16px; }
-    .lightbox-counter {
-      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
-      font-size: 13px; color: rgba(255,255,255,.5);
-    }
+    .lightbox-counter { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); font-size: 13px; color: rgba(255,255,255,.5); }
 
     /* ── SIDEBAR ── */
     .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 999; }
     .sb-overlay.open { display: block; }
-    .sidebar {
-      position: fixed; top: 0; left: -260px; width: 240px; height: 100vh;
-      background: #FFFFFF; border-right: 1px solid #E5E5EA;
-      z-index: 1000; transition: left .22s ease; overflow-y: auto;
-      display: flex; flex-direction: column;
-      box-shadow: 4px 0 20px rgba(0,0,0,.08);
-    }
+    .sidebar { position: fixed; top: 0; left: -260px; width: 240px; height: 100vh; background: #FFFFFF; border-right: 1px solid #E5E5EA; z-index: 1000; transition: left .22s ease; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,.08); }
     .sidebar.open { left: 0; }
     .sb-head { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #E5E5EA; flex-shrink: 0; }
     .sb-logo { font-size: 16px; font-weight: 700; color: #1C1C1E; }
@@ -271,13 +223,7 @@
     .sb-item:hover { background: #F2F2F7; color: #1C1C1E; }
     .sb-item.sb-active { color: #2962FF; font-weight: 600; }
 
-    #back-top {
-      position: fixed; bottom: 20px; right: 16px; z-index: 998;
-      width: 40px; height: 40px; border-radius: 50%;
-      background: #2962FF; border: none; color: #fff; font-size: 18px;
-      cursor: pointer; display: none; align-items: center; justify-content: center;
-      box-shadow: 0 4px 12px rgba(41,98,255,.35);
-    }
+    #back-top { position: fixed; bottom: 20px; right: 16px; z-index: 998; width: 40px; height: 40px; border-radius: 50%; background: #2962FF; border: none; color: #fff; font-size: 18px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(41,98,255,.35); }
     #back-top.show { display: flex; }
     #back-top:hover { background: #1E53E5; }
 
@@ -358,7 +304,11 @@
   <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="toolbar-title">筆記本 <span>記錄市場觀察與交易心得</span></div>
   <div class="header-spacer"></div>
-  <span class="note-count-badge" id="note-count">0 篇筆記</span>
+  <div class="sync-status" id="sync-status">
+    <div class="sync-dot loading" id="sync-dot"></div>
+    <span id="sync-label">連線中</span>
+  </div>
+  <span class="note-count-badge" id="note-count" style="margin-left:8px">0 篇筆記</span>
 </div>
 
 <!-- MAIN -->
@@ -398,14 +348,14 @@
       <span class="field-label" style="display:block;margin-bottom:6px">圖片（選填）</span>
       <div class="img-upload-area" id="img-upload-area" onclick="document.getElementById('img-file-input').click()">
         <span class="img-upload-icon">🖼</span>
-        <div class="img-upload-text">點擊上傳圖片，或將圖片<strong>拖曳</strong>到此處<br><span style="font-size:11px;color:#C7C7CC">支援 JPG、PNG、GIF、WebP；每張壓縮後儲存</span></div>
+        <div class="img-upload-text">點擊上傳圖片，或將圖片<strong>拖曳</strong>到此處<br><span style="font-size:11px;color:#C7C7CC">支援 JPG、PNG、GIF、WebP</span></div>
       </div>
       <input type="file" id="img-file-input" accept="image/*" multiple>
       <div class="img-preview-grid" id="img-preview-grid"></div>
     </div>
 
     <div class="form-actions">
-      <span class="img-size-warn" id="size-warn"></span>
+      <span class="form-status" id="form-status"></span>
       <button class="btn-cancel-edit" id="btn-cancel-edit" onclick="cancelEdit()">取消編輯</button>
       <button class="btn-clear" onclick="clearForm()">清除</button>
       <button class="btn-save" id="btn-save" onclick="saveNote()">儲存筆記</button>
@@ -425,33 +375,89 @@
   </div>
 
   <!-- NOTES LIST -->
-  <div id="notes-list" class="notes-list"></div>
+  <div id="notes-list" class="notes-list">
+    <div class="list-loading">載入中…</div>
+  </div>
 
 </div>
 
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc,
+  doc, query, orderBy, Timestamp
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import {
+  getStorage, ref as sRef, uploadBytes, getDownloadURL, deleteObject
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+const app = initializeApp({
+  apiKey:"AIzaSyDMpaJo2I0KN6OU7UVgvvNRPzNNJefJiC4",
+  authDomain:"transaction-log-fe0c3.firebaseapp.com",
+  projectId:"transaction-log-fe0c3",
+  storageBucket:"transaction-log-fe0c3.firebasestorage.app",
+  messagingSenderId:"762032844445",
+  appId:"1:762032844405:web:cbc466f21dd73ab80f523c"
+});
+const db = getFirestore(app);
+const storage = getStorage(app);
+const COL = 'notebook';
+
 const TYPE_LABELS = { market:'市場觀察', technical:'技術分析', stock:'個股研究', chip:'籌碼分析', strategy:'交易策略', review:'事後檢討' };
-let notes = JSON.parse(localStorage.getItem('stock_notebook') || '[]');
+let notes = [];
 let currentFilter = 'all';
+// each item: { src: string (preview URL or storage URL), blob: Blob|null (null = already uploaded), storageUrl: string|null }
 let pendingImages = [];
 let editingId = null;
 
-// ── INIT ─────────────────────────────────────────────────────────────────
-function init() {
-  const today = new Date();
-  document.getElementById('note-date').value =
-    today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-  setupDragDrop();
-  document.getElementById('img-file-input').addEventListener('change', function(e) {
-    processFiles(Array.from(e.target.files));
-    e.target.value = '';
-  });
-  renderNotes();
+// ── SYNC STATUS ───────────────────────────────────────────────────────────
+function setSyncStatus(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = label;
 }
 
-// ── IMAGE ─────────────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────────────
+const today = new Date();
+document.getElementById('note-date').value =
+  today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+setupDragDrop();
+document.getElementById('img-file-input').addEventListener('change', function(e) {
+  processFiles(Array.from(e.target.files));
+  e.target.value = '';
+});
+window.addEventListener('scroll', () => {
+  document.getElementById('back-top').classList.toggle('show', window.scrollY > 200);
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') lightboxNav(-1);
+  if (e.key === 'ArrowRight') lightboxNav(1);
+});
+
+load();
+
+// ── LOAD FROM FIRESTORE ───────────────────────────────────────────────────
+async function load() {
+  setSyncStatus('loading', '連線中');
+  try {
+    const snap = await getDocs(query(collection(db, COL), orderBy('createdAt', 'desc')));
+    notes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    setSyncStatus('ok', '已同步');
+    renderNotes();
+  } catch(e) {
+    setSyncStatus('err', '連線失敗');
+    document.getElementById('notes-list').innerHTML =
+      `<div class="note-empty"><div class="note-empty-icon">⚠️</div><div class="note-empty-msg">載入失敗：${e.message}</div></div>`;
+  }
+}
+
+// ── IMAGE PROCESSING ──────────────────────────────────────────────────────
 function setupDragDrop() {
   const area = document.getElementById('img-upload-area');
   area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag-over'); });
@@ -465,9 +471,9 @@ function setupDragDrop() {
 function processFiles(files) {
   files.forEach(file => {
     const reader = new FileReader();
-    reader.onload = e => compressImage(e.target.result, compressed => {
-      pendingImages.push({ dataUrl: compressed });
-      renderPreview(); checkSizeWarn();
+    reader.onload = e => compressImage(e.target.result, (dataUrl, blob) => {
+      pendingImages.push({ src: dataUrl, blob, storageUrl: null });
+      renderPreview();
     });
     reader.readAsDataURL(file);
   });
@@ -483,7 +489,7 @@ function compressImage(dataUrl, cb) {
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    cb(canvas.toDataURL('image/jpeg', 0.75));
+    canvas.toBlob(blob => cb(canvas.toDataURL('image/jpeg', 0.75), blob), 'image/jpeg', 0.75);
   };
   img.src = dataUrl;
 }
@@ -491,28 +497,33 @@ function compressImage(dataUrl, cb) {
 function renderPreview() {
   document.getElementById('img-preview-grid').innerHTML = pendingImages.map((img, i) => `
     <div class="img-preview-wrap">
-      <img src="${img.dataUrl}" alt="">
+      <img src="${img.src}" alt="">
       <button class="img-preview-del" onclick="removePending(${i})">✕</button>
     </div>`).join('');
 }
 
-function removePending(i) {
+window.removePending = function(i) {
   pendingImages.splice(i, 1);
-  renderPreview(); checkSizeWarn();
-}
+  renderPreview();
+};
 
-function checkSizeWarn() {
-  const totalKB = pendingImages.reduce((s, img) => s + Math.round(img.dataUrl.length * 0.75 / 1024), 0);
-  const warn = document.getElementById('size-warn');
-  if (totalKB > 3000) {
-    warn.textContent = '⚠ 圖片過大，建議減少張數';
-  } else {
-    warn.textContent = pendingImages.length ? `${pendingImages.length} 張（約 ${totalKB}KB）` : '';
+async function uploadPendingImages() {
+  const urls = [];
+  for (const img of pendingImages) {
+    if (!img.blob) {
+      // already a storage URL
+      urls.push(img.storageUrl || img.src);
+    } else {
+      const r = sRef(storage, `notebook/img_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+      await uploadBytes(r, img.blob);
+      urls.push(await getDownloadURL(r));
+    }
   }
+  return urls;
 }
 
 // ── EDIT ─────────────────────────────────────────────────────────────────
-function startEdit(id) {
+window.startEdit = function(id) {
   const n = notes.find(x => x.id === id);
   if (!n) return;
   editingId = id;
@@ -520,14 +531,15 @@ function startEdit(id) {
   document.getElementById('note-title').value   = n.title;
   document.getElementById('note-type').value    = n.type;
   document.getElementById('note-content').value = n.content;
-  pendingImages = (n.images || []).map(url => ({ dataUrl: url }));
-  renderPreview(); checkSizeWarn();
+  // existing images: src = storage URL, blob = null
+  pendingImages = (n.images || []).map(url => ({ src: url, blob: null, storageUrl: url }));
+  renderPreview();
   document.getElementById('form-title').textContent = '編輯筆記';
   document.getElementById('form-title').classList.add('editing-mode');
   document.getElementById('btn-save').textContent = '儲存修改';
   document.getElementById('btn-cancel-edit').classList.add('visible');
   document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+};
 
 function cancelEdit() {
   editingId = null;
@@ -535,15 +547,16 @@ function cancelEdit() {
   document.getElementById('note-content').value = '';
   pendingImages = [];
   renderPreview();
-  document.getElementById('size-warn').textContent = '';
+  document.getElementById('form-status').textContent = '';
   document.getElementById('form-title').textContent = '新增筆記';
   document.getElementById('form-title').classList.remove('editing-mode');
   document.getElementById('btn-save').textContent = '儲存筆記';
   document.getElementById('btn-cancel-edit').classList.remove('visible');
 }
+window.cancelEdit = cancelEdit;
 
-// ── SAVE / DELETE ─────────────────────────────────────────────────────────
-function saveNote() {
+// ── SAVE ─────────────────────────────────────────────────────────────────
+window.saveNote = async function() {
   const date    = document.getElementById('note-date').value;
   const title   = document.getElementById('note-title').value.trim();
   const type    = document.getElementById('note-type').value;
@@ -552,87 +565,108 @@ function saveNote() {
   if (!title)   { alert('請輸入標題'); return; }
   if (!content) { alert('請輸入筆記內容'); return; }
 
-  const images = pendingImages.map(i => i.dataUrl);
-
-  if (editingId !== null) {
-    const idx = notes.findIndex(x => x.id === editingId);
-    if (idx !== -1) notes[idx] = { ...notes[idx], date, title, type, content, images };
-  } else {
-    notes.unshift({ id: Date.now(), date, title, type, content, images });
-  }
+  const btn = document.getElementById('btn-save');
+  const stat = document.getElementById('form-status');
+  btn.disabled = true;
+  stat.textContent = pendingImages.some(i => i.blob) ? '上傳圖片中…' : '儲存中…';
+  setSyncStatus('loading', '同步中');
 
   try {
-    localStorage.setItem('stock_notebook', JSON.stringify(notes));
+    const images = await uploadPendingImages();
+
+    if (editingId !== null) {
+      await updateDoc(doc(db, COL, editingId), { date, title, type, content, images });
+      const idx = notes.findIndex(x => x.id === editingId);
+      if (idx !== -1) notes[idx] = { ...notes[idx], date, title, type, content, images };
+    } else {
+      const ref = await addDoc(collection(db, COL), {
+        date, title, type, content, images, createdAt: Timestamp.now()
+      });
+      notes.unshift({ id: ref.id, date, title, type, content, images, createdAt: Timestamp.now() });
+    }
+
+    setSyncStatus('ok', '已同步');
+    cancelEdit();
+    renderNotes();
   } catch(e) {
-    if (editingId === null) notes.shift();
-    alert('儲存失敗，localStorage 空間不足。請嘗試減少圖片數量或刪除舊筆記。');
-    return;
+    setSyncStatus('err', '同步失敗');
+    stat.textContent = '儲存失敗：' + e.message;
+  } finally {
+    btn.disabled = false;
+    if (!stat.textContent.startsWith('儲存失敗')) stat.textContent = '';
   }
+};
 
-  cancelEdit();
-  renderNotes();
-}
+// ── DELETE ────────────────────────────────────────────────────────────────
+window.deleteNote = async function(id) {
+  if (!confirm('確定要刪除這篇筆記？')) return;
+  if (editingId === id) cancelEdit();
+  setSyncStatus('loading', '同步中');
+  try {
+    await deleteDoc(doc(db, COL, id));
+    notes = notes.filter(n => n.id !== id);
+    setSyncStatus('ok', '已同步');
+    renderNotes();
+  } catch(e) {
+    setSyncStatus('err', '刪除失敗');
+    alert('刪除失敗：' + e.message);
+  }
+};
 
-function clearForm() {
+// ── FORM CLEAR ────────────────────────────────────────────────────────────
+window.clearForm = function() {
   document.getElementById('note-title').value = '';
   document.getElementById('note-content').value = '';
   pendingImages = [];
   renderPreview();
-  document.getElementById('size-warn').textContent = '';
-}
-
-function deleteNote(id) {
-  if (!confirm('確定要刪除這篇筆記？')) return;
-  if (editingId === id) cancelEdit();
-  notes = notes.filter(n => n.id !== id);
-  localStorage.setItem('stock_notebook', JSON.stringify(notes));
-  renderNotes();
-}
+  document.getElementById('form-status').textContent = '';
+};
 
 // ── TOGGLE ────────────────────────────────────────────────────────────────
-function toggleNote(id) {
+window.toggleNote = function(id) {
   const item = document.getElementById('ni-' + id);
   if (!item) return;
   const body = item.querySelector('.note-body');
   const isExp = item.classList.contains('expanded');
   if (isExp) { item.classList.remove('expanded'); body.style.maxHeight = '0'; }
   else        { item.classList.add('expanded');    body.style.maxHeight = body.scrollHeight + 'px'; }
-}
+};
 
 // ── FILTER ────────────────────────────────────────────────────────────────
-function filterNotes(type, btn) {
+window.filterNotes = function(type, btn) {
   currentFilter = type;
   document.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b.dataset.type === type));
   renderNotes();
-}
+};
 
 // ── LIGHTBOX ──────────────────────────────────────────────────────────────
 let _lbImages = [], _lbIdx = 0;
 
-function openLightbox(images, idx) {
+window.openLightbox = function(images, idx) {
   _lbImages = images; _lbIdx = idx;
   document.getElementById('lightbox-img').src = images[idx];
   document.getElementById('lightbox-counter').textContent = images.length > 1 ? `${idx+1} / ${images.length}` : '';
   document.getElementById('lightbox').classList.add('open');
   document.querySelector('.lightbox-prev').style.display = images.length > 1 ? 'flex' : 'none';
   document.querySelector('.lightbox-next').style.display = images.length > 1 ? 'flex' : 'none';
-}
+};
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 function lightboxNav(dir) {
   _lbIdx = (_lbIdx + dir + _lbImages.length) % _lbImages.length;
   document.getElementById('lightbox-img').src = _lbImages[_lbIdx];
   document.getElementById('lightbox-counter').textContent = `${_lbIdx+1} / ${_lbImages.length}`;
 }
-document.addEventListener('keydown', e => {
-  if (!document.getElementById('lightbox').classList.contains('open')) return;
-  if (e.key === 'Escape') closeLightbox();
-  if (e.key === 'ArrowLeft') lightboxNav(-1);
-  if (e.key === 'ArrowRight') lightboxNav(1);
-});
+window.closeLightbox = closeLightbox;
+window.lightboxNav = lightboxNav;
 
 // ── RENDER ────────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function noteImgsArr(id) {
+  const n = notes.find(x => x.id === id);
+  return n ? (n.images || []) : [];
 }
 
 function renderNotes() {
@@ -650,21 +684,22 @@ function renderNotes() {
 
   list.innerHTML = filtered.map(n => {
     const imgs = n.images || [];
+    const escId = esc(String(n.id));
     const imgBadge = imgs.length ? `<span class="note-img-badge">🖼 ${imgs.length}</span>` : '';
     const imgGrid = imgs.length ? `<div class="note-imgs">${imgs.map((src, i) =>
-      `<div class="note-img-thumb" onclick="event.stopPropagation();openLightbox(noteImgs(${n.id}),${i})">
-        <img src="${src}" alt="圖片${i+1}">
+      `<div class="note-img-thumb" onclick="event.stopPropagation();openLightbox(noteImgsArr('${escId}'),${i})">
+        <img src="${esc(src)}" alt="圖片${i+1}">
       </div>`).join('')}</div>` : '';
     return `
-    <div class="note-item" id="ni-${n.id}">
-      <div class="note-header" onclick="toggleNote(${n.id})">
+    <div class="note-item" id="ni-${escId}">
+      <div class="note-header" onclick="toggleNote('${escId}')">
         <span class="note-date">${esc(n.date)}</span>
         <span class="note-type-tag tag-${esc(n.type)}">${TYPE_LABELS[n.type] || esc(n.type)}</span>
         ${imgBadge}
         <span class="note-title">${esc(n.title)}</span>
         <div class="note-actions">
-          <button class="note-edit" onclick="event.stopPropagation();startEdit(${n.id})" title="編輯">✏️</button>
-          <button class="note-del"  onclick="event.stopPropagation();deleteNote(${n.id})" title="刪除">✕</button>
+          <button class="note-edit" onclick="event.stopPropagation();startEdit('${escId}')" title="編輯">✏️</button>
+          <button class="note-del"  onclick="event.stopPropagation();deleteNote('${escId}')" title="刪除">✕</button>
         </div>
         <span class="note-chevron">›</span>
       </div>
@@ -676,21 +711,12 @@ function renderNotes() {
   }).join('');
 }
 
-function noteImgs(id) {
-  const n = notes.find(x => x.id === id);
-  return n ? (n.images || []) : [];
-}
+window.noteImgsArr = noteImgsArr;
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────
-function openSidebar()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); }
-function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); }
-function toggleSbGroup(el) { el.classList.toggle('closed'); var g = el.nextElementSibling; if (g && g.classList.contains('sb-group')) g.classList.toggle('closed'); }
-
-window.addEventListener('scroll', function() {
-  document.getElementById('back-top').classList.toggle('show', window.scrollY > 200);
-});
-
-document.addEventListener('DOMContentLoaded', init);
+window.openSidebar  = () => { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); };
+window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); };
+window.toggleSbGroup = el => { el.classList.toggle('closed'); const g = el.nextElementSibling; if (g && g.classList.contains('sb-group')) g.classList.toggle('closed'); };
 </script>
 </body>
 </html>
