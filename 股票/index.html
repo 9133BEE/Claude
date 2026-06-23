@@ -637,6 +637,7 @@ a { color: inherit; text-decoration: none; }
       <a class="sb-item" href="../stock-monitor/">外資籌碼篩選器</a>
       <a class="sb-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
       <a class="sb-item" href="trade-journal.html">交易日誌</a>
+      <a class="sb-item" href="notebook.html">筆記本</a>
     </div>
     <div class="sb-section-title closed" onclick="toggleSbGroup(this)">收藏 <span class="sb-arrow">▾</span></div>
     <div class="sb-group closed">
@@ -792,13 +793,31 @@ a { color: inherit; text-decoration: none; }
         <a class="gnav-item" href="strategy-glossary.html">技術分析策略</a>
         <a class="gnav-item" href="advanced-tips.html">股票進階技巧</a>
         <a class="gnav-item" href="futures-advanced-tips.html">期貨進階技巧</a>
-        <a class="gnav-item" href="tradingview-guide.html">TradingView 指南</a>
-        <a class="gnav-item" href="advanced-indicators.html">TradingView指標策略</a>
-        <a class="gnav-item" href="tv-indicators.html">TradingView指標大全</a>
+      </div>
+    </div>
+    <!-- TradingView -->
+    <div class="gnav-group" id="gnav-tv">
+      <button class="gnav-btn" onclick="toggleDrop('tv')">
+        TradingView <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <a class="gnav-item" href="tradingview-guide.html">TV 指南</a>
+        <a class="gnav-item" href="tv-indicators.html">TV 指標大全</a>
+        <a class="gnav-item" href="advanced-indicators.html">TV 指標策略</a>
       </div>
     </div>
     <!-- 工具 -->
-    <button class="gnav-btn" onclick="switchTools()" id="tools-btn">🔧 工具</button>
+    <div class="gnav-group" id="gnav-tools">
+      <button class="gnav-btn" onclick="toggleDrop('tools')" id="tools-btn">
+        工具 <span class="gnav-arrow">▾</span>
+      </button>
+      <div class="gnav-drop">
+        <a class="gnav-item" href="../stock-monitor/">外資籌碼篩選器</a>
+        <a class="gnav-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
+        <a class="gnav-item" href="trade-journal.html">交易日誌</a>
+        <a class="gnav-item" href="notebook.html">筆記本</a>
+      </div>
+    </div>
     <!-- 交易日誌 -->
     <a href="trade-journal.html" style="text-decoration:none;background:#e8a228;color:#000;font-weight:700;font-size:.85rem;padding:6px 16px;border-radius:8px;border:none;cursor:pointer;white-space:nowrap">交易日誌</a>
     <!-- 收藏 -->
@@ -1618,7 +1637,7 @@ function switchUSStocks(id) {
 
 // === 下拉選單：portal 容器 (position:fixed z-index:99999)，子層用 absolute 定位 ===
 // 完全繞過 iOS Safari sticky/backdrop-filter compositing 截斷問題
-const _DROP_GROUPS = ['gnav-stocks','gnav-usstocks','gnav-futures','gnav-chart','gnav-courses','gnav-glossary'];
+const _DROP_GROUPS = ['gnav-stocks','gnav-usstocks','gnav-futures','gnav-chart','gnav-courses','gnav-glossary','gnav-tv','gnav-tools'];
 (function initDrops() {
   const portal = document.createElement('div');
   portal.id = 'gnav-portal';
@@ -1662,7 +1681,8 @@ function toggleDrop(id) {
   const idMap = {
     'stocks':'gnav-stocks','us-stocks':'gnav-usstocks',
     'futures-nav':'gnav-futures','chart':'gnav-chart',
-    'courses':'gnav-courses','glossary':'gnav-glossary'
+    'courses':'gnav-courses','glossary':'gnav-glossary',
+    'tv':'gnav-tv','tools':'gnav-tools'
   };
   const targetGid = idMap[id];
   _DROP_GROUPS.forEach(function(gid) {
@@ -1677,7 +1697,7 @@ function toggleDrop(id) {
 }
 
 function closeDrop(id) {
-  const map = {'stocks':'gnav-stocks','us-stocks':'gnav-usstocks','futures-nav':'gnav-futures','chart':'gnav-chart','courses':'gnav-courses','glossary':'gnav-glossary'};
+  const map = {'stocks':'gnav-stocks','us-stocks':'gnav-usstocks','futures-nav':'gnav-futures','chart':'gnav-chart','courses':'gnav-courses','glossary':'gnav-glossary','tv':'gnav-tv','tools':'gnav-tools'};
   const gid = map[id];
   if (gid) _hideGroupDrop(gid);
 }

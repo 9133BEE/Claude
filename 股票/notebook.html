@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>筆記本</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #131722; color: #D1D4DC;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px; line-height: 1.4;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: #1E222D; border-bottom: 1px solid #2A2E39;
+      height: 56px; display: flex; align-items: center;
+      padding: 0 16px; gap: 12px;
+      position: sticky; top: 0; z-index: 300;
+    }
+    .hamburger {
+      background: rgba(255,255,255,.06); border: 1px solid #2A2E39;
+      border-radius: 4px; color: #D1D4DC; font-size: 20px;
+      cursor: pointer; padding: 4px 10px; line-height: 1; flex-shrink: 0;
+    }
+    .hamburger:hover { background: rgba(255,255,255,.12); }
+    .toolbar-title { font-size: 17px; font-weight: 700; color: #D1D4DC; flex-shrink: 0; }
+    .toolbar-title span { color: #787B86; font-weight: 400; font-size: 13px; margin-left: 6px; }
+    .header-spacer { flex: 1; }
+    .note-count-badge {
+      font-size: 12px; color: #787B86; background: #2A2E39;
+      border: 1px solid #363A45; border-radius: 4px; padding: 3px 10px;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main-wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 72px; }
+
+    /* ── NOTE FORM ── */
+    .form-card {
+      background: #1E222D; border: 1px solid #2A2E39;
+      border-radius: 8px; padding: 20px; margin-bottom: 20px;
+    }
+    .form-card-title {
+      font-size: 12px; font-weight: 700; color: #787B86;
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px;
+    }
+    .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+    .form-field.field-date   { flex: 0 0 140px; }
+    .form-field.field-title  { flex: 2; min-width: 180px; }
+    .form-field.field-type   { flex: 0 0 130px; }
+    .field-label {
+      font-size: 11px; font-weight: 700; color: #787B86;
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    .field-input, .field-select, .field-textarea {
+      background: #131722; border: 1px solid #2A2E39; border-radius: 4px;
+      padding: 7px 10px; color: #D1D4DC; font-size: 14px;
+      font-family: inherit; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      color-scheme: dark;
+    }
+    .field-input:focus, .field-select:focus, .field-textarea:focus {
+      border-color: #2962FF; box-shadow: 0 0 0 2px rgba(41,98,255,.15);
+    }
+    .field-textarea { resize: vertical; line-height: 1.65; min-height: 110px; }
+    .form-actions { display: flex; justify-content: flex-end; margin-top: 12px; gap: 8px; }
+    .btn-save {
+      background: #2962FF; border: none; border-radius: 4px;
+      padding: 0 22px; height: 36px; color: #fff;
+      font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: background .15s;
+    }
+    .btn-save:hover { background: #1E53E5; }
+    .btn-clear {
+      background: #2A2E39; border: 1px solid #363A45; border-radius: 4px;
+      padding: 0 14px; height: 36px; color: #787B86;
+      font-size: 14px; cursor: pointer; font-family: inherit;
+      transition: background .15s;
+    }
+    .btn-clear:hover { background: #363A45; color: #D1D4DC; }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .filter-label { font-size: 12px; color: #787B86; flex-shrink: 0; }
+    .filter-chip {
+      padding: 3px 12px; border-radius: 100px; font-size: 12px;
+      border: 1px solid #2A2E39; color: #787B86; background: #131722;
+      cursor: pointer; transition: all .12s; font-family: inherit;
+    }
+    .filter-chip:hover { border-color: #2962FF; color: #7BA3F8; }
+    .filter-chip.active { background: rgba(41,98,255,.12); border-color: rgba(41,98,255,.3); color: #7BA3F8; }
+
+    /* ── NOTES LIST ── */
+    .notes-list { display: flex; flex-direction: column; gap: 6px; }
+    .note-item {
+      background: #1E222D; border: 1px solid #2A2E39; border-radius: 6px;
+      overflow: hidden; transition: border-color .15s;
+    }
+    .note-item:hover { border-color: #363A45; }
+    .note-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; cursor: pointer; user-select: none;
+    }
+    .note-date {
+      font-size: 11px; font-weight: 600; color: #787B86;
+      background: #2A2E39; border-radius: 3px; padding: 2px 7px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .note-type-tag {
+      font-size: 11px; font-weight: 700; padding: 2px 7px;
+      border-radius: 3px; white-space: nowrap; flex-shrink: 0;
+    }
+    .tag-market   { background: rgba(41,98,255,.12); color: #7BA3F8; border: 1px solid rgba(41,98,255,.25); }
+    .tag-technical{ background: rgba(90,163,240,.12); color: #5aa3f0; border: 1px solid rgba(90,163,240,.25); }
+    .tag-stock    { background: rgba(8,153,129,.12); color: #089981; border: 1px solid rgba(8,153,129,.25); }
+    .tag-chip     { background: rgba(240,185,11,.12); color: #F0B90B; border: 1px solid rgba(240,185,11,.25); }
+    .tag-strategy { background: rgba(124,58,237,.12); color: #a78bfa; border: 1px solid rgba(124,58,237,.25); }
+    .tag-review   { background: rgba(242,54,69,.12); color: #F23645; border: 1px solid rgba(242,54,69,.25); }
+    .note-title {
+      font-size: 14px; font-weight: 600; color: #D1D4DC;
+      flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .note-del {
+      background: none; border: none; color: #4a4f5e; font-size: 14px;
+      cursor: pointer; padding: 3px; line-height: 1; flex-shrink: 0;
+      transition: color .12s;
+    }
+    .note-del:hover { color: #F23645; }
+    .note-chevron {
+      font-size: 14px; color: #4a4f5e; flex-shrink: 0;
+      display: inline-block; transition: transform .22s;
+    }
+    .note-item.expanded .note-chevron { transform: rotate(90deg); color: #2962FF; }
+    .note-body {
+      max-height: 0; overflow: hidden; transition: max-height .28s ease;
+      border-top: 0px solid #2A2E39;
+    }
+    .note-item.expanded .note-body { max-height: 800px; border-top-width: 1px; }
+    .note-body-inner {
+      padding: 14px 16px; font-size: 14px; color: #9AA3B2;
+      line-height: 1.75; white-space: pre-wrap; word-break: break-word;
+    }
+    .note-empty {
+      text-align: center; padding: 60px 24px; color: #4a4f5e;
+    }
+    .note-empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .note-empty-msg { font-size: 15px; color: #787B86; }
+
+    /* ── SIDEBAR ── */
+    .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 999; }
+    .sb-overlay.open { display: block; }
+    .sidebar {
+      position: fixed; top: 0; left: -260px; width: 240px; height: 100vh;
+      background: #1E222D; border-right: 1px solid #2A2E39;
+      z-index: 1000; transition: left .22s ease; overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .sidebar.open { left: 0; }
+    .sb-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; border-bottom: 1px solid #2A2E39; flex-shrink: 0;
+    }
+    .sb-logo { font-size: 17px; font-weight: 700; color: #D1D4DC; }
+    .sb-close { background: none; border: none; color: #787B86; font-size: 16px; cursor: pointer; padding: 0; }
+    .sb-close:hover { color: #D1D4DC; }
+    .sb-nav { padding: 8px 0 24px; }
+    .sb-section-title {
+      font-size: 11px; font-weight: 700; color: #787B86; letter-spacing: .08em;
+      text-transform: uppercase; padding: 14px 16px 5px;
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;
+    }
+    .sb-section-title:hover { color: #c9d1d9; }
+    .sb-arrow { font-size: 10px; opacity: .55; transition: transform .2s; flex-shrink: 0; }
+    .sb-section-title.closed .sb-arrow { transform: rotate(-90deg); }
+    .sb-group { overflow: hidden; max-height: 600px; transition: max-height .25s ease; }
+    .sb-group.closed { max-height: 0; }
+    .sb-item { display: block; padding: 6px 16px; font-size: 14px; color: #9AA3B2; text-decoration: none; transition: background .12s, color .12s; }
+    .sb-item:hover { background: #252931; color: #D1D4DC; }
+    .sb-item.sb-active { color: #D1D4DC; font-weight: 600; }
+
+    /* ── BACK TOP ── */
+    #back-top {
+      position: fixed; bottom: 20px; right: 16px; z-index: 998;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #2962FF; border: none; color: #fff; font-size: 18px;
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(41,98,255,.4);
+    }
+    #back-top.show { display: flex; }
+    #back-top:hover { background: #1E53E5; }
+
+    @media (max-width: 640px) {
+      .main-wrap { padding: 14px 12px 56px; }
+      .form-card { padding: 14px; }
+      .form-row { flex-direction: column; }
+      .form-field.field-date, .form-field.field-type { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <span class="sb-logo">📊 股票工具箱</span>
+    <button class="sb-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section-title" onclick="toggleSbGroup(this)">工具 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group">
+      <a class="sb-item" href="../stock-monitor/">外資籌碼篩選器</a>
+      <a class="sb-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
+      <a class="sb-item" href="trade-journal.html">交易日誌</a>
+      <a class="sb-item sb-active" href="notebook.html">筆記本</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">收藏 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="index.html">我的收藏</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">TradingView <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="tradingview-guide.html">TV 指南</a>
+      <a class="sb-item" href="tv-indicators.html">TV 指標大全</a>
+      <a class="sb-item" href="advanced-indicators.html">TV 指標策略</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">台股 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="index.html">技術</a>
+      <a class="sb-item" href="index.html">基本</a>
+      <a class="sb-item" href="index.html">籌碼</a>
+      <a class="sb-item" href="index.html">消息</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">圖鑑 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="candlestick-patterns.html">全部</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">教學 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="stock-course.html">台股課程</a>
+      <a class="sb-item" href="futures-course.html">台指期課程</a>
+      <a class="sb-item" href="stock-glossary.html">股票相關名詞</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">策略 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="strategy-glossary.html">技術分析策略</a>
+      <a class="sb-item" href="advanced-tips.html">股票進階技巧</a>
+    </div>
+  </nav>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <button class="hamburger" onclick="openSidebar()">☰</button>
+  <div class="toolbar-title">筆記本 <span>記錄市場觀察與交易心得</span></div>
+  <div class="header-spacer"></div>
+  <span class="note-count-badge" id="note-count">0 篇筆記</span>
+</div>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- FORM -->
+  <div class="form-card">
+    <div class="form-card-title">新增筆記</div>
+    <div class="form-row">
+      <div class="form-field field-date">
+        <span class="field-label">日期</span>
+        <input type="date" id="note-date" class="field-input">
+      </div>
+      <div class="form-field field-title">
+        <span class="field-label">標題</span>
+        <input type="text" id="note-title" class="field-input" placeholder="今日市場觀察 / 個股研究...">
+      </div>
+      <div class="form-field field-type">
+        <span class="field-label">類型</span>
+        <select id="note-type" class="field-select">
+          <option value="market">市場觀察</option>
+          <option value="technical">技術分析</option>
+          <option value="stock">個股研究</option>
+          <option value="chip">籌碼分析</option>
+          <option value="strategy">交易策略</option>
+          <option value="review">事後檢討</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field" style="margin-bottom:0">
+      <span class="field-label">內容</span>
+      <textarea id="note-content" class="field-textarea" placeholder="寫下你的想法、觀察、心得...&#10;&#10;可以記錄：今日大盤走勢、個股分析重點、進出場理由、學習心得..."></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn-clear" onclick="clearForm()">清除</button>
+      <button class="btn-save" onclick="saveNote()">儲存筆記</button>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <span class="filter-label">類型</span>
+    <button class="filter-chip active" data-type="all" onclick="filterNotes('all',this)">全部</button>
+    <button class="filter-chip" data-type="market" onclick="filterNotes('market',this)">市場觀察</button>
+    <button class="filter-chip" data-type="technical" onclick="filterNotes('technical',this)">技術分析</button>
+    <button class="filter-chip" data-type="stock" onclick="filterNotes('stock',this)">個股研究</button>
+    <button class="filter-chip" data-type="chip" onclick="filterNotes('chip',this)">籌碼分析</button>
+    <button class="filter-chip" data-type="strategy" onclick="filterNotes('strategy',this)">交易策略</button>
+    <button class="filter-chip" data-type="review" onclick="filterNotes('review',this)">事後檢討</button>
+  </div>
+
+  <!-- NOTES LIST -->
+  <div id="notes-list" class="notes-list"></div>
+
+</div>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
+
+<script>
+const TYPE_LABELS = { market:'市場觀察', technical:'技術分析', stock:'個股研究', chip:'籌碼分析', strategy:'交易策略', review:'事後檢討' };
+let notes = JSON.parse(localStorage.getItem('stock_notebook') || '[]');
+let currentFilter = 'all';
+
+function init() {
+  const today = new Date();
+  document.getElementById('note-date').value =
+    today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  renderNotes();
+}
+
+function saveNote() {
+  const date    = document.getElementById('note-date').value;
+  const title   = document.getElementById('note-title').value.trim();
+  const type    = document.getElementById('note-type').value;
+  const content = document.getElementById('note-content').value.trim();
+  if (!date)    { alert('請選擇日期'); return; }
+  if (!title)   { alert('請輸入標題'); return; }
+  if (!content) { alert('請輸入筆記內容'); return; }
+  notes.unshift({ id: Date.now(), date, title, type, content });
+  localStorage.setItem('stock_notebook', JSON.stringify(notes));
+  clearForm();
+  renderNotes();
+}
+
+function clearForm() {
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-content').value = '';
+}
+
+function deleteNote(id) {
+  if (!confirm('確定要刪除這篇筆記？')) return;
+  notes = notes.filter(n => n.id !== id);
+  localStorage.setItem('stock_notebook', JSON.stringify(notes));
+  renderNotes();
+}
+
+function toggleNote(id) {
+  const item = document.getElementById('ni-' + id);
+  if (!item) return;
+  const body = item.querySelector('.note-body');
+  const isExp = item.classList.contains('expanded');
+  if (isExp) { item.classList.remove('expanded'); body.style.maxHeight = '0'; }
+  else        { item.classList.add('expanded');    body.style.maxHeight = body.scrollHeight + 'px'; }
+}
+
+function filterNotes(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+  renderNotes();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderNotes() {
+  const list = document.getElementById('notes-list');
+  const filtered = currentFilter === 'all' ? notes : notes.filter(n => n.type === currentFilter);
+
+  document.getElementById('note-count').textContent = notes.length + ' 篇筆記';
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="note-empty">
+      <div class="note-empty-icon">📝</div>
+      <div class="note-empty-msg">${currentFilter === 'all' ? '還沒有筆記，開始記錄第一篇！' : '此類型還沒有筆記'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(n => `
+    <div class="note-item" id="ni-${n.id}">
+      <div class="note-header" onclick="toggleNote(${n.id})">
+        <span class="note-date">${esc(n.date)}</span>
+        <span class="note-type-tag tag-${esc(n.type)}">${TYPE_LABELS[n.type] || esc(n.type)}</span>
+        <span class="note-title">${esc(n.title)}</span>
+        <button class="note-del" onclick="event.stopPropagation();deleteNote(${n.id})" title="刪除">✕</button>
+        <span class="note-chevron">›</span>
+      </div>
+      <div class="note-body">
+        <div class="note-body-inner">${esc(n.content)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function openSidebar()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); }
+function toggleSbGroup(el) { el.classList.toggle('closed'); var g = el.nextElementSibling; if (g && g.classList.contains('sb-group')) g.classList.toggle('closed'); }
+
+window.addEventListener('scroll', function() {
+  document.getElementById('back-top').classList.toggle('show', window.scrollY > 200);
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
