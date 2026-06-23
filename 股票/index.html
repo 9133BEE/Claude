@@ -557,6 +557,70 @@ a { color: inherit; text-decoration: none; }
 .sb-group.closed{max-height:0}
 .sb-hamburger { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.15); border-radius: 4px; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 10px; line-height: 1; flex-shrink: 0; margin-right: 12px; }
 .sb-hamburger:hover { background: rgba(0,0,0,.4); }
+
+/* ── TOOLS PANEL ── */
+.tools-wrap { max-width:1200px; margin:0 auto; padding:24px 28px 72px; display:flex; flex-direction:column; gap:28px; }
+.tools-section-title { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:4px; }
+.tools-section-sub { font-size:.78rem; color:var(--text-muted); margin-bottom:12px; }
+.tool-cards { display:flex; flex-direction:column; gap:8px; }
+.tool-card {
+  display:flex; align-items:center; gap:16px;
+  background:var(--bg-card); border:1px solid var(--border-default);
+  border-radius:var(--radius); padding:16px 20px;
+  text-decoration:none; color:inherit;
+  transition:all var(--t-fast); box-shadow:var(--shadow-card);
+}
+.tool-card:hover { border-color:var(--accent-border); background:var(--bg-card-hover); box-shadow:var(--shadow-hover); }
+.tool-card-icon { font-size:1.5rem; flex-shrink:0; }
+.tool-card-info { flex:1; min-width:0; }
+.tool-card-title { font-size:.95rem; font-weight:700; color:var(--text-primary); }
+.tool-card-desc { font-size:.78rem; color:var(--text-muted); margin-top:2px; }
+.tool-card-arrow { font-size:1rem; color:var(--accent); font-weight:700; flex-shrink:0; }
+
+/* Note Form */
+.note-form { background:var(--bg-card); border:1px solid var(--border-default); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-card); margin-bottom:12px; }
+.note-form-row { display:flex; gap:10px; flex-wrap:wrap; }
+.note-form-field { display:flex; flex-direction:column; gap:4px; flex:1; min-width:130px; }
+.note-form-field label { font-size:.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; }
+.note-form-field input, .note-form-field select, .note-form-field textarea {
+  border:1px solid var(--border-default); border-radius:6px;
+  padding:7px 10px; font-size:.88rem; font-family:var(--font);
+  color:var(--text-primary); background:var(--bg-raised);
+  outline:none; transition:border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.note-form-field input:focus, .note-form-field select:focus, .note-form-field textarea:focus {
+  border-color:var(--accent-border); box-shadow:0 0 0 3px var(--accent-dim);
+}
+.note-form-field textarea { resize:vertical; line-height:1.6; }
+.note-save-btn { margin-top:10px; display:flex; justify-content:flex-end; }
+.note-save-btn button { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:8px 22px; font-size:.88rem; font-weight:600; cursor:pointer; font-family:var(--font); transition:opacity var(--t-fast); }
+.note-save-btn button:hover { opacity:.85; }
+.notes-list { display:flex; flex-direction:column; gap:8px; }
+.note-item { background:var(--bg-card); border:1px solid var(--border-default); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-card); }
+.note-item-header { display:flex; align-items:center; gap:10px; padding:12px 16px; cursor:pointer; }
+.note-item:hover .note-item-header { background:var(--bg-card-hover); }
+.note-date-badge { font-size:.7rem; font-weight:600; color:var(--text-muted); background:var(--bg-raised); border:1px solid var(--border-default); border-radius:4px; padding:2px 7px; white-space:nowrap; flex-shrink:0; }
+.note-type-badge { font-size:.67rem; font-weight:600; padding:2px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
+.note-item-title { font-size:.9rem; font-weight:600; color:var(--text-primary); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.note-del-btn { background:none; border:none; color:var(--text-faint); font-size:.95rem; cursor:pointer; padding:3px; line-height:1; flex-shrink:0; transition:color var(--t-fast); }
+.note-del-btn:hover { color:var(--bear); }
+.note-chevron { font-size:.95rem; color:var(--text-faint); flex-shrink:0; display:inline-block; transition:transform .25s; }
+.note-item.expanded .note-chevron { transform:rotate(90deg); color:var(--accent); }
+.note-body { max-height:0; overflow:hidden; transition:max-height .3s ease; border-top:0px solid var(--border-subtle); }
+.note-item.expanded .note-body { max-height:600px; border-top-width:1px; }
+.note-body-text { padding:12px 16px; font-size:.85rem; color:var(--text-secondary); line-height:1.75; white-space:pre-wrap; word-break:break-word; }
+.note-empty { text-align:center; padding:40px 24px; color:var(--text-muted); font-size:.9rem; }
+.type-market   { background:rgba(59,130,246,.1); color:#3b82f6; border:1px solid rgba(59,130,246,.25); }
+.type-technical{ background:rgba(29,78,216,.1); color:var(--accent); border:1px solid rgba(29,78,216,.25); }
+.type-stock    { background:rgba(5,150,105,.1); color:var(--bull); border:1px solid rgba(5,150,105,.25); }
+.type-chip     { background:rgba(217,119,6,.1); color:var(--warn); border:1px solid rgba(217,119,6,.25); }
+.type-strategy { background:rgba(124,58,237,.1); color:var(--purple); border:1px solid rgba(124,58,237,.25); }
+.type-review   { background:rgba(220,38,38,.1); color:var(--bear); border:1px solid rgba(220,38,38,.25); }
+@media(max-width:640px){
+  .tools-wrap { padding:16px 16px 56px; }
+  .note-form-row { flex-direction:column; }
+  .tool-card { padding:12px 14px; gap:12px; }
+}
 </style>
 </head>
 <body>
@@ -571,6 +635,7 @@ a { color: inherit; text-decoration: none; }
     <div class="sb-section-title" onclick="toggleSbGroup(this)">工具 <span class="sb-arrow">▾</span></div>
     <div class="sb-group">
       <a class="sb-item" href="../stock-monitor/">外資籌碼篩選器</a>
+      <a class="sb-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
       <a class="sb-item" href="trade-journal.html">交易日誌</a>
     </div>
     <div class="sb-section-title closed" onclick="toggleSbGroup(this)">收藏 <span class="sb-arrow">▾</span></div>
@@ -732,6 +797,8 @@ a { color: inherit; text-decoration: none; }
         <a class="gnav-item" href="tv-indicators.html">TradingView指標大全</a>
       </div>
     </div>
+    <!-- 工具 -->
+    <button class="gnav-btn" onclick="switchTools()" id="tools-btn">🔧 工具</button>
     <!-- 交易日誌 -->
     <a href="trade-journal.html" style="text-decoration:none;background:#e8a228;color:#000;font-weight:700;font-size:.85rem;padding:6px 16px;border-radius:8px;border:none;cursor:pointer;white-space:nowrap">交易日誌</a>
     <!-- 收藏 -->
@@ -745,7 +812,7 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <!-- JOURNAL BANNER -->
-<div class="journal-banner">
+<div class="journal-banner" id="journal-banner">
   <a class="journal-btn" href="trade-journal.html">
     <div class="jb-left">
       <div class="jb-icon">📒</div>
@@ -771,7 +838,7 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <!-- CARDS -->
-<div class="cards-section">
+<div class="cards-section" id="cards-section">
   <div class="cards-grid" id="cards-grid"></div>
 </div>
 
@@ -1403,6 +1470,7 @@ function toggleStar(id, e) {
 
 function switchFavorites() {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  hideToolsPanel();
   currentSection = 'favorites';
   document.querySelectorAll('.gnav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('fav-btn').classList.add('active');
@@ -1498,6 +1566,7 @@ function renderSection(sectionId) {
 
 function switchTab(id) {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  hideToolsPanel();
   currentSection = id;
   const labels = {all:'全部', technical:'技術', fundamental:'基本', chip:'籌碼', news:'消息'};
   const subEl = document.getElementById('sub-stocks');
@@ -1515,6 +1584,7 @@ function switchTab(id) {
 
 function switchFutures(mkt) {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  hideToolsPanel();
   const id = mkt === 'us' ? 'futures-us' : 'futures-tw';
   currentSection = id;
   const subEl = document.getElementById('sub-futures');
@@ -1532,6 +1602,7 @@ function switchFutures(mkt) {
 
 function switchUSStocks(id) {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  hideToolsPanel();
   currentSection = id;
   const labels = {'us-basic':'基礎','us-pick':'選股','us-advanced':'進階'};
   document.querySelectorAll('#gnav-usstocks .gnav-item').forEach(b => {
@@ -1764,5 +1835,164 @@ function closeSidebar() {
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
 <script>window.addEventListener('scroll',function(){document.getElementById('back-top').classList.toggle('show',window.scrollY>280);});</script>
 <script>function toggleSbGroup(el){el.classList.toggle('closed');var g=el.nextElementSibling;if(g&&g.classList.contains('sb-group'))g.classList.toggle('closed');}</script>
+
+<!-- TOOLS PANEL -->
+<div id="tools-panel" style="display:none">
+  <div class="tools-wrap">
+
+    <!-- External Tools -->
+    <div>
+      <div class="tools-section-title">📊 分析工具</div>
+      <div class="tools-section-sub">快速進入常用的交易分析工具</div>
+      <div class="tool-cards">
+        <a href="../stock-monitor/" class="tool-card">
+          <div class="tool-card-icon">📈</div>
+          <div class="tool-card-info">
+            <div class="tool-card-title">外資籌碼篩選器</div>
+            <div class="tool-card-desc">篩選外資買超／賣超個股，比對兩日籌碼變化，發現主力動向</div>
+          </div>
+          <span class="tool-card-arrow">→</span>
+        </a>
+        <a href="../stock-monitor/signal-tracker.html" class="tool-card">
+          <div class="tool-card-icon">🔔</div>
+          <div class="tool-card-info">
+            <div class="tool-card-title">籌碼訊號器</div>
+            <div class="tool-card-desc">追蹤外資籌碼分層訊號，觀察強度等級，掌握買賣時機</div>
+          </div>
+          <span class="tool-card-arrow">→</span>
+        </a>
+        <a href="trade-journal.html" class="tool-card">
+          <div class="tool-card-icon">📒</div>
+          <div class="tool-card-info">
+            <div class="tool-card-title">交易日誌</div>
+            <div class="tool-card-desc">記錄每一筆交易的判斷與檢討，持續追蹤績效，提升勝率</div>
+          </div>
+          <span class="tool-card-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Notebook -->
+    <div>
+      <div class="tools-section-title">📝 筆記本</div>
+      <div class="tools-section-sub">記錄市場觀察、個股研究與交易心得</div>
+
+      <div class="note-form">
+        <div class="note-form-row">
+          <div class="note-form-field" style="min-width:130px;flex:0 0 auto">
+            <label>日期</label>
+            <input type="date" id="note-date">
+          </div>
+          <div class="note-form-field" style="flex:2">
+            <label>標題</label>
+            <input type="text" id="note-title" placeholder="今日市場觀察 / 個股研究...">
+          </div>
+          <div class="note-form-field" style="min-width:130px;flex:0 0 auto">
+            <label>類型</label>
+            <select id="note-type">
+              <option value="market">市場觀察</option>
+              <option value="technical">技術分析</option>
+              <option value="stock">個股研究</option>
+              <option value="chip">籌碼分析</option>
+              <option value="strategy">交易策略</option>
+              <option value="review">事後檢討</option>
+            </select>
+          </div>
+        </div>
+        <div class="note-form-field" style="margin-top:10px">
+          <label>內容</label>
+          <textarea id="note-content" rows="5" placeholder="寫下你的想法、觀察、心得..."></textarea>
+        </div>
+        <div class="note-save-btn">
+          <button onclick="saveNote()">儲存筆記</button>
+        </div>
+      </div>
+
+      <div id="notes-list" class="notes-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── TOOLS PANEL & NOTEBOOK ───────────────────────────────────────────────
+
+let _notesData = JSON.parse(localStorage.getItem('stock_notebook') || '[]');
+const _noteTypeLabels = { market:'市場觀察', technical:'技術分析', stock:'個股研究', chip:'籌碼分析', strategy:'交易策略', review:'事後檢討' };
+
+function switchTools() {
+  if (typeof expandedCard !== 'undefined' && expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  if (typeof _DROP_GROUPS !== 'undefined') _DROP_GROUPS.forEach(gid => _hideGroupDrop(gid));
+  document.querySelectorAll('.gnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tools-btn').classList.add('active');
+  document.getElementById('journal-banner').style.display = 'none';
+  document.getElementById('filter-bar').style.display = 'none';
+  document.getElementById('cards-section').style.display = 'none';
+  document.getElementById('tools-panel').style.display = 'block';
+  const today = new Date();
+  document.getElementById('note-date').value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  renderNotes();
+  document.getElementById('tab-nav').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function hideToolsPanel() {
+  const p = document.getElementById('tools-panel'); if (p) p.style.display = 'none';
+  const jb = document.getElementById('journal-banner'); if (jb) jb.style.display = '';
+  const fb = document.getElementById('filter-bar'); if (fb) fb.style.display = '';
+  const cs = document.getElementById('cards-section'); if (cs) cs.style.display = '';
+  const tb = document.getElementById('tools-btn'); if (tb) tb.classList.remove('active');
+}
+
+function saveNote() {
+  const date = document.getElementById('note-date').value;
+  const title = document.getElementById('note-title').value.trim();
+  const type = document.getElementById('note-type').value;
+  const content = document.getElementById('note-content').value.trim();
+  if (!date) { alert('請選擇日期'); return; }
+  if (!title) { alert('請輸入標題'); return; }
+  if (!content) { alert('請輸入筆記內容'); return; }
+  _notesData.unshift({ id: Date.now(), date, title, type, content });
+  localStorage.setItem('stock_notebook', JSON.stringify(_notesData));
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-content').value = '';
+  renderNotes();
+}
+
+function deleteNote(id) {
+  if (!confirm('確定要刪除這篇筆記？')) return;
+  _notesData = _notesData.filter(n => n.id !== id);
+  localStorage.setItem('stock_notebook', JSON.stringify(_notesData));
+  renderNotes();
+}
+
+function toggleNote(id) {
+  const item = document.getElementById('note-' + id);
+  if (!item) return;
+  const body = item.querySelector('.note-body');
+  const expanded = item.classList.contains('expanded');
+  if (expanded) { item.classList.remove('expanded'); body.style.maxHeight = '0'; }
+  else { item.classList.add('expanded'); body.style.maxHeight = body.scrollHeight + 'px'; }
+}
+
+function _escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderNotes() {
+  const el = document.getElementById('notes-list'); if (!el) return;
+  if (!_notesData.length) { el.innerHTML = '<div class="note-empty">📝 還沒有筆記，開始記錄第一篇！</div>'; return; }
+  el.innerHTML = _notesData.map(n => `
+    <div class="note-item" id="note-${n.id}">
+      <div class="note-item-header" onclick="toggleNote(${n.id})">
+        <span class="note-date-badge">${_escH(n.date)}</span>
+        <span class="note-type-badge type-${_escH(n.type)}">${_noteTypeLabels[n.type]||_escH(n.type)}</span>
+        <span class="note-item-title">${_escH(n.title)}</span>
+        <button class="note-del-btn" onclick="event.stopPropagation();deleteNote(${n.id})" title="刪除">✕</button>
+        <span class="note-chevron">›</span>
+      </div>
+      <div class="note-body">
+        <div class="note-body-text">${_escH(n.content)}</div>
+      </div>
+    </div>`).join('');
+}
+</script>
 </body>
 </html>
