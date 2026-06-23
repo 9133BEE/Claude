@@ -7,30 +7,31 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #131722; color: #D1D4DC;
+      background: #F2F2F7; color: #1C1C1E;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 15px; line-height: 1.4;
     }
 
     /* ── HEADER ── */
     .header {
-      background: #1E222D; border-bottom: 1px solid #2A2E39;
+      background: #FFFFFF; border-bottom: 1px solid #E5E5EA;
       height: 56px; display: flex; align-items: center;
       padding: 0 16px; gap: 12px;
       position: sticky; top: 0; z-index: 300;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
     }
     .hamburger {
-      background: rgba(255,255,255,.06); border: 1px solid #2A2E39;
-      border-radius: 4px; color: #D1D4DC; font-size: 20px;
+      background: #F2F2F7; border: 1px solid #E5E5EA;
+      border-radius: 4px; color: #1C1C1E; font-size: 20px;
       cursor: pointer; padding: 4px 10px; line-height: 1; flex-shrink: 0;
     }
-    .hamburger:hover { background: rgba(255,255,255,.12); }
-    .toolbar-title { font-size: 17px; font-weight: 700; color: #D1D4DC; flex-shrink: 0; }
-    .toolbar-title span { color: #787B86; font-weight: 400; font-size: 13px; margin-left: 6px; }
+    .hamburger:hover { background: #E5E5EA; }
+    .toolbar-title { font-size: 17px; font-weight: 700; color: #1C1C1E; flex-shrink: 0; }
+    .toolbar-title span { color: #8E8E93; font-weight: 400; font-size: 13px; margin-left: 6px; }
     .header-spacer { flex: 1; }
     .note-count-badge {
-      font-size: 12px; color: #787B86; background: #2A2E39;
-      border: 1px solid #363A45; border-radius: 4px; padding: 3px 10px;
+      font-size: 12px; color: #8E8E93; background: #F2F2F7;
+      border: 1px solid #E5E5EA; border-radius: 4px; padding: 3px 10px;
     }
 
     /* ── MAIN LAYOUT ── */
@@ -38,197 +39,205 @@
 
     /* ── NOTE FORM ── */
     .form-card {
-      background: #1E222D; border: 1px solid #2A2E39;
-      border-radius: 8px; padding: 20px; margin-bottom: 20px;
+      background: #FFFFFF; border: 1px solid #E5E5EA;
+      border-radius: 10px; padding: 20px; margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
     }
     .form-card-title {
-      font-size: 12px; font-weight: 700; color: #787B86;
+      font-size: 12px; font-weight: 700; color: #8E8E93;
       text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px;
     }
+    .form-card-title.editing-mode { color: #2962FF; }
     .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
     .form-field { display: flex; flex-direction: column; gap: 4px; }
     .form-field.field-date   { flex: 0 0 140px; }
     .form-field.field-title  { flex: 2; min-width: 180px; }
     .form-field.field-type   { flex: 0 0 130px; }
     .field-label {
-      font-size: 11px; font-weight: 700; color: #787B86;
+      font-size: 11px; font-weight: 700; color: #8E8E93;
       text-transform: uppercase; letter-spacing: .06em;
     }
     .field-input, .field-select, .field-textarea {
-      background: #131722; border: 1px solid #2A2E39; border-radius: 4px;
-      padding: 7px 10px; color: #D1D4DC; font-size: 14px;
+      background: #F9F9FB; border: 1px solid #E5E5EA; border-radius: 6px;
+      padding: 8px 10px; color: #1C1C1E; font-size: 14px;
       font-family: inherit; outline: none;
       transition: border-color .15s, box-shadow .15s;
-      color-scheme: dark;
     }
     .field-input:focus, .field-select:focus, .field-textarea:focus {
-      border-color: #2962FF; box-shadow: 0 0 0 2px rgba(41,98,255,.15);
+      border-color: #2962FF; box-shadow: 0 0 0 3px rgba(41,98,255,.1);
+      background: #FFFFFF;
     }
     .field-textarea { resize: vertical; line-height: 1.65; min-height: 110px; }
 
     /* ── IMAGE UPLOAD ── */
     .img-section { margin-top: 10px; }
     .img-upload-area {
-      border: 1.5px dashed #2A2E39; border-radius: 6px;
+      border: 1.5px dashed #D1D1D6; border-radius: 8px;
       padding: 14px 16px; display: flex; align-items: center; gap: 12px;
-      cursor: pointer; transition: border-color .15s, background .15s;
+      cursor: pointer; background: #F9F9FB;
+      transition: border-color .15s, background .15s;
     }
-    .img-upload-area:hover { border-color: #2962FF; background: rgba(41,98,255,.04); }
-    .img-upload-area.drag-over { border-color: #2962FF; background: rgba(41,98,255,.08); }
+    .img-upload-area:hover { border-color: #2962FF; background: rgba(41,98,255,.03); }
+    .img-upload-area.drag-over { border-color: #2962FF; background: rgba(41,98,255,.06); }
     .img-upload-icon { font-size: 22px; flex-shrink: 0; }
-    .img-upload-text { font-size: 13px; color: #787B86; }
-    .img-upload-text strong { color: #7BA3F8; }
+    .img-upload-text { font-size: 13px; color: #8E8E93; }
+    .img-upload-text strong { color: #2962FF; }
     #img-file-input { display: none; }
 
-    /* image preview grid */
-    .img-preview-grid {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
-    }
+    .img-preview-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .img-preview-wrap {
       position: relative; width: 80px; height: 80px;
-      border-radius: 5px; overflow: hidden;
-      border: 1px solid #2A2E39;
+      border-radius: 6px; overflow: hidden; border: 1px solid #E5E5EA;
     }
-    .img-preview-wrap img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
+    .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .img-preview-del {
       position: absolute; top: 2px; right: 2px;
       width: 18px; height: 18px; border-radius: 50%;
-      background: rgba(0,0,0,.7); border: none;
+      background: rgba(0,0,0,.5); border: none;
       color: #fff; font-size: 10px; line-height: 1;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .img-preview-del:hover { background: #F23645; }
+    .img-preview-del:hover { background: #FF3B30; }
 
-    .form-actions { display: flex; justify-content: flex-end; margin-top: 12px; gap: 8px; align-items: center; }
-    .img-size-warn { font-size: 11px; color: #F0B90B; flex: 1; }
+    .form-actions { display: flex; justify-content: flex-end; margin-top: 14px; gap: 8px; align-items: center; }
+    .img-size-warn { font-size: 11px; color: #FF9500; flex: 1; }
     .btn-save {
-      background: #2962FF; border: none; border-radius: 4px;
+      background: #2962FF; border: none; border-radius: 6px;
       padding: 0 22px; height: 36px; color: #fff;
       font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
       transition: background .15s;
     }
     .btn-save:hover { background: #1E53E5; }
+    .btn-cancel-edit {
+      background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 6px;
+      padding: 0 14px; height: 36px; color: #8E8E93;
+      font-size: 14px; cursor: pointer; font-family: inherit;
+      display: none;
+    }
+    .btn-cancel-edit.visible { display: block; }
+    .btn-cancel-edit:hover { background: #E5E5EA; color: #1C1C1E; }
     .btn-clear {
-      background: #2A2E39; border: 1px solid #363A45; border-radius: 4px;
-      padding: 0 14px; height: 36px; color: #787B86;
+      background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 6px;
+      padding: 0 14px; height: 36px; color: #8E8E93;
       font-size: 14px; cursor: pointer; font-family: inherit;
       transition: background .15s;
     }
-    .btn-clear:hover { background: #363A45; color: #D1D4DC; }
+    .btn-clear:hover { background: #E5E5EA; color: #1C1C1E; }
 
     /* ── FILTER BAR ── */
     .filter-bar {
       display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
       margin-bottom: 14px;
     }
-    .filter-label { font-size: 12px; color: #787B86; flex-shrink: 0; }
+    .filter-label { font-size: 12px; color: #8E8E93; flex-shrink: 0; }
     .filter-chip {
-      padding: 3px 12px; border-radius: 100px; font-size: 12px;
-      border: 1px solid #2A2E39; color: #787B86; background: #131722;
+      padding: 4px 12px; border-radius: 100px; font-size: 12px;
+      border: 1px solid #E5E5EA; color: #8E8E93; background: #FFFFFF;
       cursor: pointer; transition: all .12s; font-family: inherit;
     }
-    .filter-chip:hover { border-color: #2962FF; color: #7BA3F8; }
-    .filter-chip.active { background: rgba(41,98,255,.12); border-color: rgba(41,98,255,.3); color: #7BA3F8; }
+    .filter-chip:hover { border-color: #2962FF; color: #2962FF; }
+    .filter-chip.active { background: #2962FF; border-color: #2962FF; color: #fff; }
 
     /* ── NOTES LIST ── */
-    .notes-list { display: flex; flex-direction: column; gap: 6px; }
+    .notes-list { display: flex; flex-direction: column; gap: 8px; }
     .note-item {
-      background: #1E222D; border: 1px solid #2A2E39; border-radius: 6px;
-      overflow: hidden; transition: border-color .15s;
+      background: #FFFFFF; border: 1px solid #E5E5EA; border-radius: 10px;
+      overflow: hidden; transition: border-color .15s, box-shadow .15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
     }
-    .note-item:hover { border-color: #363A45; }
+    .note-item:hover { border-color: #C7C7CC; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
     .note-header {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px; cursor: pointer; user-select: none;
     }
     .note-date {
-      font-size: 11px; font-weight: 600; color: #787B86;
-      background: #2A2E39; border-radius: 3px; padding: 2px 7px;
+      font-size: 11px; font-weight: 600; color: #8E8E93;
+      background: #F2F2F7; border-radius: 4px; padding: 2px 8px;
       white-space: nowrap; flex-shrink: 0;
     }
     .note-type-tag {
       font-size: 11px; font-weight: 700; padding: 2px 7px;
-      border-radius: 3px; white-space: nowrap; flex-shrink: 0;
+      border-radius: 4px; white-space: nowrap; flex-shrink: 0;
     }
-    .tag-market   { background: rgba(41,98,255,.12); color: #7BA3F8; border: 1px solid rgba(41,98,255,.25); }
-    .tag-technical{ background: rgba(90,163,240,.12); color: #5aa3f0; border: 1px solid rgba(90,163,240,.25); }
-    .tag-stock    { background: rgba(8,153,129,.12); color: #089981; border: 1px solid rgba(8,153,129,.25); }
-    .tag-chip     { background: rgba(240,185,11,.12); color: #F0B90B; border: 1px solid rgba(240,185,11,.25); }
-    .tag-strategy { background: rgba(124,58,237,.12); color: #a78bfa; border: 1px solid rgba(124,58,237,.25); }
-    .tag-review   { background: rgba(242,54,69,.12); color: #F23645; border: 1px solid rgba(242,54,69,.25); }
+    .tag-market   { background: rgba(41,98,255,.08);  color: #2962FF;  border: 1px solid rgba(41,98,255,.2); }
+    .tag-technical{ background: rgba(0,122,255,.08);  color: #007AFF;  border: 1px solid rgba(0,122,255,.2); }
+    .tag-stock    { background: rgba(52,199,89,.08);  color: #34C759;  border: 1px solid rgba(52,199,89,.2); }
+    .tag-chip     { background: rgba(255,149,0,.1);   color: #FF9500;  border: 1px solid rgba(255,149,0,.2); }
+    .tag-strategy { background: rgba(175,82,222,.08); color: #AF52DE;  border: 1px solid rgba(175,82,222,.2); }
+    .tag-review   { background: rgba(255,59,48,.08);  color: #FF3B30;  border: 1px solid rgba(255,59,48,.2); }
     .note-img-badge {
-      font-size: 11px; color: #4a4f5e; flex-shrink: 0; white-space: nowrap;
+      font-size: 11px; color: #C7C7CC; flex-shrink: 0; white-space: nowrap;
     }
     .note-title {
-      font-size: 14px; font-weight: 600; color: #D1D4DC;
+      font-size: 14px; font-weight: 600; color: #1C1C1E;
       flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .note-del {
-      background: none; border: none; color: #4a4f5e; font-size: 14px;
-      cursor: pointer; padding: 3px; line-height: 1; flex-shrink: 0;
-      transition: color .12s;
+    .note-actions { display: flex; gap: 2px; flex-shrink: 0; }
+    .note-edit, .note-del {
+      background: none; border: none; font-size: 13px;
+      cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 1;
+      transition: background .12s, color .12s;
     }
-    .note-del:hover { color: #F23645; }
+    .note-edit { color: #C7C7CC; }
+    .note-edit:hover { background: #F2F2F7; color: #2962FF; }
+    .note-del { color: #C7C7CC; }
+    .note-del:hover { background: #FFF0EF; color: #FF3B30; }
     .note-chevron {
-      font-size: 14px; color: #4a4f5e; flex-shrink: 0;
+      font-size: 14px; color: #C7C7CC; flex-shrink: 0;
       display: inline-block; transition: transform .22s;
     }
     .note-item.expanded .note-chevron { transform: rotate(90deg); color: #2962FF; }
     .note-body {
       max-height: 0; overflow: hidden; transition: max-height .28s ease;
-      border-top: 0px solid #2A2E39;
+      border-top: 0px solid #E5E5EA;
     }
     .note-item.expanded .note-body { max-height: 2000px; border-top-width: 1px; }
     .note-body-inner {
-      padding: 14px 16px; font-size: 14px; color: #9AA3B2;
+      padding: 14px 16px; font-size: 14px; color: #3C3C43;
       line-height: 1.75; white-space: pre-wrap; word-break: break-word;
     }
     .note-imgs {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      padding: 0 16px 14px;
+      display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 14px;
     }
     .note-img-thumb {
-      width: 90px; height: 90px; border-radius: 5px; overflow: hidden;
-      border: 1px solid #2A2E39; cursor: pointer;
+      width: 90px; height: 90px; border-radius: 6px; overflow: hidden;
+      border: 1px solid #E5E5EA; cursor: pointer; flex-shrink: 0;
       transition: border-color .12s, transform .12s;
-      flex-shrink: 0;
     }
     .note-img-thumb:hover { border-color: #2962FF; transform: scale(1.04); }
     .note-img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .note-empty { text-align: center; padding: 60px 24px; color: #4a4f5e; }
+    .note-empty { text-align: center; padding: 60px 24px; }
     .note-empty-icon { font-size: 48px; margin-bottom: 14px; }
-    .note-empty-msg { font-size: 15px; color: #787B86; }
+    .note-empty-msg { font-size: 15px; color: #8E8E93; }
 
     /* ── LIGHTBOX ── */
     .lightbox {
       display: none; position: fixed; inset: 0; z-index: 2000;
-      background: rgba(0,0,0,.88); align-items: center; justify-content: center;
+      background: rgba(0,0,0,.82); align-items: center; justify-content: center;
     }
     .lightbox.open { display: flex; }
     .lightbox-img {
       max-width: 90vw; max-height: 90vh;
-      object-fit: contain; border-radius: 4px;
-      box-shadow: 0 8px 40px rgba(0,0,0,.6);
+      object-fit: contain; border-radius: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
     }
     .lightbox-close {
       position: absolute; top: 16px; right: 20px;
-      background: rgba(255,255,255,.12); border: none; color: #fff;
-      font-size: 22px; cursor: pointer; width: 40px; height: 40px;
+      background: rgba(255,255,255,.15); border: none; color: #fff;
+      font-size: 20px; cursor: pointer; width: 40px; height: 40px;
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       transition: background .15s;
     }
-    .lightbox-close:hover { background: rgba(255,255,255,.25); }
+    .lightbox-close:hover { background: rgba(255,255,255,.3); }
     .lightbox-nav {
       position: absolute; top: 50%; transform: translateY(-50%);
-      background: rgba(255,255,255,.12); border: none; color: #fff;
-      font-size: 24px; cursor: pointer; width: 44px; height: 44px;
+      background: rgba(255,255,255,.15); border: none; color: #fff;
+      font-size: 26px; cursor: pointer; width: 44px; height: 44px;
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       transition: background .15s;
     }
-    .lightbox-nav:hover { background: rgba(255,255,255,.25); }
+    .lightbox-nav:hover { background: rgba(255,255,255,.3); }
     .lightbox-prev { left: 16px; }
     .lightbox-next { right: 16px; }
     .lightbox-counter {
@@ -237,36 +246,37 @@
     }
 
     /* ── SIDEBAR ── */
-    .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 999; }
+    .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 999; }
     .sb-overlay.open { display: block; }
     .sidebar {
       position: fixed; top: 0; left: -260px; width: 240px; height: 100vh;
-      background: #1E222D; border-right: 1px solid #2A2E39;
+      background: #FFFFFF; border-right: 1px solid #E5E5EA;
       z-index: 1000; transition: left .22s ease; overflow-y: auto;
       display: flex; flex-direction: column;
+      box-shadow: 4px 0 20px rgba(0,0,0,.08);
     }
     .sidebar.open { left: 0; }
-    .sb-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #2A2E39; flex-shrink: 0; }
-    .sb-logo { font-size: 17px; font-weight: 700; color: #D1D4DC; }
-    .sb-close { background: none; border: none; color: #787B86; font-size: 16px; cursor: pointer; padding: 0; }
-    .sb-close:hover { color: #D1D4DC; }
+    .sb-head { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #E5E5EA; flex-shrink: 0; }
+    .sb-logo { font-size: 16px; font-weight: 700; color: #1C1C1E; }
+    .sb-close { background: none; border: none; color: #8E8E93; font-size: 16px; cursor: pointer; padding: 0; }
+    .sb-close:hover { color: #1C1C1E; }
     .sb-nav { padding: 8px 0 24px; }
-    .sb-section-title { font-size: 11px; font-weight: 700; color: #787B86; letter-spacing: .08em; text-transform: uppercase; padding: 14px 16px 5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-    .sb-section-title:hover { color: #c9d1d9; }
+    .sb-section-title { font-size: 11px; font-weight: 700; color: #8E8E93; letter-spacing: .08em; text-transform: uppercase; padding: 14px 16px 5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .sb-section-title:hover { color: #1C1C1E; }
     .sb-arrow { font-size: 10px; opacity: .55; transition: transform .2s; flex-shrink: 0; }
     .sb-section-title.closed .sb-arrow { transform: rotate(-90deg); }
     .sb-group { overflow: hidden; max-height: 600px; transition: max-height .25s ease; }
     .sb-group.closed { max-height: 0; }
-    .sb-item { display: block; padding: 6px 16px; font-size: 14px; color: #9AA3B2; text-decoration: none; transition: background .12s, color .12s; }
-    .sb-item:hover { background: #252931; color: #D1D4DC; }
-    .sb-item.sb-active { color: #D1D4DC; font-weight: 600; }
+    .sb-item { display: block; padding: 7px 16px; font-size: 14px; color: #3C3C43; text-decoration: none; transition: background .12s; }
+    .sb-item:hover { background: #F2F2F7; color: #1C1C1E; }
+    .sb-item.sb-active { color: #2962FF; font-weight: 600; }
 
     #back-top {
       position: fixed; bottom: 20px; right: 16px; z-index: 998;
       width: 40px; height: 40px; border-radius: 50%;
       background: #2962FF; border: none; color: #fff; font-size: 18px;
       cursor: pointer; display: none; align-items: center; justify-content: center;
-      box-shadow: 0 4px 12px rgba(41,98,255,.4);
+      box-shadow: 0 4px 12px rgba(41,98,255,.35);
     }
     #back-top.show { display: flex; }
     #back-top:hover { background: #1E53E5; }
@@ -355,8 +365,8 @@
 <div class="main-wrap">
 
   <!-- FORM -->
-  <div class="form-card">
-    <div class="form-card-title">新增筆記</div>
+  <div class="form-card" id="form-card">
+    <div class="form-card-title" id="form-title">新增筆記</div>
     <div class="form-row">
       <div class="form-field field-date">
         <span class="field-label">日期</span>
@@ -388,7 +398,7 @@
       <span class="field-label" style="display:block;margin-bottom:6px">圖片（選填）</span>
       <div class="img-upload-area" id="img-upload-area" onclick="document.getElementById('img-file-input').click()">
         <span class="img-upload-icon">🖼</span>
-        <div class="img-upload-text">點擊上傳圖片，或將圖片<strong>拖曳</strong>到此處<br><span style="font-size:11px;color:#4a4f5e">支援 JPG、PNG、GIF、WebP；每張壓縮後儲存</span></div>
+        <div class="img-upload-text">點擊上傳圖片，或將圖片<strong>拖曳</strong>到此處<br><span style="font-size:11px;color:#C7C7CC">支援 JPG、PNG、GIF、WebP；每張壓縮後儲存</span></div>
       </div>
       <input type="file" id="img-file-input" accept="image/*" multiple>
       <div class="img-preview-grid" id="img-preview-grid"></div>
@@ -396,8 +406,9 @@
 
     <div class="form-actions">
       <span class="img-size-warn" id="size-warn"></span>
+      <button class="btn-cancel-edit" id="btn-cancel-edit" onclick="cancelEdit()">取消編輯</button>
       <button class="btn-clear" onclick="clearForm()">清除</button>
-      <button class="btn-save" onclick="saveNote()">儲存筆記</button>
+      <button class="btn-save" id="btn-save" onclick="saveNote()">儲存筆記</button>
     </div>
   </div>
 
@@ -424,9 +435,10 @@
 const TYPE_LABELS = { market:'市場觀察', technical:'技術分析', stock:'個股研究', chip:'籌碼分析', strategy:'交易策略', review:'事後檢討' };
 let notes = JSON.parse(localStorage.getItem('stock_notebook') || '[]');
 let currentFilter = 'all';
-let pendingImages = []; // { dataUrl }
+let pendingImages = [];
+let editingId = null;
 
-// ── INIT ────────────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────────────
 function init() {
   const today = new Date();
   document.getElementById('note-date').value =
@@ -439,7 +451,7 @@ function init() {
   renderNotes();
 }
 
-// ── IMAGE PROCESSING ────────────────────────────────────────────────────
+// ── IMAGE ─────────────────────────────────────────────────────────────────
 function setupDragDrop() {
   const area = document.getElementById('img-upload-area');
   area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag-over'); });
@@ -455,8 +467,7 @@ function processFiles(files) {
     const reader = new FileReader();
     reader.onload = e => compressImage(e.target.result, compressed => {
       pendingImages.push({ dataUrl: compressed });
-      renderPreview();
-      checkSizeWarn();
+      renderPreview(); checkSizeWarn();
     });
     reader.readAsDataURL(file);
   });
@@ -478,8 +489,7 @@ function compressImage(dataUrl, cb) {
 }
 
 function renderPreview() {
-  const grid = document.getElementById('img-preview-grid');
-  grid.innerHTML = pendingImages.map((img, i) => `
+  document.getElementById('img-preview-grid').innerHTML = pendingImages.map((img, i) => `
     <div class="img-preview-wrap">
       <img src="${img.dataUrl}" alt="">
       <button class="img-preview-del" onclick="removePending(${i})">✕</button>
@@ -488,21 +498,51 @@ function renderPreview() {
 
 function removePending(i) {
   pendingImages.splice(i, 1);
-  renderPreview();
-  checkSizeWarn();
+  renderPreview(); checkSizeWarn();
 }
 
 function checkSizeWarn() {
   const totalKB = pendingImages.reduce((s, img) => s + Math.round(img.dataUrl.length * 0.75 / 1024), 0);
   const warn = document.getElementById('size-warn');
   if (totalKB > 3000) {
-    warn.textContent = `⚠ 圖片約 ${Math.round(totalKB/1024)}MB，localStorage 容量有限，建議減少張數`;
+    warn.textContent = '⚠ 圖片過大，建議減少張數';
   } else {
-    warn.textContent = pendingImages.length ? `${pendingImages.length} 張圖片（約 ${totalKB}KB）` : '';
+    warn.textContent = pendingImages.length ? `${pendingImages.length} 張（約 ${totalKB}KB）` : '';
   }
 }
 
-// ── SAVE / DELETE ────────────────────────────────────────────────────────
+// ── EDIT ─────────────────────────────────────────────────────────────────
+function startEdit(id) {
+  const n = notes.find(x => x.id === id);
+  if (!n) return;
+  editingId = id;
+  document.getElementById('note-date').value    = n.date;
+  document.getElementById('note-title').value   = n.title;
+  document.getElementById('note-type').value    = n.type;
+  document.getElementById('note-content').value = n.content;
+  pendingImages = (n.images || []).map(url => ({ dataUrl: url }));
+  renderPreview(); checkSizeWarn();
+  document.getElementById('form-title').textContent = '編輯筆記';
+  document.getElementById('form-title').classList.add('editing-mode');
+  document.getElementById('btn-save').textContent = '儲存修改';
+  document.getElementById('btn-cancel-edit').classList.add('visible');
+  document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-content').value = '';
+  pendingImages = [];
+  renderPreview();
+  document.getElementById('size-warn').textContent = '';
+  document.getElementById('form-title').textContent = '新增筆記';
+  document.getElementById('form-title').classList.remove('editing-mode');
+  document.getElementById('btn-save').textContent = '儲存筆記';
+  document.getElementById('btn-cancel-edit').classList.remove('visible');
+}
+
+// ── SAVE / DELETE ─────────────────────────────────────────────────────────
 function saveNote() {
   const date    = document.getElementById('note-date').value;
   const title   = document.getElementById('note-title').value.trim();
@@ -512,16 +552,24 @@ function saveNote() {
   if (!title)   { alert('請輸入標題'); return; }
   if (!content) { alert('請輸入筆記內容'); return; }
 
-  const note = { id: Date.now(), date, title, type, content, images: pendingImages.map(i => i.dataUrl) };
+  const images = pendingImages.map(i => i.dataUrl);
+
+  if (editingId !== null) {
+    const idx = notes.findIndex(x => x.id === editingId);
+    if (idx !== -1) notes[idx] = { ...notes[idx], date, title, type, content, images };
+  } else {
+    notes.unshift({ id: Date.now(), date, title, type, content, images });
+  }
+
   try {
-    notes.unshift(note);
     localStorage.setItem('stock_notebook', JSON.stringify(notes));
   } catch(e) {
-    notes.shift();
+    if (editingId === null) notes.shift();
     alert('儲存失敗，localStorage 空間不足。請嘗試減少圖片數量或刪除舊筆記。');
     return;
   }
-  clearForm();
+
+  cancelEdit();
   renderNotes();
 }
 
@@ -535,12 +583,13 @@ function clearForm() {
 
 function deleteNote(id) {
   if (!confirm('確定要刪除這篇筆記？')) return;
+  if (editingId === id) cancelEdit();
   notes = notes.filter(n => n.id !== id);
   localStorage.setItem('stock_notebook', JSON.stringify(notes));
   renderNotes();
 }
 
-// ── TOGGLE ───────────────────────────────────────────────────────────────
+// ── TOGGLE ────────────────────────────────────────────────────────────────
 function toggleNote(id) {
   const item = document.getElementById('ni-' + id);
   if (!item) return;
@@ -550,16 +599,15 @@ function toggleNote(id) {
   else        { item.classList.add('expanded');    body.style.maxHeight = body.scrollHeight + 'px'; }
 }
 
-// ── FILTER ───────────────────────────────────────────────────────────────
+// ── FILTER ────────────────────────────────────────────────────────────────
 function filterNotes(type, btn) {
   currentFilter = type;
   document.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b.dataset.type === type));
   renderNotes();
 }
 
-// ── LIGHTBOX ─────────────────────────────────────────────────────────────
-let _lbImages = [];
-let _lbIdx = 0;
+// ── LIGHTBOX ──────────────────────────────────────────────────────────────
+let _lbImages = [], _lbIdx = 0;
 
 function openLightbox(images, idx) {
   _lbImages = images; _lbIdx = idx;
@@ -569,15 +617,12 @@ function openLightbox(images, idx) {
   document.querySelector('.lightbox-prev').style.display = images.length > 1 ? 'flex' : 'none';
   document.querySelector('.lightbox-next').style.display = images.length > 1 ? 'flex' : 'none';
 }
-
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
-
 function lightboxNav(dir) {
   _lbIdx = (_lbIdx + dir + _lbImages.length) % _lbImages.length;
   document.getElementById('lightbox-img').src = _lbImages[_lbIdx];
   document.getElementById('lightbox-counter').textContent = `${_lbIdx+1} / ${_lbImages.length}`;
 }
-
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('open')) return;
   if (e.key === 'Escape') closeLightbox();
@@ -585,7 +630,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') lightboxNav(1);
 });
 
-// ── RENDER ───────────────────────────────────────────────────────────────
+// ── RENDER ────────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
@@ -617,7 +662,10 @@ function renderNotes() {
         <span class="note-type-tag tag-${esc(n.type)}">${TYPE_LABELS[n.type] || esc(n.type)}</span>
         ${imgBadge}
         <span class="note-title">${esc(n.title)}</span>
-        <button class="note-del" onclick="event.stopPropagation();deleteNote(${n.id})" title="刪除">✕</button>
+        <div class="note-actions">
+          <button class="note-edit" onclick="event.stopPropagation();startEdit(${n.id})" title="編輯">✏️</button>
+          <button class="note-del"  onclick="event.stopPropagation();deleteNote(${n.id})" title="刪除">✕</button>
+        </div>
         <span class="note-chevron">›</span>
       </div>
       <div class="note-body">
@@ -633,7 +681,7 @@ function noteImgs(id) {
   return n ? (n.images || []) : [];
 }
 
-// ── SIDEBAR ──────────────────────────────────────────────────────────────
+// ── SIDEBAR ───────────────────────────────────────────────────────────────
 function openSidebar()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); }
 function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); }
 function toggleSbGroup(el) { el.classList.toggle('closed'); var g = el.nextElementSibling; if (g && g.classList.contains('sb-group')) g.classList.toggle('closed'); }
