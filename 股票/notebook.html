@@ -164,6 +164,7 @@
     .tag-chip     { background: rgba(255,149,0,.1);   color: #FF9500;  border: 1px solid rgba(255,149,0,.2); }
     .tag-strategy { background: rgba(175,82,222,.08); color: #AF52DE;  border: 1px solid rgba(175,82,222,.2); }
     .tag-review   { background: rgba(255,59,48,.08);  color: #FF3B30;  border: 1px solid rgba(255,59,48,.2); }
+    .tag-smc      { background: rgba(139,92,246,.08); color: #8B5CF6;  border: 1px solid rgba(139,92,246,.2); }
     .note-img-badge { font-size: 11px; color: #C7C7CC; flex-shrink: 0; white-space: nowrap; }
     .note-title { font-size: 14px; font-weight: 600; color: #1C1C1E; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .note-actions { display: flex; gap: 2px; flex-shrink: 0; }
@@ -309,6 +310,7 @@
     <span id="sync-label">連線中</span>
   </div>
   <span class="note-count-badge" id="note-count" style="margin-left:8px">0 篇筆記</span>
+  <button onclick="location.reload()" style="background:none;border:1px solid #E5E5EA;border-radius:5px;color:#8E8E93;font-size:16px;cursor:pointer;padding:3px 9px;line-height:1;flex-shrink:0;margin-left:8px" title="重新整理">↻</button>
 </div>
 
 <!-- MAIN -->
@@ -335,6 +337,7 @@
           <option value="chip">籌碼分析</option>
           <option value="strategy">交易策略</option>
           <option value="review">事後檢討</option>
+          <option value="smc">SMC 概念</option>
         </select>
       </div>
     </div>
@@ -372,6 +375,7 @@
     <button class="filter-chip" data-type="chip" onclick="filterNotes('chip',this)">籌碼分析</button>
     <button class="filter-chip" data-type="strategy" onclick="filterNotes('strategy',this)">交易策略</button>
     <button class="filter-chip" data-type="review" onclick="filterNotes('review',this)">事後檢討</button>
+    <button class="filter-chip" data-type="smc" onclick="filterNotes('smc',this)">SMC 概念</button>
   </div>
 
   <!-- NOTES LIST -->
@@ -405,7 +409,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const COL = 'notebook';
 
-const TYPE_LABELS = { market:'市場觀察', technical:'技術分析', stock:'個股研究', chip:'籌碼分析', strategy:'交易策略', review:'事後檢討' };
+const TYPE_LABELS = { market:'市場觀察', technical:'技術分析', stock:'個股研究', chip:'籌碼分析', strategy:'交易策略', review:'事後檢討', smc:'SMC 概念' };
 let notes = [];
 let currentFilter = 'all';
 // each item: { src: string (preview URL or storage URL), blob: Blob|null (null = already uploaded), storageUrl: string|null }

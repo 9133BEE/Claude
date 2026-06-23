@@ -153,6 +153,7 @@ a{color:#58a6ff;text-decoration:none}
   <a href="index.html">← 回主頁</a>
   <a href="advanced-indicators.html">指標策略</a>
   <a href="tradingview-guide.html">TV 指南</a>
+  <button onclick="location.reload()" style="margin-left:auto;background:none;border:1px solid #30363d;border-radius:5px;color:#8b949e;font-size:15px;cursor:pointer;padding:3px 9px;line-height:1" title="重新整理">↻</button>
 </div>
 <div class="hero">
   <h1>TradingView 指標大全</h1>
@@ -6601,6 +6602,135 @@ a{color:#58a6ff;text-decoration:none}
   </div>
 
   <!-- ═════════════════════════════════════════════ -->
+  <!--  G. 關鍵參考價位 PDH/PDL/PWH/PWL/VWAP       -->
+  <!-- ═════════════════════════════════════════════ -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">📌</span>
+      <span class="smc-sec-title">關鍵參考價位 — PDH · PDL · PWH · PWL · VWAP</span>
+      <span class="smc-sec-sub">機構每天都在盯的水平線</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        機構不是憑感覺交易，而是以<strong>已知的客觀價位</strong>作為目標和參考。前一天/週/月的高低點是全市場參與者都看到的關鍵水平，機構會利用這些位置來<strong>掃流動性、設定目標價、確認進場</strong>。掌握這些價位，就知道機構的下一個動作在哪裡。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>前日/週/月 高低點</h4>
+          <ul>
+            <li><span class="p">PDH（Previous Day High）</span> — 前一交易日最高點，上方聚集 BSL</li>
+            <li><span class="p">PDL（Previous Day Low）</span> — 前一交易日最低點，下方聚集 SSL</li>
+            <li><span class="y">PDMid</span> — 前日高低點的中點，等同 Equilibrium</li>
+            <li><span class="p">PWH（Previous Week High）</span> — 上週最高點，比 PDH 更重要的壓力</li>
+            <li><span class="p">PWL（Previous Week Low）</span> — 上週最低點，比 PDL 更重要的支撐</li>
+            <li><span class="p">PMH / PML</span> — 上個月高低點，月線級別的關鍵位</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>DIST % 距離判讀</h4>
+          <ul>
+            <li>公式：<strong>（目前價 − 關卡價）÷ 關卡價 × 100%</strong></li>
+            <li>正數 (+) = 目前價格在關卡<span class="g">上方</span></li>
+            <li>負數 (−) = 目前價格在關卡<span class="r">下方（還沒到）</span></li>
+            <li>NEAR = 距離 &lt; 0.25%，幾乎貼著，高度警戒</li>
+            <li>CLEAR = 距離充裕，尚無立即壓力/支撐</li>
+            <li>越靠近 PDH/PDL/PWH/PWL → 越容易出現掃流動性行為</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>操作邏輯</h4>
+          <ul>
+            <li><span class="r">接近 PDH/PWH</span>：BSL 密集，機構可能先掃高再反轉下跌；或真突破繼續上漲</li>
+            <li><span class="g">接近 PDL/PWL</span>：SSL 密集，機構可能先掃低再反轉上漲；或真跌破繼續下跌</li>
+            <li>掃完 PDH 後收回 → 假突破，看空；突破後站穩 → 真突破，看多</li>
+            <li>PWH/PWL 的重要性遠高於 PDH/PDL，週線級別的掃蕩反應更劇烈</li>
+            <li>這些位置也是設定<strong>目標價（TP）</strong>的常用參考</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>VWAP（成交量加權平均價）</h4>
+          <ul>
+            <li>全名：Volume Weighted Average Price</li>
+            <li>以成交量加權計算的當日平均成本，機構最重視的日內參考線</li>
+            <li>價格在 VWAP 上方 → 機構持有獲利部位，偏多</li>
+            <li>價格在 VWAP 下方 → 機構持有虧損部位，偏空</li>
+            <li>回測 VWAP 後反彈/反壓 = 常見的進場訊號</li>
+            <li>與 PDH/PDL 重疊時效力加倍</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ 開盤前先標好 PDH/PDL/PWH/PWL，這四條線會是當天最重要的流動性目標。行情接近這些位置時特別注意 Stop Hunt 可能性，不要在這些位置追多/追空。</div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════ -->
+  <!--  G2. Candle Bias                             -->
+  <!-- ═════════════════════════════════════════════ -->
+  <div class="smc-section">
+    <div class="smc-sec-head">
+      <span class="smc-sec-icon">🕯️</span>
+      <span class="smc-sec-title">K棒偏向 — Candle Bias（MTF）</span>
+      <span class="smc-sec-sub">判斷當根K棒買賣方誰佔優勢，決定下一根方向</span>
+    </div>
+    <div class="smc-sec-body">
+      <div class="smc-def">
+        Candle Bias 是在進場前快速判斷市場方向的過濾器。有兩種主流方法：<strong>中點法（當根K棒內部）</strong>與 <strong>PDH/PDL 法（相對前日高低點）</strong>。搭配 MTF（多時框架）同時觀察多個週期，可大幅提升進場方向的可靠度。
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>方法一：中點法（當根 K 棒）</h4>
+          <ul>
+            <li>公式：<strong>中點 =（最高 + 最低）÷ 2</strong></li>
+            <li><span class="g">收盤 &gt; 中點</span> → Bullish Bias（多方控盤，偏多）</li>
+            <li><span class="r">收盤 &lt; 中點</span> → Bearish Bias（空方控盤，偏空）</li>
+            <li>即使K棒是陰線，收盤在中點以上仍算 Bullish Bias</li>
+            <li>日線收在中點以上 → 隔天操作偏多方向</li>
+            <li>搭配 OB/FVG：方向一致才進場</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>方法二：PDH / PDL 法（前日高低點）</h4>
+          <ul>
+            <li><span class="r">wick 掃 PDH 後收回</span> → 假突破，隔天看跌</li>
+            <li><span class="r">實體收破 PDL</span> → 真跌破，隔天看跌延續</li>
+            <li><span class="g">wick 掃 PDL 後收回</span> → 假跌破，隔天看漲</li>
+            <li><span class="g">實體收破 PDH</span> → 真突破，隔天看漲延續</li>
+            <li>核心邏輯：影線掃流動性後收回 = 機構方向相反</li>
+            <li>實體突破 = 機構確認方向，順勢延續</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-row">
+        <div class="smc-box">
+          <h4>MTF Candle Bias 表格判讀</h4>
+          <ul>
+            <li><span class="p">MTF = Multi Time Frame</span>，同時顯示多個週期 Bias</li>
+            <li>1m / 5m / 15m / 1H / 4H / 1D / 1W 全部 BULL → 極強多訊號</li>
+            <li>全部 BEAR → 極強空訊號</li>
+            <li>大週期（1D/1W）決定大方向，小週期（1H/15m）找進場時機</li>
+            <li>SCORE 3/3 = 三個條件（Candle/Trend/VWAP）全部看同方向</li>
+            <li>FADE = 趨勢動能開始減弱，需謹慎</li>
+          </ul>
+        </div>
+        <div class="smc-box">
+          <h4>兩種方法組合使用</h4>
+          <ul>
+            <li><strong>步驟一</strong>：中點法看今天日線收在中點上/下 → 決定明天大方向</li>
+            <li><strong>步驟二</strong>：PDH/PDL 法確認有沒有掃流動性後反轉</li>
+            <li><strong>兩方向一致</strong> → 訊號可靠，找 OB/FVG 進場</li>
+            <li><strong>兩方向衝突</strong> → 觀望不操作</li>
+            <li>⚠ Candle Bias 是輔助工具，準確率約 55–65%，必須搭配結構和 PD Array</li>
+            <li>推薦指標：MTF Candle Bias Table（jferheart，1.3K）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="smc-note">⚠ Candle Bias 只是「機率偏向」，不是保證。即使兩根K棒都看空，若週線是多頭結構，機構仍可能反向掃完流動性後拉高。永遠先確認高時框架結構方向，再用 Candle Bias 輔助時機。</div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════ -->
   <!--  H. 完整名詞速查索引                         -->
   <!-- ═════════════════════════════════════════════ -->
   <div class="smc-section">
@@ -6673,6 +6803,12 @@ a{color:#58a6ff;text-decoration:none}
             <li><span class="y">Discount Zone</span> — 波段 50% 以下，做多的好位置</li>
             <li><span class="y">Equilibrium (EQ)</span> — 波段精確 50% 中點，公平價值</li>
             <li><span class="p">MTF（Multi-Time Frame）</span> — 多時框架分析，高時框方向優先</li>
+            <li><span class="y">Candle Bias（中點法）</span> — 收盤在K棒中點以上=Bullish，以下=Bearish</li>
+            <li><span class="y">Candle Bias（PDH/PDL法）</span> — wick掃PDH後收回=看跌；wick掃PDL後收回=看漲；實體收破=同向延續</li>
+            <li><span class="p">PDH / PDL</span> — Previous Day High/Low，前一交易日高低點，BSL/SSL聚集位</li>
+            <li><span class="p">PWH / PWL</span> — Previous Week High/Low，上週高低點，比PDH/PDL更重要</li>
+            <li><span class="p">PMH / PML</span> — Previous Month High/Low，上月高低點，月線關鍵位</li>
+            <li><span class="p">VWAP</span> — 成交量加權平均價，機構日內最重要參考線，上方偏多下方偏空</li>
             <li><span class="p">Killzone</span> — 機構集中行動的高效時段</li>
             <li><span class="p">Silver Bullet</span> — ICT 特定1小時窗口內的 FVG 入場模型</li>
             <li><span class="p">NDOG / NWOG</span> — 新日/週開盤跳空缺口，常為回填目標</li>
