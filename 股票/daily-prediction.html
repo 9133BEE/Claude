@@ -470,36 +470,37 @@ async function fetchTWSE(code, isoDate) {
   return j;
 }
 
-// ── TPEX API（上櫃，雙路備援）──
+// ── TPEX API（上櫃，多路備援）──
 async function fetchTPEX(code, isoDate) {
   const [y, m, d] = isoDate.split('-');
   const rocDate = `${+y - 1911}/${m}/${d}`;
+  const PROXY = 'https://api.allorigins.win/raw?url=';
 
-  // 路線1：個股月資料 st43
-  try {
-    const r = await fetch(
-      `https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php` +
-      `?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}&s=${code}`
-    );
-    const j = await r.json();
-    if (j.aaData?.length) return { stat: 'OK', data: j.aaData, title: code };
-  } catch(e) { console.warn('[TPEX st43]', e.message); }
+  const st43Path =
+    `https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php` +
+    `?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}&s=${code}`;
+  const wn1430Path =
+    `https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php` +
+    `?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}`;
 
-  // 路線2：當日全上櫃報價 stk_wn1430，找到該股後轉 st43 欄位格式
-  // stk_wn1430 欄位: [代號(0), 名稱(1), 成交量(2), 金額(3), 開(4), 高(5), 低(6), 收(7), 漲跌符號(8), 漲跌額(9)]
+  // 轉換 stk_wn1430 行 → st43 格式
+  const normWn = (row) => {
+    const syn = [rocDate, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9] ?? '0'];
+    return { stat:'OK', data:[syn], title:code };
+  };
+
+  // 路線1：直接 st43
+  try { const j = await (await fetch(st43Path)).json(); if (j.aaData?.length) return { stat:'OK', data:j.aaData, title:code }; } catch(e) { console.warn('[st43]', e.message); }
+
+  // 路線2：Proxy st43（繞過 CORS）
+  try { const j = await (await fetch(PROXY + encodeURIComponent(st43Path))).json(); if (j.aaData?.length) return { stat:'OK', data:j.aaData, title:code }; } catch(e) { console.warn('[st43 proxy]', e.message); }
+
+  // 路線3：Proxy stk_wn1430（當日全市場報價）
   try {
-    const r = await fetch(
-      `https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php` +
-      `?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}`
-    );
-    const j = await r.json();
+    const j = await (await fetch(PROXY + encodeURIComponent(wn1430Path))).json();
     const row = j.aaData?.find(x => String(x[0]).trim() === code);
-    if (row) {
-      // 轉成 st43 格式: [日期(0), 量(1), 金(2), 開(3), 高(4), 低(5), 收(6), 漲跌符號(7), 漲跌額(8)]
-      const syn = [rocDate, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9] ?? '0'];
-      return { stat: 'OK', data: [syn], title: code };
-    }
-  } catch(e) { console.warn('[TPEX stk_wn1430]', e.message); }
+    if (row) return normWn(row);
+  } catch(e) { console.warn('[wn1430 proxy]', e.message); }
 
   return null;
 }
