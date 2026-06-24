@@ -145,6 +145,19 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 .empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:14px}
 
+/* Staged list */
+.staged-list{border-top:1px solid var(--border);margin:12px 0 0;padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.staged-item{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px}
+.staged-code{font-weight:700;color:var(--text);flex-shrink:0}
+.staged-name{color:var(--muted);flex-shrink:0}
+.staged-bias{font-size:11px;padding:2px 6px;border-radius:3px;flex-shrink:0}
+.staged-bias.bull{color:var(--green);border:1px solid rgba(38,166,154,.3)}
+.staged-bias.bear{color:var(--red);border:1px solid rgba(239,83,80,.3)}
+.staged-bias.skip{color:var(--muted);border:1px solid var(--border)}
+.staged-notes{color:var(--muted);font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.staged-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 2px;flex-shrink:0;line-height:1}
+.staged-del:hover{color:var(--red)}
+
 /* Filter buttons */
 .filter-btns{display:flex;gap:4px}
 .fbtn{background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:12px;padding:3px 10px;cursor:pointer;font-family:inherit}
@@ -320,10 +333,15 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
       <textarea class="ftextarea" id="f-notes" placeholder="例：6/23收盤實體線略低於6/22上影線，收盤>pdmid"></textarea>
     </div>
 
-    <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
-      <span id="save-msg" style="font-size:12px;color:var(--orange)"></span>
+    <!-- 暫存清單 -->
+    <div id="staged-list"></div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center;margin-top:12px">
+      <span id="save-msg" style="font-size:12px;color:var(--orange);flex:1"></span>
       <button class="btn btn-ghost btn-sm" onclick="clearForm()">清除</button>
-      <button class="btn" onclick="savePred()" id="save-btn">新增預測</button>
+      <button class="btn btn-ghost btn-sm" id="save-btn" onclick="savePred()" style="display:none">更新預測</button>
+      <button class="btn btn-ghost btn-sm" id="submit-staged-btn" onclick="submitAll()" style="display:none"></button>
+      <button class="btn" id="add-staged-btn" onclick="addToStaged()">加入清單</button>
     </div>
   </div>
 
@@ -373,7 +391,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, orderBy, Timestamp }
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, Timestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FB_CFG = {
@@ -393,6 +411,7 @@ let bias = { pat: null, mid: null, pred: null };
 let prevK = null;
 let histFilter = 'all';
 let editingPredId = null;
+let staged = [];
 
 // ── Helpers ──
 const num = s => parseFloat(String(s).replace(/,/g, '')) || 0;
@@ -587,7 +606,9 @@ window.startEditPred = function(id) {
   setBias('mid',  p.midpointBias || 'skip');
   setBias('pred', p.prediction   || 'skip');
   prevK = p.prevK || null;
-  document.getElementById('save-btn').textContent = '更新預測';
+  document.getElementById('save-btn').style.display = 'inline-flex';
+  document.getElementById('add-staged-btn').style.display = 'none';
+  document.getElementById('submit-staged-btn').style.display = 'none';
   document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
@@ -610,7 +631,8 @@ window.setBias = function(grp, val) {
 
 window.clearForm = function() {
   editingPredId = null;
-  document.getElementById('save-btn').textContent = '新增預測';
+  document.getElementById('save-btn').style.display = 'none';
+  document.getElementById('add-staged-btn').style.display = '';
   document.getElementById('f-code').value = '';
   document.getElementById('f-name').value = '';
   document.getElementById('f-notes').value = '';
@@ -627,7 +649,99 @@ window.clearForm = function() {
   document.getElementById('save-msg').textContent = '';
 };
 
-// ── Save ──
+// ── Staged list ──
+function renderStagedList() {
+  const el = document.getElementById('staged-list');
+  const submitBtn = document.getElementById('submit-staged-btn');
+  if (!staged.length) { el.innerHTML = ''; submitBtn.style.display = 'none'; return; }
+  submitBtn.style.display = '';
+  submitBtn.textContent = `全部送出（${staged.length} 筆）`;
+  el.innerHTML = `<div class="staged-list">${staged.map((s, i) => {
+    const biasText = s.prediction === 'bull' ? '看多' : s.prediction === 'bear' ? '看空' : '觀望';
+    const biasClass = s.prediction === 'bull' ? 'bull' : s.prediction === 'bear' ? 'bear' : 'skip';
+    return `<div class="staged-item">
+      <span class="staged-code">${s.stockCode}</span>
+      ${s.stockName && s.stockName !== s.stockCode ? `<span class="staged-name">${s.stockName}</span>` : ''}
+      <span class="staged-bias ${biasClass}">${biasText}</span>
+      ${s.notes ? `<span class="staged-notes">${s.notes}</span>` : ''}
+      <button class="staged-del" onclick="removeStaged(${i})">✕</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+window.removeStaged = function(idx) {
+  staged.splice(idx, 1);
+  renderStagedList();
+};
+
+window.addToStaged = function() {
+  const date  = document.getElementById('f-date').value;
+  const code  = document.getElementById('f-code').value.trim();
+  const name  = document.getElementById('f-name').value.trim();
+  const notes = document.getElementById('f-notes').value.trim();
+  if (!date || !code) { alert('請填入日期和股票代號'); return; }
+  if (!bias.pred)      { alert('請選擇整體預測方向'); return; }
+  staged.push({
+    date, stockCode: code, stockName: name || code,
+    patternBias: bias.pat || 'skip', midpointBias: bias.mid || 'skip',
+    prediction: bias.pred, notes, prevK: prevK || null
+  });
+  // Clear only stock fields, keep date
+  document.getElementById('f-code').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('k-info').classList.remove('show');
+  document.getElementById('manual-k').style.display = 'none';
+  bias = { pat: null, mid: null, pred: null };
+  prevK = null;
+  ['p-bull','p-skip','p-bear','m-bull','m-skip','m-bear','pr-bull','pr-skip','pr-bear'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.className = 'bbtn';
+  });
+  document.getElementById('save-msg').textContent = '';
+  renderStagedList();
+  document.getElementById('f-code').focus();
+};
+
+window.submitAll = async function() {
+  if (!staged.length) return;
+  const btn = document.getElementById('submit-staged-btn');
+  btn.disabled = true;
+  document.getElementById('save-msg').textContent = '儲存中…';
+  setSyncDot('loading');
+  try {
+    for (const s of staged) {
+      await addDoc(collection(db, COL), {
+        ...s, resultClose: null, resultPrevClose: null,
+        resultDirection: null, resultChange: null,
+        isCorrect: null, patternCorrect: null, midpointCorrect: null,
+        createdAt: Timestamp.now()
+      });
+    }
+    staged = [];
+    setSyncDot('ok');
+    document.getElementById('save-msg').textContent = `✓ 已儲存`;
+    clearForm();
+    renderStagedList();
+    await loadAll();
+  } catch(e) {
+    setSyncDot('err');
+    document.getElementById('save-msg').textContent = '儲存失敗：' + e.message;
+  } finally { btn.disabled = false; }
+};
+
+// ── Delete ──
+window.deletePred = async function(id) {
+  if (!confirm('確定刪除這筆預測？')) return;
+  setSyncDot('loading');
+  try {
+    await deleteDoc(doc(db, COL, id));
+    preds = preds.filter(p => p.id !== id);
+    setSyncDot('ok');
+    render();
+  } catch(e) { setSyncDot('err'); alert('刪除失敗：' + e.message); }
+};
+
+// ── Save (edit mode only) ──
 window.savePred = async function() {
   const date  = document.getElementById('f-date').value;
   const code  = document.getElementById('f-code').value.trim();
@@ -641,35 +755,18 @@ window.savePred = async function() {
   btn.disabled = true;
   document.getElementById('save-msg').textContent = '儲存中…';
 
+  if (!editingPredId) return;
   try {
     setSyncDot('loading');
-    if (editingPredId) {
-      const update = {
-        date, stockCode: code, stockName: name || code,
-        patternBias: bias.pat || 'skip',
-        midpointBias: bias.mid || 'skip',
-        prediction: bias.pred,
-        notes,
-        prevK: prevK || null,
-      };
-      await updateDoc(doc(db, COL, editingPredId), update);
-    } else {
-      const rec = {
-        date, stockCode: code, stockName: name || code,
-        patternBias: bias.pat || 'skip',
-        midpointBias: bias.mid || 'skip',
-        prediction: bias.pred,
-        notes,
-        prevK: prevK || null,
-        resultClose: null, resultPrevClose: null,
-        resultDirection: null, resultChange: null,
-        isCorrect: null, patternCorrect: null, midpointCorrect: null,
-        createdAt: Timestamp.now()
-      };
-      await addDoc(collection(db, COL), rec);
-    }
+    const update = {
+      date, stockCode: code, stockName: name || code,
+      patternBias: bias.pat || 'skip',
+      midpointBias: bias.mid || 'skip',
+      prediction: bias.pred, notes, prevK: prevK || null,
+    };
+    await updateDoc(doc(db, COL, editingPredId), update);
     setSyncDot('ok');
-    document.getElementById('save-msg').textContent = '✓ 已儲存';
+    document.getElementById('save-msg').textContent = '✓ 已更新';
     clearForm();
     await loadAll();
   } catch(e) {
@@ -877,7 +974,8 @@ function renderItem(p) {
   if (p.patternCorrect !== null)  patResTag = `<span class="tag" style="font-size:10px">型態${p.patternCorrect ? '✓' : '✗'}</span>`;
   if (p.midpointCorrect !== null) midResTag = `<span class="tag" style="font-size:10px">中點${p.midpointCorrect ? '✓' : '✗'}</span>`;
 
-  const editBtn = `<button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="startEditPred('${p.id}')">編輯</button>`;
+  const editBtn = `<button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="startEditPred('${p.id}')">編輯</button>
+  <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:rgba(239,83,80,.3)" onclick="deletePred('${p.id}')">✕</button>`;
 
   return `
 <div class="pred-item">
