@@ -877,7 +877,7 @@ function renderNotes() {
   list.innerHTML = filtered.map(n => {
     const imgs = n.images || [];
     const escId = esc(String(n.id));
-    const imgBadge = imgs.length ? `<span class="note-img-badge">🖼 ${imgs.length}</span>` : '';
+
     const imgGrid = imgs.length ? `<div class="note-imgs">${imgs.map((src, i) =>
       `<div class="note-img-thumb" onclick="event.stopPropagation();openLightbox(noteImgsArr('${escId}'),${i})">
         <img src="${esc(src)}" alt="圖片${i+1}">
@@ -887,7 +887,6 @@ function renderNotes() {
       <div class="note-header" onclick="toggleNote('${escId}')">
         <span class="note-date">${esc(n.date)}</span>
         <span class="note-type-tag tag-${esc(n.type)}">${TYPE_LABELS[n.type] || esc(n.type)}</span>
-        ${imgBadge}
         <span class="note-title">${esc(n.title)}</span>
         <div class="note-actions">
           <button class="note-edit" onclick="event.stopPropagation();startEdit('${escId}')" title="編輯">✏️</button>
