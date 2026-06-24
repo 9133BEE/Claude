@@ -74,6 +74,15 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 /* Card */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+
+/* Form card hidden by default */
+#pred-form-card{display:none}
+#pred-form-card.open{display:block}
+
+/* FAB */
+.fab-add{position:fixed;bottom:24px;right:20px;z-index:200;background:var(--blue);color:#fff;border:none;border-radius:28px;height:52px;padding:0 22px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(41,98,255,.4);transition:background .15s,transform .12s}
+.fab-add:hover{background:#1E53E5}.fab-add:active{transform:scale(.96)}
+.fab-add.hidden{display:none}
 .card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
 
 /* Form */
@@ -273,11 +282,16 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   </div>
 </div>
 
+<button class="fab-add" id="fab-add" onclick="openPredForm()">+ 新增清單</button>
+
 <div class="main">
 
   <!-- Add Form -->
-  <div class="card">
-    <div class="card-title">新增預測</div>
+  <div class="card" id="pred-form-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:0" id="pred-form-title">新增預測</div>
+      <button class="btn btn-ghost btn-sm" onclick="closePredForm()" id="form-close-btn">✕ 關閉</button>
+    </div>
 
     <div class="form-row">
       <div class="form-field">
@@ -709,7 +723,8 @@ window.startEditPred = function(id) {
   document.getElementById('save-btn').style.display = 'inline-flex';
   document.getElementById('add-staged-btn').style.display = 'none';
   document.getElementById('submit-staged-btn').style.display = 'none';
-  document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  openPredForm();
+  document.getElementById('pred-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 // ── Bias buttons ──
@@ -822,6 +837,8 @@ window.submitAll = async function() {
     document.getElementById('save-msg').textContent = `✓ 已儲存`;
     clearForm();
     renderStagedList();
+    document.getElementById('pred-form-card').classList.remove('open');
+    document.getElementById('fab-add').classList.remove('hidden');
     await loadAll();
   } catch(e) {
     setSyncDot('err');
@@ -1131,6 +1148,23 @@ window.setFilter = function(f, btn) {
 })();
 
 loadAll();
+
+// ── Form show/hide ──
+window.openPredForm = function() {
+  document.getElementById('pred-form-card').classList.add('open');
+  document.getElementById('fab-add').classList.add('hidden');
+  document.getElementById('pred-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+window.closePredForm = function() {
+  if (staged.length) {
+    if (!confirm('清單中還有未送出的預測，確定要關閉？')) return;
+  }
+  staged = [];
+  renderStagedList();
+  window.clearForm();
+  document.getElementById('pred-form-card').classList.remove('open');
+  document.getElementById('fab-add').classList.remove('hidden');
+};
 
 // ── Sidebar & Dropdown ──
 window.openSidebar  = () => { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); };
