@@ -14,10 +14,48 @@
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;font-size:14px}
 
 /* Header */
-.header{background:var(--surface);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 16px;gap:12px;position:sticky;top:0;z-index:100}
-.back-link{color:var(--muted);font-size:13px;text-decoration:none}.back-link:hover{color:var(--text)}
-.hdr-title{font-size:16px;font-weight:700}.hdr-title span{color:var(--muted);font-weight:400;font-size:12px;margin-left:8px}
+.header{background:var(--surface);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 16px;gap:10px;position:sticky;top:0;z-index:100}
+.hamburger{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:18px;cursor:pointer;padding:3px 9px;line-height:1;flex-shrink:0}
+.hamburger:hover{background:rgba(255,255,255,.12)}
+.hdr-title{font-size:15px;font-weight:700;white-space:nowrap}.hdr-title span{color:var(--muted);font-weight:400;font-size:12px;margin-left:6px}
 .hdr-spacer{flex:1}
+
+/* Header nav dropdowns */
+.header-nav{display:flex;gap:5px;align-items:center;margin-left:10px}
+.nav-dropdown{position:relative}
+.nav-dd-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;padding:0 10px;height:30px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap;user-select:none;transition:background .12s}
+.nav-dd-btn:hover{background:rgba(255,255,255,.12)}
+.nav-dd-btn .dd-arrow{font-size:8px;color:var(--muted);transition:transform .15s}
+.nav-dropdown.open .dd-arrow{transform:rotate(180deg)}
+.dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.4);min-width:160px;z-index:999;padding:6px 0;max-height:calc(100vh - 80px);overflow-y:auto}
+.nav-dropdown.open .dd-menu{display:block}
+.dd-section{font-size:10px;font-weight:700;color:var(--muted);padding:8px 14px 3px;text-transform:uppercase;letter-spacing:.08em}
+.dd-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;color:var(--text);text-decoration:none;cursor:pointer;transition:background .1s}
+.dd-item:hover{background:rgba(255,255,255,.06)}
+.dd-item.current{color:var(--blue);font-weight:600}
+.dd-divider{height:1px;background:var(--border);margin:4px 0}
+
+/* Sidebar */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999}
+.sb-overlay.open{display:block}
+.sidebar{position:fixed;top:0;left:-250px;width:230px;height:100vh;background:var(--surface);border-right:1px solid var(--border);z-index:1000;transition:left .22s ease;overflow-y:auto;display:flex;flex-direction:column;box-shadow:4px 0 20px rgba(0,0,0,.3)}
+.sidebar.open{left:0}
+.sb-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-logo{font-size:15px;font-weight:700;color:var(--text)}
+.sb-close{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0}
+.sb-close:hover{color:var(--text)}
+.sb-nav{padding:6px 0 20px}
+.sb-section-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:12px 14px 4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.sb-section-title:hover{color:var(--text)}
+.sb-arrow{font-size:10px;opacity:.6;transition:transform .2s;flex-shrink:0}
+.sb-section-title.closed .sb-arrow{transform:rotate(-90deg)}
+.sb-group{overflow:hidden;max-height:600px;transition:max-height .25s ease}
+.sb-group.closed{max-height:0}
+.sb-item{display:block;padding:7px 14px;font-size:13px;color:var(--text);text-decoration:none;opacity:.75;transition:background .12s,opacity .12s}
+.sb-item:hover{background:rgba(255,255,255,.06);opacity:1}
+.sb-item.sb-active{color:var(--blue);opacity:1;font-weight:600}
+
+@media(max-width:640px){.header-nav{display:none}}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#555;flex-shrink:0}
 .sync-dot.ok{background:var(--green)}.sync-dot.err{background:var(--red)}
 .sync-dot.loading{background:var(--orange);animation:pulse .8s ease-in-out infinite alternate}
@@ -128,11 +166,58 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 </head>
 <body>
 
+<!-- Sidebar -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <span class="sb-logo">📊 股票工具箱</span>
+    <button class="sb-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section-title" onclick="toggleSbGroup(this)">工具 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group">
+      <a class="sb-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
+      <a class="sb-item" href="trade-journal.html">交易日誌</a>
+      <a class="sb-item" href="notebook.html">筆記本</a>
+      <a class="sb-item sb-active" href="daily-prediction.html">每日預測</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">TradingView <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="tradingview-guide.html">TV 指南</a>
+      <a class="sb-item" href="tv-indicators.html">TV 指標大全</a>
+      <a class="sb-item" href="advanced-indicators.html">TV 指標策略</a>
+    </div>
+    <div class="sb-section-title closed" onclick="toggleSbGroup(this)">教學 <span class="sb-arrow">▾</span></div>
+    <div class="sb-group closed">
+      <a class="sb-item" href="stock-course.html">台股課程</a>
+      <a class="sb-item" href="futures-course.html">台指期課程</a>
+      <a class="sb-item" href="stock-glossary.html">股票名詞</a>
+      <a class="sb-item" href="strategy-glossary.html">技術策略</a>
+    </div>
+  </div>
+</nav>
+
 <div class="header">
-  <a href="index.html" class="back-link">← 股學筆記</a>
+  <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="hdr-title">每日預測追蹤 <span>Candle Bias 日誌</span></div>
+
+  <div class="header-nav">
+    <div class="nav-dropdown" id="dd-tools">
+      <button class="nav-dd-btn" onclick="toggleDD('dd-tools')">
+        工具 <span class="dd-arrow">▾</span>
+      </button>
+      <div class="dd-menu">
+        <a class="dd-item" href="trade-journal.html">交易日誌</a>
+        <a class="dd-item" href="notebook.html">筆記本</a>
+        <a class="dd-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
+        <a class="dd-item current" href="daily-prediction.html">每日預測</a>
+      </div>
+    </div>
+  </div>
+
   <div class="hdr-spacer"></div>
   <div class="sync-dot loading" id="sync-dot"></div>
+  <button onclick="location.reload()" style="background:none;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:15px;cursor:pointer;padding:3px 9px;line-height:1;flex-shrink:0" title="重新整理">↻</button>
 </div>
 
 <div class="stats-bar">
@@ -736,6 +821,20 @@ window.setFilter = function(f, btn) {
 })();
 
 loadAll();
+
+// ── Sidebar & Dropdown ──
+window.openSidebar  = () => { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); };
+window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); };
+window.toggleSbGroup = el => { el.classList.toggle('closed'); const g = el.nextElementSibling; if (g) g.classList.toggle('closed'); };
+window.toggleDD = id => {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+};
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-dropdown')) document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+});
 </script>
 </body>
 </html>
