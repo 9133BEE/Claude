@@ -139,7 +139,17 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .tag{font-size:11px;padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--muted)}
 .tag.agree{border-color:rgba(38,166,154,.3);color:var(--green)}
 .tag.conflict{border-color:rgba(255,152,0,.3);color:var(--orange)}
-.tag.result-up{color:var(--green)}.tag.result-down{color:var(--red)}
+.tag.result-up{color:var(--red)}.tag.result-down{color:var(--green)}
+
+/* Date group */
+.date-group{margin-bottom:14px}
+.date-group-hdr{font-size:11px;font-weight:700;color:var(--muted);padding:2px 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px;letter-spacing:.06em}
+
+/* Result indicator (亮燈) */
+.pred-ind{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.ind-ok{background:rgba(38,166,154,.15);color:var(--green);border:1.5px solid var(--green)}
+.ind-ng{background:rgba(239,83,80,.15);color:var(--red);border:1.5px solid var(--red)}
+.ind-pending{background:rgba(120,123,134,.12);color:var(--muted);border:1.5px solid var(--border)}
 .pred-notes{font-size:12px;color:var(--muted);line-height:1.5}
 .pred-actions{display:flex;gap:6px;margin-top:8px}
 
@@ -345,26 +355,21 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
     </div>
   </div>
 
-  <!-- Pending -->
-  <div style="margin-bottom:16px">
-    <div class="sec-hdr">
-      <div class="sec-title">待核對 <span class="count-badge" id="pending-ct">0</span></div>
-      <button class="btn btn-sm" onclick="autoVerify()" id="verify-btn">自動核對結果</button>
-    </div>
-    <div id="pending-list"><div class="empty">沒有待核對的預測</div></div>
-  </div>
-
-  <!-- History -->
+  <!-- All predictions grouped by date -->
   <div>
     <div class="sec-hdr">
-      <div class="sec-title">歷史記錄</div>
-      <div class="filter-btns">
-        <button class="fbtn active" onclick="setFilter('all',this)">全部</button>
-        <button class="fbtn" onclick="setFilter('ok',this)">正確</button>
-        <button class="fbtn" onclick="setFilter('ng',this)">錯誤</button>
+      <div class="sec-title">預測記錄 <span class="count-badge" id="pending-ct" style="background:var(--orange);color:#fff">0</span></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="filter-btns">
+          <button class="fbtn active" onclick="setFilter('all',this)">全部</button>
+          <button class="fbtn" onclick="setFilter('ok',this)">正確</button>
+          <button class="fbtn" onclick="setFilter('ng',this)">錯誤</button>
+          <button class="fbtn" onclick="setFilter('pending',this)">待核對</button>
+        </div>
+        <button class="btn btn-sm" onclick="autoVerify()" id="verify-btn">自動核對</button>
       </div>
     </div>
-    <div id="history-list"><div class="empty">還沒有歷史記錄</div></div>
+    <div id="pred-groups"><div class="empty">尚無預測記錄</div></div>
   </div>
 
 </div>
@@ -442,8 +447,8 @@ async function fetchTWSE(code, isoDate) {
 
 // ── TPEX API（上櫃）──
 async function fetchTPEX(code, isoDate) {
-  const [y, m] = isoDate.split('-');
-  const rocDate = `${+y - 1911}/${m}/01`;
+  const [y, m, d] = isoDate.split('-');
+  const rocDate = `${+y - 1911}/${m}/${d}`;
   const r = await fetch(`https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}&s=${code}`);
   const j = await r.json();
   if (!j.aaData?.length) return null;
@@ -900,51 +905,56 @@ async function loadAll() {
 
 function render() {
   // Stats
-  const verified  = preds.filter(p => p.isCorrect !== null);
-  const correct   = verified.filter(p => p.isCorrect);
-  const patV      = preds.filter(p => p.patternCorrect !== null);
-  const patOk     = patV.filter(p => p.patternCorrect);
-  const midV      = preds.filter(p => p.midpointCorrect !== null);
-  const midOk     = midV.filter(p => p.midpointCorrect);
+  const verified = preds.filter(p => p.isCorrect !== null);
+  const correct  = verified.filter(p => p.isCorrect);
+  const patV     = preds.filter(p => p.patternCorrect !== null);
+  const patOk    = patV.filter(p => p.patternCorrect);
+  const midV     = preds.filter(p => p.midpointCorrect !== null);
+  const midOk    = midV.filter(p => p.midpointCorrect);
 
   document.getElementById('s-total').textContent = preds.length;
-
   const wrEl = document.getElementById('s-wr');
   wrEl.textContent = pct(correct.length, verified.length);
   wrEl.className = 'stat-value' + (verified.length ? (correct.length / verified.length >= 0.5 ? ' green' : ' red') : '');
-
   document.getElementById('s-pat').textContent = pct(patOk.length, patV.length);
   document.getElementById('s-mid').textContent = pct(midOk.length, midV.length);
 
-  // Pending
-  const pending = preds.filter(p => p.prediction !== 'skip' && p.isCorrect === null);
-  document.getElementById('pending-ct').textContent = pending.length;
+  // Pending count badge
+  const pendingCount = preds.filter(p => p.prediction !== 'skip' && p.isCorrect === null).length;
+  document.getElementById('pending-ct').textContent = pendingCount;
+  document.getElementById('pending-ct').style.display = pendingCount ? '' : 'none';
 
-  const pendEl = document.getElementById('pending-list');
-  pendEl.innerHTML = pending.length
-    ? pending.map(renderItem).join('')
-    : '<div class="empty">沒有待核對的預測</div>';
+  // Filter
+  let filtered = [...preds];
+  if (histFilter === 'ok')      filtered = filtered.filter(p => p.isCorrect === true);
+  if (histFilter === 'ng')      filtered = filtered.filter(p => p.isCorrect === false);
+  if (histFilter === 'pending') filtered = filtered.filter(p => p.isCorrect === null && p.prediction !== 'skip');
 
-  // History
-  let hist = preds.filter(p => p.prediction === 'skip' || p.isCorrect !== null);
-  if (histFilter === 'ok') hist = hist.filter(p => p.isCorrect === true);
-  if (histFilter === 'ng') hist = hist.filter(p => p.isCorrect === false);
+  // Group by date
+  const groups = {};
+  filtered.forEach(p => { if (!groups[p.date]) groups[p.date] = []; groups[p.date].push(p); });
+  const dates = Object.keys(groups).sort().reverse();
 
-  const histEl = document.getElementById('history-list');
-  histEl.innerHTML = hist.length
-    ? hist.map(renderItem).join('')
-    : '<div class="empty">還沒有歷史記錄</div>';
+  const el = document.getElementById('pred-groups');
+  if (!dates.length) { el.innerHTML = '<div class="empty">尚無符合的記錄</div>'; return; }
+
+  el.innerHTML = dates.map(date => `
+    <div class="date-group">
+      <div class="date-group-hdr">${date}</div>
+      ${groups[date].map(renderItem).join('')}
+    </div>
+  `).join('');
 }
 
 function renderItem(p) {
   const predClass = p.prediction === 'bull' ? 'bull' : p.prediction === 'bear' ? 'bear' : 'skip';
   const predText  = p.prediction === 'bull' ? '看多' : p.prediction === 'bear' ? '看空' : '觀望';
 
-  // Result indicator
-  let resultHtml = '';
-  if (p.isCorrect !== null) {
-    resultHtml = `<span class="pred-result ${p.isCorrect ? 'ok' : 'ng'}">${p.isCorrect ? 'v' : 'x'}</span>`;
-  }
+  // 亮燈指示器
+  let indCls = 'ind-pending', indTxt = '●';
+  if (p.isCorrect === true)  { indCls = 'ind-ok';  indTxt = 'O'; }
+  if (p.isCorrect === false) { indCls = 'ind-ng';  indTxt = 'X'; }
+  const indicator = `<span class="pred-ind ${indCls}">${indTxt}</span>`;
 
   // Pattern / midpoint tags
   const patLabel = p.patternBias === 'bull' ? '型態看多' : p.patternBias === 'bear' ? '型態看空' : '';
@@ -952,15 +962,7 @@ function renderItem(p) {
   const agree    = patLabel && midLabel && p.patternBias === p.midpointBias;
   const conflict = patLabel && midLabel && p.patternBias !== p.midpointBias;
 
-  // PDMid tag
-  let midTag = '';
-  if (p.prevK) {
-    const m   = ((p.prevK.h + p.prevK.l) / 2).toFixed(2);
-    const rel = p.prevK.c > +m ? '>' : p.prevK.c < +m ? '<' : '=';
-    midTag = `<span class="tag">PDMid ${m} | 收盤${rel}PDMid</span>`;
-  }
-
-  // Result tag
+  // Result tag（漲=紅↑ 跌=綠↓）
   let resTag = '';
   if (p.resultClose !== null) {
     const ch  = p.resultChange !== null ? (p.resultChange > 0 ? `+${p.resultChange.toFixed(2)}` : p.resultChange.toFixed(2)) : '';
@@ -971,25 +973,22 @@ function renderItem(p) {
 
   // Individual method result tags
   let patResTag = '', midResTag = '';
-  if (p.patternCorrect !== null)  patResTag = `<span class="tag" style="font-size:10px">型態${p.patternCorrect ? '✓' : '✗'}</span>`;
-  if (p.midpointCorrect !== null) midResTag = `<span class="tag" style="font-size:10px">中點${p.midpointCorrect ? '✓' : '✗'}</span>`;
-
-  const editBtn = `<button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="startEditPred('${p.id}')">編輯</button>
-  <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:rgba(239,83,80,.3)" onclick="deletePred('${p.id}')">✕</button>`;
+  if (p.patternCorrect !== null)  patResTag = `<span class="tag" style="font-size:10px">型態${p.patternCorrect ? 'O' : 'X'}</span>`;
+  if (p.midpointCorrect !== null) midResTag = `<span class="tag" style="font-size:10px">中點${p.midpointCorrect ? 'O' : 'X'}</span>`;
 
   return `
 <div class="pred-item">
   <div class="pred-hdr">
-    <span class="pred-date">${p.date}</span>
-    <span class="pred-stock">${p.stockCode}${p.stockName && p.stockName !== p.stockCode ? ' ' + p.stockName : ''}</span>
+    ${indicator}
+    <span class="pred-stock">${p.stockCode}${p.stockName && p.stockName !== p.stockCode ? ' <span style="font-weight:400;color:var(--muted)">' + p.stockName + '</span>' : ''}</span>
     <span class="pred-badge ${predClass}">${predText}</span>
-    ${resultHtml}
-    ${editBtn}
+    <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="startEditPred('${p.id}')">編輯</button>
+    <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:rgba(239,83,80,.3)" onclick="deletePred('${p.id}')">✕</button>
   </div>
-  <div class="pred-tags">
+  <div class="pred-tags" style="padding-left:32px">
     ${patLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${patLabel}</span>` : ''}
     ${midLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${midLabel}</span>` : ''}
-    ${midTag}${resTag}${patResTag}${midResTag}
+    ${resTag}${patResTag}${midResTag}
     ${p.notes ? `<span class="pred-notes">${p.notes}</span>` : ''}
   </div>
 </div>`;
@@ -998,7 +997,7 @@ function renderItem(p) {
 window.setFilter = function(f, btn) {
   histFilter = f;
   document.querySelectorAll('.filter-btns .fbtn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   render();
 };
 
