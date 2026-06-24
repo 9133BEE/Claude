@@ -412,13 +412,30 @@ function prevTradingDay(isoDate) {
   return d.toISOString().slice(0, 10);
 }
 
-// ── TWSE API ──
+// ── TWSE API（上市）──
 async function fetchTWSE(code, isoDate) {
   const dp = isoDate.replace(/-/g, '');
   const r = await fetch(`https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?response=json&stockNo=${code}&date=${dp}`);
   const j = await r.json();
   if (j.stat !== 'OK' || !j.data?.length) return null;
   return j;
+}
+
+// ── TPEX API（上櫃）──
+async function fetchTPEX(code, isoDate) {
+  const [y, m] = isoDate.split('-');
+  const rocDate = `${+y - 1911}/${m}/01`;
+  const r = await fetch(`https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}&s=${code}`);
+  const j = await r.json();
+  if (!j.aaData?.length) return null;
+  return { stat: 'OK', data: j.aaData, title: code };
+}
+
+// ── 統一查詢（先上市，再上櫃）──
+async function fetchStock(code, isoDate) {
+  const twse = await fetchTWSE(code, isoDate).catch(() => null);
+  if (twse) return twse;
+  return await fetchTPEX(code, isoDate).catch(() => null);
 }
 
 function findRow(data, isoDate) {
@@ -436,20 +453,20 @@ window.fetchPrevK = async function() {
 
   try {
     const prev = prevTradingDay(date);
-    let json = await fetchTWSE(code, prev);
+    let json = await fetchStock(code, prev);
 
     // If not found in current month, try prev month
     if (!json || !findRow(json.data, prev)) {
       const pm = new Date(prev);
       pm.setMonth(pm.getMonth() - 1);
-      json = await fetchTWSE(code, pm.toISOString().slice(0, 10));
+      json = await fetchStock(code, pm.toISOString().slice(0, 10));
     }
 
     const row = json && findRow(json.data, prev);
     if (!row) {
       document.getElementById('manual-k').style.display = 'block';
       document.getElementById('k-info').classList.remove('show');
-      alert('查無資料（可能是OTC股或假日），請手動輸入前日K棒');
+      alert('查無資料，請手動輸入前日K棒');
       return;
     }
 
@@ -675,10 +692,17 @@ window.autoVerify = async function() {
   let done = 0, noData = 0;
   for (const p of pending) {
     try {
-      let json = await fetchTWSE(p.stockCode, p.date);
+      let json = await fetchStock(p.stockCode, p.date);
       let row  = json && findRow(json.data, p.date);
 
-      // If current month has no data yet, it's fine (market not closed yet)
+      // If not found, try previous month (cross-month edge case)
+      if (!row) {
+        const pm = new Date(p.date); pm.setMonth(pm.getMonth() - 1);
+        json = await fetchStock(p.stockCode, pm.toISOString().slice(0, 10));
+        row  = json && findRow(json.data, p.date);
+      }
+
+      // Still no data: market not closed yet or invalid code
       if (!row) { noData++; continue; }
 
       const resultClose  = num(row[6]);
