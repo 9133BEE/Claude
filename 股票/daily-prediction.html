@@ -124,8 +124,9 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 /* Badge */
 .count-badge{background:rgba(255,152,0,.15);color:var(--orange);border:1px solid rgba(255,152,0,.3);border-radius:10px;padding:1px 8px;font-size:11px;margin-left:6px}
 
-/* Prediction item */
-.pred-item{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:8px}
+/* Prediction item (row inside date-group card) */
+.pred-item{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pred-item:last-child{border-bottom:none}
 .pred-hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .pred-date{font-size:11px;color:var(--muted);background:var(--surface);border-radius:4px;padding:2px 7px;white-space:nowrap}
 .pred-stock{font-size:14px;font-weight:700}
@@ -141,14 +142,19 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .tag.conflict{border-color:rgba(255,152,0,.3);color:var(--orange)}
 .tag.result-up{color:var(--red)}.tag.result-down{color:var(--green)}
 
-/* Date group */
-.date-group{margin-bottom:14px}
-.date-group-hdr{font-size:12px;font-weight:700;color:var(--muted);padding:6px 8px;border:1px solid var(--border);border-radius:6px;margin-bottom:0;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;background:rgba(255,255,255,.03);transition:background .15s}
-.date-group-hdr:hover{background:rgba(255,255,255,.07)}
+/* Date group — one card per day */
+.date-group{margin-bottom:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.date-group-hdr{font-size:12px;font-weight:700;color:var(--muted);padding:8px 12px;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;gap:7px;user-select:none;transition:background .15s}
+.date-group-hdr:hover{background:rgba(255,255,255,.05)}
+.date-group.open>.date-group-hdr{border-bottom:1px solid var(--border)}
 .date-group-arrow{font-size:10px;transition:transform .2s;display:inline-block;flex-shrink:0}
 .date-group.open>.date-group-hdr .date-group-arrow{transform:rotate(90deg)}
-.date-group-body{display:none;padding-top:6px}
+.date-group-body{display:none}
 .date-group.open>.date-group-body{display:block}
+
+/* Prediction rows inside date group (no individual card border) */
+.pred-item{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pred-item:last-child{border-bottom:none}
 
 /* Result indicator (亮燈) */
 .pred-ind{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
@@ -450,14 +456,38 @@ async function fetchTWSE(code, isoDate) {
   return j;
 }
 
-// ── TPEX API（上櫃）──
+// ── TPEX API（上櫃，雙路備援）──
 async function fetchTPEX(code, isoDate) {
   const [y, m, d] = isoDate.split('-');
   const rocDate = `${+y - 1911}/${m}/${d}`;
-  const r = await fetch(`https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}&s=${code}`);
-  const j = await r.json();
-  if (!j.aaData?.length) return null;
-  return { stat: 'OK', data: j.aaData, title: code };
+
+  // 路線1：個股月資料 st43
+  try {
+    const r = await fetch(
+      `https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php` +
+      `?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}&s=${code}`
+    );
+    const j = await r.json();
+    if (j.aaData?.length) return { stat: 'OK', data: j.aaData, title: code };
+  } catch(e) { console.warn('[TPEX st43]', e.message); }
+
+  // 路線2：當日全上櫃報價 stk_wn1430，找到該股後轉 st43 欄位格式
+  // stk_wn1430 欄位: [代號(0), 名稱(1), 成交量(2), 金額(3), 開(4), 高(5), 低(6), 收(7), 漲跌符號(8), 漲跌額(9)]
+  try {
+    const r = await fetch(
+      `https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php` +
+      `?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}`
+    );
+    const j = await r.json();
+    const row = j.aaData?.find(x => String(x[0]).trim() === code);
+    if (row) {
+      // 轉成 st43 格式: [日期(0), 量(1), 金(2), 開(3), 高(4), 低(5), 收(6), 漲跌符號(7), 漲跌額(8)]
+      const syn = [rocDate, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9] ?? '0'];
+      return { stat: 'OK', data: [syn], title: code };
+    }
+  } catch(e) { console.warn('[TPEX stk_wn1430]', e.message); }
+
+  return null;
 }
 
 // ── 統一查詢（先上市，再上櫃）──
