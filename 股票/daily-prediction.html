@@ -140,7 +140,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .tag.agree{border-color:rgba(38,166,154,.3);color:var(--green)}
 .tag.conflict{border-color:rgba(255,152,0,.3);color:var(--orange)}
 .tag.result-up{color:var(--green)}.tag.result-down{color:var(--red)}
-.pred-notes{font-size:12px;color:var(--muted);margin-top:6px;font-style:italic;line-height:1.5}
+.pred-notes{font-size:12px;color:var(--muted);line-height:1.5}
 .pred-actions{display:flex;gap:6px;margin-top:8px}
 
 .empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:14px}
@@ -253,7 +253,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
       <div class="form-field">
         <div class="fl">股票代號</div>
         <input type="text" id="f-code" class="finput" placeholder="如 8046" style="width:90px" maxlength="6"
-          onkeydown="if(event.key==='Enter')fetchPrevK()">
+          onkeydown="if(event.key==='Enter')fetchPrevK()" onblur="autoFillName()">
       </div>
       <div class="form-field" style="flex:1;min-width:120px">
         <div class="fl">股票名稱</div>
@@ -392,6 +392,7 @@ let preds = [];
 let bias = { pat: null, mid: null, pred: null };
 let prevK = null;
 let histFilter = 'all';
+let editingPredId = null;
 
 // ── Helpers ──
 const num = s => parseFloat(String(s).replace(/,/g, '')) || 0;
@@ -512,6 +513,31 @@ window.calcManualMid = function() {
   }
 };
 
+// ── Auto fill name from history ──
+window.autoFillName = function() {
+  const code = document.getElementById('f-code').value.trim();
+  if (!code || document.getElementById('f-name').value) return;
+  const match = preds.find(p => p.stockCode === code && p.stockName && p.stockName !== p.stockCode);
+  if (match) document.getElementById('f-name').value = match.stockName;
+};
+
+// ── Start Edit ──
+window.startEditPred = function(id) {
+  const p = preds.find(x => x.id === id);
+  if (!p) return;
+  editingPredId = id;
+  document.getElementById('f-date').value  = p.date;
+  document.getElementById('f-code').value  = p.stockCode;
+  document.getElementById('f-name').value  = p.stockName || '';
+  document.getElementById('f-notes').value = p.notes || '';
+  setBias('pat',  p.patternBias  || 'skip');
+  setBias('mid',  p.midpointBias || 'skip');
+  setBias('pred', p.prediction   || 'skip');
+  prevK = p.prevK || null;
+  document.getElementById('save-btn').textContent = '更新預測';
+  document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
 // ── Bias buttons ──
 window.setBias = function(grp, val) {
   bias[grp] = val;
@@ -530,6 +556,8 @@ window.setBias = function(grp, val) {
 };
 
 window.clearForm = function() {
+  editingPredId = null;
+  document.getElementById('save-btn').textContent = '新增預測';
   document.getElementById('f-code').value = '';
   document.getElementById('f-name').value = '';
   document.getElementById('f-notes').value = '';
@@ -560,22 +588,33 @@ window.savePred = async function() {
   btn.disabled = true;
   document.getElementById('save-msg').textContent = '儲存中…';
 
-  const rec = {
-    date, stockCode: code, stockName: name || code,
-    patternBias: bias.pat || 'skip',
-    midpointBias: bias.mid || 'skip',
-    prediction: bias.pred,
-    notes,
-    prevK: prevK || null,
-    resultClose: null, resultPrevClose: null,
-    resultDirection: null, resultChange: null,
-    isCorrect: null, patternCorrect: null, midpointCorrect: null,
-    createdAt: Timestamp.now()
-  };
-
   try {
     setSyncDot('loading');
-    await addDoc(collection(db, COL), rec);
+    if (editingPredId) {
+      const update = {
+        date, stockCode: code, stockName: name || code,
+        patternBias: bias.pat || 'skip',
+        midpointBias: bias.mid || 'skip',
+        prediction: bias.pred,
+        notes,
+        prevK: prevK || null,
+      };
+      await updateDoc(doc(db, COL, editingPredId), update);
+    } else {
+      const rec = {
+        date, stockCode: code, stockName: name || code,
+        patternBias: bias.pat || 'skip',
+        midpointBias: bias.mid || 'skip',
+        prediction: bias.pred,
+        notes,
+        prevK: prevK || null,
+        resultClose: null, resultPrevClose: null,
+        resultDirection: null, resultChange: null,
+        isCorrect: null, patternCorrect: null, midpointCorrect: null,
+        createdAt: Timestamp.now()
+      };
+      await addDoc(collection(db, COL), rec);
+    }
     setSyncDot('ok');
     document.getElementById('save-msg').textContent = '✓ 已儲存';
     clearForm();
@@ -778,10 +817,7 @@ function renderItem(p) {
   if (p.patternCorrect !== null)  patResTag = `<span class="tag" style="font-size:10px">型態${p.patternCorrect ? '✓' : '✗'}</span>`;
   if (p.midpointCorrect !== null) midResTag = `<span class="tag" style="font-size:10px">中點${p.midpointCorrect ? '✓' : '✗'}</span>`;
 
-  // Actions
-  const actions = p.isCorrect === null && p.prediction !== 'skip'
-    ? `<div class="pred-actions"><button class="btn btn-ghost btn-sm" onclick="openManualResult('${p.id}')">手動輸入結果</button></div>`
-    : '';
+  const editBtn = `<button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="startEditPred('${p.id}')">編輯</button>`;
 
   return `
 <div class="pred-item">
@@ -790,14 +826,14 @@ function renderItem(p) {
     <span class="pred-stock">${p.stockCode}${p.stockName && p.stockName !== p.stockCode ? ' ' + p.stockName : ''}</span>
     <span class="pred-badge ${predClass}">${predText}</span>
     ${resultHtml}
+    ${editBtn}
   </div>
   <div class="pred-tags">
     ${patLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${patLabel}</span>` : ''}
     ${midLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${midLabel}</span>` : ''}
     ${midTag}${resTag}${patResTag}${midResTag}
+    ${p.notes ? `<span class="pred-notes">${p.notes}</span>` : ''}
   </div>
-  ${p.notes ? `<div class="pred-notes">${p.notes}</div>` : ''}
-  ${actions}
 </div>`;
 }
 
