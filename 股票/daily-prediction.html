@@ -257,7 +257,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
       </div>
       <div class="form-field" style="flex:1;min-width:120px">
         <div class="fl">股票名稱</div>
-        <input type="text" id="f-name" class="finput" placeholder="（可選）">
+        <input type="text" id="f-name" class="finput" placeholder="（可選）" onblur="autoFillCode()">
       </div>
       <button class="btn btn-sm" onclick="fetchPrevK()" id="fetch-btn" style="align-self:flex-end">查昨日K棒</button>
     </div>
@@ -513,12 +513,48 @@ window.calcManualMid = function() {
   }
 };
 
-// ── Auto fill name from history ──
-window.autoFillName = function() {
+// ── Taiwan stock list (TWSE + TPEX) ──
+let _stockList = null;
+async function getStockList() {
+  if (_stockList) return _stockList;
+  const cached = sessionStorage.getItem('tw_stocks');
+  if (cached) { _stockList = JSON.parse(cached); return _stockList; }
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch('https://openapi.twse.com.tw/v1/opendata/t187ap03_L'),
+      fetch('https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O')
+    ]);
+    const d1 = await r1.json();
+    const d2 = await r2.json();
+    _stockList = [
+      ...d1.map(s => ({ code: s['公司代號'], name: s['公司簡稱'] || s['公司名稱'] })),
+      ...d2.map(s => ({ code: s['SecuritiesCompanyCode'] || s['公司代號'], name: s['CompanyAbbreviation'] || s['公司簡稱'] || s['公司名稱'] }))
+    ].filter(s => s.code && s.name);
+    sessionStorage.setItem('tw_stocks', JSON.stringify(_stockList));
+  } catch(e) { _stockList = []; }
+  return _stockList;
+}
+
+// ── Auto fill name from code ──
+window.autoFillName = async function() {
   const code = document.getElementById('f-code').value.trim();
   if (!code || document.getElementById('f-name').value) return;
-  const match = preds.find(p => p.stockCode === code && p.stockName && p.stockName !== p.stockCode);
-  if (match) document.getElementById('f-name').value = match.stockName;
+  const fromHistory = preds.find(p => p.stockCode === code && p.stockName && p.stockName !== p.stockCode);
+  if (fromHistory) { document.getElementById('f-name').value = fromHistory.stockName; return; }
+  const list = await getStockList();
+  const match = list.find(s => s.code === code);
+  if (match) document.getElementById('f-name').value = match.name;
+};
+
+// ── Auto fill code from name ──
+window.autoFillCode = async function() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name || document.getElementById('f-code').value) return;
+  const fromHistory = preds.find(p => p.stockName && p.stockName.includes(name) && p.stockCode);
+  if (fromHistory) { document.getElementById('f-code').value = fromHistory.stockCode; return; }
+  const list = await getStockList();
+  const match = list.find(s => s.name.includes(name));
+  if (match) document.getElementById('f-code').value = match.code;
 };
 
 // ── Start Edit ──
