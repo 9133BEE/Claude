@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>每日預測追蹤 | 股學筆記</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#131722;--surface:#1e2230;--border:#2a2e39;
+  --text:#d1d4dc;--muted:#787b86;
+  --blue:#2962FF;--green:#26a69a;--red:#ef5350;--orange:#ff9800;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;font-size:14px}
+
+/* Header */
+.header{background:var(--surface);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 16px;gap:12px;position:sticky;top:0;z-index:100}
+.back-link{color:var(--muted);font-size:13px;text-decoration:none}.back-link:hover{color:var(--text)}
+.hdr-title{font-size:16px;font-weight:700}.hdr-title span{color:var(--muted);font-weight:400;font-size:12px;margin-left:8px}
+.hdr-spacer{flex:1}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#555;flex-shrink:0}
+.sync-dot.ok{background:var(--green)}.sync-dot.err{background:var(--red)}
+.sync-dot.loading{background:var(--orange);animation:pulse .8s ease-in-out infinite alternate}
+@keyframes pulse{from{opacity:.4}to{opacity:1}}
+
+/* Stats bar */
+.stats-bar{display:flex;border-bottom:1px solid var(--border)}
+.stat-item{flex:1;padding:12px 8px;text-align:center;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.stat-value{font-size:20px;font-weight:700;color:var(--text)}
+.stat-value.green{color:var(--green)}.stat-value.red{color:var(--red)}
+
+/* Main */
+.main{max-width:860px;margin:0 auto;padding:16px}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+
+/* Form */
+.form-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.fl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase}
+.finput{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:7px 10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.finput:focus{border-color:var(--blue)}
+
+/* K bar info */
+.k-info{background:rgba(41,98,255,.07);border:1px solid rgba(41,98,255,.2);border-radius:6px;padding:10px 14px;margin-bottom:12px;display:none}
+.k-info.show{display:block}
+.k-row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.kv{font-size:13px}.kv span{color:var(--muted);margin-right:3px}
+.mid-badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:4px;margin-left:auto}
+.mid-badge.bull{background:rgba(38,166,154,.2);color:var(--green)}
+.mid-badge.bear{background:rgba(239,83,80,.2);color:var(--red)}
+.mid-badge.neutral{background:rgba(255,152,0,.15);color:var(--orange)}
+
+/* Bias buttons */
+.bias-section{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.bias-group{display:flex;flex-direction:column;gap:6px}
+.bias-group-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase}
+.bias-btns{display:flex;gap:4px}
+.bbtn{background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:13px;cursor:pointer;padding:6px 14px;font-family:inherit;transition:all .12s}
+.bbtn:hover{border-color:#555;color:var(--text)}
+.bbtn.a-bull{background:rgba(38,166,154,.15);border-color:var(--green);color:var(--green);font-weight:700}
+.bbtn.a-bear{background:rgba(239,83,80,.15);border-color:var(--red);color:var(--red);font-weight:700}
+.bbtn.a-skip{background:rgba(255,152,0,.12);border-color:var(--orange);color:var(--orange);font-weight:700}
+
+/* Textarea */
+.ftextarea{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:64px;width:100%;transition:border-color .15s}
+.ftextarea:focus{border-color:var(--blue)}
+
+/* Buttons */
+.btn{background:var(--blue);border:none;border-radius:5px;color:#fff;padding:7px 14px;font-size:13px;font-family:inherit;cursor:pointer;transition:background .12s;white-space:nowrap}
+.btn:hover{background:#1e53e5}.btn:disabled{background:#444;cursor:default}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--text);color:var(--text);background:transparent}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-warn{background:rgba(239,83,80,.15);border:1px solid rgba(239,83,80,.3);color:var(--red)}
+.btn-warn:hover{background:rgba(239,83,80,.25);color:var(--red)}
+
+/* Section header */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* Badge */
+.count-badge{background:rgba(255,152,0,.15);color:var(--orange);border:1px solid rgba(255,152,0,.3);border-radius:10px;padding:1px 8px;font-size:11px;margin-left:6px}
+
+/* Prediction item */
+.pred-item{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:8px}
+.pred-hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.pred-date{font-size:11px;color:var(--muted);background:var(--surface);border-radius:4px;padding:2px 7px;white-space:nowrap}
+.pred-stock{font-size:14px;font-weight:700}
+.pred-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.pred-badge.bull{background:rgba(38,166,154,.15);color:var(--green);border:1px solid rgba(38,166,154,.3)}
+.pred-badge.bear{background:rgba(239,83,80,.15);color:var(--red);border:1px solid rgba(239,83,80,.3)}
+.pred-badge.skip{background:rgba(255,152,0,.1);color:var(--orange);border:1px solid rgba(255,152,0,.3)}
+.pred-result{font-size:16px;font-weight:700;margin-left:auto}
+.pred-result.ok{color:var(--green)}.pred-result.ng{color:var(--red)}
+.pred-tags{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.tag{font-size:11px;padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--muted)}
+.tag.agree{border-color:rgba(38,166,154,.3);color:var(--green)}
+.tag.conflict{border-color:rgba(255,152,0,.3);color:var(--orange)}
+.tag.result-up{color:var(--green)}.tag.result-down{color:var(--red)}
+.pred-notes{font-size:12px;color:var(--muted);margin-top:6px;font-style:italic;line-height:1.5}
+.pred-actions{display:flex;gap:6px;margin-top:8px}
+
+.empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:14px}
+
+/* Filter buttons */
+.filter-btns{display:flex;gap:4px}
+.fbtn{background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:12px;padding:3px 10px;cursor:pointer;font-family:inherit}
+.fbtn:hover{border-color:var(--text);color:var(--text)}
+.fbtn.active{background:rgba(41,98,255,.15);border-color:var(--blue);color:#8ab4ff}
+
+/* Manual result modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;width:320px;max-width:90vw}
+.modal-title{font-size:14px;font-weight:700;margin-bottom:14px}
+
+@media(max-width:600px){
+  .stats-bar{flex-wrap:wrap}
+  .stat-item{min-width:50%;flex:none}
+  .bias-section{gap:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back-link">← 股學筆記</a>
+  <div class="hdr-title">每日預測追蹤 <span>Candle Bias 日誌</span></div>
+  <div class="hdr-spacer"></div>
+  <div class="sync-dot loading" id="sync-dot"></div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-label">整體勝率</div>
+    <div class="stat-value" id="s-wr">—</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-label">型態準確率</div>
+    <div class="stat-value" id="s-pat">—</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-label">中點法準確率</div>
+    <div class="stat-value" id="s-mid">—</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-label">總筆數</div>
+    <div class="stat-value" id="s-total">0</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Add Form -->
+  <div class="card">
+    <div class="card-title">新增預測</div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <div class="fl">預測日期</div>
+        <input type="date" id="f-date" class="finput" style="width:155px">
+      </div>
+      <div class="form-field">
+        <div class="fl">股票代號</div>
+        <input type="text" id="f-code" class="finput" placeholder="如 8046" style="width:90px" maxlength="6"
+          onkeydown="if(event.key==='Enter')fetchPrevK()">
+      </div>
+      <div class="form-field" style="flex:1;min-width:120px">
+        <div class="fl">股票名稱</div>
+        <input type="text" id="f-name" class="finput" placeholder="（可選）">
+      </div>
+      <button class="btn btn-sm" onclick="fetchPrevK()" id="fetch-btn" style="align-self:flex-end">查昨日K棒</button>
+    </div>
+
+    <!-- K Info -->
+    <div class="k-info" id="k-info">
+      <div class="k-row">
+        <div class="kv"><span>前日</span><strong id="ki-date">—</strong></div>
+        <div class="kv"><span>O</span><strong id="ki-o">—</strong></div>
+        <div class="kv"><span>H</span><strong id="ki-h">—</strong></div>
+        <div class="kv"><span>L</span><strong id="ki-l">—</strong></div>
+        <div class="kv"><span>C</span><strong id="ki-c">—</strong></div>
+        <div class="kv"><span>PDMid</span><strong id="ki-mid">—</strong></div>
+        <div class="mid-badge" id="ki-badge">—</div>
+      </div>
+    </div>
+
+    <!-- Manual K input (fallback) -->
+    <div id="manual-k" style="display:none;margin-bottom:12px">
+      <div class="fl" style="margin-bottom:6px">手動輸入前日K棒（查詢失敗時使用）</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="number" id="mk-o" class="finput" placeholder="Open" style="width:85px" oninput="calcManualMid()">
+        <input type="number" id="mk-h" class="finput" placeholder="High" style="width:85px" oninput="calcManualMid()">
+        <input type="number" id="mk-l" class="finput" placeholder="Low"  style="width:85px" oninput="calcManualMid()">
+        <input type="number" id="mk-c" class="finput" placeholder="Close" style="width:85px" oninput="calcManualMid()">
+        <span id="mk-mid-display" style="font-size:12px;color:var(--muted)">PDMid: —</span>
+      </div>
+    </div>
+
+    <!-- Bias Selection -->
+    <div class="bias-section">
+      <div class="bias-group">
+        <div class="bias-group-label">型態判斷</div>
+        <div class="bias-btns">
+          <button class="bbtn" onclick="setBias('pat','bull')" id="p-bull">看多</button>
+          <button class="bbtn" onclick="setBias('pat','skip')" id="p-skip">中立</button>
+          <button class="bbtn" onclick="setBias('pat','bear')" id="p-bear">看空</button>
+        </div>
+      </div>
+      <div class="bias-group">
+        <div class="bias-group-label">中點法</div>
+        <div class="bias-btns">
+          <button class="bbtn" onclick="setBias('mid','bull')" id="m-bull">看多</button>
+          <button class="bbtn" onclick="setBias('mid','skip')" id="m-skip">中立</button>
+          <button class="bbtn" onclick="setBias('mid','bear')" id="m-bear">看空</button>
+        </div>
+      </div>
+      <div class="bias-group">
+        <div class="bias-group-label">整體預測</div>
+        <div class="bias-btns">
+          <button class="bbtn" onclick="setBias('pred','bull')" id="pr-bull">看多</button>
+          <button class="bbtn" onclick="setBias('pred','skip')" id="pr-skip">觀望</button>
+          <button class="bbtn" onclick="setBias('pred','bear')" id="pr-bear">看空</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div class="fl" style="margin-bottom:4px">備註（型態說明）</div>
+      <textarea class="ftextarea" id="f-notes" placeholder="例：6/23收盤實體線略低於6/22上影線，收盤>pdmid"></textarea>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
+      <span id="save-msg" style="font-size:12px;color:var(--orange)"></span>
+      <button class="btn btn-ghost btn-sm" onclick="clearForm()">清除</button>
+      <button class="btn" onclick="savePred()" id="save-btn">新增預測</button>
+    </div>
+  </div>
+
+  <!-- Pending -->
+  <div style="margin-bottom:16px">
+    <div class="sec-hdr">
+      <div class="sec-title">待核對 <span class="count-badge" id="pending-ct">0</span></div>
+      <button class="btn btn-sm" onclick="autoVerify()" id="verify-btn">自動核對結果</button>
+    </div>
+    <div id="pending-list"><div class="empty">沒有待核對的預測</div></div>
+  </div>
+
+  <!-- History -->
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-title">歷史記錄</div>
+      <div class="filter-btns">
+        <button class="fbtn active" onclick="setFilter('all',this)">全部</button>
+        <button class="fbtn" onclick="setFilter('ok',this)">正確</button>
+        <button class="fbtn" onclick="setFilter('ng',this)">錯誤</button>
+      </div>
+    </div>
+    <div id="history-list"><div class="empty">還沒有歷史記錄</div></div>
+  </div>
+
+</div>
+
+<!-- Manual Result Modal -->
+<div class="overlay" id="overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">手動輸入結果</div>
+    <input type="hidden" id="modal-id">
+    <div class="form-field" style="margin-bottom:12px">
+      <div class="fl">實際收盤價</div>
+      <input type="number" id="modal-close" class="finput" placeholder="收盤價">
+    </div>
+    <div class="form-field" style="margin-bottom:16px">
+      <div class="fl">前日收盤（用於判斷漲跌）</div>
+      <input type="number" id="modal-prev" class="finput" placeholder="前日收盤">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">取消</button>
+      <button class="btn btn-sm" onclick="submitManualResult()">確認</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, orderBy, Timestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FB_CFG = {
+  apiKey:"AIzaSyDMpaJo2I0KN6OU7UVgvvNRPzNNJefJiC4",
+  authDomain:"transaction-log-fe0c3.firebaseapp.com",
+  projectId:"transaction-log-fe0c3",
+  storageBucket:"transaction-log-fe0c3.firebasestorage.app",
+  messagingSenderId:"762032844445",
+  appId:"1:762032844405:web:cbc466f21dd73ab80f523c"
+};
+const app = initializeApp(FB_CFG);
+const db = getFirestore(app);
+const COL = 'daily_predictions';
+
+let preds = [];
+let bias = { pat: null, mid: null, pred: null };
+let prevK = null;
+let histFilter = 'all';
+
+// ── Helpers ──
+const num = s => parseFloat(String(s).replace(/,/g, '')) || 0;
+const pct = (n, d) => d ? Math.round(n / d * 100) + '%' : '—';
+const setSyncDot = s => document.getElementById('sync-dot').className = 'sync-dot ' + s;
+
+function rocToISO(roc) {
+  // "115/06/24" → "2026-06-24"
+  const [y, m, d] = roc.split('/');
+  return `${+y + 1911}-${m}-${d}`;
+}
+
+function prevTradingDay(isoDate) {
+  const d = new Date(isoDate);
+  d.setDate(d.getDate() - 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+// ── TWSE API ──
+async function fetchTWSE(code, isoDate) {
+  const dp = isoDate.replace(/-/g, '');
+  const r = await fetch(`https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?response=json&stockNo=${code}&date=${dp}`);
+  const j = await r.json();
+  if (j.stat !== 'OK' || !j.data?.length) return null;
+  return j;
+}
+
+function findRow(data, isoDate) {
+  return data.find(r => rocToISO(r[0]) === isoDate) || null;
+}
+
+// ── Fetch previous day's K bar ──
+window.fetchPrevK = async function() {
+  const code = document.getElementById('f-code').value.trim();
+  const date = document.getElementById('f-date').value;
+  if (!code || !date) { alert('請先填入代號和日期'); return; }
+
+  const btn = document.getElementById('fetch-btn');
+  btn.disabled = true; btn.textContent = '查詢中…';
+
+  try {
+    const prev = prevTradingDay(date);
+    let json = await fetchTWSE(code, prev);
+
+    // If not found in current month, try prev month
+    if (!json || !findRow(json.data, prev)) {
+      const pm = new Date(prev);
+      pm.setMonth(pm.getMonth() - 1);
+      json = await fetchTWSE(code, pm.toISOString().slice(0, 10));
+    }
+
+    const row = json && findRow(json.data, prev);
+    if (!row) {
+      document.getElementById('manual-k').style.display = 'block';
+      document.getElementById('k-info').classList.remove('show');
+      alert('查無資料（可能是OTC股或假日），請手動輸入前日K棒');
+      return;
+    }
+
+    const o = num(row[3]), h = num(row[4]), l = num(row[5]), c = num(row[6]);
+    const mid = (h + l) / 2;
+    prevK = { date: prev, o, h, l, c, mid };
+    showKInfo(prev, o, h, l, c, mid);
+
+    // Try to parse stock name
+    if (json.title && !document.getElementById('f-name').value) {
+      const m = json.title.match(/(\d+)\s+(.+?)\s+(日|個)/);
+      if (m) document.getElementById('f-name').value = m[2].trim();
+    }
+  } catch(e) {
+    document.getElementById('manual-k').style.display = 'block';
+    alert('查詢失敗，請手動輸入');
+  } finally {
+    btn.disabled = false; btn.textContent = '查昨日K棒';
+  }
+};
+
+function showKInfo(date, o, h, l, c, mid) {
+  document.getElementById('ki-date').textContent = date;
+  document.getElementById('ki-o').textContent = o;
+  document.getElementById('ki-h').textContent = h;
+  document.getElementById('ki-l').textContent = l;
+  document.getElementById('ki-c').textContent = c;
+  document.getElementById('ki-mid').textContent = mid.toFixed(2);
+
+  let cls, label;
+  if (c > mid)       { cls = 'bull'; label = `收盤 ${c} > PDMid ${mid.toFixed(2)}　→ 中點法看多`; }
+  else if (c < mid)  { cls = 'bear'; label = `收盤 ${c} < PDMid ${mid.toFixed(2)}　→ 中點法看空`; }
+  else               { cls = 'neutral'; label = `收盤 ${c} = PDMid ${mid.toFixed(2)}　→ 中點法中立`; }
+
+  const badge = document.getElementById('ki-badge');
+  badge.className = 'mid-badge ' + cls;
+  badge.textContent = label;
+  document.getElementById('k-info').classList.add('show');
+
+  // Auto-suggest midpoint bias
+  setBias('mid', cls === 'neutral' ? 'skip' : cls);
+}
+
+// ── Manual K ──
+window.calcManualMid = function() {
+  const h = parseFloat(document.getElementById('mk-h').value) || 0;
+  const l = parseFloat(document.getElementById('mk-l').value) || 0;
+  const c = parseFloat(document.getElementById('mk-c').value) || 0;
+  if (!h || !l) return;
+  const mid = (h + l) / 2;
+  const date = prevTradingDay(document.getElementById('f-date').value || new Date().toISOString().slice(0, 10));
+  document.getElementById('mk-mid-display').textContent = `PDMid: ${mid.toFixed(2)}`;
+
+  if (c) {
+    prevK = {
+      date,
+      o: parseFloat(document.getElementById('mk-o').value) || 0,
+      h, l, c, mid
+    };
+    showKInfo(date, prevK.o, h, l, c, mid);
+  }
+};
+
+// ── Bias buttons ──
+window.setBias = function(grp, val) {
+  bias[grp] = val;
+  const prefix = grp === 'pat' ? 'p' : grp === 'mid' ? 'm' : 'pr';
+  ['bull','skip','bear'].forEach(v => {
+    const el = document.getElementById(`${prefix}-${v}`);
+    if (el) el.className = 'bbtn';
+  });
+  const el = document.getElementById(`${prefix}-${val}`);
+  if (el) el.classList.add(`a-${val}`);
+
+  // Auto-suggest overall prediction when both pattern & midpoint are set
+  if (grp !== 'pred' && bias.pat && bias.mid) {
+    if (bias.pat === bias.mid && bias.pat !== 'skip') setBias('pred', bias.pat);
+  }
+};
+
+window.clearForm = function() {
+  document.getElementById('f-code').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('k-info').classList.remove('show');
+  document.getElementById('manual-k').style.display = 'none';
+  ['mk-o','mk-h','mk-l','mk-c'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mk-mid-display').textContent = 'PDMid: —';
+  bias = { pat: null, mid: null, pred: null };
+  prevK = null;
+  ['p-bull','p-skip','p-bear','m-bull','m-skip','m-bear','pr-bull','pr-skip','pr-bear'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'bbtn';
+  });
+  document.getElementById('save-msg').textContent = '';
+};
+
+// ── Save ──
+window.savePred = async function() {
+  const date  = document.getElementById('f-date').value;
+  const code  = document.getElementById('f-code').value.trim();
+  const name  = document.getElementById('f-name').value.trim();
+  const notes = document.getElementById('f-notes').value.trim();
+
+  if (!date || !code)      { alert('請填入日期和股票代號'); return; }
+  if (!bias.pred)           { alert('請選擇整體預測方向'); return; }
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  document.getElementById('save-msg').textContent = '儲存中…';
+
+  const rec = {
+    date, stockCode: code, stockName: name || code,
+    patternBias: bias.pat || 'skip',
+    midpointBias: bias.mid || 'skip',
+    prediction: bias.pred,
+    notes,
+    prevK: prevK || null,
+    resultClose: null, resultPrevClose: null,
+    resultDirection: null, resultChange: null,
+    isCorrect: null, patternCorrect: null, midpointCorrect: null,
+    createdAt: Timestamp.now()
+  };
+
+  try {
+    setSyncDot('loading');
+    await addDoc(collection(db, COL), rec);
+    setSyncDot('ok');
+    document.getElementById('save-msg').textContent = '✓ 已儲存';
+    clearForm();
+    await loadAll();
+  } catch(e) {
+    setSyncDot('err');
+    document.getElementById('save-msg').textContent = '儲存失敗：' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+// ── Auto Verify ──
+window.autoVerify = async function() {
+  const pending = preds.filter(p => p.prediction !== 'skip' && p.isCorrect === null);
+  if (!pending.length) { alert('沒有待核對的預測'); return; }
+
+  const btn = document.getElementById('verify-btn');
+  btn.disabled = true; btn.textContent = '核對中…';
+  setSyncDot('loading');
+
+  let done = 0, noData = 0;
+  for (const p of pending) {
+    try {
+      let json = await fetchTWSE(p.stockCode, p.date);
+      let row  = json && findRow(json.data, p.date);
+
+      // If current month has no data yet, it's fine (market not closed yet)
+      if (!row) { noData++; continue; }
+
+      const resultClose  = num(row[6]);
+      const resultChange = num(row[7]);   // positive = up, negative = down
+      const prevClose    = p.prevK?.c ?? null;
+
+      let dir = 'flat';
+      if (resultChange > 0)       dir = 'up';
+      else if (resultChange < 0)  dir = 'down';
+
+      const check = (bias_, dir_) => {
+        if (bias_ === 'skip' || !bias_) return null;
+        if (bias_ === 'bull') return dir_ === 'up';
+        if (bias_ === 'bear') return dir_ === 'down';
+        return null;
+      };
+
+      const isCorrect       = check(p.prediction,   dir);
+      const patternCorrect  = check(p.patternBias,  dir);
+      const midpointCorrect = check(p.midpointBias, dir);
+
+      const update = { resultClose, resultPrevClose: prevClose, resultDirection: dir,
+                       resultChange, isCorrect, patternCorrect, midpointCorrect };
+
+      await updateDoc(doc(db, COL, p.id), update);
+      Object.assign(p, update);
+      done++;
+    } catch(e) { console.warn('verify error', p.stockCode, e); }
+  }
+
+  setSyncDot('ok');
+  btn.disabled = false; btn.textContent = '自動核對結果';
+  render();
+
+  if (done)       alert(`核對完成！更新了 ${done} 筆`);
+  else if (noData) alert('查無收盤資料，可能市場尚未收盤或代號有誤');
+  else            alert('沒有可更新的資料');
+};
+
+// ── Manual Result ──
+window.openManualResult = function(id) {
+  const p = preds.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modal-id').value = id;
+  document.getElementById('modal-close').value = '';
+  document.getElementById('modal-prev').value = p.prevK?.c || '';
+  document.getElementById('overlay').classList.add('show');
+};
+window.closeModal = function() { document.getElementById('overlay').classList.remove('show'); };
+
+window.submitManualResult = async function() {
+  const id         = document.getElementById('modal-id').value;
+  const resultClose = parseFloat(document.getElementById('modal-close').value);
+  const prevClose   = parseFloat(document.getElementById('modal-prev').value);
+
+  if (!id || isNaN(resultClose)) { alert('請輸入收盤價'); return; }
+
+  const p = preds.find(x => x.id === id);
+  if (!p) return;
+
+  const dir = isNaN(prevClose) ? 'flat' : resultClose > prevClose ? 'up' : resultClose < prevClose ? 'down' : 'flat';
+  const chk = (b) => b === 'skip' || !b ? null : b === 'bull' ? dir === 'up' : dir === 'down';
+
+  const update = {
+    resultClose, resultPrevClose: isNaN(prevClose) ? null : prevClose,
+    resultDirection: dir, resultChange: isNaN(prevClose) ? null : resultClose - prevClose,
+    isCorrect: chk(p.prediction),
+    patternCorrect: chk(p.patternBias),
+    midpointCorrect: chk(p.midpointBias)
+  };
+
+  try {
+    setSyncDot('loading');
+    await updateDoc(doc(db, COL, id), update);
+    Object.assign(p, update);
+    setSyncDot('ok');
+    closeModal();
+    render();
+  } catch(e) {
+    setSyncDot('err');
+    alert('更新失敗：' + e.message);
+  }
+};
+
+// ── Load & Render ──
+async function loadAll() {
+  setSyncDot('loading');
+  try {
+    const snap = await getDocs(query(collection(db, COL), orderBy('createdAt', 'desc')));
+    preds = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    setSyncDot('ok');
+  } catch(e) {
+    setSyncDot('err');
+    console.error(e);
+  }
+  render();
+}
+
+function render() {
+  // Stats
+  const verified  = preds.filter(p => p.isCorrect !== null);
+  const correct   = verified.filter(p => p.isCorrect);
+  const patV      = preds.filter(p => p.patternCorrect !== null);
+  const patOk     = patV.filter(p => p.patternCorrect);
+  const midV      = preds.filter(p => p.midpointCorrect !== null);
+  const midOk     = midV.filter(p => p.midpointCorrect);
+
+  document.getElementById('s-total').textContent = preds.length;
+
+  const wrEl = document.getElementById('s-wr');
+  wrEl.textContent = pct(correct.length, verified.length);
+  wrEl.className = 'stat-value' + (verified.length ? (correct.length / verified.length >= 0.5 ? ' green' : ' red') : '');
+
+  document.getElementById('s-pat').textContent = pct(patOk.length, patV.length);
+  document.getElementById('s-mid').textContent = pct(midOk.length, midV.length);
+
+  // Pending
+  const pending = preds.filter(p => p.prediction !== 'skip' && p.isCorrect === null);
+  document.getElementById('pending-ct').textContent = pending.length;
+
+  const pendEl = document.getElementById('pending-list');
+  pendEl.innerHTML = pending.length
+    ? pending.map(renderItem).join('')
+    : '<div class="empty">沒有待核對的預測</div>';
+
+  // History
+  let hist = preds.filter(p => p.prediction === 'skip' || p.isCorrect !== null);
+  if (histFilter === 'ok') hist = hist.filter(p => p.isCorrect === true);
+  if (histFilter === 'ng') hist = hist.filter(p => p.isCorrect === false);
+
+  const histEl = document.getElementById('history-list');
+  histEl.innerHTML = hist.length
+    ? hist.map(renderItem).join('')
+    : '<div class="empty">還沒有歷史記錄</div>';
+}
+
+function renderItem(p) {
+  const predClass = p.prediction === 'bull' ? 'bull' : p.prediction === 'bear' ? 'bear' : 'skip';
+  const predText  = p.prediction === 'bull' ? '看多' : p.prediction === 'bear' ? '看空' : '觀望';
+
+  // Result indicator
+  let resultHtml = '';
+  if (p.isCorrect !== null) {
+    resultHtml = `<span class="pred-result ${p.isCorrect ? 'ok' : 'ng'}">${p.isCorrect ? 'v' : 'x'}</span>`;
+  }
+
+  // Pattern / midpoint tags
+  const patLabel = p.patternBias === 'bull' ? '型態看多' : p.patternBias === 'bear' ? '型態看空' : '';
+  const midLabel = p.midpointBias === 'bull' ? '中點看多' : p.midpointBias === 'bear' ? '中點看空' : '';
+  const agree    = patLabel && midLabel && p.patternBias === p.midpointBias;
+  const conflict = patLabel && midLabel && p.patternBias !== p.midpointBias;
+
+  // PDMid tag
+  let midTag = '';
+  if (p.prevK) {
+    const m   = ((p.prevK.h + p.prevK.l) / 2).toFixed(2);
+    const rel = p.prevK.c > +m ? '>' : p.prevK.c < +m ? '<' : '=';
+    midTag = `<span class="tag">PDMid ${m} | 收盤${rel}PDMid</span>`;
+  }
+
+  // Result tag
+  let resTag = '';
+  if (p.resultClose !== null) {
+    const ch  = p.resultChange !== null ? (p.resultChange > 0 ? `+${p.resultChange.toFixed(2)}` : p.resultChange.toFixed(2)) : '';
+    const dir = p.resultDirection === 'up' ? '↑' : p.resultDirection === 'down' ? '↓' : '→';
+    const cls = p.resultDirection === 'up' ? 'result-up' : 'result-down';
+    resTag = `<span class="tag ${cls}">收盤 ${p.resultClose}${ch ? ' (' + ch + ')' : ''} ${dir}</span>`;
+  }
+
+  // Individual method result tags
+  let patResTag = '', midResTag = '';
+  if (p.patternCorrect !== null)  patResTag = `<span class="tag" style="font-size:10px">型態${p.patternCorrect ? '✓' : '✗'}</span>`;
+  if (p.midpointCorrect !== null) midResTag = `<span class="tag" style="font-size:10px">中點${p.midpointCorrect ? '✓' : '✗'}</span>`;
+
+  // Actions
+  const actions = p.isCorrect === null && p.prediction !== 'skip'
+    ? `<div class="pred-actions"><button class="btn btn-ghost btn-sm" onclick="openManualResult('${p.id}')">手動輸入結果</button></div>`
+    : '';
+
+  return `
+<div class="pred-item">
+  <div class="pred-hdr">
+    <span class="pred-date">${p.date}</span>
+    <span class="pred-stock">${p.stockCode}${p.stockName && p.stockName !== p.stockCode ? ' ' + p.stockName : ''}</span>
+    <span class="pred-badge ${predClass}">${predText}</span>
+    ${resultHtml}
+  </div>
+  <div class="pred-tags">
+    ${patLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${patLabel}</span>` : ''}
+    ${midLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${midLabel}</span>` : ''}
+    ${midTag}${resTag}${patResTag}${midResTag}
+  </div>
+  ${p.notes ? `<div class="pred-notes">${p.notes}</div>` : ''}
+  ${actions}
+</div>`;
+}
+
+window.setFilter = function(f, btn) {
+  histFilter = f;
+  document.querySelectorAll('.filter-btns .fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+};
+
+// ── Init ──
+(function() {
+  // Default date: today if before 3pm, otherwise tomorrow
+  const now = new Date();
+  let d = new Date(now);
+  if (now.getHours() >= 15) {
+    d.setDate(d.getDate() + 1);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+  }
+  document.getElementById('f-date').value = d.toISOString().slice(0, 10);
+})();
+
+loadAll();
+</script>
+</body>
+</html>
