@@ -528,13 +528,33 @@ async function fetchYahoo(code, isoDate) {
   return null;
 }
 
-// ── 統一查詢（上市 → 上櫃 → Yahoo Finance）──
+// ── Finmind 台灣金融數據 API（上市+上櫃，CORS 開放）──
+async function fetchFinmind(code, isoDate) {
+  try {
+    const r = await fetch(
+      `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${code}&start_date=${isoDate}&end_date=${isoDate}`
+    );
+    const j = await r.json();
+    const d = j.data?.find(x => x.date === isoDate);
+    if (!d) return null;
+    const [yr, mo, dy] = isoDate.split('-');
+    const rocDate = `${+yr - 1911}/${mo}/${dy}`;
+    // 欄位: open=d.open, high=d.max, low=d.min, close=d.close, spread=漲跌
+    const syn = [rocDate, '0', '0', String(d.open), String(d.max), String(d.min), String(d.close), String(d.spread ?? 0)];
+    console.info('[Finmind]', code, isoDate, 'close=', d.close, 'spread=', d.spread);
+    return { stat: 'OK', data: [syn], title: code };
+  } catch(e) { console.warn('[Finmind]', e.message); return null; }
+}
+
+// ── 統一查詢（上市 → 上櫃 → Yahoo → Finmind）──
 async function fetchStock(code, isoDate) {
   const twse = await fetchTWSE(code, isoDate).catch(() => null);
   if (twse) return twse;
   const tpex = await fetchTPEX(code, isoDate).catch(() => null);
   if (tpex) return tpex;
-  return await fetchYahoo(code, isoDate).catch(() => null);
+  const yahoo = await fetchYahoo(code, isoDate).catch(() => null);
+  if (yahoo) return yahoo;
+  return await fetchFinmind(code, isoDate).catch(() => null);
 }
 
 function findRow(data, isoDate) {
