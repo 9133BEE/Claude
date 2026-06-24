@@ -325,6 +325,21 @@
         order: 1;
         text-align: center;
       }
+
+      /* 手機隱藏 header nav（側欄已有導航） */
+      .header-nav { display: none; }
+
+      /* 手機 header 副標題隱藏 */
+      .toolbar-title span { display: none; }
+
+      /* filter bar 橫向捲動不換行 */
+      .filter-bar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+      }
+      .filter-bar::-webkit-scrollbar { display: none; }
     }
   </style>
 </head>
