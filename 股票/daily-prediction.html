@@ -143,7 +143,12 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 /* Date group */
 .date-group{margin-bottom:14px}
-.date-group-hdr{font-size:11px;font-weight:700;color:var(--muted);padding:2px 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px;letter-spacing:.06em}
+.date-group-hdr{font-size:12px;font-weight:700;color:var(--muted);padding:6px 8px;border:1px solid var(--border);border-radius:6px;margin-bottom:0;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;background:rgba(255,255,255,.03);transition:background .15s}
+.date-group-hdr:hover{background:rgba(255,255,255,.07)}
+.date-group-arrow{font-size:10px;transition:transform .2s;display:inline-block;flex-shrink:0}
+.date-group.open>.date-group-hdr .date-group-arrow{transform:rotate(90deg)}
+.date-group-body{display:none;padding-top:6px}
+.date-group.open>.date-group-body{display:block}
 
 /* Result indicator (亮燈) */
 .pred-ind{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
@@ -424,9 +429,9 @@ const pct = (n, d) => d ? Math.round(n / d * 100) + '%' : '—';
 const setSyncDot = s => document.getElementById('sync-dot').className = 'sync-dot ' + s;
 
 function rocToISO(roc) {
-  // "115/06/24" → "2026-06-24"
+  // "115/06/24" or "115/6/4" → "2026-06-24"
   const [y, m, d] = roc.split('/');
-  return `${+y + 1911}-${m}-${d}`;
+  return `${+y + 1911}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
 }
 
 function prevTradingDay(isoDate) {
@@ -808,12 +813,23 @@ window.autoVerify = async function() {
       if (!row) { noData++; continue; }
 
       const resultClose  = num(row[6]);
-      const resultChange = num(row[7]);   // positive = up, negative = down
       const prevClose    = p.prevK?.c ?? null;
 
-      let dir = 'flat';
-      if (resultChange > 0)       dir = 'up';
-      else if (resultChange < 0)  dir = 'down';
+      // Determine direction: prefer prevK comparison, fall back to API change column
+      // (TPEX row[7] may be just "+" or "-" sign, giving num()=0)
+      let dir = 'flat', resultChange = 0;
+      if (prevClose !== null && resultClose !== prevClose) {
+        dir = resultClose > prevClose ? 'up' : 'down';
+        resultChange = +(resultClose - prevClose).toFixed(4);
+      } else {
+        // row[7] for TWSE: "+0.15" or "-0.15"; for TPEX may be "+" or "-"
+        const rawChange = String(row[7] ?? '').trim();
+        if (rawChange === '+' && row[8]) resultChange = num(row[8]);
+        else if (rawChange === '-' && row[8]) resultChange = -num(row[8]);
+        else resultChange = num(rawChange);
+        if (resultChange > 0) dir = 'up';
+        else if (resultChange < 0) dir = 'down';
+      }
 
       const check = (bias_, dir_) => {
         if (bias_ === 'skip' || !bias_) return null;
@@ -938,12 +954,27 @@ function render() {
   const el = document.getElementById('pred-groups');
   if (!dates.length) { el.innerHTML = '<div class="empty">尚無符合的記錄</div>'; return; }
 
-  el.innerHTML = dates.map(date => `
-    <div class="date-group">
-      <div class="date-group-hdr">${date}</div>
-      ${groups[date].map(renderItem).join('')}
-    </div>
-  `).join('');
+  // Restore open state after re-render
+  const prevOpen = new Set([...el.querySelectorAll('.date-group.open')].map(g => g.dataset.date));
+
+  el.innerHTML = dates.map((date, i) => {
+    const isOpen = prevOpen.size ? prevOpen.has(date) : (i === 0); // first group open by default
+    const pending = groups[date].filter(p => p.isCorrect === null && p.prediction !== 'skip').length;
+    const total   = groups[date].length;
+    const badge   = pending ? `<span class="count-badge" style="background:var(--orange);color:#fff">${pending}</span>` : '';
+    return `
+    <div class="date-group ${isOpen ? 'open' : ''}" data-date="${date}">
+      <div class="date-group-hdr" onclick="this.parentElement.classList.toggle('open')">
+        <span class="date-group-arrow">▶</span>
+        ${date}
+        <span style="font-weight:400;margin-left:4px">${total} 筆</span>
+        ${badge}
+      </div>
+      <div class="date-group-body">
+        ${groups[date].map(renderItem).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderItem(p) {
