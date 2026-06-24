@@ -29,6 +29,45 @@
     .toolbar-title { font-size: 17px; font-weight: 700; color: #1C1C1E; flex-shrink: 0; }
     .toolbar-title span { color: #8E8E93; font-weight: 400; font-size: 13px; margin-left: 6px; }
     .header-spacer { flex: 1; }
+
+    /* ── HEADER NAV DROPDOWNS ── */
+    .header-nav { display: flex; gap: 6px; align-items: center; margin-left: 14px; }
+    .nav-dropdown { position: relative; }
+    .nav-dd-btn {
+      background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 6px;
+      padding: 0 11px; height: 32px; font-size: 13px; font-weight: 600;
+      color: #1C1C1E; cursor: pointer; display: flex; align-items: center;
+      gap: 5px; font-family: inherit; white-space: nowrap; user-select: none;
+      transition: background .12s;
+    }
+    .nav-dd-btn:hover { background: #E5E5EA; }
+    .nav-dd-btn .dd-arrow { font-size: 8px; color: #8E8E93; transition: transform .15s; }
+    .nav-dropdown.open .dd-arrow { transform: rotate(180deg); }
+    .dd-menu {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0;
+      background: #FFFFFF; border: 1px solid #E5E5EA; border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.12); min-width: 170px;
+      z-index: 999; overflow: hidden; padding: 6px 0;
+    }
+    .nav-dropdown.open .dd-menu { display: block; }
+    .dd-section {
+      font-size: 10px; font-weight: 700; color: #C7C7CC;
+      padding: 8px 14px 3px; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .dd-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; font-size: 13px; color: #1C1C1E;
+      text-decoration: none; cursor: pointer; transition: background .1s;
+    }
+    .dd-item:hover { background: #F2F2F7; }
+    .dd-item.current { color: #2962FF; font-weight: 600; }
+    .dd-item.wip { color: #C7C7CC; cursor: default; }
+    .dd-item.wip:hover { background: none; }
+    .dd-wip-tag {
+      font-size: 10px; background: #F2F2F7; color: #C7C7CC;
+      border-radius: 3px; padding: 1px 5px; margin-left: auto;
+    }
+    .dd-divider { height: 1px; background: #F2F2F7; margin: 4px 0; }
     .sync-status {
       font-size: 11px; color: #8E8E93; display: flex; align-items: center; gap: 4px; flex-shrink: 0;
     }
@@ -50,7 +89,23 @@
       background: #FFFFFF; border: 1px solid #E5E5EA;
       border-radius: 10px; padding: 20px; margin-bottom: 20px;
       box-shadow: 0 1px 4px rgba(0,0,0,.05);
+      display: none;
     }
+    .form-card.open { display: block; }
+
+    /* ── FAB 新增按鈕 ── */
+    .fab-add {
+      position: fixed; bottom: 24px; right: 20px; z-index: 200;
+      background: #2962FF; color: #fff; border: none; border-radius: 28px;
+      height: 52px; padding: 0 22px; font-size: 15px; font-weight: 700;
+      font-family: inherit; cursor: pointer; display: flex; align-items: center;
+      gap: 8px; box-shadow: 0 4px 16px rgba(41,98,255,.4);
+      transition: background .15s, box-shadow .15s, transform .12s;
+    }
+    .fab-add:hover { background: #1E53E5; box-shadow: 0 6px 20px rgba(41,98,255,.5); }
+    .fab-add:active { transform: scale(.96); }
+    .fab-add .fab-icon { font-size: 22px; font-weight: 300; line-height: 1; }
+    .fab-add.hidden { display: none; }
     .form-card-title {
       font-size: 12px; font-weight: 700; color: #8E8E93;
       text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px;
@@ -107,27 +162,34 @@
     }
     .img-preview-del:hover { background: #FF3B30; }
 
-    .form-actions { display: flex; justify-content: flex-end; margin-top: 14px; gap: 8px; align-items: center; }
+    .form-actions {
+      display: flex; justify-content: flex-end;
+      margin: 18px -20px -20px; gap: 8px; align-items: center;
+      padding: 12px 20px;
+      background: #F9F9FB;
+      border-top: 1px solid #E5E5EA;
+      border-radius: 0 0 10px 10px;
+    }
     .form-status { font-size: 11px; color: #FF9500; flex: 1; }
     .btn-save {
-      background: #2962FF; border: none; border-radius: 6px;
-      padding: 0 22px; height: 36px; color: #fff;
-      font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
-      transition: background .15s; min-width: 90px;
+      background: #2962FF; border: none; border-radius: 8px;
+      padding: 0 22px; height: 44px; color: #fff;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: background .15s; min-width: 100px;
     }
     .btn-save:disabled { background: #C7C7CC; cursor: default; }
     .btn-save:not(:disabled):hover { background: #1E53E5; }
     .btn-cancel-edit {
-      background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 6px;
-      padding: 0 14px; height: 36px; color: #8E8E93;
+      background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 8px;
+      padding: 0 14px; height: 44px; color: #8E8E93;
       font-size: 14px; cursor: pointer; font-family: inherit;
       display: none;
     }
     .btn-cancel-edit.visible { display: block; }
     .btn-cancel-edit:hover { background: #E5E5EA; color: #1C1C1E; }
     .btn-clear {
-      background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 6px;
-      padding: 0 14px; height: 36px; color: #8E8E93;
+      background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 8px;
+      padding: 0 14px; height: 44px; color: #8E8E93;
       font-size: 14px; cursor: pointer; font-family: inherit;
     }
     .btn-clear:hover { background: #E5E5EA; color: #1C1C1E; }
@@ -234,6 +296,34 @@
       .form-row { flex-direction: column; }
       .form-field.field-date, .form-field.field-type { flex: 1; }
       .note-img-thumb { width: 72px; height: 72px; }
+
+      /* 手機：操作列貼卡片底邊，縮回卡片 padding */
+      .form-actions {
+        margin: 16px -14px -14px;
+        padding: 12px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      /* 儲存按鈕佔整行，突出顯示 */
+      .btn-save {
+        order: -1;
+        flex: 1 0 100%;
+        height: 48px;
+        font-size: 16px;
+        border-radius: 10px;
+      }
+      /* 清除與取消縮為同行次要按鈕 */
+      .btn-clear,
+      .btn-cancel-edit {
+        flex: 1;
+        height: 40px;
+        font-size: 13px;
+      }
+      .form-status {
+        flex: 0 0 100%;
+        order: 1;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -304,6 +394,58 @@
 <div class="header">
   <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="toolbar-title">筆記本 <span>記錄市場觀察與交易心得</span></div>
+
+  <!-- NAV DROPDOWNS -->
+  <div class="header-nav">
+
+    <!-- 股學 -->
+    <div class="nav-dropdown" id="dd-study">
+      <button class="nav-dd-btn" onclick="toggleDD('dd-study')">
+        股學 <span class="dd-arrow">▾</span>
+      </button>
+      <div class="dd-menu">
+        <div class="dd-section">TradingView</div>
+        <a class="dd-item" href="tv-indicators.html">TV 指標大全</a>
+        <a class="dd-item" href="advanced-indicators.html">TV 指標策略</a>
+        <a class="dd-item" href="tradingview-guide.html">TV 指南</a>
+        <div class="dd-divider"></div>
+        <div class="dd-section">課程</div>
+        <a class="dd-item" href="stock-course.html">台股課程</a>
+        <a class="dd-item" href="us-stock-course.html">美股課程</a>
+        <a class="dd-item" href="futures-course.html">台指期課程</a>
+        <a class="dd-item" href="us-futures-course.html">美股期貨課程</a>
+        <div class="dd-divider"></div>
+        <div class="dd-section">圖鑑 &amp; 名詞</div>
+        <a class="dd-item" href="candlestick-patterns.html">K線圖鑑</a>
+        <a class="dd-item" href="stock-glossary.html">股票名詞</a>
+        <a class="dd-item" href="futures-glossary.html">期貨名詞</a>
+        <div class="dd-divider"></div>
+        <div class="dd-section">策略 &amp; 技巧</div>
+        <a class="dd-item" href="strategy-glossary.html">技術分析策略</a>
+        <a class="dd-item" href="advanced-tips.html">股票進階技巧</a>
+        <a class="dd-item" href="futures-advanced-tips.html">期貨進階技巧</a>
+        <div class="dd-divider"></div>
+        <div class="dd-section">測驗</div>
+        <a class="dd-item" href="stock-quiz.html">股票題型</a>
+        <a class="dd-item" href="futures-quiz.html">期貨題型</a>
+      </div>
+    </div>
+
+    <!-- 工具 -->
+    <div class="nav-dropdown" id="dd-tools">
+      <button class="nav-dd-btn" onclick="toggleDD('dd-tools')">
+        工具 <span class="dd-arrow">▾</span>
+      </button>
+      <div class="dd-menu">
+        <a class="dd-item" href="trade-journal.html">交易日誌</a>
+        <a class="dd-item current" href="notebook.html">筆記本</a>
+        <a class="dd-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
+        <span class="dd-item wip">預測回顧 <span class="dd-wip-tag">製作中</span></span>
+      </div>
+    </div>
+
+  </div>
+
   <div class="header-spacer"></div>
   <div class="sync-status" id="sync-status">
     <div class="sync-dot loading" id="sync-dot"></div>
@@ -386,6 +528,7 @@
 </div>
 
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
+<button class="fab-add" id="fab-add" onclick="openForm()"><span class="fab-icon">+</span> 新增筆記</button>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -584,6 +727,8 @@ window.startEdit = function(id) {
   document.getElementById('form-title').classList.add('editing-mode');
   document.getElementById('btn-save').textContent = '儲存修改';
   document.getElementById('btn-cancel-edit').classList.add('visible');
+  document.getElementById('form-card').classList.add('open');
+  document.getElementById('fab-add').classList.add('hidden');
   document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
@@ -598,6 +743,7 @@ function cancelEdit() {
   document.getElementById('form-title').classList.remove('editing-mode');
   document.getElementById('btn-save').textContent = '儲存筆記';
   document.getElementById('btn-cancel-edit').classList.remove('visible');
+  hideForm();
 }
 window.cancelEdit = cancelEdit;
 
@@ -763,6 +909,31 @@ window.noteImgsArr = noteImgsArr;
 window.openSidebar  = () => { document.getElementById('sidebar').classList.add('open');    document.getElementById('sb-overlay').classList.add('open'); };
 window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); };
 window.toggleSbGroup = el => { el.classList.toggle('closed'); const g = el.nextElementSibling; if (g && g.classList.contains('sb-group')) g.classList.toggle('closed'); };
+
+// ── FORM OPEN/CLOSE ───────────────────────────────────────────────────────
+window.openForm = function() {
+  document.getElementById('form-card').classList.add('open');
+  document.getElementById('fab-add').classList.add('hidden');
+  document.getElementById('note-title').focus();
+  document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+function hideForm() {
+  document.getElementById('form-card').classList.remove('open');
+  document.getElementById('fab-add').classList.remove('hidden');
+}
+
+// ── HEADER DROPDOWNS ──────────────────────────────────────────────────────
+window.toggleDD = id => {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+};
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-dropdown')) {
+    document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
+});
 </script>
 </body>
 </html>
