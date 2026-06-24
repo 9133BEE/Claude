@@ -1072,10 +1072,6 @@ function renderItem(p) {
     resTag = `<span class="tag ${cls}">收盤 ${p.resultClose}${ch ? ' (' + ch + ')' : ''} ${dir}</span>`;
   }
 
-  // Individual method result tags
-  let patResTag = '', midResTag = '';
-  if (p.patternCorrect !== null)  patResTag = `<span class="tag" style="font-size:10px">型態${p.patternCorrect ? 'O' : 'X'}</span>`;
-  if (p.midpointCorrect !== null) midResTag = `<span class="tag" style="font-size:10px">中點${p.midpointCorrect ? 'O' : 'X'}</span>`;
 
   return `
 <div class="pred-item">
@@ -1089,7 +1085,7 @@ function renderItem(p) {
   <div class="pred-tags" style="padding-left:32px">
     ${patLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${patLabel}</span>` : ''}
     ${midLabel ? `<span class="tag ${agree ? 'agree' : conflict ? 'conflict' : ''}">${midLabel}</span>` : ''}
-    ${resTag}${patResTag}${midResTag}
+    ${resTag}
     ${p.notes ? `<span class="pred-notes">${p.notes}</span>` : ''}
   </div>
 </div>`;
