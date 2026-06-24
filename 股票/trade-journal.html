@@ -42,7 +42,31 @@ input,select,textarea,button{font-family:inherit}
   padding:6px 12px;border:1px solid var(--border);border-radius:7px;transition:all .15s;white-space:nowrap}
 .nav-back:hover{color:var(--text);border-color:var(--text3)}
 .nav-title{font-size:.95rem;font-weight:700;color:var(--text)}
-.nav-sync{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text3);margin-left:auto}
+.nav-sync{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text3)}
+
+/* ── NAV DROPDOWNS ── */
+.nav-dds{display:flex;gap:5px;align-items:center;margin-left:auto}
+.nav-dd{position:relative}
+.nav-dd-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;
+  padding:0 10px;height:30px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;
+  display:flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap;
+  user-select:none;transition:background .12s}
+.nav-dd-btn:hover{background:rgba(255,255,255,.12)}
+.nav-dd-btn .dd-arrow{font-size:8px;color:var(--text3);transition:transform .15s}
+.nav-dd.open .dd-arrow{transform:rotate(180deg)}
+.nav-dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;
+  background:#1e2230;border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 6px 24px rgba(0,0,0,.5);min-width:160px;z-index:999;padding:6px 0;
+  max-height:calc(100vh - 80px);overflow-y:auto}
+.nav-dd.open .nav-dd-menu{display:block}
+.nav-dd-sec{font-size:10px;font-weight:700;color:var(--text3);padding:8px 14px 3px;
+  text-transform:uppercase;letter-spacing:.08em}
+.nav-dd-item{display:flex;align-items:center;padding:8px 14px;font-size:13px;
+  color:var(--text);text-decoration:none;cursor:pointer;transition:background .1s}
+.nav-dd-item:hover{background:rgba(255,255,255,.06)}
+.nav-dd-item.cur{color:#2962ff;font-weight:600}
+.nav-dd-div{height:1px;background:var(--border);margin:4px 0}
+@media(max-width:600px){.nav-dds{display:none}}
 .nav-refresh{background:none;border:1px solid var(--border);color:var(--text2);border-radius:7px;
   width:32px;height:32px;font-size:1.1rem;cursor:pointer;transition:all .15s;line-height:1}
 .nav-refresh:hover{color:var(--text);border-color:var(--text2)}
@@ -346,6 +370,46 @@ canvas{display:block;width:100%}
 <nav class="nav">
   <a class="nav-back" href="index.html">← 股學筆記</a>
   <span class="nav-title">交易日誌</span>
+  <!-- Dropdown nav -->
+  <div class="nav-dds">
+    <div class="nav-dd" id="jdd-study">
+      <button class="nav-dd-btn" onclick="toggleJDD('jdd-study')">股學 <span class="dd-arrow">▾</span></button>
+      <div class="nav-dd-menu">
+        <div class="nav-dd-sec">TradingView</div>
+        <a class="nav-dd-item" href="tv-indicators.html">TV 指標大全</a>
+        <a class="nav-dd-item" href="advanced-indicators.html">TV 指標策略</a>
+        <a class="nav-dd-item" href="tradingview-guide.html">TV 指南</a>
+        <div class="nav-dd-div"></div>
+        <div class="nav-dd-sec">課程</div>
+        <a class="nav-dd-item" href="stock-course.html">台股課程</a>
+        <a class="nav-dd-item" href="us-stock-course.html">美股課程</a>
+        <a class="nav-dd-item" href="futures-course.html">台指期課程</a>
+        <a class="nav-dd-item" href="us-futures-course.html">美股期貨課程</a>
+        <div class="nav-dd-div"></div>
+        <div class="nav-dd-sec">名詞 / 策略</div>
+        <a class="nav-dd-item" href="candlestick-patterns.html">K線圖鑑</a>
+        <a class="nav-dd-item" href="stock-glossary.html">股票名詞</a>
+        <a class="nav-dd-item" href="futures-glossary.html">期貨名詞</a>
+        <a class="nav-dd-item" href="strategy-glossary.html">技術分析策略</a>
+        <a class="nav-dd-item" href="advanced-tips.html">股票進階技巧</a>
+        <a class="nav-dd-item" href="futures-advanced-tips.html">期貨進階技巧</a>
+        <div class="nav-dd-div"></div>
+        <div class="nav-dd-sec">測驗</div>
+        <a class="nav-dd-item" href="stock-quiz.html">股票題型</a>
+        <a class="nav-dd-item" href="futures-quiz.html">期貨題型</a>
+      </div>
+    </div>
+    <div class="nav-dd" id="jdd-tools">
+      <button class="nav-dd-btn" onclick="toggleJDD('jdd-tools')">工具 <span class="dd-arrow">▾</span></button>
+      <div class="nav-dd-menu">
+        <a class="nav-dd-item cur" href="trade-journal.html">交易日誌</a>
+        <a class="nav-dd-item" href="notebook.html">筆記本</a>
+        <a class="nav-dd-item" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
+        <a class="nav-dd-item" href="daily-prediction.html">每日預測</a>
+      </div>
+    </div>
+  </div>
+
   <div class="nav-sync">
     <div class="sync-dot"></div>
     <span>即時同步</span>
@@ -1151,6 +1215,16 @@ async function refreshLivePrices() {
 
 load();
 window.addEventListener('resize',()=>{drawChart(trades.filter(t=>t.status!=='open'));});
+
+function toggleJDD(id){
+  const el=document.getElementById(id);
+  const isOpen=el.classList.contains('open');
+  document.querySelectorAll('.nav-dd.open').forEach(d=>d.classList.remove('open'));
+  if(!isOpen)el.classList.add('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.nav-dd'))document.querySelectorAll('.nav-dd.open').forEach(d=>d.classList.remove('open'));
+});
 </script>
 <style>#back-top{position:fixed;bottom:24px;right:20px;z-index:998;width:44px;height:44px;border-radius:50%;background:#2962FF;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(41,98,255,.45);transition:background .15s}#back-top.show{display:flex}#back-top:hover{background:#1E53E5}</style>
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到最上面">↑</button>
