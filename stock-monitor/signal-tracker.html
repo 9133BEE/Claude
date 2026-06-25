@@ -1831,13 +1831,16 @@ function toggleRef(titleEl) {
 }
 
 // ── mine section special case ──
-document.getElementById('mine-toggle').addEventListener('click', function() {
-  const body = document.getElementById('mine-body');
-  const isCollapsed = body.classList.contains('collapsed');
-  body.classList.toggle('collapsed');
-  this.querySelector('.ref-toggle').style.transform = isCollapsed ? '' : 'rotate(-90deg)';
-});
-document.getElementById('mine-toggle').removeAttribute('onclick');
+const _mineToggle = document.getElementById('mine-toggle');
+if (_mineToggle) {
+  _mineToggle.addEventListener('click', function() {
+    const body = document.getElementById('mine-body');
+    const isCollapsed = body.classList.contains('collapsed');
+    body.classList.toggle('collapsed');
+    this.querySelector('.ref-toggle').style.transform = isCollapsed ? '' : 'rotate(-90deg)';
+  });
+  _mineToggle.removeAttribute('onclick');
+}
 
 // ══════════════════════════════════════
 //  SIDEBAR
@@ -2006,31 +2009,37 @@ function engRatioClass(r) {
 }
 
 // ── Finmind helpers ──
+const _FMPROXY = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
+
+async function _fmFetch(apiUrl, timeout) {
+  for (const px of _FMPROXY) {
+    try {
+      const r = await fetch(px + encodeURIComponent(apiUrl), {signal: AbortSignal.timeout(timeout || 20000)});
+      const j = await r.json();
+      if (j?.status === 200 && j.data?.length) return j.data;
+    } catch(e) { console.warn('[FM proxy]', px, e.message); }
+  }
+  return null;
+}
+
 async function getFinmindInfo() {
   const KEY = 'eng_info_v1', TTL = 86400000;
   try { const c = JSON.parse(localStorage.getItem(KEY)||'{}'); if (c.ts && Date.now()-c.ts<TTL && c.d) return c.d; } catch{}
-  try {
-    const r = await fetch('https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo', {signal:AbortSignal.timeout(15000)});
-    const j = await r.json();
-    if (j.status===200 && j.data?.length) {
-      const d = {};
-      j.data.forEach(s => { d[s.stock_id] = {n: s.stock_name, m: s.type}; });
-      localStorage.setItem(KEY, JSON.stringify({ts:Date.now(), d}));
-      return d;
-    }
-  } catch(e) { console.warn('[StockInfo]', e.message); }
+  const data = await _fmFetch('https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo', 15000);
+  if (data) {
+    const d = {};
+    data.forEach(s => { d[s.stock_id] = {n: s.stock_name, m: s.type}; });
+    try { localStorage.setItem('eng_info_v1', JSON.stringify({ts: Date.now(), d})); } catch{}
+    return d;
+  }
   return {};
 }
 
 async function getFinmindPrice(prevISO, todayISO) {
-  const url = `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&start_date=${prevISO}&end_date=${todayISO}`;
-  try {
-    const r = await fetch(url, {signal:AbortSignal.timeout(30000)});
-    const j = await r.json();
-    if (j.status===200 && j.data?.length) return j.data;
-    console.warn('[Finmind price]', j.msg);
-  } catch(e) { console.warn('[Finmind price]', e.message); }
-  return null;
+  return await _fmFetch(
+    `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&start_date=${prevISO}&end_date=${todayISO}`,
+    35000
+  );
 }
 
 async function runEngulfing() {
