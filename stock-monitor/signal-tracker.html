@@ -1872,37 +1872,69 @@ function getPrevTradingDay(isoDate) {
   return d.toISOString().split('T')[0];
 }
 
+// 將 Gregorian YYYYMMDD 轉換為 ROC 民國年格式（7碼，例如 20260624 → 1150624）
+function gregorianToROC(dateStr) {
+  const y = parseInt(dateStr.slice(0, 4), 10) - 1911;
+  return String(y) + dateStr.slice(4); // e.g. "1150624"
+}
+
 async function fetchTWSEAll(dateStr) {
-  const PROXY = 'https://api.allorigins.win/raw?url=';
-  const urls = [
+  const rocDate = gregorianToROC(dateStr); // e.g. "1150624"
+
+  // ── 策略 1：openapi.twse.com.tw（無 CORS 限制，永遠回傳最新交易日）──
+  try {
+    const r = await fetch('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',
+      { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (Array.isArray(j) && j.length) {
+      // 確認回傳資料的日期是否與請求日期吻合（Date 欄位為民國年格式）
+      const dataDate = String(j[0].Date || '');
+      if (dataDate === rocDate) {
+        console.log('[TWSE_OpenAPI] 日期吻合', rocDate, '，共', j.length, '筆');
+        return j.map(s => [
+          s.Code, s.Name, s.TradeVolume, s.Transaction, s.TradeValue,
+          s.OpeningPrice, s.HighestPrice, s.LowestPrice, s.ClosingPrice,
+          String(s.Change || '').startsWith('-') ? '-' : '+',
+          String(s.Change || '').replace(/^[+-]/, '')
+        ]);
+      } else {
+        console.warn('[TWSE_OpenAPI] 日期不符：請求', rocDate, '，API 回傳', dataDate);
+      }
+    }
+  } catch(e) { console.warn('[TWSE_OpenAPI]', e.message); }
+
+  // ── 策略 2：TWSE rwd 端點（直接 + proxy）──
+  const rwdUrls = [
     `https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json&date=${dateStr}`,
     `https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=json&date=${dateStr}`
   ];
-  for (const url of urls) {
+  for (const url of rwdUrls) {
     try {
       const r = await fetch(url, { signal: AbortSignal.timeout(6000) });
       const j = await r.json();
-      if (j.stat === 'OK' && j.data?.length) return j.data;
-    } catch(e) { console.warn('[TWSE_ALL direct]', e.message); }
-    try {
-      const r = await fetch(PROXY + encodeURIComponent(url), { signal: AbortSignal.timeout(12000) });
-      const j = await r.json();
-      if (j.stat === 'OK' && j.data?.length) return j.data;
-    } catch(e) { console.warn('[TWSE_ALL proxy]', e.message); }
-  }
-  // Fallback: OpenAPI (returns latest available day, no date filter)
-  try {
-    const r = await fetch('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL', { signal: AbortSignal.timeout(10000) });
-    const j = await r.json();
-    if (Array.isArray(j) && j.length) {
-      return j.map(s => [
-        s.Code, s.Name, s.TradeVolume, s.Transaction, s.TradeValue,
-        s.OpeningPrice, s.HighestPrice, s.LowestPrice, s.ClosingPrice,
-        String(s.Change || '').startsWith('-') ? '-' : '+',
-        String(s.Change || '').replace(/^[+-]/, '')
-      ]);
+      if (j.stat === 'OK' && j.data?.length) {
+        console.log('[TWSE_rwd direct] 成功', url);
+        return j.data;
+      }
+    } catch(e) { console.warn('[TWSE_rwd direct]', e.message); }
+    // 嘗試多個 CORS proxy
+    const proxies = [
+      'https://api.allorigins.win/raw?url=',
+      'https://corsproxy.io/?',
+      'https://api.codetabs.com/v1/proxy?quest='
+    ];
+    for (const px of proxies) {
+      try {
+        const r = await fetch(px + encodeURIComponent(url), { signal: AbortSignal.timeout(14000) });
+        const j = await r.json();
+        if (j.stat === 'OK' && j.data?.length) {
+          console.log('[TWSE_rwd proxy]', px, '成功');
+          return j.data;
+        }
+      } catch(e) { console.warn('[TWSE_rwd proxy]', px, e.message); }
     }
-  } catch(e) { console.warn('[TWSE_OpenAPI]', e.message); }
+  }
+
   return null;
 }
 
