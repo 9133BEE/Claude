@@ -2005,6 +2005,34 @@ function engRatioClass(r) {
   return 'eng-r1';
 }
 
+// ── Finmind helpers ──
+async function getFinmindInfo() {
+  const KEY = 'eng_info_v1', TTL = 86400000;
+  try { const c = JSON.parse(localStorage.getItem(KEY)||'{}'); if (c.ts && Date.now()-c.ts<TTL && c.d) return c.d; } catch{}
+  try {
+    const r = await fetch('https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo', {signal:AbortSignal.timeout(15000)});
+    const j = await r.json();
+    if (j.status===200 && j.data?.length) {
+      const d = {};
+      j.data.forEach(s => { d[s.stock_id] = {n: s.stock_name, m: s.type}; });
+      localStorage.setItem(KEY, JSON.stringify({ts:Date.now(), d}));
+      return d;
+    }
+  } catch(e) { console.warn('[StockInfo]', e.message); }
+  return {};
+}
+
+async function getFinmindPrice(prevISO, todayISO) {
+  const url = `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&start_date=${prevISO}&end_date=${todayISO}`;
+  try {
+    const r = await fetch(url, {signal:AbortSignal.timeout(30000)});
+    const j = await r.json();
+    if (j.status===200 && j.data?.length) return j.data;
+    console.warn('[Finmind price]', j.msg);
+  } catch(e) { console.warn('[Finmind price]', e.message); }
+  return null;
+}
+
 async function runEngulfing() {
   const btn = document.getElementById('eng-btn');
   const status = document.getElementById('eng-status');
@@ -2024,72 +2052,58 @@ async function runEngulfing() {
   const volConfirm = document.getElementById('eng-vol-confirm').checked;
   const strict = document.getElementById('eng-strict').checked;
   const prevDate = getPrevTradingDay(dateVal);
-  const todayStr = dateVal.replace(/-/g, '');
-  const prevStr  = prevDate.replace(/-/g, '');
 
   const results = [];
   const twseWarnings = [];
 
   try {
-    if (market !== 'tpex') {
-      status.textContent = '下載上市股今日資料（嘗試多種來源）...';
-      const todayTWSE = await fetchTWSEAll(todayStr);
-      if (!todayTWSE) {
-        twseWarnings.push('上市今日資料取得失敗');
-      } else {
-        status.textContent = '下載上市股昨日資料...';
-        const prevTWSE = await fetchTWSEAll(prevStr);
-        if (!prevTWSE) {
-          twseWarnings.push('上市昨日資料取得失敗');
-        } else {
-          const prevMap = new Map(prevTWSE.map(r => [String(r[0]).trim(), r]));
-          let twseLoaded = 0;
-          for (const row of todayTWSE) {
-            const today = normalizeEngRow(row, '上市');
-            const prevRow = prevMap.get(today.code);
-            if (!prevRow) continue;
-            twseLoaded++;
-            const prev = normalizeEngRow(prevRow, '上市');
-            if (today.vol < volMin) continue;
-            if (volConfirm && today.vol <= prev.vol) continue;
-            const res = checkBullEngulfing(today, prev, strict);
-            if (res) results.push({ ...today, market:'上市', ...res });
-          }
-          twseWarnings.push(`上市載入 ${twseLoaded} 筆`);
-        }
-      }
-    }
+    // ── 主要來源：Finmind API（CORS無限制、涵蓋上市+上櫃、支援日期區間）──
+    status.textContent = '下載股票清單...';
+    const infoMap = await getFinmindInfo();
+    const hasInfo = Object.keys(infoMap).length > 0;
 
-    if (market !== 'twse') {
-      status.textContent = '下載上櫃股今日資料...';
-      const todayTPEX = await fetchTPEXAll(dateVal);
-      status.textContent = '下載上櫃股昨日資料...';
-      const prevTPEX  = await fetchTPEXAll(prevDate);
+    status.textContent = `下載全市場 K 線（${prevDate} ~ ${dateVal}）...`;
+    const prices = await getFinmindPrice(prevDate, dateVal);
 
-      if (todayTPEX && prevTPEX) {
-        const prevMap = new Map(prevTPEX.map(r => [String(r[0]).trim(), r]));
-        let tpexLoaded = 0;
-        for (const row of todayTPEX) {
-          const today = normalizeEngRow(row, '上櫃');
-          const prevRow = prevMap.get(today.code);
-          if (!prevRow) continue;
-          tpexLoaded++;
-          const prev = normalizeEngRow(prevRow, '上櫃');
-          if (today.vol < volMin) continue;
-          if (volConfirm && today.vol <= prev.vol) continue;
-          const res = checkBullEngulfing(today, prev, strict);
-          if (res) results.push({ ...today, market:'上櫃', ...res });
-        }
-        twseWarnings.push(`上櫃載入 ${tpexLoaded} 筆`);
-      } else {
-        twseWarnings.push('上櫃資料取得失敗');
+    if (prices?.length) {
+      // 分日期
+      const todayMap = {}, prevMap = {};
+      for (const d of prices) {
+        if (d.date === dateVal) todayMap[d.stock_id] = d;
+        else if (d.date === prevDate) prevMap[d.stock_id] = d;
       }
+      const todayCount = Object.keys(todayMap).length;
+      const prevCount  = Object.keys(prevMap).length;
+
+      if (!todayCount || !prevCount) {
+        twseWarnings.push(`資料不完整（今:${todayCount} 昨:${prevCount}），可能非交易日`);
+      } else {
+        let scanned = 0;
+        for (const [code, td] of Object.entries(todayMap)) {
+          const pd = prevMap[code];
+          if (!pd) continue;
+          const info = infoMap[code];
+          const mkt = info?.m === '上市' ? '上市' : '上櫃';
+          if (market === 'twse' && mkt !== '上市') continue;
+          if (market === 'tpex' && mkt !== '上櫃') continue;
+          scanned++;
+          const tN = { code, name: info?.n || code, open: +td.open, high: +td.max, low: +td.min, close: +td.close, vol: +td.Trading_Volume/1000 };
+          const pN = { code, name: '', open: +pd.open, high: +pd.max, low: +pd.min, close: +pd.close, vol: +pd.Trading_Volume/1000 };
+          if (tN.vol < volMin) continue;
+          if (volConfirm && tN.vol <= pN.vol) continue;
+          const res = checkBullEngulfing(tN, pN, strict);
+          if (res) results.push({ ...tN, market: mkt, ...res });
+        }
+        twseWarnings.push(`掃描 ${scanned} 檔`);
+      }
+    } else {
+      twseWarnings.push('Finmind 資料取得失敗（請稍後再試）');
     }
 
     results.sort((a, b) => b.engulfRatio - a.engulfRatio);
 
     if (!results.length) {
-      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:48px;color:#787B86">沒有符合條件的標的<br><span style="font-size:12px;color:#4a4f5e">可能是非交易日，或篩選條件過嚴</span></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:48px;color:#787B86">沒有符合條件的標的<br><span style="font-size:12px;color:#4a4f5e">可能是非交易日、篩選條件過嚴，或資料來源暫時無法存取</span></td></tr>';
     } else {
       tbody.innerHTML = results.map(r => {
         const rc = engRatioClass(r.engulfRatio);
@@ -2113,8 +2127,9 @@ async function runEngulfing() {
     }
 
     const mktLabel = market === 'both' ? '上市+上櫃' : market === 'twse' ? '上市' : '上櫃';
-    const warnText = twseWarnings.length ? `（⚠ ${twseWarnings.join('、')}）` : '';
-    status.textContent = `篩選完成（${dateVal}・${mktLabel}）${warnText}`;
+    const infoNote = hasInfo ? '' : '（名稱快取載入失敗，顯示代號）';
+    const warnText = twseWarnings.length ? ` ｜ ${twseWarnings.join('、')}` : '';
+    status.textContent = `篩選完成（${dateVal}・${mktLabel}）${infoNote}${warnText}`;
     countEl.textContent = `共 ${results.length} 筆`;
   } catch(e) {
     status.textContent = '錯誤：' + e.message;
