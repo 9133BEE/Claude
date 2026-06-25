@@ -1868,11 +1868,36 @@ function getPrevTradingDay(isoDate) {
 }
 
 async function fetchTWSEAll(dateStr) {
+  const PROXY = 'https://api.allorigins.win/raw?url=';
+  const urls = [
+    `https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json&date=${dateStr}`,
+    `https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=json&date=${dateStr}`
+  ];
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(6000) });
+      const j = await r.json();
+      if (j.stat === 'OK' && j.data?.length) return j.data;
+    } catch(e) { console.warn('[TWSE_ALL direct]', e.message); }
+    try {
+      const r = await fetch(PROXY + encodeURIComponent(url), { signal: AbortSignal.timeout(12000) });
+      const j = await r.json();
+      if (j.stat === 'OK' && j.data?.length) return j.data;
+    } catch(e) { console.warn('[TWSE_ALL proxy]', e.message); }
+  }
+  // Fallback: OpenAPI (returns latest available day, no date filter)
   try {
-    const r = await fetch(`https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json&date=${dateStr}`);
+    const r = await fetch('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL', { signal: AbortSignal.timeout(10000) });
     const j = await r.json();
-    if (j.stat === 'OK' && j.data?.length) return j.data;
-  } catch(e) { console.warn('[TWSE_ALL]', e.message); }
+    if (Array.isArray(j) && j.length) {
+      return j.map(s => [
+        s.Code, s.Name, s.TradeVolume, s.Transaction, s.TradeValue,
+        s.OpeningPrice, s.HighestPrice, s.LowestPrice, s.ClosingPrice,
+        String(s.Change || '').startsWith('-') ? '-' : '+',
+        String(s.Change || '').replace(/^[+-]/, '')
+      ]);
+    }
+  } catch(e) { console.warn('[TWSE_OpenAPI]', e.message); }
   return null;
 }
 
@@ -1964,26 +1989,32 @@ async function runEngulfing() {
   const prevStr  = prevDate.replace(/-/g, '');
 
   const results = [];
+  const twseWarnings = [];
 
   try {
     if (market !== 'tpex') {
-      status.textContent = '下載上市股今日資料...';
+      status.textContent = '下載上市股今日資料（嘗試多種來源）...';
       const todayTWSE = await fetchTWSEAll(todayStr);
-      if (!todayTWSE) throw new Error('上市今日資料下載失敗（可能非交易日）');
-      status.textContent = '下載上市股昨日資料...';
-      const prevTWSE = await fetchTWSEAll(prevStr);
-      if (!prevTWSE) throw new Error('上市昨日資料下載失敗');
-
-      const prevMap = new Map(prevTWSE.map(r => [String(r[0]).trim(), r]));
-      for (const row of todayTWSE) {
-        const today = normalizeEngRow(row, '上市');
-        const prevRow = prevMap.get(today.code);
-        if (!prevRow) continue;
-        const prev = normalizeEngRow(prevRow, '上市');
-        if (today.vol < volMin) continue;
-        if (volConfirm && today.vol <= prev.vol) continue;
-        const res = checkBullEngulfing(today, prev);
-        if (res) results.push({ ...today, market:'上市', ...res });
+      if (!todayTWSE) {
+        twseWarnings.push('上市今日資料取得失敗');
+      } else {
+        status.textContent = '下載上市股昨日資料...';
+        const prevTWSE = await fetchTWSEAll(prevStr);
+        if (!prevTWSE) {
+          twseWarnings.push('上市昨日資料取得失敗');
+        } else {
+          const prevMap = new Map(prevTWSE.map(r => [String(r[0]).trim(), r]));
+          for (const row of todayTWSE) {
+            const today = normalizeEngRow(row, '上市');
+            const prevRow = prevMap.get(today.code);
+            if (!prevRow) continue;
+            const prev = normalizeEngRow(prevRow, '上市');
+            if (today.vol < volMin) continue;
+            if (volConfirm && today.vol <= prev.vol) continue;
+            const res = checkBullEngulfing(today, prev);
+            if (res) results.push({ ...today, market:'上市', ...res });
+          }
+        }
       }
     }
 
@@ -2037,7 +2068,8 @@ async function runEngulfing() {
     }
 
     const mktLabel = market === 'both' ? '上市+上櫃' : market === 'twse' ? '上市' : '上櫃';
-    status.textContent = `篩選完成（${dateVal}・${mktLabel}）`;
+    const warnText = twseWarnings.length ? `（⚠ ${twseWarnings.join('、')}）` : '';
+    status.textContent = `篩選完成（${dateVal}・${mktLabel}）${warnText}`;
     countEl.textContent = `共 ${results.length} 筆`;
   } catch(e) {
     status.textContent = '錯誤：' + e.message;
