@@ -1890,8 +1890,9 @@ async function fetchTWSEAll(dateStr) {
       { signal: AbortSignal.timeout(12000) });
     const j = await r.json();
     if (Array.isArray(j) && j.length) {
-      // 確認回傳資料的日期是否與請求日期吻合（Date 欄位為民國年格式）
-      const dataDate = String(j[0].Date || '');
+      // TWSE OpenAPI 回傳的日期欄位為小寫 date（民國年格式，如 "1150626"）
+      const dataDate = String(j[0].date || j[0].Date || '');
+      console.log('[TWSE_OpenAPI] 請求', rocDate, '回傳', dataDate, '第一筆keys:', Object.keys(j[0]).join(','));
       if (dataDate === rocDate) {
         console.log('[TWSE_OpenAPI] 日期吻合', rocDate, '，共', j.length, '筆');
         return j.map(s => [
@@ -1943,21 +1944,29 @@ async function fetchTWSEAll(dateStr) {
 
 async function fetchTPEXAll(isoDate) {
   const [y, m, d] = isoDate.split('-');
-  const rocDate = `${+y - 1911}/${m}/${d}`;
-  const PROXY = 'https://api.allorigins.win/raw?url=';
-  const url = `https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php?l=zh-tw&o=json&d=${encodeURIComponent(rocDate)}`;
+  const rocDate = `${+y - 1911}/${m}/${d}`;  // "115/06/26"（含斜線）
+  // 不預先 encode rocDate，讓 proxy 層統一 encode 整個 URL
+  const url = `https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php?l=zh-tw&o=json&d=${rocDate}`;
+  // 直接嘗試（一般 CORS 阻擋，但先試）
   try {
     const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
     const j = await r.json();
-    if (j.aaData?.length) return j.aaData;
+    if (j?.aaData?.length) { console.log('[TPEX direct] rows:', j.aaData.length); return j.aaData; }
   } catch(e) {}
-  try {
-    const r = await fetch(PROXY + encodeURIComponent(url), {signal: AbortSignal.timeout(28000)});
-    const text = await r.text();
-    const j = JSON.parse(text);
-    if (j?.aaData?.length) { console.log('[TPEX proxy] rows:', j.aaData.length); return j.aaData; }
-    console.warn('[TPEX proxy] no aaData, records:', j?.iTotalRecords, JSON.stringify(j).slice(0,100));
-  } catch(e) { console.warn('[TPEX_ALL proxy]', e.message); }
+  // Proxy 陣列：allorigins 用 encoded URL，codetabs 也用 encoded URL
+  const proxies = [
+    'https://api.allorigins.win/raw?url=',
+    'https://api.codetabs.com/v1/proxy?quest='
+  ];
+  for (const px of proxies) {
+    try {
+      const r = await fetch(px + encodeURIComponent(url), {signal: AbortSignal.timeout(25000)});
+      const text = await r.text();
+      const j = JSON.parse(text);
+      if (j?.aaData?.length) { console.log('[TPEX proxy]', px.split('/')[2], 'rows:', j.aaData.length); return j.aaData; }
+      console.warn('[TPEX proxy]', px.split('/')[2], 'no aaData, iTotalRecords:', j?.iTotalRecords, text.slice(0,80));
+    } catch(e) { console.warn('[TPEX proxy]', px.split('/')[2], e.message); }
+  }
   return null;
 }
 
