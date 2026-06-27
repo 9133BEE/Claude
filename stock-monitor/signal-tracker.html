@@ -1881,6 +1881,25 @@ function gregorianToROC(dateStr) {
   return String(y) + dateStr.slice(4); // e.g. "1150624"
 }
 
+// STOCK_DAY row 中的 "115/06/26" → ISO "2026-06-26"
+function rocRowToISO(rocStr) {
+  if (!rocStr) return '';
+  const p = String(rocStr).trim().split('/');
+  if (p.length !== 3) return '';
+  return `${parseInt(p[0]) + 1911}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`;
+}
+
+// TWSE 個股月資料（CORS-free）：回傳整月每日 [日期,股數,金額,開,高,低,收,漲跌,筆數]
+async function fetchTWSEStockDay(stockNo, dateStr) {
+  const url = `https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?response=json&date=${dateStr}&stockNo=${stockNo}`;
+  try {
+    const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    const j = await r.json();
+    if (j?.stat === 'OK' && j.data?.length) return j.data;
+  } catch(e) {}
+  return null;
+}
+
 async function fetchTWSEAll(dateStr) {
   const rocDate = gregorianToROC(dateStr); // e.g. "1150624"
 
@@ -2049,61 +2068,79 @@ async function runEngulfing() {
   const prevDate = getPrevTradingDay(dateVal);
   const results = [];
   const warnings = [];
+  const dateStr = dateVal.replace(/-/g,'');
+  const prevStr = prevDate.replace(/-/g,'');
+  const sameMonth = dateStr.slice(0,6) === prevStr.slice(0,6);
 
   try {
-    status.textContent = `下載上市+上櫃（今：${dateVal}、昨：${prevDate}）...`;
+    // ── 先啟動 TPEX 下載（背景平行，不阻塞 TWSE）──
+    const tpexTodayP = market !== 'twse' ? fetchTPEXAll(dateVal)  : Promise.resolve(null);
+    const tpexPrevP  = market !== 'twse' ? fetchTPEXAll(prevDate) : Promise.resolve(null);
 
-    // 平行取得：TWSE 今昨 + TPEX 今昨
-    const [twseTodayRaw, twsePrevRaw, tpexTodayRaw, tpexPrevRaw] = await Promise.all([
-      market !== 'tpex' ? fetchTWSEAll(dateVal.replace(/-/g,'')) : Promise.resolve(null),
-      market !== 'tpex' ? fetchTWSEAll(prevDate.replace(/-/g,'')) : Promise.resolve(null),
-      market !== 'twse' ? fetchTPEXAll(dateVal) : Promise.resolve(null),
-      market !== 'twse' ? fetchTPEXAll(prevDate) : Promise.resolve(null),
-    ]);
-
-    // ── 上市：快取管理（今日存檔、昨日若無法取得則查快取）──
+    // ── 上市：OpenAPI 預篩 → 個股 STOCK_DAY（CORS-free，含今昨 OHLC）──
     if (market !== 'tpex') {
-      const cache = _twseLoadCache();
-      if (twseTodayRaw?.length) { cache[dateVal] = twseTodayRaw; _twseSaveCache(cache); }
-      if (twsePrevRaw?.length)  { cache[prevDate] = twsePrevRaw; _twseSaveCache(cache); }
-      const todayData = twseTodayRaw?.length ? twseTodayRaw : cache[dateVal] || null;
-      const prevData  = twsePrevRaw?.length  ? twsePrevRaw  : cache[prevDate] || null;
+      status.textContent = '下載上市今日資料（OpenAPI）...';
+      const twseToday = await fetchTWSEAll(dateStr);
 
-      if (!todayData) {
-        warnings.push('上市今日無資料');
-      } else if (!prevData) {
-        warnings.push(`上市今日已快取，昨日(${prevDate})未取得，明日可篩選`);
+      if (!twseToday?.length) {
+        warnings.push('上市今日無資料（可能非交易日）');
       } else {
-        // TWSE 欄位：[0]代號 [1]名稱 [2]成交股數 [5]開盤 [6]最高 [7]最低 [8]收盤
-        const prevMap = {};
-        for (const row of prevData) {
-          const code = String(row[0]).trim();
-          const o = engNum(row[5]), c = engNum(row[8]), v = engNum(row[2]) / 1000;
-          if (code && o > 0) prevMap[code] = {o, c, v};
-        }
-        let scanned = 0;
-        for (const row of todayData) {
+        // 預篩：今日多頭 + 量足夠，大幅減少後續個股請求數
+        const candidates = [];
+        for (const row of twseToday) {
           const code = String(row[0]).trim();
           if (!code || code.length > 5) continue;
-          const o = engNum(row[5]), h = engNum(row[6]), l = engNum(row[7]), c = engNum(row[8]);
-          const v = engNum(row[2]) / 1000;
-          const name = String(row[1]).trim();
-          if (!(o > 0) || isNaN(c)) continue;
-          const pd = prevMap[code];
-          if (!pd) continue;
-          if (v < volMin) continue;
-          if (volConfirm && v <= pd.v) continue;
-          scanned++;
-          const res = checkBullEngulfing({open:o,high:h,low:l,close:c,vol:v},{open:pd.o,close:pd.c,vol:pd.v},strict);
-          if (res) results.push({code, name, market:'上市', ...res});
+          const o = engNum(row[5]), c = engNum(row[8]), v = engNum(row[2]) / 1000;
+          if (!(o > 0) || isNaN(c) || c <= o || v < volMin) continue;
+          candidates.push({code, name: String(row[1]).trim()});
         }
-        warnings.push(`上市 ${scanned} 檔`);
+
+        const total = candidates.length;
+        status.textContent = `上市多頭候選 ${total} 檔，取個股歷史（約 ${Math.ceil(total/10)} 秒）...`;
+
+        // 批次取個股 STOCK_DAY（CORS-free）：整月資料含今日和昨日
+        const CONC = 10;
+        let done = 0;
+        for (let i = 0; i < total; i += CONC) {
+          const batch = candidates.slice(i, i + CONC);
+          await Promise.all(batch.map(async ({code, name}) => {
+            done++;
+            if (done % CONC === 0 || done === total) status.textContent = `上市取歷史 ${done}/${total}...`;
+
+            const rows = await fetchTWSEStockDay(code, dateStr);
+            if (!rows) return;
+
+            let todayRow = rows.find(r => rocRowToISO(r[0]) === dateVal);
+            let prevRow  = rows.find(r => rocRowToISO(r[0]) === prevDate);
+
+            // 跨月邊界時再抓上月資料
+            if (!prevRow && !sameMonth) {
+              const pm = await fetchTWSEStockDay(code, prevStr);
+              if (pm) prevRow = pm.find(r => rocRowToISO(r[0]) === prevDate);
+            }
+            if (!todayRow || !prevRow) return;
+
+            // STOCK_DAY row: [0]日期 [1]股數 [2]金額 [3]開 [4]高 [5]低 [6]收 [7]漲跌 [8]筆數
+            const tO = engNum(todayRow[3]), tH = engNum(todayRow[4]), tL = engNum(todayRow[5]), tC = engNum(todayRow[6]);
+            const tV = engNum(todayRow[1]) / 1000;
+            const pO = engNum(prevRow[3]), pC = engNum(prevRow[6]), pV = engNum(prevRow[1]) / 1000;
+
+            if (tV < volMin) return;
+            if (volConfirm && tV <= pV) return;
+            const res = checkBullEngulfing({open:tO,high:tH,low:tL,close:tC,vol:tV},{open:pO,close:pC,vol:pV},strict);
+            if (res) results.push({code, name, market:'上市', ...res});
+          }));
+        }
+        warnings.push(`上市掃 ${total} 檔（多頭預篩）`);
       }
     }
 
-    // ── 上櫃 ──
-    // TPEX aaData 欄位：[0]代號 [1]名稱 [2]收盤 [3]漲跌 [4]開盤 [5]最高 [6]最低 [7]成交張數
+    // ── 上櫃：等待 TPEX proxy 結果 ──
+    // TPEX aaData: [0]代號 [1]名稱 [2]收盤 [3]漲跌 [4]開盤 [5]最高 [6]最低 [7]成交張數
     if (market !== 'twse') {
+      status.textContent = '等待上櫃資料...';
+      const [tpexTodayRaw, tpexPrevRaw] = await Promise.all([tpexTodayP, tpexPrevP]);
+
       if (!tpexTodayRaw?.length) {
         warnings.push('上櫃今日無資料');
       } else if (!tpexPrevRaw?.length) {
@@ -2119,8 +2156,7 @@ async function runEngulfing() {
         for (const row of tpexTodayRaw) {
           const code = String(row[0]).trim();
           if (!code) continue;
-          const o = engNum(row[4]), h = engNum(row[5]), l = engNum(row[6]);
-          const c = engNum(row[2]), v = engNum(row[7]);
+          const o = engNum(row[4]), h = engNum(row[5]), l = engNum(row[6]), c = engNum(row[2]), v = engNum(row[7]);
           const name = String(row[1]).trim();
           if (!(o > 0) || isNaN(c)) continue;
           const pd = prevMap[code];
@@ -2131,7 +2167,7 @@ async function runEngulfing() {
           const res = checkBullEngulfing({open:o,high:h,low:l,close:c,vol:v},{open:pd.o,close:pd.c,vol:pd.v},strict);
           if (res) results.push({code, name, market:'上櫃', ...res});
         }
-        warnings.push(`上櫃 ${scanned} 檔`);
+        warnings.push(`上櫃掃 ${scanned} 檔`);
       }
     }
 
