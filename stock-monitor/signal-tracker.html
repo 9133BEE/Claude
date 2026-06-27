@@ -1952,10 +1952,12 @@ async function fetchTPEXAll(isoDate) {
     if (j.aaData?.length) return j.aaData;
   } catch(e) {}
   try {
-    const r = await fetch(PROXY + encodeURIComponent(url));
-    const j = await r.json();
-    if (j.aaData?.length) return j.aaData;
-  } catch(e) { console.warn('[TPEX_ALL]', e.message); }
+    const r = await fetch(PROXY + encodeURIComponent(url), {signal: AbortSignal.timeout(28000)});
+    const text = await r.text();
+    const j = JSON.parse(text);
+    if (j?.aaData?.length) { console.log('[TPEX proxy] rows:', j.aaData.length); return j.aaData; }
+    console.warn('[TPEX proxy] no aaData, records:', j?.iTotalRecords, JSON.stringify(j).slice(0,100));
+  } catch(e) { console.warn('[TPEX_ALL proxy]', e.message); }
   return null;
 }
 
@@ -2008,38 +2010,13 @@ function engRatioClass(r) {
   return 'eng-r1';
 }
 
-// ── Finmind helpers ──
-const _FMPROXY = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
-
-async function _fmFetch(apiUrl, timeout) {
-  for (const px of _FMPROXY) {
-    try {
-      const r = await fetch(px + encodeURIComponent(apiUrl), {signal: AbortSignal.timeout(timeout || 20000)});
-      const j = await r.json();
-      if (j?.status === 200 && j.data?.length) return j.data;
-    } catch(e) { console.warn('[FM proxy]', px, e.message); }
-  }
-  return null;
-}
-
-async function getFinmindInfo() {
-  const KEY = 'eng_info_v1', TTL = 86400000;
-  try { const c = JSON.parse(localStorage.getItem(KEY)||'{}'); if (c.ts && Date.now()-c.ts<TTL && c.d) return c.d; } catch{}
-  const data = await _fmFetch('https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo', 15000);
-  if (data) {
-    const d = {};
-    data.forEach(s => { d[s.stock_id] = {n: s.stock_name, m: s.type}; });
-    try { localStorage.setItem('eng_info_v1', JSON.stringify({ts: Date.now(), d})); } catch{}
-    return d;
-  }
-  return {};
-}
-
-async function getFinmindPrice(prevISO, todayISO) {
-  return await _fmFetch(
-    `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&start_date=${prevISO}&end_date=${todayISO}`,
-    35000
-  );
+// ── TWSE 滾動快取（保留最近 5 交易日，供比對昨日 K 線）──
+const _TWSE_CACHE_KEY = 'eng_twse_v2';
+function _twseLoadCache() { try { return JSON.parse(localStorage.getItem(_TWSE_CACHE_KEY)||'{}'); } catch { return {}; } }
+function _twseSaveCache(cache) {
+  const pruned = {};
+  Object.keys(cache).sort().reverse().slice(0, 5).forEach(k => { pruned[k] = cache[k]; });
+  try { localStorage.setItem(_TWSE_CACHE_KEY, JSON.stringify(pruned)); } catch(e) { console.warn('[eng cache]', e); }
 }
 
 async function runEngulfing() {
@@ -2061,52 +2038,92 @@ async function runEngulfing() {
   const volConfirm = document.getElementById('eng-vol-confirm').checked;
   const strict = document.getElementById('eng-strict').checked;
   const prevDate = getPrevTradingDay(dateVal);
-
   const results = [];
-  const twseWarnings = [];
+  const warnings = [];
 
   try {
-    // ── 主要來源：Finmind API（CORS無限制、涵蓋上市+上櫃、支援日期區間）──
-    status.textContent = '下載股票清單...';
-    const infoMap = await getFinmindInfo();
-    const hasInfo = Object.keys(infoMap).length > 0;
+    status.textContent = `下載上市+上櫃（今：${dateVal}、昨：${prevDate}）...`;
 
-    status.textContent = `下載全市場 K 線（${prevDate} ~ ${dateVal}）...`;
-    const prices = await getFinmindPrice(prevDate, dateVal);
+    // 平行取得：TWSE 今昨 + TPEX 今昨
+    const [twseTodayRaw, twsePrevRaw, tpexTodayRaw, tpexPrevRaw] = await Promise.all([
+      market !== 'tpex' ? fetchTWSEAll(dateVal.replace(/-/g,'')) : Promise.resolve(null),
+      market !== 'tpex' ? fetchTWSEAll(prevDate.replace(/-/g,'')) : Promise.resolve(null),
+      market !== 'twse' ? fetchTPEXAll(dateVal) : Promise.resolve(null),
+      market !== 'twse' ? fetchTPEXAll(prevDate) : Promise.resolve(null),
+    ]);
 
-    if (prices?.length) {
-      // 分日期
-      const todayMap = {}, prevMap = {};
-      for (const d of prices) {
-        if (d.date === dateVal) todayMap[d.stock_id] = d;
-        else if (d.date === prevDate) prevMap[d.stock_id] = d;
-      }
-      const todayCount = Object.keys(todayMap).length;
-      const prevCount  = Object.keys(prevMap).length;
+    // ── 上市：快取管理（今日存檔、昨日若無法取得則查快取）──
+    if (market !== 'tpex') {
+      const cache = _twseLoadCache();
+      if (twseTodayRaw?.length) { cache[dateVal] = twseTodayRaw; _twseSaveCache(cache); }
+      if (twsePrevRaw?.length)  { cache[prevDate] = twsePrevRaw; _twseSaveCache(cache); }
+      const todayData = twseTodayRaw?.length ? twseTodayRaw : cache[dateVal] || null;
+      const prevData  = twsePrevRaw?.length  ? twsePrevRaw  : cache[prevDate] || null;
 
-      if (!todayCount || !prevCount) {
-        twseWarnings.push(`資料不完整（今:${todayCount} 昨:${prevCount}），可能非交易日`);
+      if (!todayData) {
+        warnings.push('上市今日無資料');
+      } else if (!prevData) {
+        warnings.push(`上市今日已快取，昨日(${prevDate})未取得，明日可篩選`);
       } else {
+        // TWSE 欄位：[0]代號 [1]名稱 [2]成交股數 [5]開盤 [6]最高 [7]最低 [8]收盤
+        const prevMap = {};
+        for (const row of prevData) {
+          const code = String(row[0]).trim();
+          const o = engNum(row[5]), c = engNum(row[8]), v = engNum(row[2]) / 1000;
+          if (code && o > 0) prevMap[code] = {o, c, v};
+        }
         let scanned = 0;
-        for (const [code, td] of Object.entries(todayMap)) {
+        for (const row of todayData) {
+          const code = String(row[0]).trim();
+          if (!code || code.length > 5) continue;
+          const o = engNum(row[5]), h = engNum(row[6]), l = engNum(row[7]), c = engNum(row[8]);
+          const v = engNum(row[2]) / 1000;
+          const name = String(row[1]).trim();
+          if (!(o > 0) || isNaN(c)) continue;
           const pd = prevMap[code];
           if (!pd) continue;
-          const info = infoMap[code];
-          const mkt = info?.m === '上市' ? '上市' : '上櫃';
-          if (market === 'twse' && mkt !== '上市') continue;
-          if (market === 'tpex' && mkt !== '上櫃') continue;
+          if (v < volMin) continue;
+          if (volConfirm && v <= pd.v) continue;
           scanned++;
-          const tN = { code, name: info?.n || code, open: +td.open, high: +td.max, low: +td.min, close: +td.close, vol: +td.Trading_Volume/1000 };
-          const pN = { code, name: '', open: +pd.open, high: +pd.max, low: +pd.min, close: +pd.close, vol: +pd.Trading_Volume/1000 };
-          if (tN.vol < volMin) continue;
-          if (volConfirm && tN.vol <= pN.vol) continue;
-          const res = checkBullEngulfing(tN, pN, strict);
-          if (res) results.push({ ...tN, market: mkt, ...res });
+          const res = checkBullEngulfing({open:o,high:h,low:l,close:c,vol:v},{open:pd.o,close:pd.c,vol:pd.v},strict);
+          if (res) results.push({code, name, market:'上市', ...res});
         }
-        twseWarnings.push(`掃描 ${scanned} 檔`);
+        warnings.push(`上市 ${scanned} 檔`);
       }
-    } else {
-      twseWarnings.push('Finmind 資料取得失敗（請稍後再試）');
+    }
+
+    // ── 上櫃 ──
+    // TPEX aaData 欄位：[0]代號 [1]名稱 [2]收盤 [3]漲跌 [4]開盤 [5]最高 [6]最低 [7]成交張數
+    if (market !== 'twse') {
+      if (!tpexTodayRaw?.length) {
+        warnings.push('上櫃今日無資料');
+      } else if (!tpexPrevRaw?.length) {
+        warnings.push('上櫃昨日無資料');
+      } else {
+        const prevMap = {};
+        for (const row of tpexPrevRaw) {
+          const code = String(row[0]).trim();
+          const o = engNum(row[4]), c = engNum(row[2]), v = engNum(row[7]);
+          if (code && o > 0) prevMap[code] = {o, c, v};
+        }
+        let scanned = 0;
+        for (const row of tpexTodayRaw) {
+          const code = String(row[0]).trim();
+          if (!code) continue;
+          const o = engNum(row[4]), h = engNum(row[5]), l = engNum(row[6]);
+          const c = engNum(row[2]), v = engNum(row[7]);
+          const name = String(row[1]).trim();
+          if (!(o > 0) || isNaN(c)) continue;
+          const pd = prevMap[code];
+          if (!pd) continue;
+          if (v < volMin) continue;
+          if (volConfirm && v <= pd.v) continue;
+          scanned++;
+          const res = checkBullEngulfing({open:o,high:h,low:l,close:c,vol:v},{open:pd.o,close:pd.c,vol:pd.v},strict);
+          if (res) results.push({code, name, market:'上櫃', ...res});
+        }
+        warnings.push(`上櫃 ${scanned} 檔`);
+      }
     }
 
     results.sort((a, b) => b.engulfRatio - a.engulfRatio);
@@ -2136,10 +2153,9 @@ async function runEngulfing() {
     }
 
     const mktLabel = market === 'both' ? '上市+上櫃' : market === 'twse' ? '上市' : '上櫃';
-    const infoNote = hasInfo ? '' : '（名稱快取載入失敗，顯示代號）';
-    const warnText = twseWarnings.length ? ` ｜ ${twseWarnings.join('、')}` : '';
-    status.textContent = `篩選完成（${dateVal}・${mktLabel}）${infoNote}${warnText}`;
+    status.textContent = `篩選完成（${dateVal}・${mktLabel}）｜ ${warnings.join(' ・ ')}`;
     countEl.textContent = `共 ${results.length} 筆`;
+
   } catch(e) {
     status.textContent = '錯誤：' + e.message;
     tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:32px;color:#F23645">${e.message}</td></tr>`;
