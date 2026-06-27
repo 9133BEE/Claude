@@ -642,6 +642,7 @@
   <div class="page-tab active" onclick="switchTab('screener')">訊號篩選器</div>
   <div class="page-tab" onclick="switchTab('watchlist')" id="wl-tab-btn">自選清單 <span id="wl-badge" style="display:none;margin-left:4px;background:#2962FF;color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;font-weight:700;"></span></div>
   <div class="page-tab" onclick="switchTab('engulfing')">吞沒K篩選</div>
+  <div class="page-tab" onclick="switchTab('indicators')">指標組合</div>
 </div>
 
 <!-- ════════════════════════════════════
@@ -1042,7 +1043,7 @@ function getBottomLevel(ratioPct) {
 //  TAB SWITCHING
 // ══════════════════════════════════════
 function switchTab(name) {
-  const tabs = ['screener','watchlist','engulfing'];
+  const tabs = ['screener','watchlist','engulfing','indicators'];
   document.querySelectorAll('.page-tab').forEach((t, i) => {
     t.classList.toggle('active', tabs[i] === name);
   });
@@ -2223,5 +2224,473 @@ updateCondDisplay();
 // Set engulfing date to today
 document.getElementById('eng-date').value = new Date().toISOString().split('T')[0];
 </script>
+
+<!-- ════════════════════════════════════
+     PAGE 4: 指標組合
+     ════════════════════════════════════ -->
+<style>
+  #panel-indicators { padding: 0; }
+  .ind-wrap { padding: 16px; }
+  .ind-page-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #D1D4DC;
+    margin-bottom: 4px;
+  }
+  .ind-page-sub {
+    font-size: 12px;
+    color: #787B86;
+    margin-bottom: 16px;
+  }
+  .ind-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 1100px) {
+    .ind-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 680px) {
+    .ind-grid { grid-template-columns: 1fr; }
+  }
+  .ind-card {
+    background: #1E222D;
+    border: 1px solid #2A2E39;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.15s;
+  }
+  .ind-card:hover { border-color: #2962FF; }
+  .ind-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .ind-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2962FF;
+    background: rgba(41,98,255,0.12);
+    border-radius: 4px;
+    padding: 2px 6px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .ind-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #D1D4DC;
+    line-height: 1.3;
+  }
+  .ind-desc {
+    font-size: 11px;
+    color: #787B86;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+  .ind-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .ind-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .ind-name {
+    color: #A0A3AB;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ind-sep {
+    color: #3A3E4A;
+    flex-shrink: 0;
+  }
+  .ind-role {
+    color: #787B86;
+  }
+</style>
+
+<div class="page-panel" id="panel-indicators">
+  <div class="ind-wrap">
+    <div class="ind-page-title">指標組合</div>
+    <div class="ind-page-sub">20 組 TradingView 實用指標組合，涵蓋趨勢、動能、籌碼、波動率等多種交易風格。在 TradingView 搜尋欄輸入英文名稱即可套用。</div>
+    <div class="ind-grid">
+
+      <!-- 01 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">01</span>
+          <div>
+            <div class="ind-title">資金動能觀察</div>
+            <div class="ind-desc">追蹤主力資金流向與成交量動能，確認價格趨勢有無量能支撐</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Money Flow Index (MFI)</span><span class="ind-sep">—</span><span class="ind-role">結合量價衡量資金流入強弱，判斷超買超賣</span></li>
+          <li><span class="ind-name">On Balance Volume (OBV)</span><span class="ind-sep">—</span><span class="ind-role">累積成交量方向，確認突破有無量能跟進</span></li>
+          <li><span class="ind-name">Chaikin Money Flow (CMF)</span><span class="ind-sep">—</span><span class="ind-role">21日資金流量振盪，正值代表買盤主導</span></li>
+          <li><span class="ind-name">Volume Weighted Average Price (VWAP)</span><span class="ind-sep">—</span><span class="ind-role">成交量加權均價，法人與當沖的關鍵進出基準</span></li>
+          <li><span class="ind-name">Relative Volume (RVOL)</span><span class="ind-sep">—</span><span class="ind-role">當前量能相對歷史均量倍數，識別異常放量</span></li>
+        </ul>
+      </div>
+
+      <!-- 02 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">02</span>
+          <div>
+            <div class="ind-title">訂單流策略</div>
+            <div class="ind-desc">分析買賣訂單的力量對比，捕捉機構進場痕跡與短期供需失衡</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Volume Delta</span><span class="ind-sep">—</span><span class="ind-role">主動買賣量差值，顯示每根K棒的訂單淨流向</span></li>
+          <li><span class="ind-name">Cumulative Volume Delta (CVD)</span><span class="ind-sep">—</span><span class="ind-role">累積訂單流方向，驗證價格走勢真偽</span></li>
+          <li><span class="ind-name">Bid Ask Volume</span><span class="ind-sep">—</span><span class="ind-role">內外盤成交量比較，判斷買賣方主導</span></li>
+          <li><span class="ind-name">Footprint Chart</span><span class="ind-sep">—</span><span class="ind-role">每個價位的成交明細，找出供需失衡的關鍵價格帶</span></li>
+          <li><span class="ind-name">Market Profile (TPO)</span><span class="ind-sep">—</span><span class="ind-role">時間價格機會圖，識別價值區間與高量節點</span></li>
+        </ul>
+      </div>
+
+      <!-- 03 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">03</span>
+          <div>
+            <div class="ind-title">經典趨勢跟蹤</div>
+            <div class="ind-desc">適合中長線波段操作，確認主趨勢方向並在回調時找進場點</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Moving Average (MA 20/60/120)</span><span class="ind-sep">—</span><span class="ind-role">多均線排列確認趨勢強度與方向</span></li>
+          <li><span class="ind-name">MACD (12,26,9)</span><span class="ind-sep">—</span><span class="ind-role">動能轉折與趨勢方向雙重確認</span></li>
+          <li><span class="ind-name">Average Directional Index (ADX)</span><span class="ind-sep">—</span><span class="ind-role">趨勢強度量化，ADX>25 代表趨勢明確</span></li>
+          <li><span class="ind-name">Parabolic SAR</span><span class="ind-sep">—</span><span class="ind-role">動態停損點，自動追蹤趨勢並給出反轉信號</span></li>
+          <li><span class="ind-name">Ichimoku Cloud</span><span class="ind-sep">—</span><span class="ind-role">一目均衡表雲層判斷多空分界與支撐壓力</span></li>
+        </ul>
+      </div>
+
+      <!-- 04 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">04</span>
+          <div>
+            <div class="ind-title">短線動能獵手</div>
+            <div class="ind-desc">捕捉價格在短時間內快速加速的動能爆發機會，適合日內與隔日沖</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Rate of Change (ROC)</span><span class="ind-sep">—</span><span class="ind-role">價格變動速率，顯示動能加速或減速</span></li>
+          <li><span class="ind-name">Stochastic RSI</span><span class="ind-sep">—</span><span class="ind-role">RSI的二次平滑，更靈敏地偵測超買超賣極端值</span></li>
+          <li><span class="ind-name">Momentum (MOM)</span><span class="ind-sep">—</span><span class="ind-role">N日動能絕對值，直觀反映多空力道強弱</span></li>
+          <li><span class="ind-name">Williams %R</span><span class="ind-sep">—</span><span class="ind-role">14日高低點相對位置，快速判斷超買超賣</span></li>
+          <li><span class="ind-name">Exponential Moving Average (EMA 5/13)</span><span class="ind-sep">—</span><span class="ind-role">短周期快速均線交叉產生進出場信號</span></li>
+        </ul>
+      </div>
+
+      <!-- 05 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">05</span>
+          <div>
+            <div class="ind-title">波動率策略</div>
+            <div class="ind-desc">利用波動率擴張與收縮週期，在低波動末期布局高勝率突破</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Bollinger Bands (BB)</span><span class="ind-sep">—</span><span class="ind-role">2倍標準差通道，帶寬收縮預示大行情即將到來</span></li>
+          <li><span class="ind-name">Average True Range (ATR)</span><span class="ind-sep">—</span><span class="ind-role">真實波幅均值，用於動態設定停損距離</span></li>
+          <li><span class="ind-name">Keltner Channels</span><span class="ind-sep">—</span><span class="ind-role">ATR基礎通道，與布林帶結合偵測擠壓突破</span></li>
+          <li><span class="ind-name">Chaikin Volatility</span><span class="ind-sep">—</span><span class="ind-role">高低差的EMA變化率，量化波動率擴張速度</span></li>
+          <li><span class="ind-name">Historical Volatility (HV)</span><span class="ind-sep">—</span><span class="ind-role">統計波動率基準，判斷當前市場情緒是否異常</span></li>
+        </ul>
+      </div>
+
+      <!-- 06 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">06</span>
+          <div>
+            <div class="ind-title">支撐壓力識別</div>
+            <div class="ind-desc">找出關鍵價格帶的供需牆，提高進出場定價精確度</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Pivot Points (Standard)</span><span class="ind-sep">—</span><span class="ind-role">日/週/月樞軸點，提供結構性支撐壓力參考</span></li>
+          <li><span class="ind-name">Fibonacci Retracement</span><span class="ind-sep">—</span><span class="ind-role">黃金比例回調位，常見回撤買點 0.382/0.618</span></li>
+          <li><span class="ind-name">Volume Profile Visible Range (VPVR)</span><span class="ind-sep">—</span><span class="ind-role">可見區間量值分佈，高量節點即為強支撐壓力</span></li>
+          <li><span class="ind-name">Price Action Levels</span><span class="ind-sep">—</span><span class="ind-role">自動識別歷史高低點與整數關口</span></li>
+          <li><span class="ind-name">Anchored VWAP</span><span class="ind-sep">—</span><span class="ind-role">從特定K棒起算的VWAP，追蹤主力平均持倉成本</span></li>
+        </ul>
+      </div>
+
+      <!-- 07 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">07</span>
+          <div>
+            <div class="ind-title">籌碼分析組合</div>
+            <div class="ind-desc">解讀三大法人與大戶的籌碼動向，順著主力方向操作</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Accumulation/Distribution (A/D)</span><span class="ind-sep">—</span><span class="ind-role">法人籌碼累積或派發的方向性指標</span></li>
+          <li><span class="ind-name">Ease of Movement (EOM)</span><span class="ind-sep">—</span><span class="ind-role">量價效率比，小量推動大漲代表籌碼鎖定</span></li>
+          <li><span class="ind-name">Force Index</span><span class="ind-sep">—</span><span class="ind-role">量能乘以價格變化，衡量多空力道的強度</span></li>
+          <li><span class="ind-name">Smart Money Flow Index</span><span class="ind-sep">—</span><span class="ind-role">開盤與尾盤的量價特徵，追蹤機構進出意圖</span></li>
+          <li><span class="ind-name">Large Lot Transactions</span><span class="ind-sep">—</span><span class="ind-role">大單成交統計，判斷是否有大戶在默默建倉</span></li>
+        </ul>
+      </div>
+
+      <!-- 08 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">08</span>
+          <div>
+            <div class="ind-title">超買超賣反轉</div>
+            <div class="ind-desc">在市場情緒極端時逆勢布局，捕捉技術性反彈或回落機會</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Relative Strength Index (RSI 14)</span><span class="ind-sep">—</span><span class="ind-role">70/30 超買超賣門檻，背離信號預示反轉</span></li>
+          <li><span class="ind-name">Commodity Channel Index (CCI)</span><span class="ind-sep">—</span><span class="ind-role">±100 極端值配合背離找反轉入場點</span></li>
+          <li><span class="ind-name">Stochastic Oscillator (14,3,3)</span><span class="ind-sep">—</span><span class="ind-role">K/D 交叉於超買超賣區產生進出信號</span></li>
+          <li><span class="ind-name">Ultimate Oscillator</span><span class="ind-sep">—</span><span class="ind-role">三周期加權動能，減少假信號提高可靠度</span></li>
+          <li><span class="ind-name">DeMarker Indicator</span><span class="ind-sep">—</span><span class="ind-role">與RSI互補的超買超賣工具，確認反轉信號</span></li>
+        </ul>
+      </div>
+
+      <!-- 09 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">09</span>
+          <div>
+            <div class="ind-title">型態確認工具組</div>
+            <div class="ind-desc">輔助確認 K 線型態的有效性，過濾假突破提升進場勝率</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Candlestick Patterns Recognition</span><span class="ind-sep">—</span><span class="ind-role">自動識別錘子、吞沒、十字星等關鍵K線型態</span></li>
+          <li><span class="ind-name">Volume</span><span class="ind-sep">—</span><span class="ind-role">確認型態成立的關鍵—量能是型態的靈魂</span></li>
+          <li><span class="ind-name">RSI (14)</span><span class="ind-sep">—</span><span class="ind-role">型態出現時確認動能是否與價格同向</span></li>
+          <li><span class="ind-name">Bollinger Bands %B</span><span class="ind-sep">—</span><span class="ind-role">確認型態發生在通道邊緣，提高信號強度</span></li>
+          <li><span class="ind-name">Pivot Points High/Low</span><span class="ind-sep">—</span><span class="ind-role">標記近期高低轉折點，確認型態的結構位置</span></li>
+        </ul>
+      </div>
+
+      <!-- 10 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">10</span>
+          <div>
+            <div class="ind-title">均線多空排列</div>
+            <div class="ind-desc">以多條均線的空間排列判斷趨勢成熟度，適合波段持有決策</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Hull Moving Average (HMA)</span><span class="ind-sep">—</span><span class="ind-role">低延遲均線，減少訊號落後問題</span></li>
+          <li><span class="ind-name">Exponential Moving Average (EMA 21/55/200)</span><span class="ind-sep">—</span><span class="ind-role">短中長三線多頭排列確認牛市格局</span></li>
+          <li><span class="ind-name">Moving Average Ribbon</span><span class="ind-sep">—</span><span class="ind-role">多條均線形成彩帶，視覺化趨勢強度與反轉</span></li>
+          <li><span class="ind-name">Double EMA (DEMA)</span><span class="ind-sep">—</span><span class="ind-role">二次指數平滑，對趨勢起點反應更快</span></li>
+          <li><span class="ind-name">Supertrend</span><span class="ind-sep">—</span><span class="ind-role">ATR動態趨勢線，顏色切換即為多空轉換信號</span></li>
+        </ul>
+      </div>
+
+      <!-- 11 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">11</span>
+          <div>
+            <div class="ind-title">突破交易系統</div>
+            <div class="ind-desc">識別整理末期的量縮跡象，在有效突破當下追入並管理風險</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Donchian Channels (20)</span><span class="ind-sep">—</span><span class="ind-role">20日高低通道，突破上軌為強勢突破信號</span></li>
+          <li><span class="ind-name">Squeeze Momentum Indicator</span><span class="ind-sep">—</span><span class="ind-role">布林帶嵌入肯特納通道時提示能量蓄積</span></li>
+          <li><span class="ind-name">Volume</span><span class="ind-sep">—</span><span class="ind-role">突破K棒量能須明顯放大，量價齊揚才算有效</span></li>
+          <li><span class="ind-name">ATR</span><span class="ind-sep">—</span><span class="ind-role">依ATR設定突破後的停損與停利目標距離</span></li>
+          <li><span class="ind-name">RSI (14)</span><span class="ind-sep">—</span><span class="ind-role">突破時RSI同步突破50確認動能支撐</span></li>
+        </ul>
+      </div>
+
+      <!-- 12 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">12</span>
+          <div>
+            <div class="ind-title">週期背離捕捉</div>
+            <div class="ind-desc">利用指標與價格的背離現象，提前預警趨勢動能衰竭與轉折</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">RSI Divergence</span><span class="ind-sep">—</span><span class="ind-role">RSI高低點與價格背離，最常見的反轉預警</span></li>
+          <li><span class="ind-name">MACD Divergence</span><span class="ind-sep">—</span><span class="ind-role">MACD柱狀圖縮量背離，中期趨勢衰竭信號</span></li>
+          <li><span class="ind-name">OBV Divergence</span><span class="ind-sep">—</span><span class="ind-role">量能方向與價格反向，法人悄悄出貨的跡象</span></li>
+          <li><span class="ind-name">CCI Divergence</span><span class="ind-sep">—</span><span class="ind-role">CCI與價格背離輔助確認反轉信號</span></li>
+          <li><span class="ind-name">Stochastic Divergence</span><span class="ind-sep">—</span><span class="ind-role">K線與隨機指標背離，短線反轉的第一個信號</span></li>
+        </ul>
+      </div>
+
+      <!-- 13 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">13</span>
+          <div>
+            <div class="ind-title">趨勢強度評估</div>
+            <div class="ind-desc">量化趨勢的健康程度，避免在弱勢趨勢中強行追多或做空</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Average Directional Index (ADX)</span><span class="ind-sep">—</span><span class="ind-role">趨勢強度純量指標，不含方向性，>25為強趨勢</span></li>
+          <li><span class="ind-name">Aroon Indicator</span><span class="ind-sep">—</span><span class="ind-role">衡量最近高低點距今的時間，判斷趨勢新鮮度</span></li>
+          <li><span class="ind-name">Vortex Indicator (VI)</span><span class="ind-sep">—</span><span class="ind-role">VI+ 與 VI- 交叉判斷多空方向的切換</span></li>
+          <li><span class="ind-name">Chande Momentum Oscillator (CMO)</span><span class="ind-sep">—</span><span class="ind-role">對稱動能振盪，判斷趨勢的純粹動量</span></li>
+          <li><span class="ind-name">Linear Regression Slope</span><span class="ind-sep">—</span><span class="ind-role">統計回歸斜率，量化趨勢上升或下降的速度</span></li>
+        </ul>
+      </div>
+
+      <!-- 14 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">14</span>
+          <div>
+            <div class="ind-title">均值回歸策略</div>
+            <div class="ind-desc">在價格偏離均值過大時逆勢操作，適合區間震盪市場環境</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Bollinger Bands %B</span><span class="ind-sep">—</span><span class="ind-role">價格在通道內的相對位置，>1 或 <0 代表極端偏離</span></li>
+          <li><span class="ind-name">Z-Score</span><span class="ind-sep">—</span><span class="ind-role">統計標準差距離，量化偏離均值的程度</span></li>
+          <li><span class="ind-name">RSI (14)</span><span class="ind-sep">—</span><span class="ind-role">確認價格極端值有動能轉弱的跡象</span></li>
+          <li><span class="ind-name">Standard Deviation Channel</span><span class="ind-sep">—</span><span class="ind-role">統計回歸通道，顯示均值與偏離帶</span></li>
+          <li><span class="ind-name">Mean Reversion Index (MRI)</span><span class="ind-sep">—</span><span class="ind-role">均值回歸信號強度，評估回歸機率</span></li>
+        </ul>
+      </div>
+
+      <!-- 15 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">15</span>
+          <div>
+            <div class="ind-title">多時框架共振</div>
+            <div class="ind-desc">對齊日線、週線、月線方向，只在大時框架方向一致時進場</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Multi-Timeframe RSI</span><span class="ind-sep">—</span><span class="ind-role">同時顯示日/週/月RSI，確認三框架同向</span></li>
+          <li><span class="ind-name">MACD Multi-Timeframe</span><span class="ind-sep">—</span><span class="ind-role">大時框架MACD翻多/翻空作為濾網</span></li>
+          <li><span class="ind-name">Ichimoku Cloud</span><span class="ind-sep">—</span><span class="ind-role">週線雲層上方代表長線多頭格局</span></li>
+          <li><span class="ind-name">EMA (200)</span><span class="ind-sep">—</span><span class="ind-role">200日均線是最廣泛使用的多空分界線</span></li>
+          <li><span class="ind-name">Supertrend (Multi-Timeframe)</span><span class="ind-sep">—</span><span class="ind-role">不同週期Supertrend同時翻色確認共振</span></li>
+        </ul>
+      </div>
+
+      <!-- 16 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">16</span>
+          <div>
+            <div class="ind-title">量價關係分析</div>
+            <div class="ind-desc">解讀量與價的配合關係，識別主力出貨、吸籌與量縮整理</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Volume</span><span class="ind-sep">—</span><span class="ind-role">最基礎的量能指標，量增價漲為健康走勢</span></li>
+          <li><span class="ind-name">Price Volume Trend (PVT)</span><span class="ind-sep">—</span><span class="ind-role">量價趨勢累計，類OBV但考慮漲跌幅比例</span></li>
+          <li><span class="ind-name">Negative Volume Index (NVI)</span><span class="ind-sep">—</span><span class="ind-role">量縮日的價格行為，追蹤聰明錢的動向</span></li>
+          <li><span class="ind-name">Positive Volume Index (PVI)</span><span class="ind-sep">—</span><span class="ind-role">量增日的價格行為，反映散戶資金流向</span></li>
+          <li><span class="ind-name">Elder Force Index</span><span class="ind-sep">—</span><span class="ind-role">量乘以漲跌幅，衡量買賣力道的動態變化</span></li>
+        </ul>
+      </div>
+
+      <!-- 17 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">17</span>
+          <div>
+            <div class="ind-title">情緒與市場寬度</div>
+            <div class="ind-desc">評估整體市場健康度與投資人情緒，避免在市場極端時追高殺低</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Advance/Decline Line</span><span class="ind-sep">—</span><span class="ind-role">漲跌家數累計線，衡量市場廣度是否健康</span></li>
+          <li><span class="ind-name">McClellan Oscillator</span><span class="ind-sep">—</span><span class="ind-role">漲跌家數的EMA差，短期市場內部強弱</span></li>
+          <li><span class="ind-name">Put/Call Ratio</span><span class="ind-sep">—</span><span class="ind-role">選擇權買賣比，高比值代表市場過度恐慌</span></li>
+          <li><span class="ind-name">Volatility Index (VIX)</span><span class="ind-sep">—</span><span class="ind-role">恐慌指數，>30 代表市場恐懼情緒濃厚</span></li>
+          <li><span class="ind-name">High Low Index</span><span class="ind-sep">—</span><span class="ind-role">創52週高低點家數比，衡量市場強弱廣度</span></li>
+        </ul>
+      </div>
+
+      <!-- 18 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">18</span>
+          <div>
+            <div class="ind-title">週期與季節性</div>
+            <div class="ind-desc">利用時間週期規律制定策略，結合月效應與統計優勢提高勝率</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Hurst Exponent</span><span class="ind-sep">—</span><span class="ind-role">判斷市場是趨勢持續或均值回歸的統計特性</span></li>
+          <li><span class="ind-name">Detrended Price Oscillator (DPO)</span><span class="ind-sep">—</span><span class="ind-role">去除趨勢的周期振盪，識別價格週期長度</span></li>
+          <li><span class="ind-name">MESA Adaptive Moving Average (MAMA)</span><span class="ind-sep">—</span><span class="ind-role">自適應周期均線，動態調整對週期的敏感度</span></li>
+          <li><span class="ind-name">Sine Wave Indicator</span><span class="ind-sep">—</span><span class="ind-role">MESA正弦波，預測當前周期中的相對位置</span></li>
+          <li><span class="ind-name">Cyclic Smoothed RSI</span><span class="ind-sep">—</span><span class="ind-role">考慮市場周期的RSI變體，過濾非周期噪音</span></li>
+        </ul>
+      </div>
+
+      <!-- 19 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">19</span>
+          <div>
+            <div class="ind-title">停損停利管理</div>
+            <div class="ind-desc">用量化方式設定動態停損與獲利目標，讓風險管理有據可循</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Average True Range (ATR)</span><span class="ind-sep">—</span><span class="ind-role">以1.5~3倍ATR設定初始停損距離</span></li>
+          <li><span class="ind-name">Chandelier Exit</span><span class="ind-sep">—</span><span class="ind-role">ATR基礎的追蹤停損，讓獲利自動跟蹤</span></li>
+          <li><span class="ind-name">Parabolic SAR</span><span class="ind-sep">—</span><span class="ind-role">加速因子隨趨勢延伸而提高，保護浮盈</span></li>
+          <li><span class="ind-name">Fibonacci Extension</span><span class="ind-sep">—</span><span class="ind-role">1.618 / 2.618 延伸位作為分批獲利目標</span></li>
+          <li><span class="ind-name">Risk Reward Ratio</span><span class="ind-sep">—</span><span class="ind-role">視覺化顯示每筆交易的預期報酬風險比</span></li>
+        </ul>
+      </div>
+
+      <!-- 20 -->
+      <div class="ind-card">
+        <div class="ind-card-header">
+          <span class="ind-num">20</span>
+          <div>
+            <div class="ind-title">量化選股濾網</div>
+            <div class="ind-desc">以多指標評分系統篩選強勢股，聚焦在技術面最強的標的</div>
+          </div>
+        </div>
+        <ul class="ind-list">
+          <li><span class="ind-name">Relative Strength Index (RSI 14)</span><span class="ind-sep">—</span><span class="ind-role">RSI>50 且持續上升為強勢股基本條件</span></li>
+          <li><span class="ind-name">MACD Histogram</span><span class="ind-sep">—</span><span class="ind-role">柱狀圖持續擴張代表動能仍在加速中</span></li>
+          <li><span class="ind-name">Relative Strength (RS Rating)</span><span class="ind-sep">—</span><span class="ind-role">與大盤相比的相對強弱，聚焦市場領頭羊</span></li>
+          <li><span class="ind-name">Volume (20-day MA)</span><span class="ind-sep">—</span><span class="ind-role">成交量持續高於20日均量，代表機構持續介入</span></li>
+          <li><span class="ind-name">EMA (21/55) Golden Cross</span><span class="ind-sep">—</span><span class="ind-role">短線均線上穿中線確認強勢趨勢啟動</span></li>
+        </ul>
+      </div>
+
+    </div><!-- .ind-grid -->
+  </div><!-- .ind-wrap -->
+</div><!-- #panel-indicators -->
+
 </body>
 </html>
