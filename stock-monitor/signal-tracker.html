@@ -2077,26 +2077,31 @@ async function runEngulfing() {
     const tpexTodayP = market !== 'twse' ? fetchTPEXAll(dateVal)  : Promise.resolve(null);
     const tpexPrevP  = market !== 'twse' ? fetchTPEXAll(prevDate) : Promise.resolve(null);
 
-    // ── 上市：OpenAPI 預篩 → 個股 STOCK_DAY（CORS-free，含今昨 OHLC）──
+    // ── 上市：OpenAPI 取股票清單（不做日期比對，只當量預篩用）→ STOCK_DAY 取精確 OHLC ──
     if (market !== 'tpex') {
-      status.textContent = '下載上市今日資料（OpenAPI）...';
-      const twseToday = await fetchTWSEAll(dateStr);
-
-      if (!twseToday?.length) {
-        warnings.push('上市今日無資料（可能非交易日）');
-      } else {
-        // 預篩：今日多頭 + 量足夠，大幅減少後續個股請求數
-        const candidates = [];
-        for (const row of twseToday) {
-          const code = String(row[0]).trim();
-          if (!code || code.length > 5) continue;
-          const o = engNum(row[5]), c = engNum(row[8]), v = engNum(row[2]) / 1000;
-          if (!(o > 0) || isNaN(c) || c <= o || v < volMin) continue;
-          candidates.push({code, name: String(row[1]).trim()});
+      status.textContent = '取上市股票清單（OpenAPI）...';
+      const candidates = [];
+      try {
+        const r = await fetch('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',
+          {signal: AbortSignal.timeout(15000)});
+        const j = await r.json();
+        if (Array.isArray(j) && j.length) {
+          const apiDate = j[0].date || j[0].Date || '?';
+          console.log('[OpenAPI] 回傳日期', apiDate, '，共', j.length, '筆，欄位:', Object.keys(j[0]).join(','));
+          for (const s of j) {
+            if (!s.Code || s.Code.length > 5) continue;
+            const v = engNum(s.TradeVolume) / 1000;  // 股 → 張
+            if (v < volMin) continue;
+            candidates.push({code: s.Code, name: s.Name || s.Code});
+          }
         }
+      } catch(e) { console.warn('[OpenAPI]', e.message); }
 
+      if (!candidates.length) {
+        warnings.push('上市股票清單無法取得');
+      } else {
         const total = candidates.length;
-        status.textContent = `上市多頭候選 ${total} 檔，取個股歷史（約 ${Math.ceil(total/10)} 秒）...`;
+        status.textContent = `上市高量股 ${total} 檔，取個股歷史（約 ${Math.ceil(total/10)} 秒）...`;
 
         // 批次取個股 STOCK_DAY（CORS-free）：整月資料含今日和昨日
         const CONC = 10;
