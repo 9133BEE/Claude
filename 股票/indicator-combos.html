@@ -16,18 +16,38 @@ a:hover{text-decoration:underline}
 .topbar a:hover{color:#58a6ff;border-color:#58a6ff;text-decoration:none}
 
 .hero{background:linear-gradient(135deg,#0d1117 0%,#1a2035 50%,#0d1117 100%);padding:48px 20px 32px;text-align:center;border-bottom:1px solid #30363d}
-.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{color:#8b949e;font-size:1rem;max-width:680px;margin:0 auto 8px}
-.hero-badge{display:inline-block;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:#60a5fa;font-size:.78rem;padding:4px 12px;border-radius:20px;margin-top:8px}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:#8b949e;font-size:1rem;max-width:680px;margin:0 auto 10px}
+.hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.hero-badge{display:inline-block;font-size:.78rem;padding:4px 12px;border-radius:20px}
+.hero-badge.b1{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:#60a5fa}
+.hero-badge.b2{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);color:#c4b5fd}
 
-.grid{max-width:1200px;margin:0 auto;padding:28px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:20px}
+.section-label{max-width:1200px;margin:28px auto 0;padding:0 20px}
+.section-label h2{font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8b949e;padding:6px 14px;border-left:3px solid #3b82f6;background:rgba(59,130,246,.06);border-radius:0 6px 6px 0;display:inline-block}
+.section-label.smc-sec h2{border-color:#8b5cf6;background:rgba(139,92,246,.06);color:#c4b5fd}
 
-.card{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;gap:0;transition:border-color .2s,box-shadow .2s}
+.grid{max-width:1200px;margin:0 auto;padding:16px 20px 28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:20px}
+
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,box-shadow .2s}
 .card:hover{border-color:#3b82f6;box-shadow:0 4px 20px rgba(59,130,246,.08)}
-.card-header{padding:14px 16px 10px;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid #21262d}
+.card.smc{border-top:2px solid #8b5cf6}
+.card.smc:hover{border-color:#8b5cf6;box-shadow:0 4px 20px rgba(139,92,246,.1)}
+.card-header{padding:14px 16px 8px;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid #21262d}
 .card-num{font-size:11px;font-weight:700;color:#3b82f6;background:rgba(59,130,246,.12);border-radius:4px;padding:2px 7px;white-space:nowrap;margin-top:3px;flex-shrink:0}
+.card.smc .card-num{color:#c4b5fd;background:rgba(139,92,246,.15)}
 .card-title{font-size:.95rem;font-weight:700;color:#e6edf3;line-height:1.3}
 .card-desc{font-size:.78rem;color:#8b949e;margin-top:4px;line-height:1.5}
+.card-tags{padding:8px 16px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid #21262d}
+.tag{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.t-tw{background:rgba(29,78,216,.15);color:#93bbf8;border:1px solid rgba(29,78,216,.3)}
+.t-us{background:rgba(22,163,74,.15);color:#6ee7a0;border:1px solid rgba(22,163,74,.3)}
+.t-fx{background:rgba(217,119,6,.15);color:#fcd34d;border:1px solid rgba(217,119,6,.3)}
+.t-crypto{background:rgba(124,58,237,.15);color:#d8b4fe;border:1px solid rgba(124,58,237,.3)}
+.t-fut{background:rgba(234,88,12,.15);color:#fdba74;border:1px solid rgba(234,88,12,.3)}
+.t-txf{background:rgba(220,38,38,.15);color:#fca5a5;border:1px solid rgba(220,38,38,.3)}
+.t-com{background:rgba(161,98,7,.15);color:#fde68a;border:1px solid rgba(161,98,7,.3)}
+.t-all{background:rgba(107,114,128,.15);color:#d1d5db;border:1px solid rgba(107,114,128,.3)}
 .card-body{padding:12px 16px}
 ul.ind-list{list-style:none;display:flex;flex-direction:column;gap:7px}
 ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-height:1.4}
@@ -48,10 +68,15 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
 
 <div class="hero">
   <h1>TV 指標組合</h1>
-  <p>20 組 TradingView 實用指標組合，涵蓋趨勢、動能、籌碼、波動率等多種交易風格。每組最多 5 個指標，在 TradingView 搜尋欄輸入英文名稱即可套用。</p>
-  <span class="hero-badge">20 組 · 每組最多 5 指標</span>
+  <p>40 組 TradingView 實用指標組合，涵蓋 SMC、FVG、ICT、Wyckoff、Elliott Wave、籌碼分析等多種交易風格。每組最多 5 個指標，含適用商品標示。</p>
+  <div class="hero-badges">
+    <span class="hero-badge b1">40 組 · 每組最多 5 指標</span>
+    <span class="hero-badge b2">SMC / FVG / ICT / Wyckoff / COT</span>
+  </div>
 </div>
 
+<!-- ── SECTION 1: 技術分析基礎組 ── -->
+<div class="section-label"><h2>技術分析基礎組（01–20）</h2></div>
 <div class="grid">
 
   <!-- 01 -->
@@ -62,6 +87,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">資金動能觀察</div>
         <div class="card-desc">追蹤主力資金流向與成交量動能，確認價格趨勢有無量能支撐</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span><span class="tag t-crypto">加密貨幣</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -83,6 +111,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">分析買賣訂單的力量對比，捕捉機構進場痕跡與短期供需失衡</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-fut">期貨</span><span class="tag t-crypto">加密貨幣</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Volume Delta</span><span class="ind-sep">—</span><span class="ind-role">主動買賣量差值，顯示每根K棒的訂單淨流向</span></li>
@@ -102,6 +133,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">經典趨勢跟蹤</div>
         <div class="card-desc">適合中長線波段操作，確認主趨勢方向並在回調時找進場點</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -123,6 +157,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">捕捉價格在短時間內快速加速的動能爆發機會，適合日內與隔日沖</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span><span class="tag t-txf">台指期</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Rate of Change (ROC)</span><span class="ind-sep">—</span><span class="ind-role">價格變動速率，顯示動能加速或減速</span></li>
@@ -142,6 +179,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">波動率策略</div>
         <div class="card-desc">利用波動率擴張與收縮週期，在低波動末期布局高勝率突破</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -163,6 +203,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">找出關鍵價格帶的供需牆，提高進出場定價精確度</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Pivot Points (Standard)</span><span class="ind-sep">—</span><span class="ind-role">日/週/月樞軸點，提供結構性支撐壓力參考</span></li>
@@ -182,6 +225,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">籌碼分析組合</div>
         <div class="card-desc">解讀三大法人與大戶的籌碼動向，順著主力方向操作</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -203,6 +249,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">在市場情緒極端時逆勢布局，捕捉技術性反彈或回落機會</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Relative Strength Index (RSI 14)</span><span class="ind-sep">—</span><span class="ind-role">70/30 超買超賣門檻，背離信號預示反轉</span></li>
@@ -222,6 +271,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">型態確認工具組</div>
         <div class="card-desc">輔助確認 K 線型態的有效性，過濾假突破提升進場勝率</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -243,6 +295,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">以多條均線的空間排列判斷趨勢成熟度，適合波段持有決策</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Hull Moving Average (HMA)</span><span class="ind-sep">—</span><span class="ind-role">低延遲均線，減少訊號落後問題</span></li>
@@ -262,6 +317,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">突破交易系統</div>
         <div class="card-desc">識別整理末期的量縮跡象，在有效突破當下追入並管理風險</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span><span class="tag t-crypto">加密貨幣</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -283,6 +341,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">利用指標與價格的背離現象，提前預警趨勢動能衰竭與轉折</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span><span class="tag t-fx">外匯</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">RSI Divergence</span><span class="ind-sep">—</span><span class="ind-role">RSI高低點與價格背離，最常見的反轉預警</span></li>
@@ -302,6 +363,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">趨勢強度評估</div>
         <div class="card-desc">量化趨勢的健康程度，避免在弱勢趨勢中強行追多或做空</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -323,6 +387,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">在價格偏離均值過大時逆勢操作，適合區間震盪市場環境</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span><span class="tag t-fx">外匯</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Bollinger Bands %B</span><span class="ind-sep">—</span><span class="ind-role">價格在通道內的相對位置，>1 或 &lt;0 代表極端偏離</span></li>
@@ -342,6 +409,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">多時框架共振</div>
         <div class="card-desc">對齊日線、週線、月線方向，只在大時框架方向一致時進場</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -363,6 +433,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">解讀量與價的配合關係，識別主力出貨、吸籌與量縮整理</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Volume</span><span class="ind-sep">—</span><span class="ind-role">最基礎的量能指標，量增價漲為健康走勢</span></li>
@@ -382,6 +455,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">情緒與市場寬度</div>
         <div class="card-desc">評估整體市場健康度與投資人情緒，避免在市場極端時追高殺低</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-us">美股</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -403,6 +479,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">利用時間週期規律制定策略，結合月效應與統計優勢提高勝率</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-us">美股</span><span class="tag t-com">商品期貨</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Hurst Exponent</span><span class="ind-sep">—</span><span class="ind-role">判斷市場是趨勢持續或均值回歸的統計特性</span></li>
@@ -422,6 +501,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-title">停損停利管理</div>
         <div class="card-desc">用量化方式設定動態停損與獲利目標，讓風險管理有據可循</div>
       </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
     </div>
     <div class="card-body">
       <ul class="ind-list">
@@ -443,6 +525,9 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <div class="card-desc">以多指標評分系統篩選強勢股，聚焦在技術面最強的標的</div>
       </div>
     </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span>
+    </div>
     <div class="card-body">
       <ul class="ind-list">
         <li><span class="ind-name">Relative Strength Index (RSI 14)</span><span class="ind-sep">—</span><span class="ind-role">RSI>50 且持續上升為強勢股基本條件</span></li>
@@ -450,6 +535,472 @@ ul.ind-list li{display:flex;align-items:baseline;gap:6px;font-size:.8rem;line-he
         <li><span class="ind-name">Relative Strength (RS Rating)</span><span class="ind-sep">—</span><span class="ind-role">與大盤相比的相對強弱，聚焦市場領頭羊</span></li>
         <li><span class="ind-name">Volume (20-day MA)</span><span class="ind-sep">—</span><span class="ind-role">成交量持續高於20日均量，代表機構持續介入</span></li>
         <li><span class="ind-name">EMA (21/55) Golden Cross</span><span class="ind-sep">—</span><span class="ind-role">短線均線上穿中線確認強勢趨勢啟動</span></li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- .grid -->
+
+<!-- ── SECTION 2: 金融分析師進階組 ── -->
+<div class="section-label smc-sec"><h2>金融分析師進階組（21–40）· SMC / FVG / ICT / Wyckoff</h2></div>
+<div class="grid">
+
+  <!-- 21 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">21</span>
+      <div>
+        <div class="card-title">SMC 核心架構</div>
+        <div class="card-desc">Smart Money Concepts 基礎五件組：識別機構留下的訂單痕跡與市場結構轉折</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-fx">外匯</span><span class="tag t-crypto">加密貨幣</span><span class="tag t-fut">期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Order Block Finder</span><span class="ind-sep">—</span><span class="ind-role">機構掛單留下的K棒結構，做多/空的最佳進場區</span></li>
+        <li><span class="ind-name">Fair Value Gap (FVG)</span><span class="ind-sep">—</span><span class="ind-role">三K組合跳空不平衡區間，價格傾向回補後再繼續</span></li>
+        <li><span class="ind-name">Break of Structure (BOS)</span><span class="ind-sep">—</span><span class="ind-role">市場結構突破，確認趨勢延伸方向</span></li>
+        <li><span class="ind-name">Change of Character (CHoCH)</span><span class="ind-sep">—</span><span class="ind-role">市場特性改變，預示趨勢即將反轉的早期信號</span></li>
+        <li><span class="ind-name">Liquidity Sweep Indicator</span><span class="ind-sep">—</span><span class="ind-role">流動性獵殺止損後的反向進場，機構最常用手法</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 22 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">22</span>
+      <div>
+        <div class="card-title">FVG 不平衡策略</div>
+        <div class="card-desc">Fair Value Gap 專項組合：利用價格不平衡區間作為精確進場與目標位</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-fx">外匯</span><span class="tag t-crypto">加密貨幣</span><span class="tag t-fut">期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Fair Value Gap (FVG)</span><span class="ind-sep">—</span><span class="ind-role">三K缺口不平衡區，機構填補目標與支撐壓力</span></li>
+        <li><span class="ind-name">Inverse FVG (IFVG)</span><span class="ind-sep">—</span><span class="ind-role">被突破的FVG反轉成新支撐或壓力，強度更高</span></li>
+        <li><span class="ind-name">Volume Imbalance</span><span class="ind-sep">—</span><span class="ind-role">成交量不均衡區，與FVG性質相近但常被忽略</span></li>
+        <li><span class="ind-name">MACD</span><span class="ind-sep">—</span><span class="ind-role">驗證FVG回測方向有無動能支撐，避免反向穿透</span></li>
+        <li><span class="ind-name">ATR</span><span class="ind-sep">—</span><span class="ind-role">依ATR判斷FVG進場後合理的停損幅度</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 23 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">23</span>
+      <div>
+        <div class="card-title">ICT 機構交易法</div>
+        <div class="card-desc">Inner Circle Trader 核心工具組：時段、折溢價、最佳進場區間的系統性整合</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-fx">外匯</span><span class="tag t-fut">股指期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">ICT Kill Zones</span><span class="ind-sep">—</span><span class="ind-role">亞洲/倫敦/紐約三大開盤高動能交易時段標記</span></li>
+        <li><span class="ind-name">Premium &amp; Discount Array (PD Array)</span><span class="ind-sep">—</span><span class="ind-role">斐波那契中線以上溢價賣、以下折價買</span></li>
+        <li><span class="ind-name">Optimal Trade Entry (OTE)</span><span class="ind-sep">—</span><span class="ind-role">0.618~0.79 回調區最佳進場，勝率最高的ICT入場點</span></li>
+        <li><span class="ind-name">Silver Bullet</span><span class="ind-sep">—</span><span class="ind-role">紐約時段特定時段FVG進場的ICT高勝率模型</span></li>
+        <li><span class="ind-name">Turtle Soup</span><span class="ind-sep">—</span><span class="ind-role">假突破後逆勢捕捉：突破近期高低後反向進場</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 24 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">24</span>
+      <div>
+        <div class="card-title">Wyckoff 市場週期</div>
+        <div class="card-desc">識別主力四階段操作結構：吸籌→上漲→出貨→下跌，預判大波段方向</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span><span class="tag t-crypto">加密貨幣</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Wyckoff Accumulation/Distribution</span><span class="ind-sep">—</span><span class="ind-role">識別主力吸籌或出貨的盤整結構（9個子階段）</span></li>
+        <li><span class="ind-name">Volume Spread Analysis (VSA)</span><span class="ind-sep">—</span><span class="ind-role">K棒振幅與量的對比，解讀主力意圖</span></li>
+        <li><span class="ind-name">Springs &amp; Upthrusts</span><span class="ind-sep">—</span><span class="ind-role">彈簧/上升測試：假突破確認區間邊界，高勝率反轉</span></li>
+        <li><span class="ind-name">Point of Control (Volume Profile)</span><span class="ind-sep">—</span><span class="ind-role">最高成交量價位，對應主力平均持倉成本</span></li>
+        <li><span class="ind-name">Composite Man Phase</span><span class="ind-sep">—</span><span class="ind-role">標記當前處於Wyckoff哪個階段，輔助判斷趨勢成熟度</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 25 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">25</span>
+      <div>
+        <div class="card-title">流動性獵殺策略</div>
+        <div class="card-desc">追蹤機構掃蕩止損的行為模式，在流動性被清除後的反向點進場</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-crypto">加密貨幣</span><span class="tag t-fx">外匯</span><span class="tag t-fut">期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Equal Highs/Equal Lows</span><span class="ind-sep">—</span><span class="ind-role">雙頂/雙底的平台區，大量止損聚集等待被掃</span></li>
+        <li><span class="ind-name">Buy-Side / Sell-Side Liquidity</span><span class="ind-sep">—</span><span class="ind-role">波段高點上方(買盤流動性)與低點下方(賣盤)標記</span></li>
+        <li><span class="ind-name">Inducement (IDM)</span><span class="ind-sep">—</span><span class="ind-role">誘多/誘空陷阱，吸引散戶在不利位置進場後反轉</span></li>
+        <li><span class="ind-name">Displacement Candle</span><span class="ind-sep">—</span><span class="ind-role">強勁單K棒留下FVG，標誌機構力量介入的時間點</span></li>
+        <li><span class="ind-name">Liquidity Void</span><span class="ind-sep">—</span><span class="ind-role">快速移動產生的無成交空白區，回測時缺乏支撐</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 26 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">26</span>
+      <div>
+        <div class="card-title">市場結構 + 訂單塊</div>
+        <div class="card-desc">用高低點序列判斷趨勢結構，結合訂單塊找到機構偏好的進場價格</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Market Structure (HH/HL/LH/LL)</span><span class="ind-sep">—</span><span class="ind-role">連續高低點判斷趨勢：HH+HL=多頭，LH+LL=空頭</span></li>
+        <li><span class="ind-name">Bullish/Bearish Order Block</span><span class="ind-sep">—</span><span class="ind-role">上漲/下跌前最後一根反向K棒，機構主要掛單區</span></li>
+        <li><span class="ind-name">Mitigation Block</span><span class="ind-sep">—</span><span class="ind-role">訂單塊被部分消化後的剩餘區域，二次進場機會</span></li>
+        <li><span class="ind-name">Break of Structure (BOS) / MSS</span><span class="ind-sep">—</span><span class="ind-role">BOS確認趨勢延伸；MSS（結構轉換）預告方向改變</span></li>
+        <li><span class="ind-name">Supply &amp; Demand Zones</span><span class="ind-sep">—</span><span class="ind-role">機構大量買賣留下的供需區，高勝率支撐壓力帶</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 27 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">27</span>
+      <div>
+        <div class="card-title">Elliott Wave 電浪計數</div>
+        <div class="card-desc">波浪理論完整工具組：識別1-5推進浪與A-B-C修正浪，預判大級別轉折</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span><span class="tag t-fx">外匯</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Elliott Wave Oscillator (EWO)</span><span class="ind-sep">—</span><span class="ind-role">第3浪動量最強，用於確認浪數與動能衰竭位置</span></li>
+        <li><span class="ind-name">RSI (14)</span><span class="ind-sep">—</span><span class="ind-role">第3浪RSI最強；第5浪頂部常見RSI背離警示</span></li>
+        <li><span class="ind-name">Fibonacci Retracement (0.382/0.618)</span><span class="ind-sep">—</span><span class="ind-role">第2、4浪典型回調位，第4浪不得低於第1浪頂</span></li>
+        <li><span class="ind-name">MACD</span><span class="ind-sep">—</span><span class="ind-role">浪間動能對比；第5浪MACD低於第3浪為衰竭信號</span></li>
+        <li><span class="ind-name">Zigzag Indicator</span><span class="ind-sep">—</span><span class="ind-role">自動連接波段高低點，輔助電浪結構視覺化</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 28 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">28</span>
+      <div>
+        <div class="card-title">VSA 量差分析</div>
+        <div class="card-desc">Volume Spread Analysis：解讀K棒振幅與量能的背後含義，追蹤主力真實意圖</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Volume Spread Analysis (VSA)</span><span class="ind-sep">—</span><span class="ind-role">量大振幅小=主力消化；量小振幅大=主力控盤</span></li>
+        <li><span class="ind-name">No Supply Bar</span><span class="ind-sep">—</span><span class="ind-role">量縮下跌K棒，代表空方力量衰竭，主力惜售</span></li>
+        <li><span class="ind-name">Climax Volume</span><span class="ind-sep">—</span><span class="ind-role">天量換手K棒，行情接近末端的警示信號</span></li>
+        <li><span class="ind-name">Test Bar</span><span class="ind-sep">—</span><span class="ind-role">量縮低探後快速收回，測試空方力量是否耗盡</span></li>
+        <li><span class="ind-name">Effort vs Result</span><span class="ind-sep">—</span><span class="ind-role">大量小漲=出貨；小量大漲=吸籌，量價效率判讀</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 29 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">29</span>
+      <div>
+        <div class="card-title">期貨 COT 籌碼分析</div>
+        <div class="card-desc">追蹤美國CFTC期貨持倉報告，了解商業避險者與大型投機者的籌碼動向</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-com">商品期貨</span><span class="tag t-fx">外匯期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">COT (Commitment of Traders)</span><span class="ind-sep">—</span><span class="ind-role">三大類持倉人多空倉位，商業多空反轉為最強信號</span></li>
+        <li><span class="ind-name">Open Interest</span><span class="ind-sep">—</span><span class="ind-role">未平倉合約量增減：量增代表新資金入場確認方向</span></li>
+        <li><span class="ind-name">Speculative Net Position</span><span class="ind-sep">—</span><span class="ind-role">非商業淨多/空達極值時往往出現趨勢反轉</span></li>
+        <li><span class="ind-name">Basis (Cash-Futures Spread)</span><span class="ind-sep">—</span><span class="ind-role">現貨與期貨差價，判斷升貼水結構與市場預期</span></li>
+        <li><span class="ind-name">Seasonal Pattern</span><span class="ind-sep">—</span><span class="ind-role">農產品/能源歷史季節性規律，提高順勢交易勝率</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 30 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">30</span>
+      <div>
+        <div class="card-title">加密貨幣核心指標</div>
+        <div class="card-desc">加密市場獨有的鏈上與市場情緒指標，判斷多空週期與資金輪動時機</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-crypto">加密貨幣</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Bitcoin Dominance</span><span class="ind-sep">—</span><span class="ind-role">BTC市值佔比下降=山寨季來臨，上升=避險需求增加</span></li>
+        <li><span class="ind-name">Crypto Fear &amp; Greed Index</span><span class="ind-sep">—</span><span class="ind-role">0=極度恐慌逢低買；100=極度貪婪考慮減倉</span></li>
+        <li><span class="ind-name">Funding Rate</span><span class="ind-sep">—</span><span class="ind-role">永續合約資金費率：高正值=多頭擁擠，警惕急跌</span></li>
+        <li><span class="ind-name">Long/Short Ratio</span><span class="ind-sep">—</span><span class="ind-role">多空比>3代表過度樂觀，極端值往往為反轉信號</span></li>
+        <li><span class="ind-name">Exchange Net Flow</span><span class="ind-sep">—</span><span class="ind-role">交易所淨流出=持幣意願增加看多；淨流入=賣壓增加</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 31 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">31</span>
+      <div>
+        <div class="card-title">台指期日內操作組</div>
+        <div class="card-desc">專為台指期日內交易設計，結合開盤框架、VWAP與選擇權籌碼精準定位</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-txf">台指期</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Opening Range (前15分高低點)</span><span class="ind-sep">—</span><span class="ind-role">開盤框架定錨，突破方向決定當日強弱</span></li>
+        <li><span class="ind-name">VWAP + Standard Deviation Bands</span><span class="ind-sep">—</span><span class="ind-role">日內均價帶：偏離2σ以上為短線過熱或過冷</span></li>
+        <li><span class="ind-name">Market Profile TPO</span><span class="ind-sep">—</span><span class="ind-role">時間價格機會圖，找出當日公平價值區與初始平衡</span></li>
+        <li><span class="ind-name">TICK Index (台股)</span><span class="ind-sep">—</span><span class="ind-role">全體股票漲跌家數差，即時衡量多空買賣力道</span></li>
+        <li><span class="ind-name">Put/Call Ratio (台指選擇權)</span><span class="ind-sep">—</span><span class="ind-role">台指選擇權買賣比，過高代表散戶過度看空（逆向）</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 32 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">32</span>
+      <div>
+        <div class="card-title">外匯時段策略組</div>
+        <div class="card-desc">根據亞洲/倫敦/紐約三大時段特性制定策略，在最佳流動性視窗進場</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-fx">外匯</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Session Highlighter (Asia/London/NY)</span><span class="ind-sep">—</span><span class="ind-role">三大時段色塊標記，視覺化各時段波動與流動性</span></li>
+        <li><span class="ind-name">London Kill Zone (2–5am ET)</span><span class="ind-sep">—</span><span class="ind-role">倫敦開盤高動能交易窗口，常見FVG與掃流動性</span></li>
+        <li><span class="ind-name">New York Open (7–10am ET)</span><span class="ind-sep">—</span><span class="ind-role">紐約開盤最大日內波動，ICT入場模型的核心時段</span></li>
+        <li><span class="ind-name">Asian Range Breakout</span><span class="ind-sep">—</span><span class="ind-role">亞洲盤整區間突破：倫敦/紐約開盤常見方向選擇</span></li>
+        <li><span class="ind-name">DXY Correlation</span><span class="ind-sep">—</span><span class="ind-role">美元指數強弱與非美貨幣的反向連動確認方向</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 33 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">33</span>
+      <div>
+        <div class="card-title">美股選擇權流分析</div>
+        <div class="card-desc">解讀期權市場的 Gamma/Delta 曝險與到期日力學，預判短期壓制或助漲區</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-us">美股</span><span class="tag t-fut">美股期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">GEX (Gamma Exposure)</span><span class="ind-sep">—</span><span class="ind-role">GEX>0做市商壓抑波動；GEX&lt;0波動放大風險</span></li>
+        <li><span class="ind-name">DEX (Delta Exposure)</span><span class="ind-sep">—</span><span class="ind-role">Delta淨曝險顯示做市商對沖方向，影響短期走勢</span></li>
+        <li><span class="ind-name">Max Pain</span><span class="ind-sep">—</span><span class="ind-role">選擇權到期最大痛苦點，股價傾向到期前向此收斂</span></li>
+        <li><span class="ind-name">0DTE Options Flow</span><span class="ind-sep">—</span><span class="ind-role">當日到期選擇權流量，反映短線多空博弈與方向偏向</span></li>
+        <li><span class="ind-name">Implied Volatility (IV) Rank</span><span class="ind-sep">—</span><span class="ind-role">IV歷史百分位：>80考慮賣選擇權；&lt;20考慮買</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 34 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">34</span>
+      <div>
+        <div class="card-title">黃金白銀大宗商品</div>
+        <div class="card-desc">貴金屬與大宗商品專用組合：結合實質利率、美元、COT籌碼做多維判斷</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-com">商品期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Gold/Silver Ratio</span><span class="ind-sep">—</span><span class="ind-role">金銀比高值時白銀相對低估，兩者走勢分歧預警</span></li>
+        <li><span class="ind-name">DXY (US Dollar Index)</span><span class="ind-sep">—</span><span class="ind-role">美元強弱與黃金呈負相關，DXY轉弱利好貴金屬</span></li>
+        <li><span class="ind-name">US Real Rates (TIPS Yield)</span><span class="ind-sep">—</span><span class="ind-role">負實質利率環境利好黃金，實質利率是定價核心</span></li>
+        <li><span class="ind-name">COT Gold Net Position</span><span class="ind-sep">—</span><span class="ind-role">大型投機者黃金淨多/空倉：極端值常為趨勢反轉點</span></li>
+        <li><span class="ind-name">Gold Seasonality</span><span class="ind-sep">—</span><span class="ind-role">黃金歷史季節性：9月/Q4通常走強，夏季相對低迷</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 35 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">35</span>
+      <div>
+        <div class="card-title">宏觀跨市場連動</div>
+        <div class="card-desc">監控跨資產連動關係：債券、美元、黃金、股市同時判讀，掌握大環境方向</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-us">美股</span><span class="tag t-com">商品期貨</span><span class="tag t-fx">外匯</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">VIX (CBOE Volatility Index)</span><span class="ind-sep">—</span><span class="ind-role">恐慌指數：>30市場恐慌逢低機會；&lt;15自滿警惕</span></li>
+        <li><span class="ind-name">US 10Y Treasury Yield</span><span class="ind-sep">—</span><span class="ind-role">10年期美債殖利率：急升壓制成長股，利好金融股</span></li>
+        <li><span class="ind-name">DXY (US Dollar Index)</span><span class="ind-sep">—</span><span class="ind-role">美元強弱影響新興市場、商品與非美股市的走勢</span></li>
+        <li><span class="ind-name">S&amp;P 500 Breadth (A/D Line)</span><span class="ind-sep">—</span><span class="ind-role">廣度指標：大盤新高但廣度未確認=頂部警訊</span></li>
+        <li><span class="ind-name">Gold/SPX Ratio</span><span class="ind-sep">—</span><span class="ind-role">黃金vs股市比值：上升代表風險規避情緒主導市場</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 36 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">36</span>
+      <div>
+        <div class="card-title">加密週期鏈上指標</div>
+        <div class="card-desc">比特幣鏈上數據專項組合：從鏈上估值、持倉成本與週期模型判斷牛熊位置</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-crypto">加密貨幣</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Pi Cycle Top Indicator</span><span class="ind-sep">—</span><span class="ind-role">111DMA×2穿越350DMA為歷史牛市頂部信號</span></li>
+        <li><span class="ind-name">200-Week MA Heatmap</span><span class="ind-sep">—</span><span class="ind-role">200週均線周圍為歷史底部區域，熱圖顯示過熱程度</span></li>
+        <li><span class="ind-name">MVRV Z-Score</span><span class="ind-sep">—</span><span class="ind-role">市值/已實現市值：>7為歷史頂部區域，&lt;0為底部</span></li>
+        <li><span class="ind-name">Stock-to-Flow (S2F) Model</span><span class="ind-sep">—</span><span class="ind-role">比特幣稀缺性模型，追蹤價格相對S2F估值的偏差</span></li>
+        <li><span class="ind-name">Altcoin Season Index</span><span class="ind-sep">—</span><span class="ind-role">>75進入山寨季；&lt;25比特幣主導，資金輪動訊號</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 37 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">37</span>
+      <div>
+        <div class="card-title">SMC 高階進場模型</div>
+        <div class="card-desc">Breaker/Rejection/Propulsion Block 進階組合，結合高時框架CHoCH的精確進場</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-fx">外匯</span><span class="tag t-crypto">加密貨幣</span><span class="tag t-fut">股指期貨</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Breaker Block</span><span class="ind-sep">—</span><span class="ind-role">被結構突破的訂單塊反轉角色，成新的進場支撐/壓力</span></li>
+        <li><span class="ind-name">Rejection Block</span><span class="ind-sep">—</span><span class="ind-role">長上/下影線確認的拒絕區：機構在此強力介入反轉</span></li>
+        <li><span class="ind-name">Propulsion Block</span><span class="ind-sep">—</span><span class="ind-role">快速推升前的整理K棒，再測試時的高勝率進場點</span></li>
+        <li><span class="ind-name">Change of Character (CHoCH)</span><span class="ind-sep">—</span><span class="ind-role">高時框架CHoCH確認方向，低時框架FVG精確進場</span></li>
+        <li><span class="ind-name">Fibonacci OTE (0.618–0.786)</span><span class="ind-sep">—</span><span class="ind-role">結合SMC結構的最佳進場區間，勝率最高的回調位</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 38 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">38</span>
+      <div>
+        <div class="card-title">Heikin Ashi 趨勢跟蹤</div>
+        <div class="card-desc">平均K線配合趨勢工具，過濾雜訊後清晰捕捉趨勢延續與轉折訊號</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Heikin Ashi Candles</span><span class="ind-sep">—</span><span class="ind-role">平均K線：連續無下影線=強勢上漲，無上影線=強勢下跌</span></li>
+        <li><span class="ind-name">Supertrend</span><span class="ind-sep">—</span><span class="ind-role">ATR趨勢線配合HA：同向翻色為最強進場信號</span></li>
+        <li><span class="ind-name">EMA (20)</span><span class="ind-sep">—</span><span class="ind-role">HA回測EMA不破代表趨勢健康，跌破才考慮出場</span></li>
+        <li><span class="ind-name">RSI (14)</span><span class="ind-sep">—</span><span class="ind-role">趨勢K棒RSI持續>50；連續回測50不破=趨勢強勢</span></li>
+        <li><span class="ind-name">Volume</span><span class="ind-sep">—</span><span class="ind-role">HA方向轉換時放量確認；轉換但量縮需提高警覺</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 39 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">39</span>
+      <div>
+        <div class="card-title">高勝率型態確認組</div>
+        <div class="card-desc">杯柄、頭肩等經典型態的完整確認工具，確保量能、動能與相對強弱同時支撐</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-tw">台股</span><span class="tag t-us">美股</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Cup &amp; Handle / Head &amp; Shoulders</span><span class="ind-sep">—</span><span class="ind-role">杯柄突破/頭肩型態自動識別與目標位計算</span></li>
+        <li><span class="ind-name">MACD Histogram Zero-Cross</span><span class="ind-sep">—</span><span class="ind-role">柱狀圖零線穿越確認型態突破方向有動能支撐</span></li>
+        <li><span class="ind-name">Relative Volume (RVOL)</span><span class="ind-sep">—</span><span class="ind-role">突破當日量能>均量1.5倍，量價齊揚才算有效突破</span></li>
+        <li><span class="ind-name">EMA (21/55)</span><span class="ind-sep">—</span><span class="ind-role">均線排列確認型態方向：突破時股價在均線上方更佳</span></li>
+        <li><span class="ind-name">Anchored VWAP (from breakout)</span><span class="ind-sep">—</span><span class="ind-role">突破點起算VWAP：回測不破代表法人持有意願強</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 40 -->
+  <div class="card smc">
+    <div class="card-header">
+      <span class="card-num">40</span>
+      <div>
+        <div class="card-title">AI 量化綜合濾網</div>
+        <div class="card-desc">機器學習與統計回歸工具組：自適應均線、回歸通道與Z-Score組合，適合量化策略</div>
+      </div>
+    </div>
+    <div class="card-tags">
+      <span class="tag t-all">全商品</span>
+    </div>
+    <div class="card-body">
+      <ul class="ind-list">
+        <li><span class="ind-name">Machine Learning Supertrend</span><span class="ind-sep">—</span><span class="ind-role">AI自適應ATR趨勢線，自動優化參數減少假信號</span></li>
+        <li><span class="ind-name">Polynomial Regression Channel</span><span class="ind-sep">—</span><span class="ind-role">多項式回歸通道，動態計算統計意義的支撐壓力帶</span></li>
+        <li><span class="ind-name">Z-Score Normalized RSI</span><span class="ind-sep">—</span><span class="ind-role">標準化RSI，量化超買超賣偏離的統計顯著程度</span></li>
+        <li><span class="ind-name">Adaptive MA (Kaufman AMA)</span><span class="ind-sep">—</span><span class="ind-role">依市場效率自動調整速度：趨勢期快、震盪期慢</span></li>
+        <li><span class="ind-name">Linear Regression Forecast</span><span class="ind-sep">—</span><span class="ind-role">統計預測線延伸，評估當前價格相對回歸路徑的偏差</span></li>
       </ul>
     </div>
   </div>
