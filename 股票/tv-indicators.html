@@ -90,6 +90,19 @@ a{color:#58a6ff;text-decoration:none}
 .nc-stars .s{color:#f59e0b}
 .nc-stars .e{color:#30363d}
 .hidden{display:none!important}
+.search-wrap{margin-left:auto;position:relative;flex-shrink:0}
+.search-input{background:#161b22;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:.82rem;padding:5px 32px 5px 30px;outline:none;width:170px;transition:border-color .15s,width .2s;font-family:inherit}
+.search-input:focus{border-color:#6b7280;width:210px}
+.search-input::placeholder{color:#484f58}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#484f58;font-size:.78rem;pointer-events:none;user-select:none}
+.search-clear{position:absolute;right:7px;top:50%;transform:translateY(-50%);background:none;border:none;color:#484f58;cursor:pointer;font-size:.75rem;display:none;padding:2px;line-height:1}
+.search-clear.show{display:block}
+.search-clear:hover{color:#c9d1d9}
+.fav-btn{position:absolute;top:12px;right:14px;background:none;border:none;color:#30363d;font-size:1rem;cursor:pointer;line-height:1;padding:2px;transition:color .15s,transform .1s}
+.fav-btn:hover{color:#f87171;transform:scale(1.2)}
+.fav-btn.fav-on{color:#f43f5e}
+.fb.fav-fb{color:#f43f5e}
+.fb.fav-fb.on{background:rgba(244,63,94,.12);color:#f43f5e}
 
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;padding:12px 10px;gap:12px}
@@ -181,6 +194,12 @@ a{color:#58a6ff;text-decoration:none}
   <button class="fb v" onclick="filt('vol',this)">量能類 18</button>
   <button class="fb w" onclick="filt('vola',this)">波動類 16</button>
   <button class="fb s" onclick="filt('smc',this)">SMC 類 8</button>
+  <button class="fb fav-fb" onclick="filtFav(this)">♥ 收藏</button>
+  <div class="search-wrap">
+    <span class="search-icon">&#128269;</span>
+    <input class="search-input" id="srch" type="text" placeholder="搜尋指標名稱…" oninput="searchCards(this.value)" autocomplete="off" spellcheck="false">
+    <button class="search-clear" id="srch-clear" onclick="clearSearch()" title="清除">✕</button>
+  </div>
 </div>
 <div class="grid">
 
@@ -7453,9 +7472,12 @@ function switchTab(tab){
   });
 }
 function filt(cat,btn){
+  curCat=cat;
+  document.getElementById('srch').value='';
+  document.getElementById('srch-clear').classList.remove('show');
   document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  document.querySelectorAll('.card').forEach(c=>{
+  document.querySelectorAll('#tab-tv .card').forEach(c=>{
     c.classList.toggle('hidden',cat!=='all'&&!c.classList.contains(cat));
   });
 }
@@ -7482,6 +7504,51 @@ function closePopup(){
 document.addEventListener('click',function(e){
   if(popOpen&&!document.getElementById('chipPopup').contains(e.target))closePopup();
 });
+var curCat='all';
+var favSet=new Set(JSON.parse(localStorage.getItem('tv_favs')||'[]'));
+function searchCards(q){
+  document.getElementById('srch-clear').classList.toggle('show',q.length>0);
+  var s=q.trim().toLowerCase();
+  document.querySelectorAll('#tab-tv .card').forEach(function(c){
+    if(s){
+      var t=(c.querySelector('.nc-title')||{}).textContent||'';
+      var u=(c.querySelector('.nc-sub')||{}).textContent||'';
+      c.classList.toggle('hidden',!t.toLowerCase().includes(s)&&!u.toLowerCase().includes(s));
+    } else {
+      var show=curCat==='all'||c.classList.contains(curCat)||(curCat==='fav'&&favSet.has(c.id));
+      c.classList.toggle('hidden',!show);
+    }
+  });
+}
+function clearSearch(){
+  var inp=document.getElementById('srch');inp.value='';searchCards('');inp.focus();
+}
+function toggleFav(id,btn){
+  if(favSet.has(id)){favSet.delete(id);btn.classList.remove('fav-on');}
+  else{favSet.add(id);btn.classList.add('fav-on');}
+  localStorage.setItem('tv_favs',JSON.stringify([...favSet]));
+  if(curCat==='fav') searchCards(document.getElementById('srch').value);
+}
+function filtFav(btn){
+  curCat='fav';
+  document.getElementById('srch').value='';
+  document.getElementById('srch-clear').classList.remove('show');
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#tab-tv .card').forEach(function(c){
+    c.classList.toggle('hidden',!favSet.has(c.id));
+  });
+}
+(function injectFavBtns(){
+  document.querySelectorAll('#tab-tv .card[id]').forEach(function(c){
+    var btn=document.createElement('button');
+    btn.className='fav-btn'+(favSet.has(c.id)?' fav-on':'');
+    btn.title='收藏';btn.textContent='♥';
+    btn.onclick=function(){toggleFav(c.id,btn);};
+    var head=c.querySelector('.nc-head');
+    if(head) head.style.position='relative',head.appendChild(btn);
+  });
+})();
 const STARS={
   c1:5,c2:5,c3:5,c4:4,c5:4,c6:3,c7:3,c8:5,c9:5,c10:5,
   c11:4,c12:4,c13:3,c14:3,c15:3,c16:5,c17:4,c18:4,c19:3,c20:3,
