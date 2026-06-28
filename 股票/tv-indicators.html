@@ -86,6 +86,10 @@ a{color:#58a6ff;text-decoration:none}
 .cp-close{position:absolute;top:8px;right:10px;background:none;border:none;color:#6b7280;font-size:.9rem;cursor:pointer;line-height:1}
 .card.smc{border-left:2px solid #8b5cf6}
 .card.smc .nc-tag{color:#c4b5fd}
+.card.stat{border-left:2px solid #0d9488}
+.card.stat .nc-tag{color:#2dd4bf}
+.card.patt{border-left:2px solid #f59e0b}
+.card.patt .nc-tag{color:#fcd34d}
 .nc-stars{font-size:.82rem;letter-spacing:2px;margin-top:7px}
 .nc-stars .s{color:#f59e0b}
 .nc-stars .e{color:#30363d}
@@ -172,10 +176,10 @@ a{color:#58a6ff;text-decoration:none}
   <h1>TradingView 指標大全</h1>
   <p>108 個核心指標完整解析 — 設定值、判讀方式、最佳搭配，一張卡片看懂一個指標</p>
   <div class="badges">
-    <span class="badge b-trend">趨勢類 31</span>
-    <span class="badge b-mom">動量類 35</span>
-    <span class="badge b-vol">量能類 18</span>
-    <span class="badge b-vola">波動類 16</span>
+    <span class="badge b-trend">趨勢類 45</span>
+    <span class="badge b-mom">動量類 50</span>
+    <span class="badge b-vol">量能類 31</span>
+    <span class="badge b-vola">波動類 29</span>
     <span class="badge b-smc">SMC 類 8</span>
   </div>
 </div>
@@ -188,12 +192,14 @@ a{color:#58a6ff;text-decoration:none}
 
 <div id="tab-tv">
 <div class="filters">
-  <button class="fb on" onclick="filt('all',this)">全部 108</button>
-  <button class="fb t" onclick="filt('trend',this)">趨勢類 31</button>
-  <button class="fb m" onclick="filt('mom',this)">動量類 35</button>
-  <button class="fb v" onclick="filt('vol',this)">量能類 18</button>
-  <button class="fb w" onclick="filt('vola',this)">波動類 16</button>
+  <button class="fb on" onclick="filt('all',this)">全部 200</button>
+  <button class="fb t" onclick="filt('trend',this)">趨勢類 45</button>
+  <button class="fb m" onclick="filt('mom',this)">動量類 50</button>
+  <button class="fb v" onclick="filt('vol',this)">量能類 31</button>
+  <button class="fb w" onclick="filt('vola',this)">波動類 29</button>
   <button class="fb s" onclick="filt('smc',this)">SMC 類 8</button>
+  <button class="fb" style="color:#2dd4bf" onclick="filt('stat',this)">統計類 19</button>
+  <button class="fb" style="color:#fcd34d" onclick="filt('patt',this)">型態類 18</button>
   <button class="fb fav-fb" onclick="filtFav(this)">♥ 收藏</button>
   <div class="search-wrap">
     <span class="search-icon">&#128269;</span>
