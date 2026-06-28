@@ -7524,11 +7524,22 @@ function clearSearch(){
   var inp=document.getElementById('srch');inp.value='';searchCards('');inp.focus();
 }
 function toggleFav(id,btn){
-  if(favSet.has(id)){favSet.delete(id);btn.classList.remove('fav-on');}
-  else{favSet.add(id);btn.classList.add('fav-on');}
+  var card=document.getElementById(id);
+  var title=card?(card.querySelector('.nc-title')||{}).textContent||id:id;
+  var subcat=card?(card.querySelector('.nc-tag')||{}).textContent||'':'';;
+  var desc=card?(card.querySelector('.nc-sub')||{}).textContent||'':'';
+  if(favSet.has(id)){
+    favSet.delete(id);btn.classList.remove('fav-on');
+    hubRemove('tv_'+id);
+  } else {
+    favSet.add(id);btn.classList.add('fav-on');
+    hubAdd({id:'tv_'+id,srcId:id,title:title.trim(),desc:desc.trim(),cat:'TV 指標',subcat:subcat.trim(),source:'tv',url:'tv-indicators.html#'+id});
+  }
   localStorage.setItem('tv_favs',JSON.stringify([...favSet]));
   if(curCat==='fav') searchCards(document.getElementById('srch').value);
 }
+function hubAdd(item){var h=JSON.parse(localStorage.getItem('hub_favs')||'[]');if(!h.find(x=>x.id===item.id)){h.push({...item,ts:Date.now()});}localStorage.setItem('hub_favs',JSON.stringify(h));}
+function hubRemove(hubId){localStorage.setItem('hub_favs',JSON.stringify(JSON.parse(localStorage.getItem('hub_favs')||'[]').filter(x=>x.id!==hubId)));}
 function filtFav(btn){
   curCat='fav';
   document.getElementById('srch').value='';

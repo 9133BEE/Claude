@@ -419,6 +419,30 @@ a { color: inherit; text-decoration: none; }
 .fav-empty-icon{font-size:2.5rem;margin-bottom:12px}
 .fav-empty p{font-size:.9rem}
 .gnav-btn.fav-btn.active{background:#f59e0b;border-color:#f59e0b;color:#fff}
+/* ── 收藏中心 ── */
+.fav-hub{max-width:820px;margin:0 auto;padding:0 0 48px}
+.fav-cats{display:flex;gap:7px;flex-wrap:wrap;padding:20px 0 16px;border-bottom:1px solid var(--border-subtle);margin-bottom:4px}
+.fav-cat{background:none;border:1px solid var(--border-default);border-radius:20px;padding:5px 14px;font-size:.8rem;cursor:pointer;color:var(--text-muted);transition:all .15s;font-family:var(--font)}
+.fav-cat:hover{border-color:var(--accent);color:var(--accent)}
+.fav-cat.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.fav-cat span{font-size:.72rem;opacity:.75;margin-left:3px}
+.fav-group{margin-top:22px}
+.fav-group-lbl{font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);padding-bottom:8px;border-bottom:1px solid var(--border-subtle);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.fav-group-lbl span{background:var(--bg-inset);border-radius:10px;padding:1px 8px;font-size:.68rem}
+.fav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border-subtle);margin-bottom:7px;transition:border-color .15s;cursor:default}
+.fav-item:hover{border-color:var(--border-strong)}
+.fav-item-content{flex:1;min-width:0}
+.fav-item-title{font-size:.88rem;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-item-desc{font-size:.75rem;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-item-src{font-size:.68rem;font-weight:600;letter-spacing:.04em;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0;background:rgba(29,78,216,.08);color:var(--accent);border:1px solid var(--accent-border)}
+.fav-item-src.src-tv{background:rgba(139,92,246,.08);color:#7c3aed;border-color:rgba(124,58,237,.2)}
+.fav-item-src.src-combo{background:rgba(5,150,105,.08);color:#059669;border-color:rgba(5,150,105,.2)}
+.fav-btn-open{background:none;border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);font-size:.78rem;padding:4px 10px;cursor:pointer;white-space:nowrap;font-family:var(--font);transition:background .12s}
+.fav-btn-open:hover{background:var(--accent-dim)}
+.fav-btn-link{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);font-size:.78rem;padding:4px 10px;text-decoration:none;white-space:nowrap;transition:background .12s}
+.fav-btn-link:hover{background:var(--accent-dim);text-decoration:none}
+.fav-btn-del{background:none;border:none;color:var(--text-muted);font-size:.8rem;padding:4px 7px;cursor:pointer;border-radius:5px;flex-shrink:0;line-height:1;transition:color .12s,background .12s}
+.fav-btn-del:hover{color:#dc2626;background:rgba(220,38,38,.08)}
 
 .card-tags { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 18px 10px; }
 .card-tag {
@@ -1492,6 +1516,89 @@ function saveFavorites() {
   window._syncFavCloud?.(arr);
 }
 
+/* ── 統一收藏中心 hub_favs ── */
+function loadHub(){return JSON.parse(localStorage.getItem('hub_favs')||'[]');}
+function saveHub(h){localStorage.setItem('hub_favs',JSON.stringify(h));}
+function addToHub(item){
+  const h=loadHub();
+  if(!h.find(x=>x.id===item.id)) h.push({...item,ts:Date.now()});
+  saveHub(h);
+}
+function removeFromHub(hubId){
+  saveHub(loadHub().filter(x=>x.id!==hubId));
+  if(currentSection==='favorites') renderFavHub();
+}
+function removeFavItem(hubId){
+  removeFromHub(hubId);
+  if(hubId.startsWith('idx_')){
+    const srcId=hubId.slice(4);
+    favorites.delete(srcId);saveFavorites();
+    document.querySelectorAll(`[data-id="${srcId}"] .card-star`).forEach(b=>b.classList.remove('starred'));
+    updateFavBtn();
+  }
+}
+function setFavCat(cat,btn){
+  document.querySelectorAll('.fav-cat').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFavHub();
+}
+function openIndexCard(cardId,secId){
+  switchTab(secId);
+  setTimeout(()=>{
+    const el=document.getElementById('card-'+cardId);
+    if(el){el.scrollIntoView({behavior:'smooth',block:'center'});toggleCard(cardId);}
+  },120);
+}
+function renderFavHub(){
+  const grid=document.getElementById('cards-grid');
+  const hub=loadHub();
+  if(hub.length===0){
+    grid.innerHTML=`<div class="fav-empty"><div class="fav-empty-icon">☆</div><p>還沒有收藏<br>在任何頁面點擊 ★ 或 ♥ 加入收藏</p></div>`;
+    return;
+  }
+  const activeCat=(document.querySelector('.fav-cat.active')||{}).dataset?.cat||'all';
+  const cats={};hub.forEach(h=>{cats[h.cat]=(cats[h.cat]||0)+1;});
+  const catBtns=`<div class="fav-cats">
+    <button class="fav-cat${activeCat==='all'?' active':''}" data-cat="all" onclick="setFavCat('all',this)">全部 <span>${hub.length}</span></button>
+    ${Object.entries(cats).map(([c,n])=>`<button class="fav-cat${activeCat===c?' active':''}" data-cat="${c}" onclick="setFavCat('${c}',this)">${c} <span>${n}</span></button>`).join('')}
+  </div>`;
+  const filtered=activeCat==='all'?hub:hub.filter(h=>h.cat===activeCat);
+  const groups={};
+  filtered.sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(h=>{
+    const k=h.cat==='TV 指標'?`TV 指標 · ${h.subcat}`:(h.cat==='指標組合'?`指標組合 · ${h.subcat}`:h.subcat||h.cat);
+    if(!groups[k])groups[k]=[];groups[k].push(h);
+  });
+  const srcLabel={index:'股學知識',tv:'TV 指標',combo:'指標組合'};
+  const srcCls={index:'',tv:'src-tv',combo:'src-combo'};
+  const groupsHtml=Object.entries(groups).map(([g,items])=>`
+    <div class="fav-group">
+      <div class="fav-group-lbl">${g} <span>${items.length}</span></div>
+      ${items.map(h=>`
+        <div class="fav-item" id="fav-item-${h.id}">
+          <div class="fav-item-content">
+            <div class="fav-item-title">${h.title}</div>
+            ${h.desc?`<div class="fav-item-desc">${h.desc}</div>`:''}
+          </div>
+          <span class="fav-item-src ${srcCls[h.source]||''}">${srcLabel[h.source]||h.source}</span>
+          ${h.source==='index'
+            ?`<button class="fav-btn-open" onclick="openIndexCard('${h.srcId}','${h.secId}')">→ 展開</button>`
+            :`<a class="fav-btn-link" href="${h.url}">→ 查看</a>`}
+          <button class="fav-btn-del" onclick="removeFavItem('${h.id}')" title="移除">✕</button>
+        </div>`).join('')}
+    </div>`).join('');
+  grid.innerHTML=`<div class="fav-hub">${catBtns}<div class="fav-groups">${groupsHtml}</div></div>`;
+}
+/* 舊 stock-favorites 遷移至 hub_favs */
+(function migrateOldFavs(){
+  if(localStorage.getItem('hub_migrated_v1'))return;
+  const old=JSON.parse(localStorage.getItem('stock-favorites')||'[]');
+  if(old.length){
+    const all=DATA.reduce((acc,s)=>acc.concat(s.cards.map(c=>({...c,_sec:s}))),[]);
+    old.forEach(id=>{const c=all.find(x=>x.id===id);if(c)addToHub({id:'idx_'+id,srcId:id,title:c.title,desc:c.en,cat:'股學知識',subcat:c._sec.title,source:'index',secId:c._sec.id});});
+  }
+  localStorage.setItem('hub_migrated_v1','1');
+})();
+
 window._updateFavFromCloud = ids => {
   favorites = new Set(ids);
   localStorage.setItem('stock-favorites', JSON.stringify(ids));
@@ -1505,7 +1612,15 @@ window._updateFavFromCloud = ids => {
 
 function toggleStar(id, e) {
   e.stopPropagation();
-  if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+  if (favorites.has(id)) {
+    favorites.delete(id);
+    removeFromHub('idx_'+id);
+  } else {
+    favorites.add(id);
+    const all=DATA.reduce((acc,s)=>acc.concat(s.cards.map(c=>({...c,_sec:s}))),[]);
+    const card=all.find(c=>c.id===id);
+    if(card) addToHub({id:'idx_'+id,srcId:id,title:card.title,desc:card.en,cat:'股學知識',subcat:card._sec.title,source:'index',secId:card._sec.id});
+  }
   saveFavorites();
   document.querySelectorAll(`[data-id="${id}"] .card-star`).forEach(btn => {
     btn.classList.toggle('starred', favorites.has(id));
@@ -1513,7 +1628,7 @@ function toggleStar(id, e) {
   });
   const favBtn = document.getElementById('fav-btn');
   if (favBtn) favBtn.textContent = favorites.size > 0 ? `★ 收藏 ${favorites.size}` : '☆ 收藏';
-  if (currentSection === 'favorites') renderSection('favorites');
+  if (currentSection === 'favorites') renderFavHub();
 }
 
 function switchFavorites() {
@@ -1597,13 +1712,10 @@ function getSection(id) {
 }
 
 function renderSection(sectionId) {
+  if (sectionId === 'favorites') { renderFavHub(); return; }
   const section = getSection(sectionId);
   const grid = document.getElementById('cards-grid');
-  if (sectionId === 'favorites' && section.cards.length === 0) {
-    grid.innerHTML = `<div class="fav-empty"><div class="fav-empty-icon">☆</div><p>還沒有收藏的字卡<br>點擊任意字卡右側的 ★ 加入收藏</p></div>`;
-    applyFilters(); return;
-  }
-  if (sectionId === 'all' || sectionId === 'favorites') {
+  if (sectionId === 'all') {
     grid.innerHTML = section.cards.map(c => renderCard(c, c._sec || section)).join('');
   } else {
     grid.innerHTML = section.cards.map(c => renderCard(c, section)).join('');
