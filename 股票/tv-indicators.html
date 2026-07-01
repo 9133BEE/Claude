@@ -180,7 +180,7 @@ a{color:#58a6ff;text-decoration:none}
     <span class="badge b-mom">動量類 50</span>
     <span class="badge b-vol">量能類 31</span>
     <span class="badge b-vola">波動類 29</span>
-    <span class="badge b-smc">SMC 類 8</span>
+    <span class="badge b-smc">SMC 類 9</span>
   </div>
 </div>
 
@@ -197,7 +197,7 @@ a{color:#58a6ff;text-decoration:none}
   <button class="fb m" onclick="filt('mom',this)">動量類 50</button>
   <button class="fb v" onclick="filt('vol',this)">量能類 31</button>
   <button class="fb w" onclick="filt('vola',this)">波動類 29</button>
-  <button class="fb s" onclick="filt('smc',this)">SMC 類 8</button>
+  <button class="fb s" onclick="filt('smc',this)">SMC 類 9</button>
   <button class="fb" style="color:#2dd4bf" onclick="filt('stat',this)">統計類 19</button>
   <button class="fb" style="color:#fcd34d" onclick="filt('patt',this)">型態類 18</button>
   <button class="fb fav-fb" onclick="filtFav(this)">♥ 收藏</button>
@@ -5610,6 +5610,65 @@ a{color:#58a6ff;text-decoration:none}
       <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','EQH/EQL 被掃後往往伴隨 CHoCH，確認趨勢轉換。','c102')">市場結構</span>
     </div></div>
     <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">EQH/EQL 的「等高等低」是相對概念，絕對價位完全相同不常見；實際操作允許一定誤差，但過鬆的標準會使訊號失去意義</div></div>
+  </div>
+</div>
+
+<!-- c109 Strong Low / Weak High -->
+<div class="card smc" id="c109">
+  <div class="nc-head"><span class="nc-tag">SMC 類</span>
+    <div class="nc-title">Strong Low / Weak High &nbsp;強低點 / 弱高點</div>
+    <div class="nc-sub">LuxAlgo 依「有沒有被突破」標記高低點強弱 — 強低點 = 多頭最後防線，弱高點 = 下一個目標</div>
+  </div>
+  <div class="nc-visual">
+    <svg viewBox="0 0 520 160" style="width:100%;max-width:520px;height:auto">
+      <rect width="520" height="160" fill="#0d1117" rx="6"/>
+      <!-- Weak High 水平線 -->
+      <line x1="20" y1="22" x2="500" y2="22" stroke="#f87171" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="22" y="18" font-size="10" fill="#f87171" font-weight="700">Weak High</text>
+      <!-- Strong Low 水平線 -->
+      <line x1="20" y1="135" x2="500" y2="135" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="22" y="150" font-size="10" fill="#22c55e" font-weight="700">Strong Low</text>
+      <!-- 價格走勢 -->
+      <polyline points="30,65 60,82 90,52 130,135 165,108 200,118 235,88 270,68 305,82 340,52 370,72 400,42 430,62 460,38 490,55" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- 最高點 Weak High 標示 -->
+      <circle cx="460" cy="38" r="3.5" fill="#f87171"/>
+      <!-- 最低點 Strong Low 標示 -->
+      <circle cx="130" cy="135" r="3.5" fill="#22c55e"/>
+      <!-- 說明：跌破 Strong Low -->
+      <text x="135" y="155" font-size="9" fill="#22c55e">↓跌破 = CHoCH 多轉空</text>
+      <!-- 說明：突破 Weak High -->
+      <text x="330" y="13" font-size="9" fill="#f87171">↑突破 = BOS 多頭延續</text>
+      <!-- 中間區間文字 -->
+      <text x="260" y="100" font-size="9" fill="#6b7280" text-anchor="middle">震盪區間</text>
+    </svg>
+    <div class="nc-concept">
+      <strong>Strong Low（強低點）</strong>：多頭結構中尚未被跌破的最重要擺動低點，是多頭的「最後防線」。若被跌破，代表結構轉換（CHoCH）或 BOS 向下，多頭失守。&nbsp;<strong>Weak High（弱高點）</strong>：尚未被突破的最近擺動高點，稱「弱」是因為還沒有 BOS 向上確認，容易成為機構掃流動性的目標；若被有效突破則成立 BOS↑，多頭延續。
+    </div>
+  </div>
+  <div class="nc-setting"><span class="nc-setting-lbl">判斷重點</span><span class="nc-setting-sep">|</span><span class="nc-setting-val"><span class="key">Strong Low 是止損參考 · Weak High 是目標參考</span></span></div>
+  <div class="nc-info-row">
+    <div class="nc-info-box"><div class="nc-info-lbl">Strong Low（強低點）</div><ul class="nc-list">
+      <li>多頭結構中<span class="r">最新、未被跌破</span>的擺動低點</li>
+      <li>跌破 Strong Low = CHoCH（多轉空警示）</li>
+      <li>LuxAlgo 以<span class="g">綠色虛線</span>向右延伸標記</li>
+      <li>做多時止損放在 Strong Low 下方</li>
+      <li>每次新 BOS 成立，Strong Low 會更新為新 HL</li>
+    </ul></div>
+    <div class="nc-info-box"><div class="nc-info-lbl">Weak High（弱高點）</div><ul class="nc-list">
+      <li>多頭走勢中<span class="r">最新、尚未被突破</span>的擺動高點</li>
+      <li>突破 Weak High = BOS↑，多頭趨勢延續</li>
+      <li>LuxAlgo 以<span class="r">紅色虛線</span>向右延伸標記</li>
+      <li>做多目標設在 Weak High 附近</li>
+      <li>突破確認後，舊 Weak High 變成新 Strong High</li>
+    </ul></div>
+  </div>
+  <div class="nc-footer">
+    <div class="nc-pair-row"><span class="nc-pair-lbl">搭配概念</span><div class="nc-pair-chips">
+      <span class="nc-pair-chip" onclick="showPopup(event,'Market Structure','Strong Low 被跌破就是 CHoCH，是市場結構轉換的第一個確認訊號。','c102')">市場結構</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'Liquidity','Weak High 常是流動性聚集區，機構會先掃 Weak High 再決定延續或反轉。','c106')">流動性</span>
+      <span class="nc-pair-chip" onclick="showPopup(event,'EQH/EQL','等高點（EQH）與 Weak High 重疊時，代表流動性更密集，被掃後做多機率更高。','c108')">EQH/EQL</span>
+    </div></div>
+    <div class="nc-tip"><div class="nc-tip-lbl">⚠ 注意：</div><div class="nc-tip-text">Strong/Weak 標籤是<strong>動態更新</strong>的：每次新的 BOS 確立，LuxAlgo 就會重新計算並更新標籤位置，舊標籤在新結構確認後自動消失，這是正常行為，不是 bug</div></div>
   </div>
 </div>
 
