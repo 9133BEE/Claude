@@ -757,6 +757,26 @@ function cancelEdit() {
 }
 window.cancelEdit = cancelEdit;
 
+// ── BACKGROUND IMAGE UPLOAD ───────────────────────────────────────────────
+function uploadImagesInBackground(docId, existingImages, blobs) {
+  let done = 0;
+  setSyncStatus('loading', `圖片上傳中 (0/${blobs.length})…`);
+  Promise.all(blobs.map(async img => {
+    const r = sRef(storage, `notebook/img_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+    await uploadBytes(r, img.blob);
+    const url = await getDownloadURL(r);
+    done++;
+    setSyncStatus('loading', `圖片上傳中 (${done}/${blobs.length})…`);
+    return url;
+  })).then(async newUrls => {
+    const allImages = [...existingImages, ...newUrls];
+    await updateDoc(doc(db, COL, docId), { images: allImages });
+    const idx = notes.findIndex(x => x.id === docId);
+    if (idx !== -1) { notes[idx].images = allImages; renderNotes(); }
+    setSyncStatus('ok', '已同步');
+  }).catch(() => setSyncStatus('err', '圖片上傳失敗，文字已儲存'));
+}
+
 // ── SAVE ─────────────────────────────────────────────────────────────────
 window.saveNote = async function() {
   const date    = document.getElementById('note-date').value;
@@ -774,7 +794,7 @@ window.saveNote = async function() {
   setSyncStatus('loading', '同步中');
 
   const existingImages = pendingImages.filter(i => !i.blob).map(i => i.storageUrl || i.src);
-  const newBlobs = pendingImages.filter(i => i.blob);
+  const newBlobs = pendingImages.filter(i => i.blob).map(i => ({ blob: i.blob }));
 
   try {
     let docId = editingId;
@@ -794,34 +814,15 @@ window.saveNote = async function() {
     setSyncStatus('ok', '已同步');
     cancelEdit();
     renderNotes();
+    btn.disabled = false;
+    stat.textContent = '';
 
-    if (newBlobs.length) {
-      setSyncStatus('loading', `圖片上傳中 (0/${newBlobs.length})…`);
-      let done = 0;
-      try {
-        const newUrls = await Promise.all(newBlobs.map(async img => {
-          const r = sRef(storage, `notebook/img_${Date.now()}_${Math.random().toString(36).slice(2)}`);
-          await uploadBytes(r, img.blob);
-          const url = await getDownloadURL(r);
-          done++;
-          setSyncStatus('loading', `圖片上傳中 (${done}/${newBlobs.length})…`);
-          return url;
-        }));
-        const allImages = [...existingImages, ...newUrls];
-        await updateDoc(doc(db, COL, docId), { images: allImages });
-        const idx = notes.findIndex(x => x.id === docId);
-        if (idx !== -1) { notes[idx].images = allImages; renderNotes(); }
-        setSyncStatus('ok', '已同步');
-      } catch(e) {
-        setSyncStatus('err', '圖片上傳失敗，文字已儲存');
-      }
-    }
+    if (newBlobs.length) uploadImagesInBackground(docId, existingImages, newBlobs);
+
   } catch(e) {
     setSyncStatus('err', '同步失敗');
     stat.textContent = '儲存失敗：' + e.message;
-  } finally {
     btn.disabled = false;
-    if (!stat.textContent.startsWith('儲存失敗')) stat.textContent = '';
   }
 };
 
