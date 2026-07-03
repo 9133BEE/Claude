@@ -687,14 +687,14 @@ function processFiles(files) {
 function compressImage(dataUrl, cb) {
   const img = new Image();
   img.onload = () => {
-    const MAX = 1200;
+    const MAX = 900;
     let w = img.width, h = img.height;
     if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
     if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    canvas.toBlob(blob => cb(canvas.toDataURL('image/jpeg', 0.75), blob), 'image/jpeg', 0.75);
+    canvas.toBlob(blob => cb(canvas.toDataURL('image/jpeg', 0.65), blob), 'image/jpeg', 0.65);
   };
   img.src = dataUrl;
 }
@@ -713,18 +713,12 @@ window.removePending = function(i) {
 };
 
 async function uploadPendingImages() {
-  const urls = [];
-  for (const img of pendingImages) {
-    if (!img.blob) {
-      // already a storage URL
-      urls.push(img.storageUrl || img.src);
-    } else {
-      const r = sRef(storage, `notebook/img_${Date.now()}_${Math.random().toString(36).slice(2)}`);
-      await uploadBytes(r, img.blob);
-      urls.push(await getDownloadURL(r));
-    }
-  }
-  return urls;
+  return Promise.all(pendingImages.map(async img => {
+    if (!img.blob) return img.storageUrl || img.src;
+    const r = sRef(storage, `notebook/img_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+    await uploadBytes(r, img.blob);
+    return getDownloadURL(r);
+  }));
 }
 
 // ── EDIT ─────────────────────────────────────────────────────────────────
@@ -776,26 +770,52 @@ window.saveNote = async function() {
   const btn = document.getElementById('btn-save');
   const stat = document.getElementById('form-status');
   btn.disabled = true;
-  stat.textContent = pendingImages.some(i => i.blob) ? '上傳圖片中…' : '儲存中…';
+  stat.textContent = '儲存中…';
   setSyncStatus('loading', '同步中');
 
+  const existingImages = pendingImages.filter(i => !i.blob).map(i => i.storageUrl || i.src);
+  const newBlobs = pendingImages.filter(i => i.blob);
+
   try {
-    const images = await uploadPendingImages();
+    let docId = editingId;
 
     if (editingId !== null) {
-      await updateDoc(doc(db, COL, editingId), { date, title, type, content, images });
+      await updateDoc(doc(db, COL, editingId), { date, title, type, content, images: existingImages });
       const idx = notes.findIndex(x => x.id === editingId);
-      if (idx !== -1) notes[idx] = { ...notes[idx], date, title, type, content, images };
+      if (idx !== -1) notes[idx] = { ...notes[idx], date, title, type, content, images: existingImages };
     } else {
       const ref = await addDoc(collection(db, COL), {
-        date, title, type, content, images, createdAt: Timestamp.now()
+        date, title, type, content, images: existingImages, createdAt: Timestamp.now()
       });
-      notes.unshift({ id: ref.id, date, title, type, content, images, createdAt: Timestamp.now() });
+      docId = ref.id;
+      notes.unshift({ id: ref.id, date, title, type, content, images: existingImages, createdAt: Timestamp.now() });
     }
 
     setSyncStatus('ok', '已同步');
     cancelEdit();
     renderNotes();
+
+    if (newBlobs.length) {
+      setSyncStatus('loading', `圖片上傳中 (0/${newBlobs.length})…`);
+      let done = 0;
+      try {
+        const newUrls = await Promise.all(newBlobs.map(async img => {
+          const r = sRef(storage, `notebook/img_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+          await uploadBytes(r, img.blob);
+          const url = await getDownloadURL(r);
+          done++;
+          setSyncStatus('loading', `圖片上傳中 (${done}/${newBlobs.length})…`);
+          return url;
+        }));
+        const allImages = [...existingImages, ...newUrls];
+        await updateDoc(doc(db, COL, docId), { images: allImages });
+        const idx = notes.findIndex(x => x.id === docId);
+        if (idx !== -1) { notes[idx].images = allImages; renderNotes(); }
+        setSyncStatus('ok', '已同步');
+      } catch(e) {
+        setSyncStatus('err', '圖片上傳失敗，文字已儲存');
+      }
+    }
   } catch(e) {
     setSyncStatus('err', '同步失敗');
     stat.textContent = '儲存失敗：' + e.message;
