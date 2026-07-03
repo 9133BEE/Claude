@@ -573,6 +573,7 @@ let notes = [];
 let currentFilter = 'all';
 // each item: { src: string (preview URL or storage URL), blob: Blob|null (null = already uploaded), storageUrl: string|null }
 let pendingImages = [];
+let pendingCompressCount = 0;
 let editingId = null;
 
 // ── SYNC STATUS ───────────────────────────────────────────────────────────
@@ -674,11 +675,16 @@ function setupDragDrop() {
 }
 
 function processFiles(files) {
+  pendingCompressCount += files.length;
+  const btn = document.getElementById('btn-save');
+  if (btn) btn.disabled = true;
   files.forEach(file => {
     const reader = new FileReader();
     reader.onload = e => compressImage(e.target.result, (dataUrl, blob) => {
       pendingImages.push({ src: dataUrl, blob, storageUrl: null });
+      pendingCompressCount--;
       renderPreview();
+      if (pendingCompressCount === 0 && btn) btn.disabled = false;
     });
     reader.readAsDataURL(file);
   });
