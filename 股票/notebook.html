@@ -763,26 +763,6 @@ function cancelEdit() {
 }
 window.cancelEdit = cancelEdit;
 
-// ── BACKGROUND IMAGE UPLOAD ───────────────────────────────────────────────
-function uploadImagesInBackground(docId, existingImages, blobs) {
-  let done = 0;
-  setSyncStatus('loading', `圖片上傳中 (0/${blobs.length})…`);
-  Promise.all(blobs.map(async img => {
-    const r = sRef(storage, `notebook/img_${Date.now()}_${Math.random().toString(36).slice(2)}`);
-    await uploadBytes(r, img.blob);
-    const url = await getDownloadURL(r);
-    done++;
-    setSyncStatus('loading', `圖片上傳中 (${done}/${blobs.length})…`);
-    return url;
-  })).then(async newUrls => {
-    const allImages = [...existingImages, ...newUrls];
-    await updateDoc(doc(db, COL, docId), { images: allImages });
-    const idx = notes.findIndex(x => x.id === docId);
-    if (idx !== -1) { notes[idx].images = allImages; renderNotes(); }
-    setSyncStatus('ok', '已同步');
-  }).catch(() => setSyncStatus('err', '圖片上傳失敗，文字已儲存'));
-}
-
 // ── SAVE ─────────────────────────────────────────────────────────────────
 window.saveNote = async function() {
   const date    = document.getElementById('note-date').value;
@@ -799,22 +779,22 @@ window.saveNote = async function() {
   stat.textContent = '儲存中…';
   setSyncStatus('loading', '同步中');
 
-  const existingImages = pendingImages.filter(i => !i.blob).map(i => i.storageUrl || i.src);
-  const newBlobs = pendingImages.filter(i => i.blob).map(i => ({ blob: i.blob }));
+  // 圖片直接用 base64 dataUrl 存進 Firestore，不走 Firebase Storage
+  const images = pendingImages.map(i => i.src);
 
   try {
     let docId = editingId;
 
     if (editingId !== null) {
-      await updateDoc(doc(db, COL, editingId), { date, title, type, content, images: existingImages });
+      await updateDoc(doc(db, COL, editingId), { date, title, type, content, images });
       const idx = notes.findIndex(x => x.id === editingId);
-      if (idx !== -1) notes[idx] = { ...notes[idx], date, title, type, content, images: existingImages };
+      if (idx !== -1) notes[idx] = { ...notes[idx], date, title, type, content, images };
     } else {
       const ref = await addDoc(collection(db, COL), {
-        date, title, type, content, images: existingImages, createdAt: Timestamp.now()
+        date, title, type, content, images, createdAt: Timestamp.now()
       });
       docId = ref.id;
-      notes.unshift({ id: ref.id, date, title, type, content, images: existingImages, createdAt: Timestamp.now() });
+      notes.unshift({ id: ref.id, date, title, type, content, images, createdAt: Timestamp.now() });
     }
 
     setSyncStatus('ok', '已同步');
@@ -822,8 +802,6 @@ window.saveNote = async function() {
     renderNotes();
     btn.disabled = false;
     stat.textContent = '';
-
-    if (newBlobs.length) uploadImagesInBackground(docId, existingImages, newBlobs);
 
   } catch(e) {
     setSyncStatus('err', '同步失敗');
