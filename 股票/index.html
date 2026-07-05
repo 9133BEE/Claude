@@ -508,6 +508,39 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 640px) { .sub-nav-inner { padding: 7px 12px; } }
 
+/* Sub-section tile grids (工具 / TV / 教學策略 panels) */
+.bt-icon-wrap svg { width: 28px; height: 28px; }
+.block-sub.bsub-tiles.active { display: block; padding: 24px 20px 28px; overflow: visible; min-width: 0; }
+.sub-tile-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+  max-width: 820px; margin: 0 auto;
+}
+.sub-tile {
+  background: var(--bg-card); border: 1.5px solid var(--border-default);
+  border-radius: 14px; padding: 20px 14px 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer; text-decoration: none; transition: all .22s; text-align: center;
+  color: var(--text-primary);
+}
+.sub-tile:hover { background: var(--bg-raised); transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.25); border-color: var(--accent); text-decoration: none; }
+.sub-tile-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-raised); border: 1px solid var(--border-subtle);
+  transition: background .22s; color: var(--text-secondary);
+}
+.sub-tile-icon svg { width: 22px; height: 22px; }
+.sub-tile:hover .sub-tile-icon { background: var(--accent-dim); color: var(--accent); }
+.sub-tile-title { font-size: .88rem; font-weight: 700; color: var(--text-primary); }
+@media (max-width: 640px) {
+  .block-sub.bsub-tiles.active { padding: 14px 12px 20px; }
+  .sub-tile-grid { grid-template-columns: repeat(2,1fr); gap: 8px; }
+  .sub-tile { padding: 16px 10px 14px; }
+  .sub-tile-icon { width: 38px; height: 38px; border-radius: 10px; }
+  .sub-tile-icon svg { width: 18px; height: 18px; }
+  .sub-tile-title { font-size: .8rem; }
+}
+
 /* ── CARD ────────────────────────────────────────────────────────────── */
 .card {
   background: var(--bg-card);
@@ -1013,37 +1046,95 @@ a { color: inherit; text-decoration: none; }
   <a class="bsub-link" href="candlestick-patterns.html?cat=combo">組合型態</a>
  </div>
  <!-- 教學策略 sub panel -->
- <div class="block-sub" id="bsub-learn">
-  <span class="sub-group-label">教學</span>
-  <a class="bsub-link" href="stock-course.html">台股課程</a>
-  <a class="bsub-link" href="us-stock-course.html">美股課程</a>
-  <a class="bsub-link" href="futures-course.html">台指期課程</a>
-  <a class="bsub-link" href="us-futures-course.html">美股期貨課程</a>
-  <a class="bsub-link" href="stock-glossary.html">股票名詞</a>
-  <a class="bsub-link" href="futures-glossary.html">期貨名詞</a>
-  <a class="bsub-link" href="stock-quiz.html">股票題型</a>
-  <a class="bsub-link" href="futures-quiz.html">期貨題型</a>
-  <span class="sub-sep"></span>
-  <span class="sub-group-label">策略</span>
-  <a class="bsub-link" href="strategy-glossary.html">技術分析策略</a>
-  <a class="bsub-link" href="advanced-tips.html">股票進階技巧</a>
-  <a class="bsub-link" href="futures-advanced-tips.html">期貨進階技巧</a>
+ <div class="block-sub bsub-tiles" id="bsub-learn">
+  <div class="sub-tile-grid">
+   <a class="sub-tile" href="strategy-glossary.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg></div>
+    <div class="sub-tile-title">技術分析策略</div>
+   </a>
+   <a class="sub-tile" href="advanced-tips.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+    <div class="sub-tile-title">股票進階技巧</div>
+   </a>
+   <a class="sub-tile" href="futures-advanced-tips.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg></div>
+    <div class="sub-tile-title">期貨進階技巧</div>
+   </a>
+   <a class="sub-tile" href="stock-course.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <div class="sub-tile-title">台股課程</div>
+   </a>
+   <a class="sub-tile" href="us-stock-course.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+    <div class="sub-tile-title">美股課程</div>
+   </a>
+   <a class="sub-tile" href="futures-course.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+    <div class="sub-tile-title">台期課程</div>
+   </a>
+   <a class="sub-tile" href="us-futures-course.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="6" height="10" rx="1"/><rect x="9" y="3" width="6" height="14" rx="1"/><rect x="16" y="5" width="6" height="12" rx="1"/></svg></div>
+    <div class="sub-tile-title">美期課程</div>
+   </a>
+   <a class="sub-tile" href="stock-glossary.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></div>
+    <div class="sub-tile-title">股票名詞</div>
+   </a>
+   <a class="sub-tile" href="futures-glossary.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></div>
+    <div class="sub-tile-title">期貨名詞</div>
+   </a>
+   <a class="sub-tile" href="stock-quiz.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    <div class="sub-tile-title">股票題型</div>
+   </a>
+   <a class="sub-tile" href="futures-quiz.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></div>
+    <div class="sub-tile-title">期貨題型</div>
+   </a>
+  </div>
  </div>
  <!-- TV 專區 sub panel -->
- <div class="block-sub" id="bsub-tv">
-  <a class="bsub-link" href="tradingview-guide.html">TV 指南</a>
-  <a class="bsub-link" href="tv-indicators.html">指標大全</a>
-  <a class="bsub-link" href="advanced-indicators.html">指標策略</a>
-  <a class="bsub-link" href="indicator-combos.html">指標組合</a>
-  <a class="bsub-link" href="pine-scripts.html">自訂腳本</a>
+ <div class="block-sub bsub-tiles" id="bsub-tv">
+  <div class="sub-tile-grid">
+   <a class="sub-tile" href="tv-indicators.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+    <div class="sub-tile-title">指標大全</div>
+   </a>
+   <a class="sub-tile" href="advanced-indicators.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg></div>
+    <div class="sub-tile-title">指標策略</div>
+   </a>
+   <a class="sub-tile" href="indicator-combos.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+    <div class="sub-tile-title">指標組合</div>
+   </a>
+   <a class="sub-tile" href="pine-scripts.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg></div>
+    <div class="sub-tile-title">自訂腳本</div>
+   </a>
+  </div>
  </div>
  <!-- 工具 sub panel -->
- <div class="block-sub" id="bsub-tools">
-  <a class="bsub-link" href="../stock-monitor/">外資籌碼篩選器</a>
-  <a class="bsub-link" href="../stock-monitor/signal-tracker.html">籌碼訊號器</a>
-  <a class="bsub-link" href="trade-journal.html">交易日誌</a>
-  <a class="bsub-link" href="notebook.html">筆記本</a>
-  <a class="bsub-link" href="daily-prediction.html">每日預測</a>
+ <div class="block-sub bsub-tiles" id="bsub-tools">
+  <div class="sub-tile-grid">
+   <a class="sub-tile" href="../stock-monitor/signal-tracker.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></div>
+    <div class="sub-tile-title">籌碼訊號器</div>
+   </a>
+   <a class="sub-tile" href="trade-journal.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+    <div class="sub-tile-title">交易日誌</div>
+   </a>
+   <a class="sub-tile" href="notebook.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <div class="sub-tile-title">筆記本</div>
+   </a>
+   <a class="sub-tile" href="daily-prediction.html">
+    <div class="sub-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="sub-tile-title">每日預測</div>
+   </a>
+  </div>
  </div>
 </div>
 
@@ -1051,27 +1142,27 @@ a { color: inherit; text-decoration: none; }
 <div id="block-home" class="block-home">
  <div class="block-grid">
   <button class="block-tile bt-market" onclick="blockTileClick('market')">
-   <div class="bt-icon-wrap">📈</div>
+   <div class="bt-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg></div>
    <div class="bt-title">股票期貨</div>
    <div class="bt-desc">台股 · 美股 · 期貨</div>
   </button>
   <button class="block-tile bt-chart" onclick="blockTileClick('chart')">
-   <div class="bt-icon-wrap">🕯</div>
+   <div class="bt-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
    <div class="bt-title">圖鑑</div>
    <div class="bt-desc">K線型態完整收錄</div>
   </button>
   <button class="block-tile bt-learn" onclick="blockTileClick('learn')">
-   <div class="bt-icon-wrap">📚</div>
+   <div class="bt-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
    <div class="bt-title">教學策略</div>
    <div class="bt-desc">課程 · 名詞 · 策略</div>
   </button>
   <button class="block-tile bt-tv" onclick="blockTileClick('tv')">
-   <div class="bt-icon-wrap">📺</div>
+   <div class="bt-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
    <div class="bt-title">TV 專區</div>
    <div class="bt-desc">指標 · 組合 · 腳本</div>
   </button>
   <button class="block-tile bt-tools" onclick="blockTileClick('tools')">
-   <div class="bt-icon-wrap">🛠</div>
+   <div class="bt-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
    <div class="bt-title">工具</div>
    <div class="bt-desc">篩選器 · 日誌 · 筆記</div>
   </button>
