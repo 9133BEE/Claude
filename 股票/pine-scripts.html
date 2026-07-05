@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pine Script 自訂腳本 | 股學筆記</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+a{color:#58a6ff;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topbar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar-title{font-size:1.1rem;font-weight:700;color:#e6edf3}
+.topbar a{font-size:.85rem;color:#8b949e;padding:4px 10px;border-radius:6px;border:1px solid #30363d;transition:all .2s}
+.topbar a:hover{color:#58a6ff;border-color:#58a6ff;text-decoration:none}
+
+.hero{background:linear-gradient(135deg,#0d1117 0%,#0f1a2e 50%,#0d1117 100%);padding:40px 20px 28px;text-align:center;border-bottom:1px solid #30363d}
+.hero h1{font-size:1.9rem;font-weight:800;margin-bottom:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:#8b949e;font-size:.95rem;max-width:580px;margin:0 auto}
+
+.filters{display:flex;gap:8px;padding:14px 20px;flex-wrap:wrap;position:sticky;top:0;z-index:100;background:#0d1117;border-bottom:1px solid #21262d}
+.filter-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:5px 14px;border-radius:20px;cursor:pointer;font-size:.82rem;transition:all .2s;font-family:inherit}
+.filter-btn:hover{border-color:#58a6ff;color:#58a6ff}
+.filter-btn.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa}
+
+.grid{max-width:960px;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
+
+.scard{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;transition:border-color .2s}
+.scard:hover{border-color:#3b82f6}
+.scard-header{padding:18px 20px 0;display:flex;gap:12px;align-items:flex-start}
+.scard-badge{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap;flex-shrink:0;margin-top:3px}
+.badge-trend{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.badge-signal{background:rgba(244,63,94,.15);color:#fb7185;border:1px solid rgba(244,63,94,.3)}
+.badge-gap{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.badge-dmi{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.scard-meta{flex:1}
+.scard-title{font-size:1.05rem;font-weight:700;color:#e6edf3;margin-bottom:3px}
+.scard-desc{font-size:.83rem;color:#8b949e;line-height:1.55}
+.scard-body{padding:14px 20px 18px}
+
+.code-block{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:14px 16px;font-family:'Consolas','Fira Code',monospace;font-size:.8rem;line-height:1.65;overflow-x:auto;position:relative;white-space:pre}
+.code-block .kw{color:#ff7b72}
+.code-block .fn{color:#d2a8ff}
+.code-block .str{color:#a5d6ff}
+.code-block .num{color:#79c0ff}
+.code-block .cmt{color:#8b949e;font-style:italic}
+.code-block .var{color:#e6edf3}
+
+.copy-btn{position:absolute;top:10px;right:10px;background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:.75rem;padding:3px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:inherit}
+.copy-btn:hover{border-color:#58a6ff;color:#58a6ff}
+
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:10px 0}
+.info-item{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:9px 12px}
+.info-label{font-size:.71rem;color:#8b949e;font-weight:600;letter-spacing:.04em;margin-bottom:3px}
+.info-val{font-size:.85rem;color:#e6edf3;font-weight:500}
+
+.tips-box{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-left:3px solid #3b82f6;border-radius:8px;padding:10px 14px;margin-top:10px}
+.tips-box h4{color:#60a5fa;font-size:.75rem;font-weight:700;margin-bottom:5px;letter-spacing:.04em}
+.tips-box p,.tips-box li{font-size:.83rem;color:#8b949e;line-height:1.6}
+.tips-box ul{padding-left:16px}
+
+.hidden{display:none!important}
+
+@media(max-width:600px){
+  .grid{padding:12px 12px;gap:14px}
+  .filters{gap:5px;padding:10px 12px}
+  .filter-btn{font-size:.76rem;padding:4px 10px}
+  .hero h1{font-size:1.5rem}
+  .topbar a{display:none}
+  .topbar a:first-of-type{display:inline}
+  .info-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-title">Pine Script 自訂腳本</span>
+  <a href="index.html">← 回主頁</a>
+  <a href="tradingview-guide.html">TradingView 指南</a>
+  <a href="tv-indicators.html">指標大全</a>
+  <a href="advanced-indicators.html">指標策略</a>
+</div>
+
+<div class="hero">
+  <h1>Pine Script 自訂腳本</h1>
+  <p>即時盤面判讀工具 — 盤面趨勢總覽、動能訊號欄、跳空區間，複製即用</p>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filt('all',this)">全部</button>
+  <button class="filter-btn" data-cat="trend" onclick="filt('trend',this)">盤面趨勢</button>
+  <button class="filter-btn" data-cat="signal" onclick="filt('signal',this)">即時訊號</button>
+  <button class="filter-btn" data-cat="gap" onclick="filt('gap',this)">跳空區間</button>
+  <button class="filter-btn" data-cat="dmi" onclick="filt('dmi',this)">DMI 趨勢</button>
+</div>
+
+<div class="grid" id="grid">
+
+<!-- ─── 盤面趨勢總覽 ─── -->
+<div class="scard" data-cat="trend">
+  <div class="scard-header">
+    <span class="scard-badge badge-trend">盤面趨勢</span>
+    <div class="scard-meta">
+      <div class="scard-title">盤面趨勢總覽（Table 資訊欄）</div>
+      <div class="scard-desc">在圖表角落顯示多時間週期多空判斷表格，整合 EMA/VWAP/RSI/ATR/OBV/ADX，一眼掌握盤面方向</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">台股 / 美股 / 期貨</div></div>
+      <div class="info-item"><div class="info-label">週期覆蓋</div><div class="info-val">5m / 30m / 日 / 週</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
+      <div class="info-item"><div class="info-label">位置</div><div class="info-val">右上角 Table</div></div>
+    </div>
+    <div style="position:relative;margin-top:12px">
+      <button class="copy-btn" onclick="copyCode(this)">複製</button>
+      <div class="code-block"><span class="cmt">//@version=5</span>
+<span class="kw">indicator</span>(<span class="str">"盤面趨勢總覽"</span>, overlay=<span class="kw">true</span>)
+
+<span class="cmt">// ── 參數 ──</span>
+ema_fast = <span class="fn">input.int</span>(<span class="num">9</span>,  <span class="str">"快線 EMA"</span>)
+ema_slow = <span class="fn">input.int</span>(<span class="num">21</span>, <span class="str">"慢線 EMA"</span>)
+rsi_len  = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"RSI 週期"</span>)
+adx_len  = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"ADX 週期"</span>)
+
+<span class="cmt">// ── 計算 ──</span>
+ema9  = <span class="fn">ta.ema</span>(close, ema_fast)
+ema21 = <span class="fn">ta.ema</span>(close, ema_slow)
+vwap  = <span class="fn">ta.vwap</span>(close)
+rsi   = <span class="fn">ta.rsi</span>(close, rsi_len)
+[di_p, di_m, adx] = <span class="fn">ta.dmi</span>(adx_len, adx_len)
+obv   = <span class="fn">ta.obv</span>
+atr   = <span class="fn">ta.atr</span>(<span class="num">14</span>)
+
+<span class="cmt">// ── 多空判斷 ──</span>
+trend_ema  = ema9 > ema21 ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
+trend_vwap = close > vwap  ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
+rsi_str    = rsi >= <span class="num">50</span> ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
+adx_str    = adx >= <span class="num">25</span> ? (di_p > di_m ? <span class="str">"強多"</span> : <span class="str">"強空"</span>) : <span class="str">"震盪"</span>
+obv_str    = obv > obv[<span class="num">1</span>] ? <span class="str">"買壓"</span> : <span class="str">"賣壓"</span>
+atr_str    = <span class="fn">str.tostring</span>(<span class="fn">math.floor</span>(atr * <span class="num">100</span>) / <span class="num">100</span>)
+
+col_bull = <span class="fn">color.new</span>(color.green, <span class="num">0</span>)
+col_bear = <span class="fn">color.new</span>(color.red,   <span class="num">0</span>)
+col_neu  = <span class="fn">color.new</span>(color.gray,  <span class="num">0</span>)
+
+<span class="fn">f_col</span>(s) =>
+    s == <span class="str">"多▲"</span> or s == <span class="str">"強多"</span> or s == <span class="str">"買壓"</span> ? col_bull :
+     s == <span class="str">"空▼"</span> or s == <span class="str">"強空"</span> or s == <span class="str">"賣壓"</span> ? col_bear : col_neu
+
+<span class="cmt">// ── Table ──</span>
+<span class="kw">var</span> t = <span class="fn">table.new</span>(position.top_right, <span class="num">2</span>, <span class="num">7</span>,
+     bgcolor=#161b22, border_color=#30363d, border_width=<span class="num">1</span>, frame_color=#30363d, frame_width=<span class="num">1</span>)
+
+<span class="fn">f_cell</span>(r, lbl, val, vc) =>
+    <span class="fn">table.cell</span>(t, <span class="num">0</span>, r, lbl, text_color=#8b949e, text_size=size.small, bgcolor=#1a1f2e)
+    <span class="fn">table.cell</span>(t, <span class="num">1</span>, r, val, text_color=vc,      text_size=size.small, bgcolor=#161b22)
+
+<span class="fn">f_cell</span>(<span class="num">0</span>, <span class="str">"EMA 趨勢"</span>, trend_ema,  <span class="fn">f_col</span>(trend_ema))
+<span class="fn">f_cell</span>(<span class="num">1</span>, <span class="str">"VWAP"</span>,     trend_vwap, <span class="fn">f_col</span>(trend_vwap))
+<span class="fn">f_cell</span>(<span class="num">2</span>, <span class="str">"RSI"</span>,      rsi_str,    <span class="fn">f_col</span>(rsi_str))
+<span class="fn">f_cell</span>(<span class="num">3</span>, <span class="str">"ADX"</span>,      adx_str,    <span class="fn">f_col</span>(adx_str))
+<span class="fn">f_cell</span>(<span class="num">4</span>, <span class="str">"OBV"</span>,      obv_str,    <span class="fn">f_col</span>(obv_str))
+<span class="fn">f_cell</span>(<span class="num">5</span>, <span class="str">"ATR"</span>,      atr_str,    col_neu)</div>
+    </div>
+    <div class="tips-box" style="margin-top:10px">
+      <h4>使用說明</h4>
+      <ul>
+        <li>貼到 TradingView → Pine 編輯器 → 儲存 → 加到圖表</li>
+        <li>EMA、VWAP、RSI 同時顯示多▲ = 趨勢確認，可加大部位</li>
+        <li>ADX &lt; 25 顯示「震盪」，此時趨勢訊號準確率降低</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 即時動能訊號 ─── -->
+<div class="scard" data-cat="signal">
+  <div class="scard-header">
+    <span class="scard-badge badge-signal">即時訊號</span>
+    <div class="scard-meta">
+      <div class="scard-title">即時動能訊號欄（1分K補足版）</div>
+      <div class="scard-desc">專為美股 1 分 K 設計的資訊欄，整合多空力道、RSI、EMA 斜率、成交量異常，補足原生數據欄不足</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">美股 1分K</div></div>
+      <div class="info-item"><div class="info-label">核心指標</div><div class="info-val">RSI / EMA / OBV / ATR</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
+      <div class="info-item"><div class="info-label">顯示</div><div class="info-val">右下角 Table</div></div>
+    </div>
+    <div style="position:relative;margin-top:12px">
+      <button class="copy-btn" onclick="copyCode(this)">複製</button>
+      <div class="code-block"><span class="cmt">//@version=5</span>
+<span class="kw">indicator</span>(<span class="str">"即時動能訊號欄"</span>, overlay=<span class="kw">true</span>)
+
+rsi_len = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"RSI 週期"</span>)
+vol_ma  = <span class="fn">input.int</span>(<span class="num">20</span>, <span class="str">"成交量均線"</span>)
+
+rsi     = <span class="fn">ta.rsi</span>(close, rsi_len)
+ema9    = <span class="fn">ta.ema</span>(close, <span class="num">9</span>)
+ema21   = <span class="fn">ta.ema</span>(close, <span class="num">21</span>)
+vol_avg = <span class="fn">ta.sma</span>(volume, vol_ma)
+obv     = <span class="fn">ta.obv</span>
+atr     = <span class="fn">ta.atr</span>(<span class="num">14</span>)
+
+<span class="cmt">// 動能方向</span>
+momentum = close - close[<span class="num">3</span>]
+mom_str  = momentum > <span class="num">0</span> ? <span class="str">"上▲"</span> : <span class="str">"下▼"</span>
+
+<span class="cmt">// RSI 評估（顯示數值+評估）</span>
+rsi_val  = <span class="fn">math.floor</span>(rsi * <span class="num">100</span>) / <span class="num">100</span>
+rsi_disp = <span class="fn">str.tostring</span>(rsi_val) + (rsi >= <span class="num">70</span> ? <span class="str">"(超買)"</span> : rsi <= <span class="num">30</span> ? <span class="str">"(超賣)"</span> : rsi >= <span class="num">50</span> ? <span class="str">"(偏多)"</span> : <span class="str">"(偏空)"</span>)
+
+<span class="cmt">// EMA 多空</span>
+ema_str  = ema9 > ema21 ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
+
+<span class="cmt">// 成交量</span>
+vol_str  = volume > vol_avg * <span class="num">1.5</span> ? <span class="str">"爆量!"</span> : volume > vol_avg ? <span class="str">"放量"</span> : <span class="str">"縮量"</span>
+
+<span class="cmt">// OBV 方向</span>
+obv_str  = obv > obv[<span class="num">1</span>] ? <span class="str">"買▲"</span> : <span class="str">"賣▼"</span>
+
+<span class="cmt">// ATR</span>
+atr_disp = <span class="fn">str.tostring</span>(<span class="fn">math.floor</span>(atr * <span class="num">100</span>) / <span class="num">100</span>)
+
+col_g = <span class="fn">color.new</span>(color.green, <span class="num">0</span>)
+col_r = <span class="fn">color.new</span>(color.red,   <span class="num">0</span>)
+col_y = <span class="fn">color.new</span>(color.yellow,<span class="num">0</span>)
+col_w = <span class="fn">color.new</span>(color.white, <span class="num">0</span>)
+col_gr= <span class="fn">color.new</span>(color.gray,  <span class="num">0</span>)
+
+<span class="kw">var</span> t = <span class="fn">table.new</span>(position.bottom_right, <span class="num">2</span>, <span class="num">6</span>,
+     bgcolor=#161b22, border_color=#30363d, border_width=<span class="num">1</span>, frame_color=#30363d, frame_width=<span class="num">1</span>)
+
+<span class="fn">f_cell</span>(r, lbl, val, vc) =>
+    <span class="fn">table.cell</span>(t, <span class="num">0</span>, r, lbl, text_color=#8b949e, text_size=size.small, bgcolor=#1a1f2e)
+    <span class="fn">table.cell</span>(t, <span class="num">1</span>, r, val, text_color=vc,      text_size=size.small, bgcolor=#161b22)
+
+<span class="fn">f_cell</span>(<span class="num">0</span>, <span class="str">"動能"</span>,   mom_str,  momentum > <span class="num">0</span> ? col_g : col_r)
+<span class="fn">f_cell</span>(<span class="num">1</span>, <span class="str">"RSI"</span>,    rsi_disp, rsi >= <span class="num">70</span> ? col_r : rsi <= <span class="num">30</span> ? col_g : rsi >= <span class="num">50</span> ? col_g : col_r)
+<span class="fn">f_cell</span>(<span class="num">2</span>, <span class="str">"EMA"</span>,    ema_str,  ema9 > ema21 ? col_g : col_r)
+<span class="fn">f_cell</span>(<span class="num">3</span>, <span class="str">"成交量"</span>, vol_str,  vol_str == <span class="str">"爆量!"</span> ? col_y : vol_str == <span class="str">"放量"</span> ? col_g : col_gr)
+<span class="fn">f_cell</span>(<span class="num">4</span>, <span class="str">"OBV"</span>,    obv_str,  obv > obv[<span class="num">1</span>] ? col_g : col_r)
+<span class="fn">f_cell</span>(<span class="num">5</span>, <span class="str">"ATR"</span>,    atr_disp, col_w)</div>
+    </div>
+    <div class="tips-box" style="margin-top:10px">
+      <h4>使用說明</h4>
+      <ul>
+        <li>動能＋EMA＋OBV 三者同向 = 順勢進場強訊號</li>
+        <li>「爆量!」出現在關鍵價位附近 = 機構介入訊號</li>
+        <li>RSI 超買 + 動能下▼ = 短線轉弱，考慮減碼</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 跳空區間 ─── -->
+<div class="scard" data-cat="gap">
+  <div class="scard-header">
+    <span class="scard-badge badge-gap">跳空區間</span>
+    <div class="scard-meta">
+      <div class="scard-title">跳空壓力 / 支撐區間框</div>
+      <div class="scard-desc">自動偵測 K 棒跳空缺口，用紅框（跳空壓力）與綠框（跳空支撐）標示在圖上，缺口填補後自動消失</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">所有標的</div></div>
+      <div class="info-item"><div class="info-label">偵測邏輯</div><div class="info-val">K棒缺口（非日缺口）</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
+      <div class="info-item"><div class="info-label">顯示</div><div class="info-val">圖表上方/下方方框</div></div>
+    </div>
+    <div style="position:relative;margin-top:12px">
+      <button class="copy-btn" onclick="copyCode(this)">複製</button>
+      <div class="code-block"><span class="cmt">//@version=5</span>
+<span class="kw">indicator</span>(<span class="str">"跳空壓力支撐區間"</span>, overlay=<span class="kw">true</span>, max_boxes_count=<span class="num">200</span>)
+
+min_gap_pct = <span class="fn">input.float</span>(<span class="num">0.1</span>, <span class="str">"最小缺口比例(%)"</span>, minval=<span class="num">0.01</span>, step=<span class="num">0.05</span>) / <span class="num">100</span>
+max_bars    = <span class="fn">input.int</span>(<span class="num">100</span>, <span class="str">"最多保留幾根K棒"</span>, minval=<span class="num">10</span>)
+col_up_gap  = <span class="fn">input.color</span>(<span class="fn">color.new</span>(color.green, <span class="num">80</span>), <span class="str">"跳空支撐填色"</span>)
+col_dn_gap  = <span class="fn">input.color</span>(<span class="fn">color.new</span>(color.red,   <span class="num">80</span>), <span class="str">"跳空壓力填色"</span>)
+border_up   = <span class="fn">input.color</span>(color.green, <span class="str">"跳空支撐邊框"</span>)
+border_dn   = <span class="fn">input.color</span>(color.red,   <span class="str">"跳空壓力邊框"</span>)
+
+<span class="cmt">// 跳空向上（支撐缺口）: 本K低點 > 前K高點</span>
+gap_up = low > high[<span class="num">1</span>] and (low - high[<span class="num">1</span>]) / high[<span class="num">1</span>] >= min_gap_pct
+
+<span class="cmt">// 跳空向下（壓力缺口）: 本K高點 < 前K低點</span>
+gap_dn = high < low[<span class="num">1</span>] and (low[<span class="num">1</span>] - high) / low[<span class="num">1</span>] >= min_gap_pct
+
+<span class="kw">if</span> gap_up
+    <span class="fn">box.new</span>(bar_index - <span class="num">1</span>, low, bar_index + max_bars, high[<span class="num">1</span>],
+         bgcolor=col_up_gap, border_color=border_up, border_width=<span class="num">1</span>)
+
+<span class="kw">if</span> gap_dn
+    <span class="fn">box.new</span>(bar_index - <span class="num">1</span>, low[<span class="num">1</span>], bar_index + max_bars, high,
+         bgcolor=col_dn_gap, border_color=border_dn, border_width=<span class="num">1</span>)
+
+<span class="cmt">// 缺口填補後延伸框至當前 bar</span>
+<span class="kw">var</span> boxes = array.new_box()
+<span class="fn">array.push</span>(boxes, gap_up ? <span class="fn">box.new</span>(bar_index,low,bar_index,high[<span class="num">1</span>],border_color=color.na) : box.na)
+
+<span class="fn">plotshape</span>(gap_up, style=shape.triangleup,   location=location.belowbar, color=color.green, size=size.tiny, title=<span class="str">"跳空支撐"</span>)
+<span class="fn">plotshape</span>(gap_dn, style=shape.triangledown, location=location.abovebar, color=color.red,   size=size.tiny, title=<span class="str">"跳空壓力"</span>)</div>
+    </div>
+    <div class="tips-box" style="margin-top:10px">
+      <h4>使用說明</h4>
+      <ul>
+        <li>綠框 = 跳空支撐（回測此區域時考慮買進）</li>
+        <li>紅框 = 跳空壓力（上漲遇此區域考慮減碼）</li>
+        <li>調整「最小缺口比例」可過濾雜訊（建議 0.1–0.3%）</li>
+        <li>「最多保留幾根K棒」決定缺口框延伸長度</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DMI 週期多空判斷 ─── -->
+<div class="scard" data-cat="dmi">
+  <div class="scard-header">
+    <span class="scard-badge badge-dmi">DMI 趨勢</span>
+    <div class="scard-meta">
+      <div class="scard-title">多週期多空判斷表（DMI + ADX）</div>
+      <div class="scard-desc">同時顯示 5分/30分/日/5日/10日/20日 六個週期的多空狀態，整合 DMI+ADX，以中文顯示趨勢強度</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">週期</div><div class="info-val">5m / 30m / D / 5D / 10D / 20D</div></div>
+      <div class="info-item"><div class="info-label">核心</div><div class="info-val">DI+ DI- ADX</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
+      <div class="info-item"><div class="info-label">顯示</div><div class="info-val">左上角 Table</div></div>
+    </div>
+    <div style="position:relative;margin-top:12px">
+      <button class="copy-btn" onclick="copyCode(this)">複製</button>
+      <div class="code-block"><span class="cmt">//@version=5</span>
+<span class="kw">indicator</span>(<span class="str">"多週期多空判斷（DMI）"</span>, overlay=<span class="kw">true</span>)
+
+adx_len = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"ADX 週期"</span>)
+adx_thr = <span class="fn">input.int</span>(<span class="num">25</span>, <span class="str">"趨勢強度門檻"</span>)
+
+<span class="fn">f_dmi</span>(tf) =>
+    [di_p, di_m, adx_v] = <span class="fn">request.security</span>(syminfo.tickerid, tf,
+         <span class="fn">ta.dmi</span>(adx_len, adx_len), lookahead=barmerge.lookahead_off)
+    label = di_p > di_m ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
+    strength = adx_v >= adx_thr ? (di_p > di_m ? <span class="str">"強多"</span> : <span class="str">"強空"</span>) : <span class="str">"震盪"</span>
+    adx_disp = <span class="fn">str.tostring</span>(<span class="fn">math.floor</span>(adx_v * <span class="num">100</span>) / <span class="num">100</span>)
+    full = strength + <span class="str">" ADX:"</span> + adx_disp
+    col  = di_p > di_m ? <span class="fn">color.new</span>(color.green,<span class="num">0</span>) : <span class="fn">color.new</span>(color.red,<span class="num">0</span>)
+    [full, col]
+
+[s5m,  c5m]  = <span class="fn">f_dmi</span>(<span class="str">"5"</span>)
+[s30m, c30m] = <span class="fn">f_dmi</span>(<span class="str">"30"</span>)
+[s1d,  c1d]  = <span class="fn">f_dmi</span>(<span class="str">"D"</span>)
+[s5d,  c5d]  = <span class="fn">f_dmi</span>(<span class="str">"5D"</span>)
+[s10d, c10d] = <span class="fn">f_dmi</span>(<span class="str">"10D"</span>)
+[s20d, c20d] = <span class="fn">f_dmi</span>(<span class="str">"20D"</span>)
+
+<span class="kw">var</span> t = <span class="fn">table.new</span>(position.top_left, <span class="num">2</span>, <span class="num">7</span>,
+     bgcolor=#161b22, border_color=#30363d, border_width=<span class="num">1</span>, frame_color=#30363d, frame_width=<span class="num">1</span>)
+
+<span class="fn">f_cell</span>(r, lbl, val, vc) =>
+    <span class="fn">table.cell</span>(t, <span class="num">0</span>, r, lbl, text_color=#8b949e, text_size=size.small, bgcolor=#1a1f2e)
+    <span class="fn">table.cell</span>(t, <span class="num">1</span>, r, val, text_color=vc,      text_size=size.small, bgcolor=#161b22)
+
+<span class="fn">table.cell</span>(t, <span class="num">0</span>, <span class="num">0</span>, <span class="str">"週期"</span>,  text_color=#e6edf3, bgcolor=#21262d, text_size=size.small)
+<span class="fn">table.cell</span>(t, <span class="num">1</span>, <span class="num">0</span>, <span class="str">"多空/ADX"</span>, text_color=#e6edf3, bgcolor=#21262d, text_size=size.small)
+<span class="fn">f_cell</span>(<span class="num">1</span>, <span class="str">"5分"</span>,  s5m,  c5m)
+<span class="fn">f_cell</span>(<span class="num">2</span>, <span class="str">"30分"</span>, s30m, c30m)
+<span class="fn">f_cell</span>(<span class="num">3</span>, <span class="str">"日"</span>,   s1d,  c1d)
+<span class="fn">f_cell</span>(<span class="num">4</span>, <span class="str">"5日"</span>,  s5d,  c5d)
+<span class="fn">f_cell</span>(<span class="num">5</span>, <span class="str">"10日"</span>, s10d, c10d)
+<span class="fn">f_cell</span>(<span class="num">6</span>, <span class="str">"20日"</span>, s20d, c20d)</div>
+    </div>
+    <div class="tips-box" style="margin-top:10px">
+      <h4>使用說明</h4>
+      <ul>
+        <li>多個週期同時顯示「強多」= 趨勢共振，勝率最高</li>
+        <li>ADX &lt; 25 顯示「震盪」，此時不追趨勢單</li>
+        <li>短中長週期「強多→震盪→空▼」= 趨勢正在弱化，準備出場</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<script>
+function filt(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.scard').forEach(c => {
+    c.classList.toggle('hidden', cat !== 'all' && c.dataset.cat !== cat);
+  });
+}
+
+function copyCode(btn) {
+  const block = btn.nextElementSibling;
+  navigator.clipboard.writeText(block.innerText).then(() => {
+    btn.textContent = '已複製!';
+    setTimeout(() => btn.textContent = '複製', 1500);
+  });
+}
+</script>
+</body>
+</html>

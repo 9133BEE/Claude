@@ -20,19 +20,6 @@ a:hover{text-decoration:underline}
 .hero p{color:#8b949e;font-size:1rem;max-width:620px;margin:0 auto 8px}
 .hero-badge{display:inline-block;background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.4);color:#fb7185;font-size:.78rem;padding:4px 12px;border-radius:20px;margin-top:8px}
 
-.toc{max-width:960px;margin:24px auto;padding:0 20px}
-.toc-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
-.toc-cat{display:flex;flex-direction:column;gap:4px}
-.toc-cat-lbl{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:4px;width:fit-content}
-.toc-cat-lbl.st{background:rgba(244,63,94,.15);color:#fb7185}
-.toc-cat-lbl.obv{background:rgba(59,130,246,.15);color:#60a5fa}
-.toc-cat-lbl.ttm{background:rgba(245,158,11,.15);color:#fbbf24}
-.toc-cat-lbl.combo{background:rgba(34,197,94,.15);color:#4ade80}
-.toc-cat-lbl.tool{background:rgba(139,92,246,.15);color:#c4b5fd}
-.toc-links{display:flex;flex-wrap:wrap;gap:4px}
-.toc-item{padding:4px 12px;border-radius:20px;color:#c9d1d9;font-size:.82rem;background:#21262d;border:1px solid #30363d;text-decoration:none;transition:all .15s;white-space:nowrap}
-.toc-item:hover{color:#58a6ff;border-color:#58a6ff;background:#161b22;text-decoration:none}
-.toc-dot{display:none}
 /* SVG 文字全白 */
 .diag svg text{fill:#e6edf3}
 
@@ -50,7 +37,6 @@ a:hover{text-decoration:underline}
 .card.smc{border-top:3px solid #8b5cf6}
 .smc .ctag{background:rgba(139,92,246,.15);color:#c4b5fd}
 .filter-btn.f-smc.active{background:rgba(139,92,246,.15);border-color:#8b5cf6;color:#c4b5fd}
-.toc-cat-lbl.smc{background:rgba(139,92,246,.15);color:#c4b5fd}
 
 .grid{max-width:1120px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:24px}
 
@@ -115,7 +101,6 @@ a:hover{text-decoration:underline}
 
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;padding:12px 10px;gap:14px}
-  .toc-links{gap:4px}
   .pair-grid{grid-template-columns:1fr}
   .filters{gap:5px;padding:10px}
   .filter-btn{font-size:.76rem;padding:5px 10px}
@@ -139,71 +124,6 @@ a:hover{text-decoration:underline}
   <h1>TradingView 指標策略</h1>
   <p>超越 MA/KD/RSI 的散戶層級 — 機構級指標完整解析，附圖解與搭配策略</p>
   <span class="hero-badge">Supertrend · OBV · TTM Squeeze · VWAP · Fibonacci · Ichimoku · SMC 智慧資金 · 更多</span>
-</div>
-
-<div class="toc">
-  <div class="toc-box">
-    <div class="toc-cat">
-      <span class="toc-cat-lbl st">Supertrend</span>
-      <div class="toc-links">
-        <a class="toc-item" href="#s1">01 原理</a>
-        <a class="toc-item" href="#s2">02 進出場訊號</a>
-        <a class="toc-item" href="#s3">03 多週期共振</a>
-      </div>
-    </div>
-    <div class="toc-cat">
-      <span class="toc-cat-lbl obv">OBV 能量潮</span>
-      <div class="toc-links">
-        <a class="toc-item" href="#s4">04 原理與計算</a>
-        <a class="toc-item" href="#s5">05 正背離</a>
-        <a class="toc-item" href="#s6">06 隱藏背離</a>
-      </div>
-    </div>
-    <div class="toc-cat">
-      <span class="toc-cat-lbl ttm">TTM Squeeze</span>
-      <div class="toc-links">
-        <a class="toc-item" href="#s7">07 原理</a>
-        <a class="toc-item" href="#s8">08 四色判讀</a>
-        <a class="toc-item" href="#s9">09 爆發強度</a>
-      </div>
-    </div>
-    <div class="toc-cat">
-      <span class="toc-cat-lbl combo">組合策略</span>
-      <div class="toc-links">
-        <a class="toc-item" href="#s10">10 三指標進場</a>
-        <a class="toc-item" href="#s11">11 三指標出場</a>
-        <a class="toc-item" href="#s12">12 常見錯誤</a>
-      </div>
-    </div>
-    <div class="toc-cat">
-      <span class="toc-cat-lbl tool">進階工具</span>
-      <div class="toc-links">
-        <a class="toc-item" href="#s13">13 VWAP</a>
-        <a class="toc-item" href="#s14">14 Fibonacci</a>
-        <a class="toc-item" href="#s15">15 Ichimoku</a>
-        <a class="toc-item" href="#s16">16 ATR 停損</a>
-        <a class="toc-item" href="#s17">17 StochRSI</a>
-        <a class="toc-item" href="#s18">18 Williams %R</a>
-        <a class="toc-item" href="#s19">19 CMF 資金流</a>
-        <a class="toc-item" href="#s20">20 Volume Profile</a>
-        <a class="toc-item" href="#s21">21 相對強度</a>
-        <a class="toc-item" href="#s22">22 Elder Ray</a>
-      </div>
-    </div>
-    <div class="toc-cat">
-      <span class="toc-cat-lbl smc">SMC 智慧資金概念</span>
-      <div class="toc-links">
-        <a class="toc-item" href="#s23">23 SMC 概論</a>
-        <a class="toc-item" href="#s24">24 Market Structure</a>
-        <a class="toc-item" href="#s25">25 FVG 公允價值缺口</a>
-        <a class="toc-item" href="#s26">26 OB 訂單區塊</a>
-        <a class="toc-item" href="#s27">27 PB / Breaker Block</a>
-        <a class="toc-item" href="#s28">28 流動性獵殺</a>
-        <a class="toc-item" href="#s29">29 SMC 共振進場</a>
-        <a class="toc-item" href="#s30">30 SMC 完整交易流程</a>
-      </div>
-    </div>
-  </div>
 </div>
 
 <div class="filters">

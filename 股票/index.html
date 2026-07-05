@@ -376,75 +376,86 @@ a { color: inherit; text-decoration: none; }
 /* ── CARDS SECTION ───────────────────────────────────────────────────── */
 .cards-section { max-width: 1200px; margin: 0 auto; padding: 24px 28px 80px; }
 .cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 16px;
-  align-items: start;
-}
-.section-hdr {
-  grid-column: 1 / -1;
-  display: flex; align-items: center; gap: 12px;
-  padding-bottom: 18px; border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 4px;
-}
-.section-hdr-icon { font-size: 1.5rem; line-height: 1; }
-.section-hdr-title { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); }
-.section-hdr-count {
-  font-size: .72rem; color: var(--text-muted);
-  background: var(--bg-raised); border: 1px solid var(--border-default);
-  border-radius: 20px; padding: 2px 10px; margin-left: 4px;
+  display: flex; flex-direction: column; gap: 8px;
 }
 @media (max-width: 640px) {
   .nav { padding: 0 16px; }
-  .cards-section { padding: 16px 12px 56px; }
-  .cards-grid { grid-template-columns: 1fr; gap: 12px; }
+  .cards-section { padding: 16px 16px 56px; }
   .filter-bar { padding: 12px 16px 0; }
 }
+
+/* ── SUB-NAV (市場子導覽 pill row) ───────────────────────────────────── */
+.sub-nav-row {
+  display: none; border-top: 1px solid var(--border-subtle);
+  background: var(--tabnav-bg); overflow-x: auto; scrollbar-width: none;
+}
+.sub-nav-row::-webkit-scrollbar { display: none; }
+.sub-nav-row.visible { display: block; }
+.sub-nav-inner {
+  display: flex; align-items: center; gap: 4px;
+  padding: 8px 24px; min-width: max-content;
+}
+.sub-label {
+  font-size: .65rem; font-weight: 700; color: var(--text-muted);
+  letter-spacing: .08em; text-transform: uppercase; padding: 0 6px; flex-shrink: 0;
+}
+.sub-pill {
+  padding: 5px 14px; border-radius: 100px; font-size: .8rem; font-weight: 500;
+  font-family: var(--font); border: 1px solid var(--border-default);
+  background: none; color: var(--text-secondary); cursor: pointer;
+  white-space: nowrap; transition: all .15s;
+}
+.sub-pill:hover { border-color: var(--accent); color: var(--accent); }
+.sub-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.sub-sep { width: 1px; height: 18px; background: var(--border-default); margin: 0 6px; flex-shrink: 0; }
+.sub-group-label { font-size:.72rem; color:var(--text-muted); font-weight:600; letter-spacing:.04em; white-space:nowrap; padding:0 2px; }
+@media (max-width: 640px) { .sub-nav-inner { padding: 7px 12px; } }
 
 /* ── CARD ────────────────────────────────────────────────────────────── */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-top: 3px solid var(--card-accent, var(--accent));
-  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--card-accent, var(--accent));
+  border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   overflow: hidden;
   display: flex; flex-direction: column;
-  transition: transform var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal), opacity .4s ease;
+  transition: background var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal);
   opacity: 0; transform: translateY(14px);
 }
-.card.visible { opacity: 1; transform: translateY(0); }
+.card.visible {
+  opacity: 1; transform: translateY(0);
+  transition: opacity .4s ease, transform .4s ease,
+              background var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal);
+}
 .card.hidden-filter { display: none; }
-.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
-.card.expanded { border-color: var(--card-accent, var(--accent)); }
+.card:hover { background: var(--bg-card-hover); box-shadow: var(--shadow-hover); }
 
-/* Card header (clickable face) */
-.card-header {
-  padding: 18px 20px 14px; cursor: pointer; flex: 1;
+/* Card row (collapsed header) */
+.card-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 18px; cursor: pointer;
 }
-.card-meta {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+.card-icon-wrap {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 1.1rem;
 }
-.card-meta-icon { font-size: 1.15rem; line-height: 1; flex-shrink: 0; }
+.card-titles { flex: 1; min-width: 0; }
 .card-title {
-  font-size: 1rem; font-weight: 700; line-height: 1.35;
-  color: var(--text-primary); margin-bottom: 4px;
+  font-size: .95rem; font-weight: 700; line-height: 1.4;
+  color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .card-en {
   font-size: .68rem; color: var(--text-muted); font-family: var(--font-en);
-  letter-spacing: .01em; margin-bottom: 10px;
+  letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.card-summary {
-  font-size: .83rem; color: var(--text-secondary); line-height: 1.65;
-  margin-bottom: 14px;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-  overflow: hidden;
+.card-summary-inline {
+  flex: 2; font-size: .82rem; color: var(--text-secondary); line-height: 1.5;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  min-width: 0;
 }
-.card-expand-hint {
-  display: flex; align-items: center; gap: 5px;
-  font-size: .7rem; color: var(--text-faint); font-family: var(--font-en);
-  letter-spacing: .02em;
-}
+.card-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
 .card-difficulty {
   padding: 2px 9px; border-radius: 100px;
@@ -465,10 +476,9 @@ a { color: inherit; text-decoration: none; }
   color: var(--card-accent, var(--accent));
 }
 .card-star {
-  background: none; border: none; cursor: pointer; padding: 2px;
-  font-size: 1rem; line-height: 1; color: var(--text-faint);
+  background: none; border: none; cursor: pointer; padding: 4px 2px;
+  font-size: 1.05rem; line-height: 1; color: var(--text-faint);
   transition: color .15s, transform .15s; flex-shrink: 0;
-  margin-left: auto;
 }
 .card-star:hover { color: #f59e0b; transform: scale(1.25); }
 .card-star.starred { color: #f59e0b; }
@@ -515,11 +525,13 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 640px) {
-  .card-header { padding: 14px 16px 10px; }
-  .card-tags { padding: 0 16px 12px; }
-  .card-title { font-size: .9rem; }
-  .card-summary { -webkit-line-clamp: 2; }
+  .card-summary-inline { display: none; }
+  .card-row { gap: 10px; padding: 12px 14px; }
+  .card-tags { padding: 0 14px 10px; }
+  .card-difficulty { display: none; }
+  .card-title { font-size: .88rem; }
 }
+@media (max-width: 380px) { .card-icon-wrap { display: none; } }
 
 /* ── CARD DETAIL ─────────────────────────────────────────────────────── */
 .card-detail { max-height: 0; overflow: hidden; transition: max-height .32s cubic-bezier(.4,0,.2,1); }
@@ -870,58 +882,12 @@ a { color: inherit; text-decoration: none; }
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="切換明暗主題">☀</button>
 </nav>
 
-<!-- HERO -->
-<section class="hero" id="hero-section">
-  <div class="hero-inner">
-    <div class="hero-badge">📊 股票知識庫 v2.0</div>
-    <h1 class="hero-title">股學筆記</h1>
-    <p class="hero-sub">台股 · 美股 · 期貨 · K線圖鑑 · 技術指標<br>系統化交易知識，從入門到高階</p>
-    <div class="hero-stats">
-      <div class="hero-stat"><span class="hero-stat-num">6</span><span class="hero-stat-lbl">知識分類</span></div>
-      <div class="hero-stat"><span class="hero-stat-num">50+</span><span class="hero-stat-lbl">知識卡片</span></div>
-      <div class="hero-stat"><span class="hero-stat-num">3</span><span class="hero-stat-lbl">難度等級</span></div>
-      <div class="hero-stat"><span class="hero-stat-num">5</span><span class="hero-stat-lbl">實用工具</span></div>
-    </div>
-  </div>
-</section>
-
 <!-- TABS -->
 <div class="tab-nav" id="tab-nav">
  <div class="gnav-wrap">
   <div class="gnav">
-    <!-- 台股 -->
-    <div class="gnav-group" id="gnav-stocks">
-      <button class="gnav-btn active" onclick="toggleDrop('stocks')">
-        台股 <span class="gnav-arrow">▾</span>
-      </button>
-      <div class="gnav-drop">
-        <button class="gnav-item cur" onclick="switchTab('technical');closeDrop('stocks')">技術</button>
-        <button class="gnav-item" onclick="switchTab('fundamental');closeDrop('stocks')">基本</button>
-        <button class="gnav-item" onclick="switchTab('chip');closeDrop('stocks')">籌碼</button>
-        <button class="gnav-item" onclick="switchTab('news');closeDrop('stocks')">消息</button>
-      </div>
-    </div>
-    <!-- 美股 -->
-    <div class="gnav-group" id="gnav-usstocks">
-      <button class="gnav-btn" onclick="toggleDrop('us-stocks')">
-        美股 <span class="gnav-arrow">▾</span>
-      </button>
-      <div class="gnav-drop">
-        <button class="gnav-item cur" onclick="switchUSStocks('us-basic');closeDrop('us-stocks')">基礎</button>
-        <button class="gnav-item" onclick="switchUSStocks('us-pick');closeDrop('us-stocks')">選股</button>
-        <button class="gnav-item" onclick="switchUSStocks('us-advanced');closeDrop('us-stocks')">進階</button>
-      </div>
-    </div>
-    <!-- 期貨 -->
-    <div class="gnav-group" id="gnav-futures">
-      <button class="gnav-btn" onclick="toggleDrop('futures-nav')">
-        期貨 <span class="gnav-arrow">▾</span>
-      </button>
-      <div class="gnav-drop">
-        <button class="gnav-item cur" onclick="switchFutures('tw');closeDrop('futures-nav')">台股期貨</button>
-        <button class="gnav-item" onclick="switchFutures('us');closeDrop('futures-nav')">美股期貨</button>
-      </div>
-    </div>
+    <!-- 股票期貨（合併台股+美股+期貨）-->
+    <button class="gnav-btn active" id="gnav-market-btn" onclick="activateMarket()">股票期貨</button>
     <!-- 圖鑑 -->
     <div class="gnav-group" id="gnav-chart">
       <button class="gnav-btn" onclick="toggleDrop('chart')">
@@ -973,6 +939,7 @@ a { color: inherit; text-decoration: none; }
         <a class="gnav-item" href="tv-indicators.html">TV 指標大全</a>
         <a class="gnav-item" href="advanced-indicators.html">TV 指標策略</a>
         <a class="gnav-item" href="indicator-combos.html">TV 指標組合</a>
+        <a class="gnav-item" href="pine-scripts.html">自訂腳本</a>
       </div>
     </div>
     <!-- 工具 -->
@@ -996,6 +963,25 @@ a { color: inherit; text-decoration: none; }
         ☆ 收藏
       </button>
     </div>
+  </div>
+ </div>
+ <!-- sub-nav pill row for 股票期貨 -->
+ <div class="sub-nav-row visible" id="sub-nav-row">
+  <div class="sub-nav-inner">
+   <span class="sub-group-label">台股</span>
+   <button class="sub-pill active" id="spill-technical" onclick="subSwitch('technical')">技術</button>
+   <button class="sub-pill" id="spill-fundamental" onclick="subSwitch('fundamental')">基本</button>
+   <button class="sub-pill" id="spill-chip" onclick="subSwitch('chip')">籌碼</button>
+   <button class="sub-pill" id="spill-news" onclick="subSwitch('news')">消息</button>
+   <span class="sub-sep"></span>
+   <span class="sub-group-label">美股</span>
+   <button class="sub-pill" id="spill-us-basic" onclick="subSwitch('us-basic')">基礎</button>
+   <button class="sub-pill" id="spill-us-pick" onclick="subSwitch('us-pick')">選股</button>
+   <button class="sub-pill" id="spill-us-advanced" onclick="subSwitch('us-advanced')">進階</button>
+   <span class="sub-sep"></span>
+   <span class="sub-group-label">期貨</span>
+   <button class="sub-pill" id="spill-futures-tw" onclick="subSwitch('futures-tw')">台指期</button>
+   <button class="sub-pill" id="spill-futures-us" onclick="subSwitch('futures-us')">美股期貨</button>
   </div>
  </div>
 </div>
@@ -1754,6 +1740,7 @@ function switchFavorites() {
   currentSection = 'favorites';
   document.querySelectorAll('.gnav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('fav-btn').classList.add('active');
+  document.getElementById('sub-nav-row').classList.remove('visible');
   renderSection('favorites');
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1770,16 +1757,18 @@ function renderCard(card, section) {
   const cssVars = `--card-accent:${section.accent};--card-kp-bg:${section.kpBg};--card-kp-border:${section.kpBorder};`;
   return `
 <div class="card" id="card-${card.id}" style="${cssVars}" data-id="${card.id}" data-diff="${card.diff}" data-section="${section.id}" data-tags="${card.tags.join(',')}">
-  <div class="card-header" onclick="toggleCard('${card.id}')">
-    <div class="card-meta">
-      <span class="card-meta-icon">${section.icon}</span>
-      <span class="card-difficulty ${diffClass}">${card.diff}</span>
-      <button class="card-star${favorites.has(card.id)?' starred':''}" onclick="toggleStar('${card.id}',event)" title="加入收藏">★</button>
+  <div class="card-row" onclick="toggleCard('${card.id}')">
+    <div class="card-icon-wrap">${section.icon}</div>
+    <div class="card-titles">
+      <div class="card-title">${card.title}</div>
+      <div class="card-en">${card.en}</div>
     </div>
-    <div class="card-title">${card.title}</div>
-    <div class="card-en">${card.en}</div>
-    <div class="card-summary">${card.summary}</div>
-    <div class="card-expand-hint">展開詳情 <span class="card-chevron">›</span></div>
+    <div class="card-summary-inline">${card.summary}</div>
+    <div class="card-right">
+      <button class="card-star${favorites.has(card.id)?' starred':''}" onclick="toggleStar('${card.id}',event)" title="加入收藏">★</button>
+      <span class="card-difficulty ${diffClass}">${card.diff}</span>
+      <span class="card-chevron">›</span>
+    </div>
   </div>
   <div class="card-tags">${card.tags.map(t=>`<span class="card-tag" onclick="filterTag('${t}',event)">#${t}</span>`).join('')}</div>
   <div class="card-detail" id="detail-${card.id}">
@@ -1840,61 +1829,37 @@ function renderSection(sectionId) {
   observeCards();
 }
 
-function switchTab(id) {
+function activateMarket() {
+  document.getElementById('gnav-market-btn').classList.add('active');
+  document.getElementById('fav-btn').classList.remove('active');
+  document.getElementById('sub-nav-row').classList.add('visible');
+  // restore last active sub-pill section, default to technical
+  const id = ['technical','fundamental','chip','news','us-basic','us-pick','us-advanced','futures-tw','futures-us'].includes(currentSection)
+    ? currentSection : 'technical';
+  subSwitch(id);
+}
+
+function subSwitch(id) {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
   hideToolsPanel();
   currentSection = id;
-  const labels = {all:'全部', technical:'技術', fundamental:'基本', chip:'籌碼', news:'消息'};
-  const subEl = document.getElementById('sub-stocks');
-  if (subEl) subEl.textContent = labels[id] || '技術';
-  document.querySelectorAll('#gnav-stocks .gnav-item').forEach(b => {
-    b.classList.toggle('cur', b.textContent.trim() === (labels[id] || '技術'));
-  });
-  document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.add('active');
-  document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.remove('active');
-  document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.remove('active');
+  document.getElementById('gnav-market-btn').classList.add('active');
   document.getElementById('fav-btn').classList.remove('active');
+  document.getElementById('sub-nav-row').classList.add('visible');
+  document.querySelectorAll('.sub-pill').forEach(b => b.classList.remove('active'));
+  const pill = document.getElementById('spill-' + id);
+  if (pill) pill.classList.add('active');
   renderSection(id);
   document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-function switchFutures(mkt) {
-  if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
-  hideToolsPanel();
-  const id = mkt === 'us' ? 'futures-us' : 'futures-tw';
-  currentSection = id;
-  const subEl = document.getElementById('sub-futures');
-  if (subEl) subEl.textContent = mkt === 'us' ? '美股' : '台股';
-  document.querySelectorAll('#gnav-futures .gnav-item').forEach(b => {
-    b.classList.toggle('cur', (mkt === 'us' && b.textContent.trim() === '美股期貨') || (mkt === 'tw' && b.textContent.trim() === '台股期貨'));
-  });
-  document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.add('active');
-  document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.remove('active');
-  document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.remove('active');
-  document.getElementById('fav-btn').classList.remove('active');
-  renderSection(id);
-  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function switchUSStocks(id) {
-  if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
-  hideToolsPanel();
-  currentSection = id;
-  const labels = {'us-basic':'基礎','us-pick':'選股','us-advanced':'進階'};
-  document.querySelectorAll('#gnav-usstocks .gnav-item').forEach(b => {
-    b.classList.toggle('cur', b.textContent.trim() === (labels[id] || '基礎'));
-  });
-  document.getElementById('gnav-usstocks').querySelector('.gnav-btn').classList.add('active');
-  document.getElementById('gnav-stocks').querySelector('.gnav-btn').classList.remove('active');
-  document.getElementById('gnav-futures').querySelector('.gnav-btn').classList.remove('active');
-  document.getElementById('fav-btn').classList.remove('active');
-  renderSection(id);
-  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
-}
+function switchTab(id) { subSwitch(id); }
+function switchFutures(mkt) { subSwitch(mkt === 'us' ? 'futures-us' : 'futures-tw'); }
+function switchUSStocks(id) { subSwitch(id); }
 
 // === 下拉選單：portal 容器 (position:fixed z-index:99999)，子層用 absolute 定位 ===
 // 完全繞過 iOS Safari sticky/backdrop-filter compositing 截斷問題
-const _DROP_GROUPS = ['gnav-stocks','gnav-usstocks','gnav-futures','gnav-chart','gnav-courses','gnav-glossary','gnav-tv','gnav-tools'];
+const _DROP_GROUPS = ['gnav-chart','gnav-courses','gnav-glossary','gnav-tv','gnav-tools'];
 (function initDrops() {
   const portal = document.createElement('div');
   portal.id = 'gnav-portal';
@@ -1936,10 +1901,8 @@ function _showGroupDrop(gid) {
 
 function toggleDrop(id) {
   const idMap = {
-    'stocks':'gnav-stocks','us-stocks':'gnav-usstocks',
-    'futures-nav':'gnav-futures','chart':'gnav-chart',
-    'courses':'gnav-courses','glossary':'gnav-glossary',
-    'tv':'gnav-tv','tools':'gnav-tools'
+    'chart':'gnav-chart','courses':'gnav-courses',
+    'glossary':'gnav-glossary','tv':'gnav-tv','tools':'gnav-tools'
   };
   const targetGid = idMap[id];
   _DROP_GROUPS.forEach(function(gid) {
@@ -1954,7 +1917,7 @@ function toggleDrop(id) {
 }
 
 function closeDrop(id) {
-  const map = {'stocks':'gnav-stocks','us-stocks':'gnav-usstocks','futures-nav':'gnav-futures','chart':'gnav-chart','courses':'gnav-courses','glossary':'gnav-glossary','tv':'gnav-tv','tools':'gnav-tools'};
+  const map = {'chart':'gnav-chart','courses':'gnav-courses','glossary':'gnav-glossary','tv':'gnav-tv','tools':'gnav-tools'};
   const gid = map[id];
   if (gid) _hideGroupDrop(gid);
 }
