@@ -410,6 +410,64 @@ a { color: inherit; text-decoration: none; }
 .sub-sep { width: 1px; height: 18px; background: var(--border-default); margin: 0 6px; flex-shrink: 0; }
 .sub-group-label { font-size:.72rem; color:var(--text-muted); font-weight:600; letter-spacing:.04em; white-space:nowrap; padding:0 2px; }
 
+/* ── BLOCK HOME (tile 首頁) ──────────────────────────────────────────── */
+.block-home {
+  max-width: 820px; margin: 56px auto 80px; padding: 0 24px;
+}
+.block-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+}
+.block-tile {
+  background: var(--bg-card); border: 1.5px solid var(--border-default);
+  border-radius: 18px; padding: 30px 16px 26px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  cursor: pointer; font-family: var(--font); text-align: center; transition: all .22s;
+}
+.block-tile:hover { background: var(--bg-raised); transform: translateY(-4px); box-shadow: 0 10px 36px rgba(0,0,0,.28); }
+.bt-market:hover  { border-color: #3b82f6; }
+.bt-chart:hover   { border-color: #8b5cf6; }
+.bt-learn:hover   { border-color: #22c55e; }
+.bt-tv:hover      { border-color: #f59e0b; }
+.bt-tools:hover   { border-color: #14b8a6; }
+.bt-fav:hover     { border-color: #f59e0b; }
+.bt-icon-wrap {
+  width: 60px; height: 60px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.9rem;
+  background: var(--bg-raised); border: 1px solid var(--border-subtle); transition: background .22s;
+}
+.bt-market:hover .bt-icon-wrap  { background: rgba(59,130,246,.12); }
+.bt-chart:hover  .bt-icon-wrap  { background: rgba(139,92,246,.12); }
+.bt-learn:hover  .bt-icon-wrap  { background: rgba(34,197,94,.12); }
+.bt-tv:hover     .bt-icon-wrap  { background: rgba(245,158,11,.12); }
+.bt-tools:hover  .bt-icon-wrap  { background: rgba(20,184,166,.12); }
+.bt-fav:hover    .bt-icon-wrap  { background: rgba(245,158,11,.12); }
+.bt-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+.bt-desc  { font-size: .75rem; color: var(--text-muted); line-height: 1.45; }
+
+/* Back bar inside tab-nav */
+.section-nav-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 20px; max-width: 1200px; margin: 0 auto;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.back-home-btn {
+  padding: 4px 12px; border-radius: 8px; border: 1px solid var(--border-default);
+  background: var(--bg-raised); color: var(--text-muted); font-size: .82rem;
+  font-weight: 600; cursor: pointer; font-family: var(--font); transition: all .15s;
+}
+.back-home-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.bc-sep { color: var(--border-default); }
+#breadcrumb-cur { font-size: .85rem; font-weight: 600; color: var(--text-primary); }
+
+@media (max-width: 640px) {
+  .block-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  .block-home { margin: 28px auto 48px; padding: 0 14px; }
+  .bt-icon-wrap { width: 46px; height: 46px; font-size: 1.45rem; border-radius: 12px; }
+  .bt-title { font-size: .88rem; }
+  .bt-desc { font-size: .68rem; }
+  .block-tile { padding: 22px 12px 18px; }
+}
+
 /* ── BLOCK NAV (大區塊導覽) ──────────────────────────────────────────── */
 .block-nav-row {
   display: flex; gap: 6px; padding: 10px 16px;
@@ -921,36 +979,15 @@ a { color: inherit; text-decoration: none; }
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="切換明暗主題">☀</button>
 </nav>
 
-<!-- TABS -->
-<div class="tab-nav" id="tab-nav">
- <div class="block-nav-row">
-  <button class="nav-block active" id="block-market" onclick="blockActivate('market')">
-   <span class="nb-icon">📈</span>
-   <span class="nb-label">股票期貨</span>
-  </button>
-  <button class="nav-block" id="block-chart" onclick="blockActivate('chart')">
-   <span class="nb-icon">🕯</span>
-   <span class="nb-label">圖鑑</span>
-  </button>
-  <button class="nav-block" id="block-learn" onclick="blockActivate('learn')">
-   <span class="nb-icon">📚</span>
-   <span class="nb-label">教學策略</span>
-  </button>
-  <button class="nav-block" id="block-tv" onclick="blockActivate('tv')">
-   <span class="nb-icon">📺</span>
-   <span class="nb-label">TV 專區</span>
-  </button>
-  <button class="nav-block" id="block-tools" onclick="blockActivate('tools')">
-   <span class="nb-icon">🛠</span>
-   <span class="nb-label">工具</span>
-  </button>
-  <button class="nav-block nb-fav" id="fav-btn" onclick="blockFav()">
-   <span class="nb-icon" id="fav-star">☆</span>
-   <span class="nb-label">收藏<span id="fav-count-badge"></span></span>
-  </button>
+<!-- TABS (hidden by default — shown when entering a section) -->
+<div class="tab-nav" id="tab-nav" style="display:none">
+ <div class="section-nav-row">
+  <button class="back-home-btn" onclick="backToHome()">← 首頁</button>
+  <span class="bc-sep">›</span>
+  <span id="breadcrumb-cur">股票期貨</span>
  </div>
  <!-- 股票期貨 sub panel -->
- <div class="block-sub active" id="bsub-market">
+ <div class="block-sub" id="bsub-market">
   <span class="sub-group-label">台股</span>
   <button class="sub-pill active" id="spill-technical" onclick="subSwitch('technical')">技術</button>
   <button class="sub-pill" id="spill-fundamental" onclick="subSwitch('fundamental')">基本</button>
@@ -1010,8 +1047,44 @@ a { color: inherit; text-decoration: none; }
  </div>
 </div>
 
+<!-- BLOCK HOME (tile 首頁) -->
+<div id="block-home" class="block-home">
+ <div class="block-grid">
+  <button class="block-tile bt-market" onclick="blockTileClick('market')">
+   <div class="bt-icon-wrap">📈</div>
+   <div class="bt-title">股票期貨</div>
+   <div class="bt-desc">台股 · 美股 · 期貨</div>
+  </button>
+  <button class="block-tile bt-chart" onclick="blockTileClick('chart')">
+   <div class="bt-icon-wrap">🕯</div>
+   <div class="bt-title">圖鑑</div>
+   <div class="bt-desc">K線型態完整收錄</div>
+  </button>
+  <button class="block-tile bt-learn" onclick="blockTileClick('learn')">
+   <div class="bt-icon-wrap">📚</div>
+   <div class="bt-title">教學策略</div>
+   <div class="bt-desc">課程 · 名詞 · 策略</div>
+  </button>
+  <button class="block-tile bt-tv" onclick="blockTileClick('tv')">
+   <div class="bt-icon-wrap">📺</div>
+   <div class="bt-title">TV 專區</div>
+   <div class="bt-desc">指標 · 組合 · 腳本</div>
+  </button>
+  <button class="block-tile bt-tools" onclick="blockTileClick('tools')">
+   <div class="bt-icon-wrap">🛠</div>
+   <div class="bt-title">工具</div>
+   <div class="bt-desc">篩選器 · 日誌 · 筆記</div>
+  </button>
+  <button class="block-tile bt-fav" id="fav-tile-btn" onclick="blockTileClick('fav')">
+   <div class="bt-icon-wrap"><span id="fav-star">☆</span></div>
+   <div class="bt-title">收藏<span id="fav-count-badge"></span></div>
+   <div class="bt-desc">我的收藏清單</div>
+  </button>
+ </div>
+</div>
+
 <!-- JOURNAL BANNER -->
-<div class="journal-banner" id="journal-banner">
+<div class="journal-banner" id="journal-banner" style="display:none">
   <a class="journal-btn" href="trade-journal.html">
     <div class="jb-left">
       <div class="jb-icon">📒</div>
@@ -1028,7 +1101,7 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <!-- FILTER BAR -->
-<div class="filter-bar" id="filter-bar">
+<div class="filter-bar" id="filter-bar" style="display:none">
   <span class="filter-label">難度</span>
   <button class="filter-btn active" data-diff="all" onclick="filterDifficulty('all',this)">全部</button>
   <button class="filter-btn" data-diff="入門" onclick="filterDifficulty('入門',this)">入門</button>
@@ -1037,7 +1110,7 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <!-- CARDS -->
-<div class="cards-section" id="cards-section">
+<div class="cards-section" id="cards-section" style="display:none">
   <div class="cards-grid" id="cards-grid"></div>
 </div>
 
@@ -1761,8 +1834,8 @@ function switchFavorites() {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
   hideToolsPanel();
   currentSection = 'favorites';
+  _showSection('fav');
   renderSection('favorites');
-  document.getElementById('tab-nav').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function updateFavBtn() {
@@ -1852,29 +1925,48 @@ function renderSection(sectionId) {
 }
 
 const _BLOCKS = ['market','chart','learn','tv','tools'];
+const _BLOCK_LABELS = { market:'股票期貨', chart:'圖鑑', learn:'教學策略', tv:'TV 專區', tools:'工具', fav:'收藏' };
+
+function _showSection(key) {
+  document.getElementById('block-home').style.display = 'none';
+  document.getElementById('tab-nav').style.display = 'block';
+  document.getElementById('breadcrumb-cur').textContent = _BLOCK_LABELS[key] || key;
+  const isMarket = ['market','fav'].includes(key);
+  document.getElementById('journal-banner').style.display = key === 'market' ? '' : 'none';
+  document.getElementById('filter-bar').style.display     = isMarket ? '' : 'none';
+  document.getElementById('cards-section').style.display  = isMarket ? '' : 'none';
+}
+
+function backToHome() {
+  document.getElementById('block-home').style.display = '';
+  document.getElementById('tab-nav').style.display = 'none';
+  document.getElementById('journal-banner').style.display = 'none';
+  document.getElementById('filter-bar').style.display = 'none';
+  document.getElementById('cards-section').style.display = 'none';
+}
+
+function blockTileClick(key) {
+  _showSection(key);
+  if (key === 'fav') {
+    _BLOCKS.forEach(k => { const s = document.getElementById('bsub-' + k); if (s) s.classList.remove('active'); });
+    switchFavorites();
+  } else {
+    blockActivate(key);
+    if (key === 'market') subSwitch(currentSection && currentSection !== 'favorites' ? currentSection : 'technical');
+  }
+}
 
 function blockActivate(key) {
   _BLOCKS.forEach(k => {
-    const blk = document.getElementById('block-' + k);
-    if (blk) blk.classList.toggle('active', k === key);
     const sub = document.getElementById('bsub-' + k);
     if (sub) sub.classList.toggle('active', k === key);
   });
-  document.getElementById('fav-btn').classList.remove('active');
 }
 
-function blockFav() {
-  _BLOCKS.forEach(k => {
-    const blk = document.getElementById('block-' + k);
-    if (blk) blk.classList.remove('active');
-    const sub = document.getElementById('bsub-' + k);
-    if (sub) sub.classList.remove('active');
-  });
-  document.getElementById('fav-btn').classList.add('active');
-  switchFavorites();
-}
+function blockFav() { blockTileClick('fav'); }
 
 function activateMarket() {
+  _showSection('market');
   blockActivate('market');
   const id = ['technical','fundamental','chip','news','us-basic','us-pick','us-advanced','futures-tw','futures-us'].includes(currentSection)
     ? currentSection : 'technical';
@@ -1885,6 +1977,7 @@ function subSwitch(id) {
   if (expandedCard) { collapseCard(expandedCard); expandedCard = null; }
   hideToolsPanel();
   currentSection = id;
+  _showSection('market');
   blockActivate('market');
   document.querySelectorAll('.sub-pill').forEach(b => b.classList.remove('active'));
   const pill = document.getElementById('spill-' + id);
@@ -1997,8 +2090,15 @@ document.getElementById('search-input').addEventListener('input', function() {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderSection('technical');
   updateFavBtn();
+  // 預載技術面資料（背景，不顯示）
+  renderSection('technical');
+  // 搜尋框：在首頁輸入時自動進入股票期貨
+  document.getElementById('search-input').addEventListener('input', function() {
+    if (document.getElementById('block-home').style.display !== 'none') {
+      blockTileClick('market');
+    }
+  });
 });
 
 window.addEventListener('resize', updateTabIndicator);
@@ -2161,6 +2261,7 @@ const _noteTypeLabels = { market:'市場觀察', technical:'技術分析', stock
 
 function switchTools() {
   if (typeof expandedCard !== 'undefined' && expandedCard) { collapseCard(expandedCard); expandedCard = null; }
+  _showSection('tools');
   blockActivate('tools');
   document.getElementById('journal-banner').style.display = 'none';
   document.getElementById('filter-bar').style.display = 'none';
