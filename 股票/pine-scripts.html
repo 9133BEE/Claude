@@ -63,6 +63,16 @@ a:hover{text-decoration:underline}
 .badge-unicorn{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
 .hidden{display:none!important}
 
+.ver-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+.ver-tab{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:.78rem;font-family:inherit;line-height:1.5;transition:all .2s;text-align:left}
+.ver-tab:hover{border-color:#8b5cf6;color:#a78bfa}
+.ver-tab.active{background:rgba(139,92,246,.12);border-color:#8b5cf6;color:#c4b5fd}
+.ver-latest-badge{background:rgba(245,158,11,.18);color:#fbbf24;border:1px solid rgba(245,158,11,.35);font-size:.68rem;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;letter-spacing:.03em}
+.ver-sub{display:block;font-size:.71rem;color:#4a5568;margin-top:1px}
+.ver-log{background:rgba(91,33,182,.07);border:1px solid rgba(139,92,246,.2);border-left:3px solid #7c3aed;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:.8rem;color:#6b7280;line-height:1.9}
+.ver-log b{color:#c4b5fd;font-weight:600}
+.vl-dot{color:#8b5cf6;margin-right:4px;font-weight:700}
+
 @media(max-width:600px){
   .grid{padding:12px 12px;gap:14px}
   .filters{gap:5px;padding:10px 12px}
@@ -406,9 +416,34 @@ adx_thr = <span class="fn">input.int</span>(<span class="num">25</span>, <span c
       <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
       <div class="info-item"><div class="info-label">時框支援</div><div class="info-val">Auto 1M – 1D</div></div>
     </div>
-    <div style="position:relative;margin-top:12px">
-      <button class="copy-btn" onclick="copyCode(this)">複製</button>
-      <div class="code-block">//@version=5
+    <!-- ── UNICORN 版本選擇器 ── -->
+    <div class="ver-tabs" id="unicorn-vtabs">
+      <button class="ver-tab active" onclick="switchUnicornVer('v2',this)">
+        v2.0 <span class="ver-latest-badge">最新</span>
+        <span class="ver-sub">2026-07-09 · 673行 · OB∩FVG 真Unicorn</span>
+      </button>
+      <button class="ver-tab" onclick="switchUnicornVer('v1',this)">
+        v1.0 <span class="ver-sub">2026-07-06 · 出場警示版</span>
+      </button>
+    </div>
+    <div id="unicorn-log-v2" class="ver-log">
+      <span class="vl-dot">›</span> <b>unicornNeedFVG</b> 預設改 true，強制OB∩FVG重疊（真Unicorn條件）<br>
+      <span class="vl-dot">›</span> 新增 <b>ovT / ovB / hasOv</b> 重疊區間計算，進場條件改用重疊區間<br>
+      <span class="vl-dot">›</span> 新增 <b>sigCooldown</b> 訊號冷卻 + <b>allowRepeat</b> 控制參數<br>
+      <span class="vl-dot">›</span> 移除 showExitLabel，出場整合入 MSS 反轉邏輯
+    </div>
+    <div id="unicorn-log-v1" class="ver-log" style="display:none">
+      <span class="vl-dot">›</span> 初始發行版：自動OB識別、MSS觸發獨角獸進場訊號<br>
+      <span class="vl-dot">›</span> 含 <b>⚠ 多/空單出場警示標籤</b>（結構反轉時自動顯示）<br>
+      <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
+    </div>
+    <div style="position:relative;margin-top:8px" id="unicorn-v2-wrap">
+      <button class="copy-btn" onclick="copyUnicornCode('v2',this)">複製</button>
+      <div class="code-block" id="unicorn-v2-code"></div>
+    </div>
+    <div style="position:relative;margin-top:8px;display:none" id="unicorn-v1-wrap">
+      <button class="copy-btn" onclick="copyUnicornCode('v1',this)">複製</button>
+      <div class="code-block" id="unicorn-v1-code">//@version=5
 indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=200)
 
 grp1 = "訂單塊設定"
@@ -805,7 +840,8 @@ if showDash and barstate.islast
     table.cell(dash,6,2,step6?"已確認":"待確認",text_color=_ick(step6),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,8,2,"",text_color=color.new(#444444,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)</div>
-    </div>
+    </div><!-- /unicorn-v1-code -->
+    </div><!-- /unicorn-v1-wrap -->
     <div class="tips-box" style="margin-top:10px">
       <h4>使用說明</h4>
       <ul>
@@ -825,6 +861,702 @@ if showDash and barstate.islast
 </div><!-- /grid -->
 
 <script>
+/* ── Unicorn Model v2.0 腳本 ── */
+const UNICORN_V2 = `//@version=5
+indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=200)
+
+grp1 = "訂單塊設定"
+tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
+pivL_m       = input.int(10,"樞紐左側（Manual用）",minval=1,group=grp1)
+pivR_m       = input.int(5, "樞紐右側（Manual用）",minval=1,group=grp1)
+bbSearchBars = input.int(100,"OB搜尋K數（Manual用）",minval=20,maxval=500,group=grp1)
+obExtR_m     = input.int(5,"OB右延伸K數",minval=1,maxval=30,group=grp1)
+minScore     = input.int(0, "最低品質分(0-4)",minval=0,maxval=4,group=grp1)
+hqMin        = input.int(3, "HQ門檻(分)",minval=2,maxval=4,group=grp1)
+maxOBs       = input.int(1, "每方向最多OB數",minval=1,maxval=5,group=grp1)
+
+grp2 = "獨角獸模型"
+unicornNeedHTF = input.bool(false,"需要HTF PDA確認",group=grp2)
+unicornNeedFVG = input.bool(true,"需要OB∩FVG重疊（真Unicorn）",group=grp2)
+allowRepeat    = input.bool(false,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
+sigCooldown    = input.int(5,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
+
+grp3 = "HTF區間顯示"
+show1HOB  = input.bool(true, "顯示 1H OB",  group=grp3)
+show1HFVG = input.bool(false,"顯示 1H FVG", group=grp3)
+h1Days    = input.int(5,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
+show4HOB  = input.bool(true, "顯示 4H OB",  group=grp3)
+show4HFVG = input.bool(false,"顯示 4H FVG", group=grp3)
+h4Days    = input.int(10, "4H 顯示天數", minval=1,maxval=90,  group=grp3)
+show1DOB  = input.bool(true, "顯示 1D OB",  group=grp3)
+show1DFVG = input.bool(false,"顯示 1D FVG", group=grp3)
+d1Days    = input.int(20, "1D 顯示天數", minval=1,maxval=180, group=grp3)
+htfExtR   = input.int(30, "HTF右延伸K數",minval=5,             group=grp3)
+
+grp4 = "訊號顯示"
+showDash    = input.bool(true,"顯示儀表板",group=grp4)
+dashPos     = input.string("左下","儀表板位置",options=["左下","右下","左上","右上"],group=grp4)
+showBull    = input.bool(true,"顯示多方OB方框",group=grp4)
+showBear    = input.bool(true,"顯示空方OB方框",group=grp4)
+sigDays     = input.int(30,"訊號顯示天數",minval=1,maxval=90,group=grp4)
+showBgColor = input.bool(false,"顯示條件背景色",group=grp4)
+
+grp5 = "透明度設定"
+obFillTransp  = input.int(60, "OB方框填色透明度",  minval=0, maxval=95, step=5, group=grp5)
+htfFillTransp = input.int(88, "HTF OB填色透明度",  minval=0, maxval=98, step=2, group=grp5)
+fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, step=2, group=grp5)
+_hqBg()  => math.min(95, obFillTransp + 15)
+_hqOvl() => math.min(98, obFillTransp + 33)
+
+_autoTfKey = switch timeframe.period
+    "1"   => "1M"
+    "3"   => "5M"
+    "5"   => "5M"
+    "15"  => "15M"
+    "30"  => "15M"
+    "45"  => "15M"
+    "60"  => "1H"
+    "120" => "1H"
+    "240" => "4H"
+    "D"   => "1D"
+    "W"   => "1D"
+    => "1D"
+_tfKey = tfPreset == "Auto" ? _autoTfKey : tfPreset
+
+_pivL   = _tfKey=="1M"?5:_tfKey=="5M"?7:_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8:_tfKey=="1D"?5:pivL_m
+_pivR   = _tfKey=="1M"?3:_tfKey=="5M"?3:_tfKey=="15M"?5:_tfKey=="1H"?5:_tfKey=="4H"?4:_tfKey=="1D"?3:pivR_m
+_bbSrch = _tfKey=="1M"?200:_tfKey=="5M"?150:_tfKey=="15M"?120:_tfKey=="1H"?100:_tfKey=="4H"?60:_tfKey=="1D"?30:bbSearchBars
+_obExtR = obExtR_m
+
+barsPerDay = math.max(1, math.round(86400 / timeframe.in_seconds()))
+sigBarsMax = sigDays * barsPerDay
+
+tfStr = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":timeframe.period=="D"?"日":timeframe.period=="W"?"週":timeframe.period+"T"
+
+autoHTF = switch timeframe.period
+    "1"   => "240"
+    "3"   => "240"
+    "5"   => "240"
+    "15"  => "240"
+    "30"  => "240"
+    "45"  => "240"
+    "60"  => "D"
+    "120" => "D"
+    "240" => "W"
+    "D"   => "W"
+    => "W"
+htfStr = autoHTF=="60"?"1H":autoHTF=="240"?"4H":autoHTF=="D"?"日":"週"
+
+f_htf_ob_setup() =>
+    var float _lpH=na, var float _lpL=na
+    var float _bTop=na, var float _bBot=na
+    var float _rTop=na, var float _rBot=na
+    _ph = ta.pivothigh(high,5,5)
+    _pl = ta.pivotlow(low,5,5)
+    if not na(_ph)
+        _lpH := _ph
+    if not na(_pl)
+        _lpL := _pl
+    if not na(_lpH) and close > _lpH and not (close[1] > _lpH)
+        _rTop := na
+        _rBot := na
+        for i = 1 to 20
+            if close[i] < open[i]
+                _bTop := high[i]
+                _bBot := low[i]
+                break
+    if not na(_lpL) and close < _lpL and not (close[1] < _lpL)
+        _bTop := na
+        _bBot := na
+        for i = 1 to 20
+            if close[i] > open[i]
+                _rTop := high[i]
+                _rBot := low[i]
+                break
+    [_bTop, _bBot, _rTop, _rBot]
+
+f_htf_fvg_setup() =>
+    var float _bFvgT = na
+    var float _bFvgB = na
+    var float _rFvgT = na
+    var float _rFvgB = na
+    if not na(_bFvgB) and low < _bFvgB
+        _bFvgT := na
+        _bFvgB := na
+    if not na(_rFvgT) and high > _rFvgT
+        _rFvgT := na
+        _rFvgB := na
+    if low[0] > high[2]
+        _bFvgT := low[0]
+        _bFvgB := high[2]
+    if high[0] < low[2]
+        _rFvgT := low[2]
+        _rFvgB := high[0]
+    [_bFvgT, _bFvgB, _rFvgT, _rFvgB]
+
+[h1BT,h1BB,h1RT,h1RB] = request.security(syminfo.tickerid,"60",  f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[h4BT,h4BB,h4RT,h4RB] = request.security(syminfo.tickerid,"240", f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[d1BT,d1BB,d1RT,d1RB] = request.security(syminfo.tickerid,"D",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+
+[h1BFvgT,h1BFvgB,h1RFvgT,h1RFvgB] = request.security(syminfo.tickerid,"60",  f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[h4BFvgT,h4BFvgB,h4RFvgT,h4RFvgB] = request.security(syminfo.tickerid,"240", f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[d1BFvgT,d1BFvgB,d1RFvgT,d1RFvgB] = request.security(syminfo.tickerid,"D",   f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+
+htfBullTop = autoHTF=="60"?h1BT:autoHTF=="240"?h4BT:d1BT
+htfBullBot = autoHTF=="60"?h1BB:autoHTF=="240"?h4BB:d1BB
+htfBearTop = autoHTF=="60"?h1RT:autoHTF=="240"?h4RT:d1RT
+htfBearBot = autoHTF=="60"?h1RB:autoHTF=="240"?h4RB:d1RB
+
+phH = ta.pivothigh(high,_pivL,_pivR)
+plL = ta.pivotlow(low, _pivL,_pivR)
+var float lastPH=na
+var float lastPL=na
+if not na(phH)
+    lastPH := phH
+if not na(plL)
+    lastPL := plL
+
+bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
+bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
+var bool hasMSSBull=false
+var bool hasMSSBear=false
+if bullMSS
+    hasMSSBull := true
+    hasMSSBear := false
+if bearMSS
+    hasMSSBear := true
+    hasMSSBull := false
+
+var float[] bb          = array.new_float()
+var float[] bl          = array.new_float()
+var bool[]  bb_hasFVG   = array.new_bool()
+var float[] bb_fvgT     = array.new_float()
+var float[] bb_fvgB     = array.new_float()
+var box[]   bb_box      = array.new_box()
+var box[]   bb_fbox     = array.new_box()
+var box[]   bb_hqbox    = array.new_box()
+var bool[]  bb_signaled = array.new_bool()
+var bool[]  bb_isHQ     = array.new_bool()
+
+var float[] rb          = array.new_float()
+var float[] rl          = array.new_float()
+var bool[]  rb_hasFVG   = array.new_bool()
+var float[] rb_fvgT     = array.new_float()
+var float[] rb_fvgB     = array.new_float()
+var box[]   rb_box      = array.new_box()
+var box[]   rb_fbox     = array.new_box()
+var box[]   rb_hqbox    = array.new_box()
+var bool[]  rb_signaled = array.new_bool()
+var bool[]  rb_isHQ     = array.new_bool()
+
+var label[] sigLabels   = array.new_label()
+var int[]   sigBars     = array.new_int()
+var int     lastAnySigBar = -999
+
+avgBody = ta.sma(math.abs(close-open),20)
+rng50   = ta.highest(high,50) - ta.lowest(low,50)
+mid50   = ta.lowest(low,50) + rng50*0.5
+var int lastMSSDir = 0
+
+f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
+
+while array.size(sigBars) > 0
+    if bar_index - array.get(sigBars, 0) > sigBarsMax
+        label.delete(array.shift(sigLabels))
+        array.shift(sigBars)
+    else
+        break
+
+f_bull_shift() =>
+    _bx = array.shift(bb_box)
+    if not na(_bx)
+        box.delete(_bx)
+    _f = array.shift(bb_fbox)
+    if not na(_f)
+        box.delete(_f)
+    _h = array.shift(bb_hqbox)
+    if not na(_h)
+        box.delete(_h)
+    array.shift(bb), array.shift(bl), array.shift(bb_hasFVG)
+    array.shift(bb_fvgT), array.shift(bb_fvgB)
+    array.shift(bb_signaled), array.shift(bb_isHQ)
+
+f_bear_shift() =>
+    _bx = array.shift(rb_box)
+    if not na(_bx)
+        box.delete(_bx)
+    _f = array.shift(rb_fbox)
+    if not na(_f)
+        box.delete(_f)
+    _h = array.shift(rb_hqbox)
+    if not na(_h)
+        box.delete(_h)
+    array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
+    array.shift(rb_fvgT), array.shift(rb_fvgB)
+    array.shift(rb_signaled), array.shift(rb_isHQ)
+
+if bullMSS and lastMSSDir != 1
+    lastMSSDir := 1
+    while array.size(rb) > 0
+        f_bear_shift()
+    if array.size(bb) >= maxOBs
+        f_bull_shift()
+    for i = 1 to _bbSrch
+        if close[i] < open[i]
+            obT   = high[i]
+            obB   = low[i]
+            obBar = bar_index - i
+            fvgOk = i > 1 ? low[i-1] > high[i+1] : false
+            fvgT  = fvgOk ? low[i-1]  : na
+            fvgB  = fvgOk ? high[i+1] : na
+            inPDA = not na(mid50) ? (obT+obB)/2 < mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            sc    = f_sc(fvgOk, big, not na(lastPL), inPDA)
+            isHQ  = sc >= hqMin
+            if sc >= minScore
+                array.push(bb, obT), array.push(bl, obB)
+                array.push(bb_hasFVG, fvgOk)
+                array.push(bb_fvgT, fvgT), array.push(bb_fvgB, fvgB)
+                array.push(bb_signaled, false), array.push(bb_isHQ, isHQ)
+                if showBull
+                    _bc = isHQ?color.new(#9C27B0,0):color.new(#1E88E5,0)
+                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#1E88E5,obFillTransp)
+                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#BBDEFB,0)
+                    array.push(bb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="+OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=size.small,text_halign=text.align_center,text_valign=text.align_center))
+                    if fvgOk
+                        array.push(bb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#64B5F6,30),bgcolor=color.new(#64B5F6,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#90CAF9,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
+                    else
+                        array.push(bb_fbox, na)
+                    if isHQ
+                        array.push(bb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
+                    else
+                        array.push(bb_hqbox, na)
+                else
+                    array.push(bb_box, na)
+                    array.push(bb_fbox, na)
+                    array.push(bb_hqbox, na)
+                if isHQ
+                    _hl = label.new(obBar,obT,"★ HQ",style=label.style_label_down,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
+                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
+            break
+
+if bearMSS and lastMSSDir != -1
+    lastMSSDir := -1
+    while array.size(bb) > 0
+        f_bull_shift()
+    if array.size(rb) >= maxOBs
+        f_bear_shift()
+    for i = 1 to _bbSrch
+        if close[i] > open[i]
+            obT   = high[i]
+            obB   = low[i]
+            obBar = bar_index - i
+            fvgOk = i > 1 ? high[i-1] < low[i+1] : false
+            fvgT  = fvgOk ? low[i+1]  : na
+            fvgB  = fvgOk ? high[i-1] : na
+            inPDA = not na(mid50) ? (obT+obB)/2 > mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            sc    = f_sc(fvgOk, big, not na(lastPH), inPDA)
+            isHQ  = sc >= hqMin
+            if sc >= minScore
+                array.push(rb, obT), array.push(rl, obB)
+                array.push(rb_hasFVG, fvgOk)
+                array.push(rb_fvgT, fvgT), array.push(rb_fvgB, fvgB)
+                array.push(rb_signaled, false), array.push(rb_isHQ, isHQ)
+                if showBear
+                    _bc = isHQ?color.new(#9C27B0,0):color.new(#FF8C00,0)
+                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#FF8C00,obFillTransp)
+                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#FFE0B2,0)
+                    array.push(rb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="-OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=size.small,text_halign=text.align_center,text_valign=text.align_center))
+                    if fvgOk
+                        array.push(rb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#FFB74D,30),bgcolor=color.new(#FFB74D,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#FFCC80,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
+                    else
+                        array.push(rb_fbox, na)
+                    if isHQ
+                        array.push(rb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
+                    else
+                        array.push(rb_hqbox, na)
+                else
+                    array.push(rb_box, na)
+                    array.push(rb_fbox, na)
+                    array.push(rb_hqbox, na)
+                if isHQ
+                    _hl = label.new(obBar,obB,"★ HQ",style=label.style_label_up,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
+                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
+            break
+
+inHTFBull = not na(htfBullTop) and not na(htfBullBot) and close >= htfBullBot and close <= htfBullTop
+inHTFBear = not na(htfBearTop) and not na(htfBearBot) and close >= htfBearBot and close <= htfBearTop
+htfOkBull = unicornNeedHTF ? inHTFBull : true
+htfOkBear = unicornNeedHTF ? inHTFBear : true
+
+var bool unicornBull = false
+var bool unicornBear = false
+unicornBull := false
+unicornBear := false
+var int trigBullIdx = -1
+var int trigBearIdx = -1
+trigBullIdx := -1
+trigBearIdx := -1
+
+if array.size(bb) > 0 and lastMSSDir == 1
+    for i = 0 to array.size(bb)-1
+        obT      = array.get(bb, i)
+        obB      = array.get(bl, i)
+        fvgOn    = array.get(bb_hasFVG, i)
+        fT       = array.get(bb_fvgT, i)
+        fB       = array.get(bb_fvgB, i)
+        signaled = array.get(bb_signaled, i)
+        bx       = array.get(bb_box, i)
+        fbx      = array.get(bb_fbox, i)
+        hqbx     = array.get(bb_hqbox, i)
+        if not na(bx)
+            box.set_right(bx, bar_index + _obExtR)
+            if fvgOn and not na(fbx)
+                box.set_right(fbx, bar_index + _obExtR)
+            if not na(hqbx)
+                box.set_right(hqbx, bar_index + _obExtR)
+        if close < obB
+            if not na(bx)
+                box.set_border_color(bx, color.new(color.gray,40))
+                box.set_bgcolor(bx, color.new(color.gray,90))
+                box.set_text_color(bx, color.new(color.gray,30))
+            if not na(hqbx)
+                box.set_border_color(hqbx, color.new(color.gray,60))
+                box.set_bgcolor(hqbx, color.new(color.gray,97))
+        else if not signaled or allowRepeat
+            ovT   = fvgOn and not na(fT) and not na(fB) ? math.min(obT, fT) : obT
+            ovB   = fvgOn and not na(fT) and not na(fB) ? math.max(obB, fB) : obB
+            hasOv = fvgOn and not na(fT) and not na(fB) and ovT > ovB
+            zone  = unicornNeedFVG ? (hasOv and low <= ovT and high >= ovB) : low <= obT
+            if zone and htfOkBull
+                unicornBull := true
+                trigBullIdx := i
+
+if array.size(rb) > 0 and lastMSSDir == -1
+    for i = 0 to array.size(rb)-1
+        obT      = array.get(rb, i)
+        obB      = array.get(rl, i)
+        fvgOn    = array.get(rb_hasFVG, i)
+        fT       = array.get(rb_fvgT, i)
+        fB       = array.get(rb_fvgB, i)
+        signaled = array.get(rb_signaled, i)
+        bx       = array.get(rb_box, i)
+        fbx      = array.get(rb_fbox, i)
+        hqbx     = array.get(rb_hqbox, i)
+        if not na(bx)
+            box.set_right(bx, bar_index + _obExtR)
+            if fvgOn and not na(fbx)
+                box.set_right(fbx, bar_index + _obExtR)
+            if not na(hqbx)
+                box.set_right(hqbx, bar_index + _obExtR)
+        if close > obT
+            if not na(bx)
+                box.set_border_color(bx, color.new(color.gray,40))
+                box.set_bgcolor(bx, color.new(color.gray,90))
+                box.set_text_color(bx, color.new(color.gray,30))
+            if not na(hqbx)
+                box.set_border_color(hqbx, color.new(color.gray,60))
+                box.set_bgcolor(hqbx, color.new(color.gray,97))
+        else if not signaled or allowRepeat
+            ovT   = fvgOn and not na(fT) and not na(fB) ? math.min(obT, fT) : obT
+            ovB   = fvgOn and not na(fT) and not na(fB) ? math.max(obB, fB) : obB
+            hasOv = fvgOn and not na(fT) and not na(fB) and ovT > ovB
+            zone  = unicornNeedFVG ? (hasOv and high >= ovB and low <= ovT) : high >= obB
+            if zone and htfOkBear
+                unicornBear := true
+                trigBearIdx := i
+
+uBullEdge = unicornBull and not unicornBull[1]
+uBearEdge = unicornBear and not unicornBear[1]
+
+bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown
+bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown
+
+if fireBull and fireBear
+    fireBull := lastMSSDir >= 0
+    fireBear := lastMSSDir < 0
+
+if fireBull
+    if not allowRepeat
+        array.set(bb_signaled, trigBullIdx, true)
+    lastAnySigBar := bar_index
+    _isHQ  = array.get(bb_isHQ, trigBullIdx)
+    _obBot = array.get(bl, trigBullIdx)
+    _yPos  = math.min(low, _obBot)
+    _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#1E88E5,0)
+    _lt    = _isHQ ? "▲ HQ unicorn" : "▲ unicorn"
+    _lbl   = label.new(bar_index, _yPos, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
+    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
+
+if fireBear
+    if not allowRepeat
+        array.set(rb_signaled, trigBearIdx, true)
+    lastAnySigBar := bar_index
+    _isHQ  = array.get(rb_isHQ, trigBearIdx)
+    _obTop = array.get(rb, trigBearIdx)
+    _yPos  = math.max(high, _obTop)
+    _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#FF8C00,0)
+    _lt    = _isHQ ? "▼ HQ unicorn" : "▼ unicorn"
+    _lbl   = label.new(bar_index, _yPos, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
+    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
+
+alertcondition(fireBull or fireBear, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
+alertcondition(fireBull,             title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
+alertcondition(fireBear,             title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
+
+bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
+
+h1W = math.max(bar_index - h1Days*barsPerDay, 1)
+h4W = math.max(bar_index - h4Days*barsPerDay, 1)
+d1W = math.max(bar_index - d1Days*barsPerDay, 1)
+ZR  = bar_index + htfExtR
+
+var box h1BullBox=na, var box h1BearBox=na
+var box h4BullBox=na, var box h4BearBox=na
+var box d1BullBox=na, var box d1BearBox=na
+var box h1BullFvgBox=na, var box h1BearFvgBox=na
+var box h4BullFvgBox=na, var box h4BearFvgBox=na
+var box d1BullFvgBox=na, var box d1BearFvgBox=na
+
+if show1HOB and not na(h1BT) and not na(h1BB)
+    if na(h1BullBox)
+        h1BullBox := box.new(h1W,h1BT,ZR,h1BB,border_color=color.new(#26A69A,20),bgcolor=color.new(#26A69A,htfFillTransp),border_width=1,text="1H+OB",text_color=color.new(#80CBC4,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h1W > 1
+            box.set_left(h1BullBox, h1W)
+        box.set_right(h1BullBox, ZR)
+        box.set_top(h1BullBox, h1BT)
+        box.set_bottom(h1BullBox, h1BB)
+        box.set_bgcolor(h1BullBox, color.new(#26A69A,htfFillTransp))
+
+if show1HOB and not na(h1RT) and not na(h1RB)
+    if na(h1BearBox)
+        h1BearBox := box.new(h1W,h1RT,ZR,h1RB,border_color=color.new(#EF5350,20),bgcolor=color.new(#EF5350,htfFillTransp),border_width=1,text="1H-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h1W > 1
+            box.set_left(h1BearBox, h1W)
+        box.set_right(h1BearBox, ZR)
+        box.set_top(h1BearBox, h1RT)
+        box.set_bottom(h1BearBox, h1RB)
+        box.set_bgcolor(h1BearBox, color.new(#EF5350,htfFillTransp))
+
+if show4HOB and not na(h4BT) and not na(h4BB)
+    if na(h4BullBox)
+        h4BullBox := box.new(h4W,h4BT,ZR,h4BB,border_color=color.new(#00BCD4,20),bgcolor=color.new(#00BCD4,htfFillTransp),border_width=2,text="4H+OB",text_color=color.new(#80DEEA,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h4W > 1
+            box.set_left(h4BullBox, h4W)
+        box.set_right(h4BullBox, ZR)
+        box.set_top(h4BullBox, h4BT)
+        box.set_bottom(h4BullBox, h4BB)
+        box.set_bgcolor(h4BullBox, color.new(#00BCD4,htfFillTransp))
+
+if show4HOB and not na(h4RT) and not na(h4RB)
+    if na(h4BearBox)
+        h4BearBox := box.new(h4W,h4RT,ZR,h4RB,border_color=color.new(#FF5722,20),bgcolor=color.new(#FF5722,htfFillTransp),border_width=2,text="4H-OB",text_color=color.new(#FF8A65,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h4W > 1
+            box.set_left(h4BearBox, h4W)
+        box.set_right(h4BearBox, ZR)
+        box.set_top(h4BearBox, h4RT)
+        box.set_bottom(h4BearBox, h4RB)
+        box.set_bgcolor(h4BearBox, color.new(#FF5722,htfFillTransp))
+
+if show1DOB and not na(d1BT) and not na(d1BB)
+    if na(d1BullBox)
+        d1BullBox := box.new(d1W,d1BT,ZR,d1BB,border_color=color.new(#4CAF50,20),bgcolor=color.new(#4CAF50,htfFillTransp),border_width=2,text="1D+OB",text_color=color.new(#A5D6A7,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if d1W > 1
+            box.set_left(d1BullBox, d1W)
+        box.set_right(d1BullBox, ZR)
+        box.set_top(d1BullBox, d1BT)
+        box.set_bottom(d1BullBox, d1BB)
+        box.set_bgcolor(d1BullBox, color.new(#4CAF50,htfFillTransp))
+
+if show1DOB and not na(d1RT) and not na(d1RB)
+    if na(d1BearBox)
+        d1BearBox := box.new(d1W,d1RT,ZR,d1RB,border_color=color.new(#F44336,20),bgcolor=color.new(#F44336,htfFillTransp),border_width=2,text="1D-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if d1W > 1
+            box.set_left(d1BearBox, d1W)
+        box.set_right(d1BearBox, ZR)
+        box.set_top(d1BearBox, d1RT)
+        box.set_bottom(d1BearBox, d1RB)
+        box.set_bgcolor(d1BearBox, color.new(#F44336,htfFillTransp))
+
+_fvgT = math.min(98, htfFillTransp + 5)
+
+if show1HFVG
+    if not na(h1BFvgT) and not na(h1BFvgB)
+        if na(h1BullFvgBox)
+            h1BullFvgBox := box.new(h1W,h1BFvgT,ZR,h1BFvgB,border_color=color.new(#26A69A,0),bgcolor=color.new(#26A69A,_fvgT),border_style=line.style_dashed,border_width=1,text="1H FVG+",text_color=color.new(#80CBC4,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            if h1W > 1
+                box.set_left(h1BullFvgBox, h1W)
+            box.set_right(h1BullFvgBox, ZR)
+            box.set_top(h1BullFvgBox, h1BFvgT)
+            box.set_bottom(h1BullFvgBox, h1BFvgB)
+            box.set_bgcolor(h1BullFvgBox, color.new(#26A69A,_fvgT))
+    else if not na(h1BullFvgBox)
+        box.delete(h1BullFvgBox)
+        h1BullFvgBox := na
+    if not na(h1RFvgT) and not na(h1RFvgB)
+        if na(h1BearFvgBox)
+            h1BearFvgBox := box.new(h1W,h1RFvgT,ZR,h1RFvgB,border_color=color.new(#EF5350,0),bgcolor=color.new(#EF5350,_fvgT),border_style=line.style_dashed,border_width=1,text="1H FVG-",text_color=color.new(#EF9A9A,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            if h1W > 1
+                box.set_left(h1BearFvgBox, h1W)
+            box.set_right(h1BearFvgBox, ZR)
+            box.set_top(h1BearFvgBox, h1RFvgT)
+            box.set_bottom(h1BearFvgBox, h1RFvgB)
+            box.set_bgcolor(h1BearFvgBox, color.new(#EF5350,_fvgT))
+    else if not na(h1BearFvgBox)
+        box.delete(h1BearFvgBox)
+        h1BearFvgBox := na
+
+if show4HFVG
+    if not na(h4BFvgT) and not na(h4BFvgB)
+        if na(h4BullFvgBox)
+            h4BullFvgBox := box.new(h4W,h4BFvgT,ZR,h4BFvgB,border_color=color.new(#00BCD4,0),bgcolor=color.new(#00BCD4,_fvgT),border_style=line.style_dashed,border_width=2,text="4H FVG+",text_color=color.new(#80DEEA,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            if h4W > 1
+                box.set_left(h4BullFvgBox, h4W)
+            box.set_right(h4BullFvgBox, ZR)
+            box.set_top(h4BullFvgBox, h4BFvgT)
+            box.set_bottom(h4BullFvgBox, h4BFvgB)
+            box.set_bgcolor(h4BullFvgBox, color.new(#00BCD4,_fvgT))
+    else if not na(h4BullFvgBox)
+        box.delete(h4BullFvgBox)
+        h4BullFvgBox := na
+    if not na(h4RFvgT) and not na(h4RFvgB)
+        if na(h4BearFvgBox)
+            h4BearFvgBox := box.new(h4W,h4RFvgT,ZR,h4RFvgB,border_color=color.new(#FF5722,0),bgcolor=color.new(#FF5722,_fvgT),border_style=line.style_dashed,border_width=2,text="4H FVG-",text_color=color.new(#FF8A65,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            if h4W > 1
+                box.set_left(h4BearFvgBox, h4W)
+            box.set_right(h4BearFvgBox, ZR)
+            box.set_top(h4BearFvgBox, h4RFvgT)
+            box.set_bottom(h4BearFvgBox, h4RFvgB)
+            box.set_bgcolor(h4BearFvgBox, color.new(#FF5722,_fvgT))
+    else if not na(h4BearFvgBox)
+        box.delete(h4BearFvgBox)
+        h4BearFvgBox := na
+
+if show1DFVG
+    if not na(d1BFvgT) and not na(d1BFvgB)
+        if na(d1BullFvgBox)
+            d1BullFvgBox := box.new(d1W,d1BFvgT,ZR,d1BFvgB,border_color=color.new(#4CAF50,0),bgcolor=color.new(#4CAF50,_fvgT),border_style=line.style_dashed,border_width=2,text="1D FVG+",text_color=color.new(#A5D6A7,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            if d1W > 1
+                box.set_left(d1BullFvgBox, d1W)
+            box.set_right(d1BullFvgBox, ZR)
+            box.set_top(d1BullFvgBox, d1BFvgT)
+            box.set_bottom(d1BullFvgBox, d1BFvgB)
+            box.set_bgcolor(d1BullFvgBox, color.new(#4CAF50,_fvgT))
+    else if not na(d1BullFvgBox)
+        box.delete(d1BullFvgBox)
+        d1BullFvgBox := na
+    if not na(d1RFvgT) and not na(d1RFvgB)
+        if na(d1BearFvgBox)
+            d1BearFvgBox := box.new(d1W,d1RFvgT,ZR,d1RFvgB,border_color=color.new(#F44336,0),bgcolor=color.new(#F44336,_fvgT),border_style=line.style_dashed,border_width=2,text="1D FVG-",text_color=color.new(#EF9A9A,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            if d1W > 1
+                box.set_left(d1BearFvgBox, d1W)
+            box.set_right(d1BearFvgBox, ZR)
+            box.set_top(d1BearFvgBox, d1RFvgT)
+            box.set_bottom(d1BearFvgBox, d1RFvgB)
+            box.set_bgcolor(d1BearFvgBox, color.new(#F44336,_fvgT))
+    else if not na(d1BearFvgBox)
+        box.delete(d1BearFvgBox)
+        d1BearFvgBox := na
+
+step1 = inHTFBull or inHTFBear
+step2 = step1
+step3 = hasMSSBull or hasMSSBear
+step4 = array.size(bb) > 0 or array.size(rb) > 0
+var bool step5 = false
+step5 := false
+if array.size(bb) > 0
+    for i = 0 to array.size(bb)-1
+        if array.get(bb_hasFVG,i)
+            step5 := true
+if array.size(rb) > 0
+    for i = 0 to array.size(rb)-1
+        if array.get(rb_hasFVG,i)
+            step5 := true
+step6 = step4
+step7 = unicornBull or unicornBear
+
+bullDir = hasMSSBull and (inHTFBull or not unicornNeedHTF)
+bearDir = hasMSSBear and (inHTFBear or not unicornNeedHTF)
+dirStr  = unicornBull?"▲ 做多進場":unicornBear?"▼ 做空進場":bullDir?"多方準備中":bearDir?"空方準備中":"觀望"
+dirCol  = unicornBull or bullDir ? color.new(#1E88E5,0) : unicornBear or bearDir ? color.new(#FF8C00,0) : color.new(#888888,0)
+htfInfo = inHTFBull?"多方PDA":inHTFBear?"空方PDA":"未進入"
+mssInfo = hasMSSBull?"看漲":hasMSSBear?"看跌":"待確認"
+bbCnt   = array.size(bb)+array.size(rb)
+bbInfo  = bbCnt>0?str.tostring(bbCnt)+"個OB":"無"
+nextStr = not step3?"等待MSS":not step4?"等待OB":(not step5 and unicornNeedFVG)?"等待FVG":not step7?"等待回測OB":"已觸發!"
+
+_pos  = dashPos=="左下"?position.bottom_left:dashPos=="右下"?position.bottom_right:dashPos=="左上"?position.top_left:position.top_right
+_cbg  = color.new(#0D1117,5)
+_chdr = color.new(#1A1F2E,5)
+_cg   = color.new(#FFD700,0)
+_co   = color.new(#FF8C00,0)
+_ick(v) => v ? color.new(#FFD700,0) : color.new(#444444,0)
+_ckk(v) => v ? "✔" : "·"
+
+if showDash and barstate.islast
+    dash = table.new(_pos,9,3,bgcolor=_cbg,border_color=color.new(#FF8C00,50),border_width=1,frame_color=#FFD700,frame_width=1)
+    table.cell(dash,0,0,"Unicorn·"+tfStr,text_color=_cg,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,1,0,"HTF PDA", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,2,0,"進入PDA", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,3,0,"MSS",     text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,4,0,"OB",      text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,5,0,"FVG",     text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,6,0,"突破OB",  text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,7,0,"Unicorn", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,8,0,"進度",    text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,0,1,dirStr,       text_color=dirCol,     text_size=size.small, bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,1,1,_ckk(step1), text_color=_ick(step1),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,2,1,_ckk(step2), text_color=_ick(step2),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,3,1,_ckk(step3), text_color=_ick(step3),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,4,1,_ckk(step4), text_color=_ick(step4),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,5,1,_ckk(step5), text_color=_ick(step5),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,6,1,_ckk(step6), text_color=_ick(step6),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,7,1,_ckk(step7), text_color=_ick(step7),text_size=size.normal,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,8,1,nextStr,      text_color=color.new(#FFCC00,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_left)
+    table.cell(dash,0,2,"參考 "+htfStr,text_color=color.new(#888888,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,1,2,htfInfo,      text_color=_ick(step1),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,2,2,step2?"已進入":"未進入",text_color=_ick(step2),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,3,2,mssInfo,      text_color=_ick(step3),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,4,2,bbInfo,       text_color=_ick(step4),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,5,2,step5?"有FVG":"無FVG",text_color=_ick(step5),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,6,2,step6?"已確認":"待確認",text_color=_ick(step6),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,8,2,"",          text_color=color.new(#444444,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
+
+document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
+
+function switchUnicornVer(ver, btn) {
+  document.querySelectorAll('#unicorn-vtabs .ver-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('unicorn-v1-wrap').style.display = ver === 'v1' ? 'block' : 'none';
+  document.getElementById('unicorn-v2-wrap').style.display = ver === 'v2' ? 'block' : 'none';
+  document.getElementById('unicorn-log-v1').style.display  = ver === 'v1' ? 'block' : 'none';
+  document.getElementById('unicorn-log-v2').style.display  = ver === 'v2' ? 'block' : 'none';
+}
+
+function copyUnicornCode(ver, btn) {
+  const text = ver === 'v2'
+    ? UNICORN_V2
+    : document.getElementById('unicorn-v1-code').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已複製!';
+    setTimeout(() => btn.textContent = '複製', 1500);
+  });
+}
+
 function filt(cat, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
