@@ -72,6 +72,13 @@ a:hover{text-decoration:underline}
 .ver-log{background:rgba(91,33,182,.07);border:1px solid rgba(139,92,246,.2);border-left:3px solid #7c3aed;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:.8rem;color:#6b7280;line-height:1.9}
 .ver-log b{color:#c4b5fd;font-weight:600}
 .vl-dot{color:#8b5cf6;margin-right:4px;font-weight:700}
+.ver-layout{display:flex;gap:14px;margin-top:10px;align-items:flex-start}
+.ver-sidebar{flex:0 0 108px}
+.ver-sidebar .ver-tabs{flex-direction:column;margin:0}
+.ver-main{flex:1;min-width:0}
+.copy-bar-btn{width:100%;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.4);color:#c4b5fd;font-size:.82rem;padding:7px 0;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:.03em;transition:all .2s;margin-bottom:8px;display:block}
+.copy-bar-btn:hover{background:rgba(139,92,246,.25);border-color:#8b5cf6;color:#e9d5ff}
+.copy-bar-btn:active{transform:scale(.98)}
 
 @media(max-width:600px){
   .grid{padding:12px 12px;gap:14px}
@@ -81,6 +88,9 @@ a:hover{text-decoration:underline}
   .topbar a{display:none}
   .topbar a:first-of-type{display:inline}
   .info-grid{grid-template-columns:1fr 1fr}
+  .ver-layout{flex-direction:column}
+  .ver-sidebar{flex:none;width:100%}
+  .ver-sidebar .ver-tabs{flex-direction:row;flex-wrap:wrap}
 }
 </style>
 </head>
@@ -417,33 +427,39 @@ adx_thr = <span class="fn">input.int</span>(<span class="num">25</span>, <span c
       <div class="info-item"><div class="info-label">時框支援</div><div class="info-val">Auto 1M – 1D</div></div>
     </div>
     <!-- ── UNICORN 版本選擇器 ── -->
-    <div class="ver-tabs" id="unicorn-vtabs">
-      <button class="ver-tab active" onclick="switchUnicornVer('v2',this)">
-        v2.0 <span class="ver-latest-badge">最新</span>
-        <span class="ver-sub">2026-07-09 · 673行 · OB∩FVG 真Unicorn</span>
-      </button>
-      <button class="ver-tab" onclick="switchUnicornVer('v1',this)">
-        v1.0 <span class="ver-sub">2026-07-06 · 出場警示版</span>
-      </button>
-    </div>
-    <div id="unicorn-log-v2" class="ver-log">
-      <span class="vl-dot">›</span> <b>unicornNeedFVG</b> 預設改 true，強制OB∩FVG重疊（真Unicorn條件）<br>
-      <span class="vl-dot">›</span> 新增 <b>ovT / ovB / hasOv</b> 重疊區間計算，進場條件改用重疊區間<br>
-      <span class="vl-dot">›</span> 新增 <b>sigCooldown</b> 訊號冷卻 + <b>allowRepeat</b> 控制參數<br>
-      <span class="vl-dot">›</span> 移除 showExitLabel，出場整合入 MSS 反轉邏輯
-    </div>
-    <div id="unicorn-log-v1" class="ver-log" style="display:none">
-      <span class="vl-dot">›</span> 初始發行版：自動OB識別、MSS觸發獨角獸進場訊號<br>
-      <span class="vl-dot">›</span> 含 <b>⚠ 多/空單出場警示標籤</b>（結構反轉時自動顯示）<br>
-      <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
-    </div>
-    <div style="position:relative;margin-top:8px" id="unicorn-v2-wrap">
-      <button class="copy-btn" onclick="copyUnicornCode('v2',this)">複製</button>
-      <div class="code-block" id="unicorn-v2-code"></div>
-    </div>
-    <div style="position:relative;margin-top:8px;display:none" id="unicorn-v1-wrap">
-      <button class="copy-btn" onclick="copyUnicornCode('v1',this)">複製</button>
-      <div class="code-block" id="unicorn-v1-code">//@version=5
+    <div class="ver-layout">
+      <div class="ver-sidebar">
+        <div class="ver-tabs" id="unicorn-vtabs">
+          <button class="ver-tab active" onclick="switchUnicornVer('v2',this)">
+            v2.0 <span class="ver-latest-badge">最新</span>
+            <span class="ver-sub">2026-07-09</span>
+            <span class="ver-sub">673行 OB∩FVG</span>
+          </button>
+          <button class="ver-tab" onclick="switchUnicornVer('v1',this)">
+            v1.0
+            <span class="ver-sub">2026-07-06</span>
+            <span class="ver-sub">出場警示版</span>
+          </button>
+        </div>
+      </div>
+      <div class="ver-main">
+        <div id="unicorn-log-v2" class="ver-log">
+          <span class="vl-dot">›</span> <b>unicornNeedFVG</b> 預設改 true，強制OB∩FVG重疊（真Unicorn條件）<br>
+          <span class="vl-dot">›</span> 新增 <b>ovT / ovB / hasOv</b> 重疊區間計算，進場條件改用重疊區間<br>
+          <span class="vl-dot">›</span> 新增 <b>sigCooldown</b> 訊號冷卻 + <b>allowRepeat</b> 控制參數<br>
+          <span class="vl-dot">›</span> 移除 showExitLabel，出場整合入 MSS 反轉邏輯
+        </div>
+        <div id="unicorn-log-v1" class="ver-log" style="display:none">
+          <span class="vl-dot">›</span> 初始發行版：自動OB識別、MSS觸發獨角獸進場訊號<br>
+          <span class="vl-dot">›</span> 含 <b>⚠ 多/空單出場警示標籤</b>（結構反轉時自動顯示）<br>
+          <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
+        </div>
+        <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
+        <div id="unicorn-v2-wrap">
+          <div class="code-block" id="unicorn-v2-code"></div>
+        </div>
+        <div id="unicorn-v1-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v1-code">//@version=5
 indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=200)
 
 grp1 = "訂單塊設定"
@@ -840,8 +856,9 @@ if showDash and barstate.islast
     table.cell(dash,6,2,step6?"已確認":"待確認",text_color=_ick(step6),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,8,2,"",text_color=color.new(#444444,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)</div>
-    </div><!-- /unicorn-v1-code -->
-    </div><!-- /unicorn-v1-wrap -->
+        </div><!-- /#unicorn-v1-wrap -->
+      </div><!-- /.ver-main -->
+    </div><!-- /.ver-layout -->
     <div class="tips-box" style="margin-top:10px">
       <h4>使用說明</h4>
       <ul>
@@ -1538,7 +1555,9 @@ if showDash and barstate.islast
 
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 
+let _uVer = 'v2';
 function switchUnicornVer(ver, btn) {
+  _uVer = ver;
   document.querySelectorAll('#unicorn-vtabs .ver-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('unicorn-v1-wrap').style.display = ver === 'v1' ? 'block' : 'none';
@@ -1547,13 +1566,13 @@ function switchUnicornVer(ver, btn) {
   document.getElementById('unicorn-log-v2').style.display  = ver === 'v2' ? 'block' : 'none';
 }
 
-function copyUnicornCode(ver, btn) {
-  const text = ver === 'v2'
+function copyUnicornCode(btn) {
+  const text = _uVer === 'v2'
     ? UNICORN_V2
     : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '已複製!';
-    setTimeout(() => btn.textContent = '複製', 1500);
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
   });
 }
 
