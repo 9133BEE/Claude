@@ -1126,9 +1126,10 @@ if bullMSS and lastMSSDir != 1
             fvgOk = i > 1 ? low[i-1] > high[i+1] : false
             fvgT  = fvgOk ? low[i-1]  : na
             fvgB  = fvgOk ? high[i+1] : na
-            inPDA = not na(mid50) ? (obT+obB)/2 < mid50 : false
-            big   = math.abs(close[i]-open[i]) > avgBody*1.5
-            sc    = f_sc(fvgOk, big, not na(lastPL), inPDA)
+            inPDA    = not na(mid50) ? (obT+obB)/2 < mid50 : false
+            big      = math.abs(close[i]-open[i]) > avgBody*1.5
+            bigRange = (obT - obB) >= avgBody
+            sc    = f_sc(fvgOk, big, bigRange, inPDA)
             isHQ  = sc >= hqMin
             if sc >= minScore
                 array.push(bb, obT), array.push(bl, obB)
@@ -1171,9 +1172,10 @@ if bearMSS and lastMSSDir != -1
             fvgOk = i > 1 ? high[i-1] < low[i+1] : false
             fvgT  = fvgOk ? low[i+1]  : na
             fvgB  = fvgOk ? high[i-1] : na
-            inPDA = not na(mid50) ? (obT+obB)/2 > mid50 : false
-            big   = math.abs(close[i]-open[i]) > avgBody*1.5
-            sc    = f_sc(fvgOk, big, not na(lastPH), inPDA)
+            inPDA    = not na(mid50) ? (obT+obB)/2 > mid50 : false
+            big      = math.abs(close[i]-open[i]) > avgBody*1.5
+            bigRange = (obT - obB) >= avgBody
+            sc    = f_sc(fvgOk, big, bigRange, inPDA)
             isHQ  = sc >= hqMin
             if sc >= minScore
                 array.push(rb, obT), array.push(rl, obB)
@@ -1243,7 +1245,7 @@ if array.size(bb) > 0 and lastMSSDir == 1
                 box.set_bgcolor(hqbx, color.new(color.gray,97))
         else if not signaled or allowRepeat
             inFVG = fvgOn and not na(fT) and not na(fB) ? low <= fT and high >= fB : false
-            zone  = unicornNeedFVG ? inFVG : low <= obT
+            zone  = unicornNeedFVG ? inFVG : (low <= obT and high >= obB)
             if zone and htfOkBull
                 unicornBull := true
                 trigBullIdx := i
@@ -1275,7 +1277,7 @@ if array.size(rb) > 0 and lastMSSDir == -1
                 box.set_bgcolor(hqbx, color.new(color.gray,97))
         else if not signaled or allowRepeat
             inFVG = fvgOn and not na(fT) and not na(fB) ? high >= fB and low <= fT : false
-            zone  = unicornNeedFVG ? inFVG : high >= obB
+            zone  = unicornNeedFVG ? inFVG : (high >= obB and low <= obT)
             if zone and htfOkBear
                 unicornBear := true
                 trigBearIdx := i
