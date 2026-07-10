@@ -433,7 +433,7 @@ adx_thr = <span class="fn">input.int</span>(<span class="num">25</span>, <span c
           <button class="ver-tab active" onclick="switchUnicornVer('v2',this)">
             v2.0 <span class="ver-latest-badge">最新</span>
             <span class="ver-sub">2026-07-09</span>
-            <span class="ver-sub">673行 OB∩FVG</span>
+            <span class="ver-sub">669行 sigCooldown</span>
           </button>
           <button class="ver-tab" onclick="switchUnicornVer('v1',this)">
             v1.0
@@ -444,10 +444,10 @@ adx_thr = <span class="fn">input.int</span>(<span class="num">25</span>, <span c
       </div>
       <div class="ver-main">
         <div id="unicorn-log-v2" class="ver-log">
-          <span class="vl-dot">›</span> <b>unicornNeedFVG</b> 預設改 true，強制OB∩FVG重疊（真Unicorn條件）<br>
-          <span class="vl-dot">›</span> 新增 <b>ovT / ovB / hasOv</b> 重疊區間計算，進場條件改用重疊區間<br>
-          <span class="vl-dot">›</span> 新增 <b>sigCooldown</b> 訊號冷卻 + <b>allowRepeat</b> 控制參數<br>
-          <span class="vl-dot">›</span> 移除 showExitLabel，出場整合入 MSS 反轉邏輯
+          <span class="vl-dot">›</span> 移除 <b>showExitLabel</b>，出場整合入 MSS 反轉邏輯（更精確）<br>
+          <span class="vl-dot">›</span> 新增 <b>sigCooldown</b> 訊號冷卻根數 + <b>allowRepeat</b> 控制<br>
+          <span class="vl-dot">›</span> <b>unicornNeedFVG</b> 預設 false，開啟後進場點需在 FVG 區間內<br>
+          <span class="vl-dot">›</span> 進場 zone 改用 <b>inFVG</b> 判斷，比 v1 更彈性
         </div>
         <div id="unicorn-log-v1" class="ver-log" style="display:none">
           <span class="vl-dot">›</span> 初始發行版：自動OB識別、MSS觸發獨角獸進場訊號<br>
@@ -894,7 +894,7 @@ maxOBs       = input.int(1, "每方向最多OB數",minval=1,maxval=5,group=grp1)
 
 grp2 = "獨角獸模型"
 unicornNeedHTF = input.bool(false,"需要HTF PDA確認",group=grp2)
-unicornNeedFVG = input.bool(true,"需要OB∩FVG重疊（真Unicorn）",group=grp2)
+unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
 allowRepeat    = input.bool(false,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
 sigCooldown    = input.int(5,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
 
@@ -1242,10 +1242,8 @@ if array.size(bb) > 0 and lastMSSDir == 1
                 box.set_border_color(hqbx, color.new(color.gray,60))
                 box.set_bgcolor(hqbx, color.new(color.gray,97))
         else if not signaled or allowRepeat
-            ovT   = fvgOn and not na(fT) and not na(fB) ? math.min(obT, fT) : obT
-            ovB   = fvgOn and not na(fT) and not na(fB) ? math.max(obB, fB) : obB
-            hasOv = fvgOn and not na(fT) and not na(fB) and ovT > ovB
-            zone  = unicornNeedFVG ? (hasOv and low <= ovT and high >= ovB) : low <= obT
+            inFVG = fvgOn and not na(fT) and not na(fB) ? low <= fT and high >= fB : false
+            zone  = unicornNeedFVG ? inFVG : low <= obT
             if zone and htfOkBull
                 unicornBull := true
                 trigBullIdx := i
@@ -1276,10 +1274,8 @@ if array.size(rb) > 0 and lastMSSDir == -1
                 box.set_border_color(hqbx, color.new(color.gray,60))
                 box.set_bgcolor(hqbx, color.new(color.gray,97))
         else if not signaled or allowRepeat
-            ovT   = fvgOn and not na(fT) and not na(fB) ? math.min(obT, fT) : obT
-            ovB   = fvgOn and not na(fT) and not na(fB) ? math.max(obB, fB) : obB
-            hasOv = fvgOn and not na(fT) and not na(fB) and ovT > ovB
-            zone  = unicornNeedFVG ? (hasOv and high >= ovB and low <= ovT) : high >= obB
+            inFVG = fvgOn and not na(fT) and not na(fB) ? high >= fB and low <= fT : false
+            zone  = unicornNeedFVG ? inFVG : high >= obB
             if zone and htfOkBear
                 unicornBear := true
                 trigBearIdx := i
