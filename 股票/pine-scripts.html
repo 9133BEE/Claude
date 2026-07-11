@@ -96,7 +96,10 @@ a:hover{text-decoration:underline}
 }
 .ver-check-btn{display:inline-block;font-size:.9rem;line-height:1;cursor:pointer;opacity:.45;border:none;background:none;color:inherit;padding:0 2px 0 0;vertical-align:middle;transition:opacity .15s,color .15s;font-family:inherit}
 .ver-check-btn:hover{opacity:.85}
-.ver-check-btn.ver-ok{opacity:1;color:#22c55e}</style>
+.ver-check-btn.ver-ok{opacity:1;color:#22c55e}
+.ver-del-btn{float:right;font-size:.8rem;cursor:pointer;opacity:0;transition:opacity .2s;padding:0 2px}
+.ver-tab:hover .ver-del-btn{opacity:.6}
+.ver-del-btn:hover{opacity:1!important}</style>
 </head>
 <body>
 
@@ -174,16 +177,6 @@ a:hover{text-decoration:underline}
     <div class="ver-layout">
       <div class="ver-sidebar">
         <div class="ver-tabs" id="dash-vtabs">
-          <button class="ver-tab active" onclick="switchDashVer('v2',this)">
-            <span class="ver-check-btn" data-ver-key="d_v2" onclick="event.stopPropagation();tvc('d_v2',this)">☐</span>V2.0 <span class="ver-latest-badge">最新</span>
-            <span class="ver-sub">2026-07-11</span>
-            <span class="ver-sub">時框快選預設</span>
-          </button>
-          <button class="ver-tab" onclick="switchDashVer('v1',this)">
-            <span class="ver-check-btn" data-ver-key="d_v1" onclick="event.stopPropagation();tvc('d_v1',this)">☐</span>V1.0
-            <span class="ver-sub">2026-07-10</span>
-            <span class="ver-sub">1分K + SMC</span>
-          </button>
         </div>
       </div>
       <div class="ver-main">
@@ -229,23 +222,7 @@ a:hover{text-decoration:underline}
     <!-- ── UNICORN 版本選擇器 ── -->
     <div class="ver-layout">
       <div class="ver-sidebar">
-        <div class="ver-tabs" id="unicorn-vtabs">
-          <button class="ver-tab active" onclick="switchUnicornVer('v3',this)">
-            <span class="ver-check-btn" data-ver-key="u_v3" onclick="event.stopPropagation();tvc('u_v3',this)">☐</span>v3.0 <span class="ver-latest-badge">最新</span>
-            <span class="ver-sub">2026-07-10</span>
-            <span class="ver-sub">HQ評分+進場改良</span>
-          </button>
-          <button class="ver-tab" onclick="switchUnicornVer('v2',this)">
-            <span class="ver-check-btn" data-ver-key="u_v2" onclick="event.stopPropagation();tvc('u_v2',this)">☐</span>v2.0
-            <span class="ver-sub">2026-07-09</span>
-            <span class="ver-sub">669行 sigCooldown</span>
-          </button>
-          <button class="ver-tab" onclick="switchUnicornVer('v1',this)">
-            <span class="ver-check-btn" data-ver-key="u_v1" onclick="event.stopPropagation();tvc('u_v1',this)">☐</span>v1.0
-            <span class="ver-sub">2026-07-06</span>
-            <span class="ver-sub">出場警示版</span>
-          </button>
-        </div>
+        <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
         <div id="unicorn-log-v3" class="ver-log">
@@ -3055,25 +3032,11 @@ if showDash and barstate.islast
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 document.getElementById('unicorn-v3-code').textContent = UNICORN_V3;
 
-let _uVer = 'v3';
-function switchUnicornVer(ver, btn) {
-  _uVer = ver;
-  document.querySelectorAll('#unicorn-vtabs .ver-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('unicorn-v1-wrap').style.display = ver === 'v1' ? 'block' : 'none';
-  document.getElementById('unicorn-v2-wrap').style.display = ver === 'v2' ? 'block' : 'none';
-  document.getElementById('unicorn-v3-wrap').style.display = ver === 'v3' ? 'block' : 'none';
-  document.getElementById('unicorn-log-v1').style.display  = ver === 'v1' ? 'block' : 'none';
-  document.getElementById('unicorn-log-v2').style.display  = ver === 'v2' ? 'block' : 'none';
-  document.getElementById('unicorn-log-v3').style.display  = ver === 'v3' ? 'block' : 'none';
-}
+
 
 function copyUnicornCode(btn) {
-  const text = _uVer === 'v3'
-    ? UNICORN_V3
-    : _uVer === 'v2'
-    ? UNICORN_V2
-    : document.getElementById('unicorn-v1-code').innerText;
+  const ak = VER_ACTIVE.unicorn || 'u_v3';
+  const text = ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -3096,6 +3059,79 @@ function copyCode(btn) {
   });
 }
 
+const VERSION_DEFS = {
+  unicorn: [
+    { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
+    { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
+    { key: 'u_v3', date: '2026-07-10', sub: 'HQ評分+進場改良', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
+  ],
+  dashboard: [
+    { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
+    { key: 'd_v2', date: '2026-07-11', sub: '時框快選預設',  contentId: 'dash-panel-v2', logId: 'dash-log-v2' },
+  ]
+};
+const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs' };
+const VER_ACTIVE = {};
+
+function _getVisible(cardKey) {
+  const defs = VERSION_DEFS[cardKey];
+  const hidden = JSON.parse(localStorage.getItem('hidden_vers_' + cardKey) || '[]');
+  return defs.filter(d => !hidden.includes(d.key));
+}
+
+function renderVerTabs(cardKey, activeKey) {
+  const vtabs = document.getElementById(VER_VTABS_ID[cardKey]);
+  if (!vtabs) return;
+  const visible = _getVisible(cardKey);
+  if (!visible.length) return;
+  const activeVer = visible.find(v => v.key === activeKey) || visible[visible.length - 1];
+  VER_ACTIVE[cardKey] = activeVer.key;
+  // display newest first (reverse), but number from oldest (original index)
+  vtabs.innerHTML = [...visible].reverse().map(v => {
+    const i = visible.indexOf(v);
+    const isLatest = i === visible.length - 1;
+    const isActive = v.key === activeVer.key;
+    return `<button class="ver-tab${isActive ? ' active' : ''}" onclick="switchVer('${cardKey}','${v.key}',this)"><span class="ver-check-btn" data-ver-key="${v.key}" onclick="event.stopPropagation();tvc('${v.key}',this)">☐</span>V${i + 1}${isLatest ? ' <span class="ver-latest-badge">最新</span>' : ''}<span class="ver-del-btn" onclick="event.stopPropagation();delVer('${cardKey}','${v.key}')" title="移除版本">🗑</span><span class="ver-sub">${v.date}</span><span class="ver-sub">${v.sub}</span></button>`;
+  }).join('');
+  vtabs.querySelectorAll('.ver-check-btn[data-ver-key]').forEach(el => {
+    if (localStorage.getItem('verok_' + el.dataset.verKey) === '1') {
+      el.textContent = '☑'; el.classList.add('ver-ok');
+    }
+  });
+  _showVerPanel(cardKey, activeVer);
+}
+
+function _showVerPanel(cardKey, activeDef) {
+  VERSION_DEFS[cardKey].forEach(v => {
+    const show = v.key === activeDef.key;
+    const c = document.getElementById(v.contentId);
+    const l = document.getElementById(v.logId);
+    if (c) c.style.display = show ? '' : 'none';
+    if (l) l.style.display = show ? '' : 'none';
+  });
+}
+
+function switchVer(cardKey, verKey, el) {
+  VER_ACTIVE[cardKey] = verKey;
+  const vtabs = document.getElementById(VER_VTABS_ID[cardKey]);
+  vtabs.querySelectorAll('.ver-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const def = VERSION_DEFS[cardKey].find(v => v.key === verKey);
+  if (def) _showVerPanel(cardKey, def);
+}
+
+function delVer(cardKey, verKey) {
+  const visible = _getVisible(cardKey);
+  if (visible.length <= 1) { alert('至少保留一個版本'); return; }
+  if (!confirm('確定移除這個版本顯示？（清除 localStorage 的 hidden_vers_' + cardKey + ' 可還原）')) return;
+  const hidden = JSON.parse(localStorage.getItem('hidden_vers_' + cardKey) || '[]');
+  hidden.push(verKey);
+  localStorage.setItem('hidden_vers_' + cardKey, JSON.stringify(hidden));
+  const newVisible = _getVisible(cardKey);
+  const curActive = VER_ACTIVE[cardKey];
+  const newActive = newVisible.find(v => v.key === curActive) ? curActive : newVisible[newVisible.length - 1].key;
+  renderVerTabs(cardKey, newActive);
+}
 function tvc(key, el) {
   event.stopPropagation();
   const k = 'verok_' + key;
@@ -3105,24 +3141,11 @@ function tvc(key, el) {
   el.classList.toggle('ver-ok', !isOk);
 }
 
-function switchDashVer(ver, el) {
-  ['v1','v2'].forEach(v => {
-    document.getElementById('dash-panel-'+v).style.display = v===ver ? '' : 'none';
-    document.getElementById('dash-log-'+v).style.display   = v===ver ? '' : 'none';
-  });
-  el.closest('#dash-vtabs').querySelectorAll('.ver-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-}
 
-// restore ver-check-btn states on load
-document.querySelectorAll('.ver-check-btn[data-ver-key]').forEach(el => {
-  if (localStorage.getItem('verok_' + el.dataset.verKey) === '1') {
-    el.textContent = '☑';
-    el.classList.add('ver-ok');
-  }
-});
 
-// populate script code elements
+// initialise dynamic version tabs (renders tabs, restores checkmarks)
+renderVerTabs('unicorn', 'u_v3');
+renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
 </script>
