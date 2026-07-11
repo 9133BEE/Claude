@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -1746,24 +1746,24 @@ maxOBs       = input.int(1, "每方向最多OB數",minval=1,maxval=5,group=grp1)
 grp2 = "獨角獸模型"
 unicornNeedHTF = input.bool(false,"需要HTF PDA確認",group=grp2)
 unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
-allowRepeat    = input.bool(false,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
+allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
 sigCooldown    = input.int(5,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
 
 grp3 = "HTF區間顯示"
-show1HOB  = input.bool(true, "顯示 1H OB",  group=grp3)
-show1HFVG = input.bool(false,"顯示 1H FVG", group=grp3)
-h1Days    = input.int(5,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
-show4HOB  = input.bool(true, "顯示 4H OB",  group=grp3)
+show1HOB  = input.bool(false,"顯示 1H OB",  group=grp3)
+show1HFVG = input.bool(true, "顯示 1H FVG", group=grp3)
+h1Days    = input.int(1,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
+show4HOB  = input.bool(false,"顯示 4H OB",  group=grp3)
 show4HFVG = input.bool(false,"顯示 4H FVG", group=grp3)
 h4Days    = input.int(10, "4H 顯示天數", minval=1,maxval=90,  group=grp3)
-show1DOB  = input.bool(true, "顯示 1D OB",  group=grp3)
+show1DOB  = input.bool(false,"顯示 1D OB",  group=grp3)
 show1DFVG = input.bool(false,"顯示 1D FVG", group=grp3)
 d1Days    = input.int(20, "1D 顯示天數", minval=1,maxval=180, group=grp3)
 htfExtR   = input.int(30, "HTF右延伸K數",minval=5,             group=grp3)
 
 grp4 = "訊號顯示"
 showDash    = input.bool(true,"顯示儀表板",group=grp4)
-dashPos     = input.string("左下","儀表板位置",options=["左下","右下","左上","右上"],group=grp4)
+dashPos     = input.string("右下","儀表板位置",options=["左下","右下","左上","右上"],group=grp4)
 showBull    = input.bool(true,"顯示多方OB方框",group=grp4)
 showBear    = input.bool(true,"顯示空方OB方框",group=grp4)
 sigDays     = input.int(30,"訊號顯示天數",minval=1,maxval=90,group=grp4)
