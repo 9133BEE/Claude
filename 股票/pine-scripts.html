@@ -1718,14 +1718,14 @@ if showDash and barstate.islast
     table.cell(dash,6,1,_ckk(step6), text_color=_ick(step6),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,7,1,_ckk(step7), text_color=_ick(step7),text_size=size.normal,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,8,1,nextStr,      text_color=color.new(#FFCC00,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_left)
-    table.cell(dash,0,2,"參考 "+htfStr,text_color=color.new(#888888,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,0,2,"參考 "+htfStr,text_color=color.new(#333333,0),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,1,2,htfInfo,      text_color=_ick(step1),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,2,2,step2?"已進入":"未進入",text_color=_ick(step2),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,3,2,mssInfo,      text_color=_ick(step3),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,4,2,bbInfo,       text_color=_ick(step4),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,5,2,step5?"有FVG":"無FVG",text_color=_ick(step5),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,6,2,step6?"已確認":"待確認",text_color=_ick(step6),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
+    table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,8,2,"",          text_color=color.new(#444444,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
 
@@ -2365,15 +2365,15 @@ bbInfo  = bbCnt>0?str.tostring(bbCnt)+"個OB":"無"
 nextStr = not step3?"等待MSS":not step4?"等待OB":(not step5 and unicornNeedFVG)?"等待FVG":not step7?"等待回測OB":"已觸發!"
 
 _pos  = dashPos=="左下"?position.bottom_left:dashPos=="右下"?position.bottom_right:dashPos=="左上"?position.top_left:position.top_right
-_cbg  = color.new(#0D1117,5)
-_chdr = color.new(#1A1F2E,5)
-_cg   = color.new(#FFD700,0)
-_co   = color.new(#FF8C00,0)
-_ick(v) => v ? color.new(#FFD700,0) : color.new(#444444,0)
+_cbg  = color.new(#0D1117, 90)
+_chdr = color.new(#d0d3d8, 0)
+_cg   = color.new(#333333, 0)
+_co   = color.new(#333333, 0)
+_ick(v) => v ? color.new(#FF8C00, 0) : color.new(#555555, 0)
 _ckk(v) => v ? "✔" : "·"
 
 if showDash and barstate.islast
-    dash = table.new(_pos,9,3,bgcolor=_cbg,border_color=color.new(#FF8C00,50),border_width=1,frame_color=#FFD700,frame_width=1)
+    dash = table.new(_pos,9,3,bgcolor=_cbg,border_color=color.new(#888888,40),border_width=1,frame_color=color.new(#aaaaaa,0),frame_width=1)
     table.cell(dash,0,0,"Unicorn·"+tfStr,text_color=_cg,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,1,0,"HTF PDA", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,2,0,"進入PDA", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
@@ -2383,24 +2383,24 @@ if showDash and barstate.islast
     table.cell(dash,6,0,"突破OB",  text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,7,0,"Unicorn", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,8,0,"進度",    text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,0,1,dirStr,       text_color=dirCol,     text_size=size.small, bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,0,1,dirStr,       text_color=dirCol,     text_size=size.small, bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,1,1,_ckk(step1), text_color=_ick(step1),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,2,1,_ckk(step2), text_color=_ick(step2),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,3,1,_ckk(step3), text_color=_ick(step3),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,4,1,_ckk(step4), text_color=_ick(step4),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,5,1,_ckk(step5), text_color=_ick(step5),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,6,1,_ckk(step6), text_color=_ick(step6),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,7,1,_ckk(step7), text_color=_ick(step7),text_size=size.normal,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,8,1,nextStr,      text_color=color.new(#FFCC00,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_left)
-    table.cell(dash,0,2,"參考 "+htfStr,text_color=color.new(#888888,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,7,1,_ckk(step7), text_color=_ick(step7),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,8,1,nextStr,      text_color=color.new(#FF8C00,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_left)
+    table.cell(dash,0,2,"參考 "+htfStr,text_color=color.new(#333333,0),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
     table.cell(dash,1,2,htfInfo,      text_color=_ick(step1),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,2,2,step2?"已進入":"未進入",text_color=_ick(step2),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,3,2,mssInfo,      text_color=_ick(step3),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,4,2,bbInfo,       text_color=_ick(step4),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,5,2,step5?"有FVG":"無FVG",text_color=_ick(step5),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,6,2,step6?"已確認":"待確認",text_color=_ick(step6),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,8,2,"",          text_color=color.new(#444444,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
+    table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
+    table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 document.getElementById('unicorn-v3-code').textContent = UNICORN_V3;
