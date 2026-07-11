@@ -2604,10 +2604,14 @@ if bullMSS and lastMSSDir != 1
             fvgOk = i > 1 ? low[i-1] > high[i+1] : false
             fvgT  = fvgOk ? low[i-1]  : na
             fvgB  = fvgOk ? high[i+1] : na
-            inPDA    = not na(mid50) ? (obT+obB)/2 < mid50 : false
-            big      = math.abs(close[i]-open[i]) > avgBody*1.5
-            bigRange = (obT - obB) >= avgBody
-            sc    = f_sc(fvgOk, big, bigRange, inPDA)
+            inPDA = not na(mid50) ? (obT+obB)/2 < mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            liqGrab = false
+            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
+                if low[_j] < obB
+                    liqGrab := true
+                    break
+            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
             isHQ  = sc >= hqMin
             if sc >= minScore
                 array.push(bb, obT), array.push(bl, obB)
@@ -2650,10 +2654,14 @@ if bearMSS and lastMSSDir != -1
             fvgOk = i > 1 ? high[i-1] < low[i+1] : false
             fvgT  = fvgOk ? low[i+1]  : na
             fvgB  = fvgOk ? high[i-1] : na
-            inPDA    = not na(mid50) ? (obT+obB)/2 > mid50 : false
-            big      = math.abs(close[i]-open[i]) > avgBody*1.5
-            bigRange = (obT - obB) >= avgBody
-            sc    = f_sc(fvgOk, big, bigRange, inPDA)
+            inPDA = not na(mid50) ? (obT+obB)/2 > mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            liqGrab = false
+            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
+                if high[_j] > obT
+                    liqGrab := true
+                    break
+            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
             isHQ  = sc >= hqMin
             if sc >= minScore
                 array.push(rb, obT), array.push(rl, obB)
@@ -3063,7 +3071,7 @@ const VERSION_DEFS = {
   unicorn: [
     { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
-    { key: 'u_v3', date: '2026-07-10', sub: 'HQ評分+進場改良', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
+    { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
