@@ -94,7 +94,9 @@ a:hover{text-decoration:underline}
   .ver-sidebar{flex:none;width:100%}
   .ver-sidebar .ver-tabs{flex-direction:row;flex-wrap:wrap}
 }
-</style>
+.ver-check-btn{display:inline-block;font-size:.9rem;line-height:1;cursor:pointer;opacity:.45;border:none;background:none;color:inherit;padding:0 2px 0 0;vertical-align:middle;transition:opacity .15s,color .15s;font-family:inherit}
+.ver-check-btn:hover{opacity:.85}
+.ver-check-btn.ver-ok{opacity:1;color:#22c55e}</style>
 </head>
 <body>
 
@@ -169,8 +171,42 @@ a:hover{text-decoration:underline}
       <span class="vl-dot">›</span> <b>自動計算停損/目標（美元）</b>：依 ATR 倍數計算，並依合約點值換算損益<br>
       <span class="vl-dot">›</span> <b>美股主力時段過濾</b>：可選僅在 09:30–16:00 ET 內觸發訊號，有效避開盤前盤後雜訊
     </div>
-    <button class="copy-bar-btn" onclick="copyDashboard(this)">一鍵複製腳本</button>
-    <div class="code-block" id="dashboard-code"></div>
+    <div class="ver-layout">
+      <div class="ver-sidebar">
+        <div class="ver-tabs" id="dash-vtabs">
+          <button class="ver-tab active" onclick="switchDashVer('v2',this)">
+            <span class="ver-check-btn" data-ver-key="d_v2" onclick="event.stopPropagation();tvc('d_v2',this)">☐</span>V2.0 <span class="ver-latest-badge">最新</span>
+            <span class="ver-sub">2026-07-11</span>
+            <span class="ver-sub">時框快選預設</span>
+          </button>
+          <button class="ver-tab" onclick="switchDashVer('v1',this)">
+            <span class="ver-check-btn" data-ver-key="d_v1" onclick="event.stopPropagation();tvc('d_v1',this)">☐</span>V1.0
+            <span class="ver-sub">2026-07-10</span>
+            <span class="ver-sub">1分K + SMC</span>
+          </button>
+        </div>
+      </div>
+      <div class="ver-main">
+        <div id="dash-log-v2" class="ver-log">
+          <span class="vl-dot">›</span> <b>⚡ 時框快選</b>：適用1M/15M/30M/1H/4H，EMA/RSI/KD/MACD/ATR 全自動對應<br>
+          <span class="vl-dot">›</span> 今日高低改用 request.security("D")，支援所有期貨品種<br>
+          <span class="vl-dot">›</span> 儀表板 header 顯示當前時框 + 使用中 preset；時段篩選預設關閉
+        </div>
+        <div id="dash-log-v1" class="ver-log" style="display:none">
+          <span class="vl-dot">›</span> 9欄 × 21列資訊面板（美期1分K優化）<br>
+          <span class="vl-dot">›</span> VWAP、EMA三線、RSI/KD/MACD、布林帶、ATR、SMC 結構<br>
+          <span class="vl-dot">›</span> 自動計算停損/目標（美元），支援 MNQ/NQ/MES/ES
+        </div>
+        <div id="dash-panel-v2">
+          <button class="copy-bar-btn" onclick="copyDashboard(this,'v2')">一鍵複製腳本</button>
+          <div class="code-block" id="dash-code-v2"></div>
+        </div>
+        <div id="dash-panel-v1" style="display:none">
+          <button class="copy-bar-btn" onclick="copyDashboard(this,'v1')">一鍵複製腳本</button>
+          <div class="code-block" id="dash-code-v1"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -195,17 +231,17 @@ a:hover{text-decoration:underline}
       <div class="ver-sidebar">
         <div class="ver-tabs" id="unicorn-vtabs">
           <button class="ver-tab active" onclick="switchUnicornVer('v3',this)">
-            v3.0 <span class="ver-latest-badge">最新</span>
+            <span class="ver-check-btn" data-ver-key="u_v3" onclick="event.stopPropagation();tvc('u_v3',this)">☐</span>v3.0 <span class="ver-latest-badge">最新</span>
             <span class="ver-sub">2026-07-10</span>
             <span class="ver-sub">HQ評分+進場改良</span>
           </button>
           <button class="ver-tab" onclick="switchUnicornVer('v2',this)">
-            v2.0
+            <span class="ver-check-btn" data-ver-key="u_v2" onclick="event.stopPropagation();tvc('u_v2',this)">☐</span>v2.0
             <span class="ver-sub">2026-07-09</span>
             <span class="ver-sub">669行 sigCooldown</span>
           </button>
           <button class="ver-tab" onclick="switchUnicornVer('v1',this)">
-            v1.0
+            <span class="ver-check-btn" data-ver-key="u_v1" onclick="event.stopPropagation();tvc('u_v1',this)">☐</span>v1.0
             <span class="ver-sub">2026-07-06</span>
             <span class="ver-sub">出場警示版</span>
           </button>
@@ -675,10 +711,7 @@ showSHSLLbl  = input.bool(true,    "顯示 SH/SL 標籤",  group=grp1)
 // ════════════════════════════════════════════════
 //  工具函式
 // ════════════════════════════════════════════════
-f_lsty(s) =>
-    s == "Dashed" ? line.style_dashed :
-    s == "Dotted" ? line.style_dotted :
-    line.style_solid
+f_lsty(s) => s == "Dashed" ? line.style_dashed : s == "Dotted" ? line.style_dotted : line.style_solid
 
 // ════════════════════════════════════════════════
 //  ① SH SL 輔助線 邏輯
@@ -733,6 +766,427 @@ function copySUPSET(btn) {
   });
 }
 const DASHBOARD_V1 = `//@version=5
+indicator("市場儀表板 1分K + SMC", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500)
+
+// ══════════════════════════════════════════
+//  參數（1分K 優化版）
+// ══════════════════════════════════════════
+emaFast  = input.int(9,   "快線 EMA",  group="均線")
+emaSlow  = input.int(20,  "慢線 EMA",  group="均線")
+emaTrend = input.int(50,  "趨勢 EMA",  group="均線")
+rsiLen   = input.int(7,   "RSI 週期",  group="RSI")
+rsiOB    = input.int(75,  "超買",      group="RSI")
+rsiOS    = input.int(25,  "超賣",      group="RSI")
+kdLen    = input.int(5,   "KD 週期",   group="KD")
+kdSmK    = input.int(3,   "K 平滑",    group="KD")
+kdSmD    = input.int(3,   "D 平滑",    group="KD")
+macdF    = input.int(5,   "MACD 快",   group="MACD")
+macdS    = input.int(13,  "MACD 慢",   group="MACD")
+macdG    = input.int(4,   "信號線",    group="MACD")
+bbLen    = input.int(15,  "BB 週期",   group="布林帶")
+bbMult   = input.float(2.0,"BB 倍數",  group="布林帶")
+atrLen   = input.int(10,  "ATR 週期",  group="ATR / 停損")
+slMult   = input.float(1.2,"停損 ATR", group="ATR / 停損", step=0.1)
+tpMult   = input.float(2.0,"目標 ATR", group="ATR / 停損", step=0.1)
+volLen   = input.int(10,  "均量週期",  group="成交量")
+pivLen   = input.int(5,   "SMC 樞紐K數",    group="SMC")
+chochCD  = input.int(10,  "CHoCH 冷卻根數", group="SMC", minval=5, maxval=30)
+useSession = input.bool(true, "僅美股主力時段 09:30–16:00 ET", group="時段")
+
+// ══════════════════════════════════════════
+//  技術指標
+// ══════════════════════════════════════════
+emaF = ta.ema(close, emaFast)
+emaS = ta.ema(close, emaSlow)
+emaT = ta.ema(close, emaTrend)
+rsi  = ta.rsi(close, rsiLen)
+
+stochRaw = ta.stoch(close, high, low, kdLen)
+k = ta.sma(stochRaw, kdSmK)
+d = ta.sma(k, kdSmD)
+
+[macdLine, sigLine, hist] = ta.macd(close, macdF, macdS, macdG)
+
+bbBasis  = ta.sma(close, bbLen)
+bbDev    = ta.stdev(close, bbLen) * bbMult
+bbUpper  = bbBasis + bbDev
+bbLower  = bbBasis - bbDev
+bbPos    = (close - bbLower) / (bbUpper - bbLower) * 100
+
+atr      = ta.atr(atrLen)
+avgVol   = ta.sma(volume, volLen)
+volRatio = volume / avgVol
+
+vwapVal  = ta.vwap(hlc3)
+dayOpen  = request.security(syminfo.tickerid, "D", open)
+dayHigh  = ta.highest(high, 390)
+dayLow   = ta.lowest(low,  390)
+
+inSess = not useSession or na(time("", "0930-1600:23456", "America/New_York")) == false
+
+// ══════════════════════════════════════════
+//  SMC 計算
+// ══════════════════════════════════════════
+ph = ta.pivothigh(high, pivLen, pivLen)
+pl = ta.pivotlow(low,  pivLen, pivLen)
+
+var float lastSH = na
+var float prevSH = na
+var float lastSL = na
+var float prevSL = na
+
+if not na(ph)
+    prevSH := lastSH
+    lastSH := ph
+if not na(pl)
+    prevSL := lastSL
+    lastSL := pl
+
+smcBull = not na(lastSH) and not na(prevSH) and not na(lastSL) and not na(prevSL) and
+          lastSH > prevSH and lastSL > prevSL
+smcBear = not na(lastSH) and not na(prevSH) and not na(lastSL) and not na(prevSL) and
+          lastSH < prevSH and lastSL < prevSL
+
+equi       = not na(lastSH) and not na(lastSL) ? (lastSH + lastSL) / 2 : na
+inDiscount = not na(equi) and close < equi
+inPremium  = not na(equi) and close > equi
+
+bullFVG = high[2] < low[0]
+bearFVG = low[2]  > high[0]
+
+var float bullOBHigh = na
+var float bullOBLow  = na
+var float bearOBHigh = na
+var float bearOBLow  = na
+
+if close[1] < open[1] and close > open and (close - open) > atr * 0.8
+    bullOBHigh := high[1]
+    bullOBLow  := low[1]
+if close[1] > open[1] and close < open and (open - close) > atr * 0.8
+    bearOBHigh := high[1]
+    bearOBLow  := low[1]
+
+inBullOB = not na(bullOBHigh) and close <= bullOBHigh and close >= bullOBLow
+inBearOB = not na(bearOBHigh) and close <= bearOBHigh and close >= bearOBLow
+
+smcBuyOK  = smcBull  or inDiscount or bullFVG or inBullOB
+smcSellOK = smcBear  or inPremium  or bearFVG or inBearOB
+
+// ══════════════════════════════════════════
+//  CHoCH 冷卻期（保留此過濾，拿掉Histogram）
+// ══════════════════════════════════════════
+var bool prevSmcBull = na
+var bool prevSmcBear = na
+var int  chochBullBar = na
+var int  chochBearBar = na
+
+if smcBull and not prevSmcBull
+    chochBullBar := bar_index
+if smcBear and not prevSmcBear
+    chochBearBar := bar_index
+
+prevSmcBull := smcBull
+prevSmcBear := smcBear
+
+inBullCooldown = not na(chochBullBar) and (bar_index - chochBullBar) <= chochCD
+inBearCooldown = not na(chochBearBar) and (bar_index - chochBearBar) <= chochCD
+
+// ══════════════════════════════════════════
+//  訊號邏輯
+// ══════════════════════════════════════════
+emaUp   = emaF > emaS
+emaDown = emaF < emaS
+emaFull = emaF > emaS and emaS > emaT
+macdGold = macdLine > sigLine
+macdDead = macdLine < sigLine
+macdMom  = hist > hist[1]
+kdGold   = k > d and k[1] <= d[1]
+kdDead   = k < d and k[1] >= d[1]
+
+macdCrossUp   = ta.crossover(macdLine,  sigLine)
+macdCrossDown = ta.crossunder(macdLine, sigLine)
+
+var int lastDir = 0
+
+buyRaw  = (macdCrossUp   or kdGold) and emaUp   and rsi < rsiOB and inSess
+          and smcBuyOK  and close > vwapVal
+          and not inBearCooldown
+
+sellRaw = (macdCrossDown or kdDead)  and emaDown and rsi > rsiOS and inSess
+          and smcSellOK and close < vwapVal
+          and not inBullCooldown
+
+buySignal  = buyRaw  and lastDir != 1
+sellSignal = sellRaw and lastDir != -1
+
+if buySignal
+    lastDir := 1
+if sellSignal
+    lastDir := -1
+
+var float sl  = na
+var float tp  = na
+var int   sig = 0
+
+if buySignal
+    sl  := close - atr * slMult
+    tp  := close + atr * tpMult
+    sig := 1
+if sellSignal
+    sl  := close + atr * slMult
+    tp  := close - atr * tpMult
+    sig := -1
+
+// ══════════════════════════════════════════
+//  訊號標記（拉長箭頭 + 自動避免重疊）
+// ══════════════════════════════════════════
+var int[]   buyBarArr  = array.new_int(0)
+var float[] buyYArr    = array.new_float(0)
+var int[]   sellBarArr = array.new_int(0)
+var float[] sellYArr   = array.new_float(0)
+
+labelBase  = atr * 1.2
+avoidRange = atr * 2.5
+checkBars  = 20
+
+if buySignal
+    targetY = low - labelBase
+    sz = array.size(buyBarArr)
+    if sz > 0
+        for i = 0 to sz - 1
+            if bar_index - array.get(buyBarArr, i) <= checkBars
+                nearY = array.get(buyYArr, i)
+                if math.abs(targetY - nearY) < avoidRange
+                    targetY := math.min(targetY, nearY) - avoidRange
+    line.new(bar_index, low, bar_index, targetY + atr * 0.4,
+         color=color.new(#22c55e, 40), width=1, style=line.style_dashed)
+    label.new(bar_index, targetY,
+         text="▲ BUY",
+         style=label.style_label_up,
+         color=#22c55e, textcolor=color.white, size=size.small)
+    array.push(buyBarArr, bar_index)
+    array.push(buyYArr,   targetY)
+    if array.size(buyBarArr) > 50
+        array.shift(buyBarArr)
+        array.shift(buyYArr)
+
+if sellSignal
+    targetY = high + labelBase
+    sz = array.size(sellBarArr)
+    if sz > 0
+        for i = 0 to sz - 1
+            if bar_index - array.get(sellBarArr, i) <= checkBars
+                nearY = array.get(sellYArr, i)
+                if math.abs(targetY - nearY) < avoidRange
+                    targetY := math.max(targetY, nearY) + avoidRange
+    line.new(bar_index, high, bar_index, targetY - atr * 0.4,
+         color=color.new(#ef4444, 40), width=1, style=line.style_dashed)
+    label.new(bar_index, targetY,
+         text="▼ SELL",
+         style=label.style_label_down,
+         color=#ef4444, textcolor=color.white, size=size.small)
+    array.push(sellBarArr, bar_index)
+    array.push(sellYArr,   targetY)
+    if array.size(sellBarArr) > 50
+        array.shift(sellBarArr)
+        array.shift(sellYArr)
+
+// ══════════════════════════════════════════
+//  綜合評分
+// ══════════════════════════════════════════
+score = 0
+score := score + (emaFull ? 2 : emaUp ? 1 : emaDown ? -1 : -2)
+score := score + (macdGold ? 1 : -1)
+score := score + (macdMom  ? 1 : -1)
+score := score + (rsi > 55 ? 1 : rsi < 45 ? -1 : 0)
+score := score + (k > d    ? 1 : -1)
+score := score + (close > bbBasis ? 1 : -1)
+score := score + (smcBull  ? 1 : smcBear  ? -1 : 0)
+score := score + (inDiscount ? 1 : inPremium ? -1 : 0)
+score := score + (close > vwapVal ? 1 : -1)
+
+// ══════════════════════════════════════════
+//  顏色
+// ══════════════════════════════════════════
+green  = #22c55e
+red    = #ef4444
+yellow = #f59e0b
+gray   = #6b7280
+white  = #e6edf3
+purple = #c4b5fd
+
+scoreCol = score >= 7  ? green  : score <= -7 ? red    :
+           score >= 4  ? color.new(green,40)  :
+           score <= -4 ? color.new(red,40)    : yellow
+scoreTxt = score >= 7  ? "強多 ▲▲" : score >= 4  ? "偏多 ▲"  :
+           score <= -7 ? "強空 ▼▼" : score <= -4 ? "偏空 ▼"  : "中性 —"
+
+// ══════════════════════════════════════════
+//  資訊面板
+// ══════════════════════════════════════════
+var table T = table.new(position.top_right, 3, 21,
+     bgcolor=color.new(#0d1117,0),
+     border_color=#30363d, border_width=1,
+     frame_color=#30363d, frame_width=1)
+
+if barstate.islast
+    ticker = syminfo.ticker
+
+    table.cell(T,0,0, ticker+" 1分K",
+         text_color=white, text_size=size.normal, bgcolor=#161b22)
+    table.cell(T,1,0, inSess?"開市 ✓":"休市",
+         text_color=inSess?green:gray, text_size=size.normal, bgcolor=#161b22)
+    table.cell(T,2,0, scoreTxt,
+         text_color=scoreCol, text_size=size.normal, bgcolor=#161b22)
+
+    table.cell(T,0,1, "指標", text_color=gray, text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,1,1, "數值", text_color=gray, text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,2,1, "狀態", text_color=gray, text_size=size.small, bgcolor=#0d1117)
+
+    vwapDiff   = close - vwapVal
+    vwapCol    = close > vwapVal ? green : red
+    vwapPosTxt = close > vwapVal ? "VWAP之上 ▲" : "VWAP之下 ▼"
+    table.cell(T,0,2, "VWAP", text_color=purple, text_size=size.small)
+    table.cell(T,1,2, str.tostring(math.round(vwapVal,2))+"  ("+
+               (vwapDiff>=0?"+":"")+str.tostring(math.round(vwapDiff,2))+")",
+         text_color=vwapCol, text_size=size.tiny)
+    table.cell(T,2,2, vwapPosTxt, text_color=vwapCol, text_size=size.small)
+
+    table.cell(T,0,3, "今日區間", text_color=gray, text_size=size.small)
+    table.cell(T,1,3, "H:"+str.tostring(math.round(dayHigh,2))+"  L:"+str.tostring(math.round(dayLow,2)),
+         text_color=white, text_size=size.tiny)
+    table.cell(T,2,3, "開:"+str.tostring(math.round(dayOpen,2)), text_color=gray, text_size=size.tiny)
+
+    emaAlignTxt = emaFull?"多頭 ▲":emaF<emaS and emaS<emaT?"空頭 ▼":emaUp?"快>慢 偏多":"快<慢 偏空"
+    emaAlignCol = emaFull?green:emaF<emaS and emaS<emaT?red:emaUp?color.new(green,40):color.new(red,40)
+    table.cell(T,0,4, "EMA 9/20/50", text_color=gray, text_size=size.small)
+    table.cell(T,1,4, str.tostring(math.round(emaF,1))+" / "+
+                      str.tostring(math.round(emaS,1))+" / "+
+                      str.tostring(math.round(emaT,1)), text_color=white, text_size=size.tiny)
+    table.cell(T,2,4, emaAlignTxt, text_color=emaAlignCol, text_size=size.small)
+
+    vsF   = close>emaF?"▲":"▼"
+    vsS   = close>emaS?"▲":"▼"
+    vsT   = close>emaT?"▲":"▼"
+    vsCol = close>emaT?green:red
+    table.cell(T,0,5, "收盤位置", text_color=gray, text_size=size.small)
+    table.cell(T,1,5, "快"+vsF+" 慢"+vsS+" 趨"+vsT, text_color=vsCol, text_size=size.small)
+    table.cell(T,2,5, close>emaT?"趨勢之上":"趨勢之下", text_color=vsCol, text_size=size.small)
+
+    rsiCol  = rsi>=rsiOB?red:rsi<=rsiOS?green:rsi>55?color.new(green,30):rsi<45?color.new(red,30):white
+    rsiStat = rsi>=rsiOB?"超買 ⚠":rsi<=rsiOS?"超賣 ⚠":rsi>55?"偏多":rsi<45?"偏空":"中性"
+    table.cell(T,0,6, "RSI("+str.tostring(rsiLen)+")", text_color=gray,   text_size=size.small)
+    table.cell(T,1,6, str.tostring(math.round(rsi,1)),  text_color=rsiCol, text_size=size.small)
+    table.cell(T,2,6, rsiStat,                           text_color=rsiCol, text_size=size.small)
+
+    kdCol     = k>=80?red:k<=20?green:k>d?color.new(green,30):color.new(red,30)
+    kdStatTxt = kdGold?"金叉 ↑":kdDead?"死叉 ↓":k>d?"K>D 偏多":"K<D 偏空"
+    kdStatCol = kdGold?green:kdDead?red:k>d?color.new(green,30):color.new(red,30)
+    table.cell(T,0,7, "KD("+str.tostring(kdLen)+")", text_color=gray, text_size=size.small)
+    table.cell(T,1,7, "K:"+str.tostring(math.round(k,1))+"  D:"+str.tostring(math.round(d,1)),
+         text_color=kdCol, text_size=size.small)
+    table.cell(T,2,7, kdStatTxt, text_color=kdStatCol, text_size=size.small)
+
+    macdStatCol = macdGold?green:red
+    table.cell(T,0,8, "MACD", text_color=gray, text_size=size.small)
+    table.cell(T,1,8, (macdGold?"金叉":"死叉")+"  "+(macdMom?"動能↑":"動能↓"),
+         text_color=macdStatCol, text_size=size.small)
+    table.cell(T,2,8, str.tostring(math.round(hist,2)),
+         text_color=hist>=0?green:red, text_size=size.small)
+
+    bbPosTxt = bbPos>=80?"近上軌 ⚠":bbPos<=20?"近下軌 ⚠":bbPos>=50?"上半部":"下半部"
+    bbPosCol = bbPos>=80?red:bbPos<=20?green:bbPos>=50?color.new(green,40):color.new(red,40)
+    table.cell(T,0,9, "布林帶", text_color=gray, text_size=size.small)
+    table.cell(T,1,9, str.tostring(math.round(bbPos,1))+"%", text_color=bbPosCol, text_size=size.small)
+    table.cell(T,2,9, bbPosTxt, text_color=bbPosCol, text_size=size.small)
+
+    atrPct = atr / close * 100
+    table.cell(T,0,10, "ATR("+str.tostring(atrLen)+")", text_color=gray, text_size=size.small)
+    table.cell(T,1,10, str.tostring(math.round(atr,2)), text_color=white, text_size=size.small)
+    table.cell(T,2,10, str.tostring(math.round(atrPct,3))+"%", text_color=gray, text_size=size.small)
+
+    volCol = volRatio>=2.0?red:volRatio>=1.5?yellow:volRatio>=1.0?green:gray
+    volTxt = volRatio>=2.0?"爆量 🔥":volRatio>=1.5?"大量":volRatio>=1.0?"放量":"縮量"
+    table.cell(T,0,11, "量能",  text_color=gray,   text_size=size.small)
+    table.cell(T,1,11, str.tostring(math.round(volRatio,2))+"x", text_color=volCol, text_size=size.small)
+    table.cell(T,2,11, volTxt,  text_color=volCol, text_size=size.small)
+
+    smcStructTxt = smcBull?"HH+HL 多頭":smcBear?"LH+LL 空頭":"結構不明"
+    smcStructCol = smcBull?green:smcBear?red:gray
+    chochTxt     = inBullCooldown?"🔒空翻多冷卻":inBearCooldown?"🔒多翻空冷卻":"--"
+    chochCol     = inBullCooldown?green:inBearCooldown?red:gray
+    table.cell(T,0,12, "市場結構",   text_color=gray,         text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,1,12, smcStructTxt, text_color=smcStructCol, text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,2,12, chochTxt,     text_color=chochCol,     text_size=size.tiny,  bgcolor=#1a1f2e)
+
+    zoneTxt = inDiscount?"折價區 (買區)":inPremium?"溢價區 (賣區)":"均衡區"
+    zoneCol = inDiscount?green:inPremium?red:gray
+    zonePct = not na(equi) and not na(lastSH) and not na(lastSL) and (lastSH-lastSL)>0 ?
+              str.tostring(math.round((close-lastSL)/(lastSH-lastSL)*100,1))+"%" : "--"
+    table.cell(T,0,13, "價格位置", text_color=gray,    text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,1,13, zoneTxt,    text_color=zoneCol, text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,2,13, zonePct,    text_color=zoneCol, text_size=size.tiny,  bgcolor=#1a1f2e)
+
+    fvgTxt = bullFVG?"多方FVG ↑":bearFVG?"空方FVG ↓":"無FVG"
+    fvgCol = bullFVG?green:bearFVG?red:gray
+    obTxt  = inBullOB?"多方OB ✓":inBearOB?"空方OB ✓":"OB未觸及"
+    obCol  = inBullOB?green:inBearOB?red:gray
+    table.cell(T,0,14, "FVG/OB", text_color=gray,   text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,1,14, fvgTxt,   text_color=fvgCol, text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,2,14, obTxt,    text_color=obCol,  text_size=size.small, bgcolor=#1a1f2e)
+
+    resTxt  = not na(lastSH)?str.tostring(math.round(lastSH,1)):"--"
+    supTxt  = not na(lastSL)?str.tostring(math.round(lastSL,1)):"--"
+    resDist = not na(lastSH)?lastSH-close:na
+    table.cell(T,0,15, "壓力/支撐", text_color=gray, text_size=size.small, bgcolor=#161b22)
+    table.cell(T,1,15, "↑"+resTxt+"  ↓"+supTxt, text_color=white, text_size=size.tiny, bgcolor=#161b22)
+    table.cell(T,2,15, not na(resDist)?"距壓"+str.tostring(math.round(resDist,1)):"--",
+         text_color=not na(resDist) and resDist<atr?red:gray, text_size=size.tiny, bgcolor=#161b22)
+
+    ticker2 = syminfo.ticker
+    pv = str.contains(ticker2,"MES")?5.0 :str.contains(ticker2,"ES") ?50.0:
+         str.contains(ticker2,"MNQ")?2.0 :str.contains(ticker2,"NQ") ?20.0:
+         str.contains(ticker2,"MYM")?0.5 :str.contains(ticker2,"YM") ?5.0 :
+         str.contains(ticker2,"MBT")?1.0 :str.contains(ticker2,"MGC")?1.0 :
+         str.contains(ticker2,"GC") ?100.0:str.contains(ticker2,"DJ") ?5.0 :1.0
+
+    slUSD  = math.abs(close-sl)*pv
+    tpUSD  = math.abs(close-tp)*pv
+    sigTxt = sig==1?"做多 ▲":sig==-1?"做空 ▼":"--"
+    sigCol = sig==1?green:sig==-1?red:gray
+
+    table.cell(T,0,16, "訊號",  text_color=gray,   text_size=size.small, bgcolor=#161b22)
+    table.cell(T,1,16, sigTxt,  text_color=sigCol, text_size=size.small, bgcolor=#161b22)
+    table.cell(T,2,16, "",      bgcolor=#161b22)
+
+    table.cell(T,0,17, "停損", text_color=gray, text_size=size.small)
+    table.cell(T,1,17, na(sl)?"--":str.tostring(math.round(sl,1)), text_color=#f87171, text_size=size.small)
+    table.cell(T,2,17, na(sl)?""  :"-$"+str.tostring(math.round(slUSD,0)), text_color=#f87171, text_size=size.small)
+
+    table.cell(T,0,18, "目標", text_color=gray, text_size=size.small)
+    table.cell(T,1,18, na(tp)?"--":str.tostring(math.round(tp,1)), text_color=#4ade80, text_size=size.small)
+    table.cell(T,2,18, na(tp)?""  :"+$"+str.tostring(math.round(tpUSD,0)), text_color=#4ade80, text_size=size.small)
+
+    recTxt = score>=7?"考慮做多":score<=-7?"考慮做空":
+             score>=4?"偏多，等確認":score<=-4?"偏空，等確認":"觀望，勿進場"
+    recCol = score>=4?green:score<=-4?red:yellow
+    table.cell(T,0,19, "建議",  text_color=gray,     text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,1,19, recTxt,  text_color=recCol,   text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,2,19, str.tostring(score)+"/10  "+scoreTxt,
+         text_color=scoreCol, text_size=size.small, bgcolor=#0d1117)
+
+    chochStatTxt = inBullCooldown?"🔒多頭保護中":inBearCooldown?"🔒空頭保護中":"無冷卻"
+    chochStatCol = inBullCooldown?green:inBearCooldown?red:gray
+    table.cell(T,0,20, "CHoCH",       text_color=gray,         text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,1,20, chochStatTxt,  text_color=chochStatCol, text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,2,20, "冷卻"+str.tostring(chochCD)+"根",
+         text_color=gray, text_size=size.tiny, bgcolor=#0d1117)
+
+alertcondition(buySignal,  "BUY",  "{{ticker}} ▲ BUY @ {{close}}")
+alertcondition(sellSignal, "SELL", "{{ticker}} ▼ SELL @ {{close}}")`;
+document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
+
+const DASHBOARD_V2 = `//@version=5
 indicator("期貨儀表板", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500)
 
 // ══════════════════════════════════════════
@@ -1196,10 +1650,11 @@ if barstate.islast
 
 alertcondition(buySignal,  "BUY",  "{{ticker}} ▲ BUY @ {{close}}")
 alertcondition(sellSignal, "SELL", "{{ticker}} ▼ SELL @ {{close}}")`;
-document.getElementById('dashboard-code').textContent = DASHBOARD_V1;
+document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
 
-function copyDashboard(btn) {
-  navigator.clipboard.writeText(DASHBOARD_V1).then(() => {
+function copyDashboard(btn, ver) {
+  const s = ver==='v1' ? DASHBOARD_V1 : DASHBOARD_V2;
+  navigator.clipboard.writeText(s).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
   });
@@ -2060,15 +2515,7 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI)
-                box.new(obI, obH, bar_index + pbExtR, obL,
-                    border_color=color.new(pbBullCol, pbBrdTransp),
-                    bgcolor     =color.new(pbBullCol, pbFillTransp),
-                    border_width=1,
-                    text        =showPBLbl?"+PB":"",
-                    text_color  =color.new(pbBullCol, 0),
-                    text_size   =size.small,
-                    text_halign =text.align_right,
-                    text_valign =text.align_top)
+                box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_top)
         pbPrevPL := plL
     if not na(phH)
         if not na(pbPrevPH) and phH < pbPrevPH
@@ -2084,15 +2531,7 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI)
-                box.new(obI, obH, bar_index + pbExtR, obL,
-                    border_color=color.new(pbBearCol, pbBrdTransp),
-                    bgcolor     =color.new(pbBearCol, pbFillTransp),
-                    border_width=1,
-                    text        =showPBLbl?"-PB":"",
-                    text_color  =color.new(pbBearCol, 0),
-                    text_size   =size.small,
-                    text_halign =text.align_right,
-                    text_valign =text.align_bottom)
+                box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_bottom)
         pbPrevPH := phH
 
 bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
@@ -2656,6 +3095,36 @@ function copyCode(btn) {
     setTimeout(() => btn.textContent = '複製', 1500);
   });
 }
+
+function tvc(key, el) {
+  event.stopPropagation();
+  const k = 'verok_' + key;
+  const isOk = localStorage.getItem(k) === '1';
+  localStorage.setItem(k, isOk ? '0' : '1');
+  el.textContent = isOk ? '☐' : '☑';
+  el.classList.toggle('ver-ok', !isOk);
+}
+
+function switchDashVer(ver, el) {
+  ['v1','v2'].forEach(v => {
+    document.getElementById('dash-panel-'+v).style.display = v===ver ? '' : 'none';
+    document.getElementById('dash-log-'+v).style.display   = v===ver ? '' : 'none';
+  });
+  el.closest('#dash-vtabs').querySelectorAll('.ver-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// restore ver-check-btn states on load
+document.querySelectorAll('.ver-check-btn[data-ver-key]').forEach(el => {
+  if (localStorage.getItem('verok_' + el.dataset.verKey) === '1') {
+    el.textContent = '☑';
+    el.classList.add('ver-ok');
+  }
+});
+
+// populate script code elements
+document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
+document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
 </script>
 </body>
 </html>
