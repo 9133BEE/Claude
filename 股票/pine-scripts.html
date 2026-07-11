@@ -121,11 +121,30 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="unicorn" onclick="filt('unicorn',this)">Unicorn</button>
   <button class="filter-btn" data-cat="dashboard" onclick="filt('dashboard',this)">期貨儀表板</button>
   <button class="filter-btn" data-cat="supset" onclick="filt('supset',this)">SUP SET</button>
+  <button class="filter-btn" data-cat="strategy" onclick="filt('strategy',this)">回測工具</button>
 </div>
 
 <div class="grid" id="grid">
 
 
+
+<!-- ─── Strategy Tester ─── -->
+<div class="scard" data-cat="strategy">
+  <div class="scard-header">
+    <span class="scard-badge" style="background:#0ea5e9;color:#fff">回測</span>
+    <span class="scard-title">Unicorn HQOB — Strategy Tester</span>
+  </div>
+  <div class="scard-body">
+    <div class="ver-log">
+      <span class="vl-dot">›</span> <b>TradingView Strategy Tester 專用</b>，非實盤腳本<br>
+      <span class="vl-dot">›</span> 進場：價格觸及 HQ OB（score ≥ 門檻）立即做多/空<br>
+      <span class="vl-dot">›</span> 止損：OB 底部（多）/ 頂部（空）；止盈：RR 倍距離<br>
+      <span class="vl-dot">›</span> 可調 HQ 門檻、RR 倍數、最長持倉K數，跑出勝率後回報給我更新版本標籤
+    </div>
+    <button class="copy-bar-btn" onclick="copyStrategy(this)">一鍵複製腳本</button>
+    <div class="code-block" id="strategy-code"></div>
+  </div>
+</div>
 
 <!-- ─── SUP SET ─── -->
 <div class="scard" data-cat="supset">
@@ -668,6 +687,158 @@ if showDash and barstate.islast
 </div><!-- /grid -->
 
 <script>
+/* -- Strategy Tester 腳本 -- */
+const STRATEGY_TESTER = `//@version=5
+// ══════════════════════════════════════════════════════════════
+//  Unicorn HQOB — Strategy Tester
+//  用途：TradingView Strategy Tester 回測專用，非實盤腳本
+//  進場：價格觸及 HQ OB（score ≥ hqMin）立即做多/空
+//  止損：OB 底部（多）/ OB 頂部（空）
+//  止盈：進場後 RR 倍距離
+// ══════════════════════════════════════════════════════════════
+strategy("Unicorn HQOB — Strategy Tester",
+     overlay            = true,
+     initial_capital    = 10000,
+     default_qty_type   = strategy.percent_of_equity,
+     default_qty_value  = 10,
+     commission_type    = strategy.commission.percent,
+     commission_value   = 0.02,
+     slippage           = 1)
+
+grp1 = "OB 偵測設定"
+tfPreset  = input.string("Auto","時框預設",options=["Auto","1M","5M","15M","1H","4H","1D"],group=grp1)
+pivL_m    = input.int(10,"左側K數",minval=1,group=grp1)
+pivR_m    = input.int(5, "右側K數",minval=1,group=grp1)
+bbSrch_m  = input.int(100,"OB搜尋K數",minval=20,maxval=500,group=grp1)
+hqMin     = input.int(3,"HQ 門檻（0-4）",minval=0,maxval=4,group=grp1)
+
+grp2 = "進出場設定"
+rrRatio        = input.float(1.5,"獲利倍數 RR",minval=0.5,maxval=10,step=0.5,group=grp2)
+maxHoldBars    = input.int(50,"最長持倉K數",minval=5,maxval=500,group=grp2)
+oneTradePerMSS = input.bool(true,"每次 MSS 只進場一次",group=grp2)
+
+_autoTf = switch timeframe.period
+    "1"   => "1M"  ; "3"   => "1M"  ; "5"   => "1M"
+    "15"  => "15M" ; "30"  => "15M" ; "45"  => "15M"
+    "60"  => "1H"  ; "120" => "1H"
+    "240" => "4H"
+    "D"   => "1D"  ; "W"   => "1D"
+    => "1D"
+_tfKey = tfPreset == "Auto" ? _autoTf : tfPreset
+_pivL  = _tfKey=="1M"?5 :_tfKey=="5M"?7 :_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8 :_tfKey=="1D"?5 :pivL_m
+_pivR  = _tfKey=="1M"?3 :_tfKey=="5M"?3 :_tfKey=="15M"?5 :_tfKey=="1H"?5 :_tfKey=="4H"?4 :_tfKey=="1D"?3 :pivR_m
+_bbSrch= _tfKey=="1M"?200:_tfKey=="5M"?150:_tfKey=="15M"?120:_tfKey=="1H"?100:_tfKey=="4H"?60:_tfKey=="1D"?30:bbSrch_m
+
+avgBody = ta.sma(math.abs(close - open), 20)
+rng50   = ta.highest(high,50) - ta.lowest(low,50)
+mid50   = ta.lowest(low,50) + rng50 * 0.5
+f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
+
+phH = ta.pivothigh(high,_pivL,_pivR)
+plL = ta.pivotlow(low, _pivL,_pivR)
+var float lastPH = na
+var float lastPL = na
+if not na(phH)
+    lastPH := phH
+if not na(plL)
+    lastPL := plL
+
+bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
+bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
+
+f_findBullOB() =>
+    obTop = float(na), obBot = float(na), found = false
+    for i = 1 to _bbSrch
+        if close[i] < open[i]
+            oT = high[i], oB = low[i]
+            fvg  = i > 1 ? low[i-1] > high[i+1] : false
+            big  = math.abs(close[i]-open[i]) > avgBody*1.5
+            pda  = not na(mid50) ? (oT+oB)/2 < mid50 : false
+            liq  = false
+            for _j = i+1 to math.min(i+25, _bbSrch-1)
+                if low[_j] < oB
+                    liq := true
+                    break
+            sc = f_sc(fvg, big, liq, pda)
+            if sc >= hqMin
+                obTop := oT, obBot := oB, found := true
+                break
+    [obTop, obBot, found]
+
+f_findBearOB() =>
+    obTop = float(na), obBot = float(na), found = false
+    for i = 1 to _bbSrch
+        if close[i] > open[i]
+            oT = high[i], oB = low[i]
+            fvg  = i > 1 ? high[i-1] < low[i+1] : false
+            big  = math.abs(close[i]-open[i]) > avgBody*1.5
+            pda  = not na(mid50) ? (oT+oB)/2 > mid50 : false
+            liq  = false
+            for _j = i+1 to math.min(i+25, _bbSrch-1)
+                if high[_j] > oT
+                    liq := true
+                    break
+            sc = f_sc(fvg, big, liq, pda)
+            if sc >= hqMin
+                obTop := oT, obBot := oB, found := true
+                break
+    [obTop, obBot, found]
+
+var float activeObTop  = na
+var float activeObBot  = na
+var bool  activeIsLong = na
+var float entrySL      = na
+var int   entryBar     = na
+var int   lastMSSDir   = 0
+var bool  mssTraded    = false
+
+if bullMSS and lastMSSDir != 1
+    lastMSSDir := 1
+    mssTraded  := false
+    [oT, oB, ok] = f_findBullOB()
+    if ok
+        activeObTop := oT, activeObBot := oB, activeIsLong := true
+
+if bearMSS and lastMSSDir != -1
+    lastMSSDir := -1
+    mssTraded  := false
+    [oT, oB, ok] = f_findBearOB()
+    if ok
+        activeObTop := oT, activeObBot := oB, activeIsLong := false
+
+noPos     = strategy.position_size == 0
+canTrade  = not (oneTradePerMSS and mssTraded)
+
+if noPos and canTrade and not na(activeObTop)
+    if activeIsLong and low <= activeObTop and high >= activeObBot
+        strategy.entry("Long", strategy.long)
+        entrySL  := activeObBot
+        entryBar := bar_index
+        mssTraded := true
+    else if not activeIsLong and high >= activeObBot and low <= activeObTop
+        strategy.entry("Short", strategy.short)
+        entrySL  := activeObTop
+        entryBar := bar_index
+        mssTraded := true
+
+if strategy.position_size > 0 and strategy.opentrades > 0
+    ep = strategy.opentrades.entry_price(0)
+    slDist = math.abs(ep - entrySL)
+    strategy.exit("Long Exit", "Long", stop=entrySL, limit=ep + slDist * rrRatio)
+    if bar_index - entryBar >= maxHoldBars
+        strategy.close("Long", comment="超時平倉")
+
+if strategy.position_size < 0 and strategy.opentrades > 0
+    ep = strategy.opentrades.entry_price(0)
+    slDist = math.abs(entrySL - ep)
+    strategy.exit("Short Exit", "Short", stop=entrySL, limit=ep - slDist * rrRatio)
+    if bar_index - entryBar >= maxHoldBars
+        strategy.close("Short", comment="超時平倉")
+
+if not na(activeObTop)
+    boxCol = activeIsLong ? color.new(#22c55e,80) : color.new(#ef4444,80)
+    box.new(bar_index-1, activeObTop, bar_index+10, activeObBot, border_color=boxCol, bgcolor=boxCol, border_width=1)`;
+
 /* -- 市場儀表板 腳本 -- */
 const SUP_SET_V1 = `//@version=5
 indicator("SUP SET", overlay=true, max_lines_count=500, max_labels_count=200)
@@ -711,27 +882,17 @@ if showSHSL
 
     if not na(ph)
         if not na(shLastVal)
-            line.new(shLastBar, shLastVal, phBar, ph,
-                color=shC, width=shslWidth, style=lsty)
+            line.new(shLastBar, shLastVal, phBar, ph, color=shC, width=shslWidth, style=lsty)
         if showSHSLLbl
-            label.new(phBar, ph, "SH",
-                color=color.new(shCol, 60),
-                textcolor=color.white,
-                style=label.style_label_down,
-                size=size.tiny)
+            label.new(phBar, ph, "SH", color=color.new(shCol, 60), textcolor=color.white, style=label.style_label_down, size=size.tiny)
         shLastVal := ph
         shLastBar := phBar
 
     if not na(pl)
         if not na(slLastVal)
-            line.new(slLastBar, slLastVal, plBar, pl,
-                color=slC, width=shslWidth, style=lsty)
+            line.new(slLastBar, slLastVal, plBar, pl, color=slC, width=shslWidth, style=lsty)
         if showSHSLLbl
-            label.new(plBar, pl, "SL",
-                color=color.new(slCol, 60),
-                textcolor=color.white,
-                style=label.style_label_up,
-                size=size.tiny)
+            label.new(plBar, pl, "SL", color=color.new(slCol, 60), textcolor=color.white, style=label.style_label_up, size=size.tiny)
         slLastVal := pl
         slLastBar := plBar`;
 document.getElementById('supset-code').textContent = SUP_SET_V1;
@@ -1171,8 +1332,21 @@ indicator("期貨儀表板", overlay=true, max_bars_back=500, max_labels_count=5
 //  切換預設後，各技術指標參數自動對應
 // ══════════════════════════════════════════
 grpPst   = "⚡ 時框快選（選「自訂」時下方參數才生效）"
-presetTF = input.string("適用1M","適用時框",
-     options=["適用1M","適用15M","適用30M","適用1H","適用4H","自訂"],group=grpPst)
+presetTF = input.string("自動","適用時框",
+     options=["自動","適用1M","適用15M","適用30M","適用1H","適用4H","自訂"],group=grpPst)
+
+_autoPreset = switch timeframe.period
+    "1"   => "適用1M"
+    "3"   => "適用1M"
+    "5"   => "適用1M"
+    "15"  => "適用15M"
+    "30"  => "適用30M"
+    "60"  => "適用1H"
+    "120" => "適用1H"
+    "240" => "適用4H"
+    "D"   => "自訂"
+    => "自訂"
+_activePreset = presetTF == "自動" ? _autoPreset : presetTF
 
 // ══════════════════════════════════════════
 //  參數（「自訂」模式下才生效）
@@ -1203,11 +1377,11 @@ useSession = input.bool(false,"篩選主力時段（期貨建議關閉）", grou
 //  快選映射（Presets）
 //  各欄位對應：[1M, 15M, 30M, 1H, 4H, 自訂]
 // ══════════════════════════════════════════
-p1 = presetTF == "適用1M"
-p2 = presetTF == "適用15M"
-p3 = presetTF == "適用30M"
-p4 = presetTF == "適用1H"
-p5 = presetTF == "適用4H"
+p1 = _activePreset == "適用1M"
+p2 = _activePreset == "適用15M"
+p3 = _activePreset == "適用30M"
+p4 = _activePreset == "適用1H"
+p5 = _activePreset == "適用4H"
 
 emaFast  = p1?9  :p2?9  :p3?9  :p4?9  :p5?9  :emaFast_i
 emaSlow  = p1?20 :p2?21 :p3?21 :p4?21 :p5?21 :emaSlow_i
@@ -1475,7 +1649,8 @@ var table T = table.new(position.top_right, 3, 21,
 if barstate.islast
     ticker = syminfo.ticker
 
-    table.cell(T,0,0, ticker+" "+tfLabel+" ["+presetTF+"]",
+    _dispPreset = presetTF == "自動" ? "自動→"+_activePreset : _activePreset
+    table.cell(T,0,0, ticker+" 時區("+tfLabel+") ["+_dispPreset+"]",
          text_color=white, text_size=size.normal, bgcolor=#161b22)
     table.cell(T,1,0, inSess?"開市 ✓":"休市",
          text_color=inSess?green:gray, text_size=size.normal, bgcolor=#161b22)
@@ -2365,6 +2540,8 @@ pbFillTransp = input.int(80,       "填充透明度",          group=grp6, minva
 pbBrdTransp  = input.int(10,       "邊框透明度",          group=grp6, minval=0, maxval=100)
 pbExtR       = input.int(20,       "右延伸K數",           group=grp6, minval=1, maxval=500)
 showPBLbl    = input.bool(true,    "顯示標籤",            group=grp6)
+pbPivLen     = input.int(15,       "PB樞紐靈敏度K數",     group=grp6, minval=5,  maxval=50,  tooltip="越大=PB越少，減少重疊，建議10-20")
+maxPBs       = input.int(3,        "最多顯示PB數量",      group=grp6, minval=1,  maxval=10)
 
 _autoTfKey = switch timeframe.period
     "1"   => "1M"
@@ -2474,17 +2651,22 @@ if not na(phH)
 if not na(plL)
     lastPL := plL
 
+pbPH = ta.pivothigh(high, pbPivLen, pbPivLen)
+pbPL = ta.pivotlow(low,   pbPivLen, pbPivLen)
+
 var float pbPrevPL = na
 var float pbPrevPH = na
+var box[] pbBullBoxes = array.new_box()
+var box[] pbBearBoxes = array.new_box()
 
 if showPB
-    if not na(plL)
-        if not na(pbPrevPL) and plL > pbPrevPL
+    if not na(pbPL)
+        if not na(pbPrevPL) and pbPL > pbPrevPL
             obH = float(na)
             obL = float(na)
             obI = int(na)
             for i = 1 to pbSearchN
-                off = _pivR + i
+                off = pbPivLen + i
                 if off < bar_index
                     if close[off] < open[off]
                         obH := high[off]
@@ -2492,15 +2674,18 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI)
-                box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_top)
-        pbPrevPL := plL
-    if not na(phH)
-        if not na(pbPrevPH) and phH < pbPrevPH
+                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_top)
+                array.push(pbBullBoxes, bx)
+                if array.size(pbBullBoxes) > maxPBs
+                    box.delete(array.shift(pbBullBoxes))
+        pbPrevPL := pbPL
+    if not na(pbPH)
+        if not na(pbPrevPH) and pbPH < pbPrevPH
             obH = float(na)
             obL = float(na)
             obI = int(na)
             for i = 1 to pbSearchN
-                off = _pivR + i
+                off = pbPivLen + i
                 if off < bar_index
                     if close[off] > open[off]
                         obH := high[off]
@@ -2508,8 +2693,11 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI)
-                box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_bottom)
-        pbPrevPH := phH
+                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_bottom)
+                array.push(pbBearBoxes, bx)
+                if array.size(pbBearBoxes) > maxPBs
+                    box.delete(array.shift(pbBearBoxes))
+        pbPrevPH := pbPH
 
 bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
 bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
@@ -3156,6 +3344,14 @@ renderVerTabs('unicorn', 'u_v3');
 renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
+document.getElementById('strategy-code').textContent = STRATEGY_TESTER;
+
+function copyStrategy(btn) {
+  navigator.clipboard.writeText(STRATEGY_TESTER).then(() => {
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
+  });
+}
 </script>
 </body>
 </html>
