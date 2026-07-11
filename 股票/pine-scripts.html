@@ -62,6 +62,7 @@ a:hover{text-decoration:underline}
 
 .badge-unicorn{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
 .badge-dashboard{background:rgba(6,182,212,.15);color:#22d3ee;border:1px solid rgba(6,182,212,.3)}
+.badge-supset{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
 .hidden{display:none!important}
 
 .ver-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
@@ -113,19 +114,45 @@ a:hover{text-decoration:underline}
 <div class="filters">
   <button class="filter-btn active" onclick="filt('all',this)">全部</button>
   <button class="filter-btn" data-cat="unicorn" onclick="filt('unicorn',this)">Unicorn</button>
-  <button class="filter-btn" data-cat="dashboard" onclick="filt('dashboard',this)">市場儀表板</button>
+  <button class="filter-btn" data-cat="dashboard" onclick="filt('dashboard',this)">期貨儀表板</button>
+  <button class="filter-btn" data-cat="supset" onclick="filt('supset',this)">SUP SET</button>
 </div>
 
 <div class="grid" id="grid">
 
 
 
-<!-- ─── 市場儀表板 ─── -->
+<!-- ─── SUP SET ─── -->
+<div class="scard" data-cat="supset">
+  <div class="scard-header">
+    <span class="scard-badge badge-supset">SUP SET</span>
+    <div class="scard-meta">
+      <div class="scard-title">SUP SET</div>
+      <div class="scard-desc">結構輔助工具組：自動連接 Swing High / Swing Low 形成結構輔助線，直觀呈現市場高低點序列與趨勢方向。後續可擴充更多 SMC 工具。</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">所有標的</div></div>
+      <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">Swing High / Swing Low / 結構線</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
+      <div class="info-item"><div class="info-label">時框</div><div class="info-val">全時框適用</div></div>
+    </div>
+    <div class="ver-log" style="margin:10px 0">
+      <span class="vl-dot">›</span> <b>SH SL 輔助線</b>：用 <code>ta.pivothigh / ta.pivotlow</code> 偵測樞紐點，自動連線顯示高點結構（紅）與低點結構（綠）<br>
+      <span class="vl-dot">›</span> <b>可自訂顏色、透明度、線條樣式、粗細</b>，每組有獨立顯示開關<br>
+      <span class="vl-dot">›</span> <b>可擴充</b>：設定分組設計，後續工具直接新增 ② ③ ... 群組即可
+    </div>
+    <button class="copy-bar-btn" onclick="copySUPSET(this)">一鍵複製腳本</button>
+    <div class="code-block" id="supset-code"></div>
+  </div>
+</div>
+<!-- ─── 期貨儀表板 ─── -->
 <div class="scard" data-cat="dashboard">
   <div class="scard-header">
-    <span class="scard-badge badge-dashboard">市場儀表板</span>
+    <span class="scard-badge badge-dashboard">期貨儀表板</span>
     <div class="scard-meta">
-      <div class="scard-title">市場儀表板 1分K + SMC</div>
+      <div class="scard-title">期貨儀表板</div>
       <div class="scard-desc">美期1分K綜合分析面板：EMA三線、RSI/KD/MACD、布林帶、VWAP + SMC結構，自動偵測BUY/SELL訊號並計算ATR停損目標與美元損益（支援MNQ/NQ/MES/ES）</div>
     </div>
   </div>
@@ -134,7 +161,7 @@ a:hover{text-decoration:underline}
       <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">美期 MNQ/NQ/MES/ES/YM</div></div>
       <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">EMA / RSI / KD / MACD / VWAP / SMC</div></div>
       <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
-      <div class="info-item"><div class="info-label">時框</div><div class="info-val">1分K 優化</div></div>
+      <div class="info-item"><div class="info-label">時框</div><div class="info-val">1M – 4H 快選</div></div>
     </div>
     <div class="ver-log" style="margin:10px 0">
       <span class="vl-dot">›</span> <b>9欄 × 21列資訊面板</b>：VWAP位置、今日區間、EMA三線排列、RSI/KD/MACD、布林帶%、ATR、量能、SMC結構、停損/目標<br>
@@ -629,33 +656,148 @@ if showDash and barstate.islast
 
 <script>
 /* -- 市場儀表板 腳本 -- */
+const SUP_SET_V1 = `//@version=5
+indicator("SUP SET", overlay=true, max_lines_count=500, max_labels_count=200)
+
+// ════════════════════════════════════════════════
+//  ① SH SL 輔助線
+// ════════════════════════════════════════════════
+grp1         = "① SH SL 輔助線"
+showSHSL     = input.bool(true,    "顯示",             group=grp1)
+shslLen      = input.int(5,        "樞紐K數",           group=grp1, minval=2, maxval=30)
+shCol        = input.color(#ef4444,"SH 線顏色",         group=grp1)
+slCol        = input.color(#22c55e,"SL 線顏色",         group=grp1)
+shslTransp   = input.int(0,        "透明度",            group=grp1, minval=0, maxval=90)
+shslWidth    = input.int(1,        "線條粗細",          group=grp1, minval=1, maxval=4)
+shslStyleStr = input.string("Solid","線條樣式",         group=grp1, options=["Solid","Dashed","Dotted"])
+showSHSLLbl  = input.bool(true,    "顯示 SH/SL 標籤",  group=grp1)
+
+// ════════════════════════════════════════════════
+//  工具函式
+// ════════════════════════════════════════════════
+f_lsty(s) =>
+    s == "Dashed" ? line.style_dashed :
+    s == "Dotted" ? line.style_dotted :
+    line.style_solid
+
+// ════════════════════════════════════════════════
+//  ① SH SL 輔助線 邏輯
+// ════════════════════════════════════════════════
+ph = ta.pivothigh(high, shslLen, shslLen)
+pl = ta.pivotlow(low,   shslLen, shslLen)
+
+phBar = bar_index - shslLen
+plBar = bar_index - shslLen
+
+var float shLastVal = na
+var int   shLastBar = na
+var float slLastVal = na
+var int   slLastBar = na
+
+if showSHSL
+    shC  = color.new(shCol, shslTransp)
+    slC  = color.new(slCol, shslTransp)
+    lsty = f_lsty(shslStyleStr)
+
+    if not na(ph)
+        if not na(shLastVal)
+            line.new(shLastBar, shLastVal, phBar, ph,
+                color=shC, width=shslWidth, style=lsty)
+        if showSHSLLbl
+            label.new(phBar, ph, "SH",
+                color=color.new(shCol, 60),
+                textcolor=color.white,
+                style=label.style_label_down,
+                size=size.tiny)
+        shLastVal := ph
+        shLastBar := phBar
+
+    if not na(pl)
+        if not na(slLastVal)
+            line.new(slLastBar, slLastVal, plBar, pl,
+                color=slC, width=shslWidth, style=lsty)
+        if showSHSLLbl
+            label.new(plBar, pl, "SL",
+                color=color.new(slCol, 60),
+                textcolor=color.white,
+                style=label.style_label_up,
+                size=size.tiny)
+        slLastVal := pl
+        slLastBar := plBar`;
+document.getElementById('supset-code').textContent = SUP_SET_V1;
+
+function copySUPSET(btn) {
+  navigator.clipboard.writeText(SUP_SET_V1).then(() => {
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
+  });
+}
 const DASHBOARD_V1 = `//@version=5
-indicator("市場儀表板 1分K + SMC", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500)
+indicator("期貨儀表板", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500)
 
 // ══════════════════════════════════════════
-//  參數（1分K 優化版）
+//  ⚡ 時框快選
+//  切換預設後，各技術指標參數自動對應
 // ══════════════════════════════════════════
-emaFast  = input.int(9,   "快線 EMA",  group="均線")
-emaSlow  = input.int(20,  "慢線 EMA",  group="均線")
-emaTrend = input.int(50,  "趨勢 EMA",  group="均線")
-rsiLen   = input.int(7,   "RSI 週期",  group="RSI")
-rsiOB    = input.int(75,  "超買",      group="RSI")
-rsiOS    = input.int(25,  "超賣",      group="RSI")
-kdLen    = input.int(5,   "KD 週期",   group="KD")
-kdSmK    = input.int(3,   "K 平滑",    group="KD")
-kdSmD    = input.int(3,   "D 平滑",    group="KD")
-macdF    = input.int(5,   "MACD 快",   group="MACD")
-macdS    = input.int(13,  "MACD 慢",   group="MACD")
-macdG    = input.int(4,   "信號線",    group="MACD")
-bbLen    = input.int(15,  "BB 週期",   group="布林帶")
-bbMult   = input.float(2.0,"BB 倍數",  group="布林帶")
-atrLen   = input.int(10,  "ATR 週期",  group="ATR / 停損")
-slMult   = input.float(1.2,"停損 ATR", group="ATR / 停損", step=0.1)
-tpMult   = input.float(2.0,"目標 ATR", group="ATR / 停損", step=0.1)
-volLen   = input.int(10,  "均量週期",  group="成交量")
-pivLen   = input.int(5,   "SMC 樞紐K數",    group="SMC")
-chochCD  = input.int(10,  "CHoCH 冷卻根數", group="SMC", minval=5, maxval=30)
-useSession = input.bool(true, "僅美股主力時段 09:30–16:00 ET", group="時段")
+grpPst   = "⚡ 時框快選（選「自訂」時下方參數才生效）"
+presetTF = input.string("適用1M","適用時框",
+     options=["適用1M","適用15M","適用30M","適用1H","適用4H","自訂"],group=grpPst)
+
+// ══════════════════════════════════════════
+//  參數（「自訂」模式下才生效）
+// ══════════════════════════════════════════
+emaFast_i  = input.int(9,    "快線 EMA",          group="均線")
+emaSlow_i  = input.int(20,   "慢線 EMA",          group="均線")
+emaTrend_i = input.int(50,   "趨勢 EMA",          group="均線")
+rsiLen_i   = input.int(7,    "RSI 週期",          group="RSI")
+rsiOB_i    = input.int(75,   "超買",              group="RSI")
+rsiOS_i    = input.int(25,   "超賣",              group="RSI")
+kdLen_i    = input.int(5,    "KD 週期",           group="KD")
+kdSmK_i    = input.int(3,    "K 平滑",            group="KD")
+kdSmD_i    = input.int(3,    "D 平滑",            group="KD")
+macdF_i    = input.int(5,    "MACD 快",           group="MACD")
+macdS_i    = input.int(13,   "MACD 慢",           group="MACD")
+macdG_i    = input.int(4,    "信號線",            group="MACD")
+bbLen_i    = input.int(15,   "BB 週期",           group="布林帶")
+bbMult_i   = input.float(2.0,"BB 倍數",           group="布林帶")
+atrLen_i   = input.int(10,   "ATR 週期",          group="ATR / 停損")
+slMult_i   = input.float(1.2,"停損 ATR",          group="ATR / 停損", step=0.1)
+tpMult_i   = input.float(2.0,"目標 ATR",          group="ATR / 停損", step=0.1)
+volLen_i   = input.int(10,   "均量週期",          group="成交量")
+pivLen_i   = input.int(5,    "SMC 樞紐K數",       group="SMC")
+chochCD_i  = input.int(10,   "CHoCH 冷卻根數",    group="SMC", minval=5, maxval=30)
+useSession = input.bool(false,"篩選主力時段（期貨建議關閉）", group="時段")
+
+// ══════════════════════════════════════════
+//  快選映射（Presets）
+//  各欄位對應：[1M, 15M, 30M, 1H, 4H, 自訂]
+// ══════════════════════════════════════════
+p1 = presetTF == "適用1M"
+p2 = presetTF == "適用15M"
+p3 = presetTF == "適用30M"
+p4 = presetTF == "適用1H"
+p5 = presetTF == "適用4H"
+
+emaFast  = p1?9  :p2?9  :p3?9  :p4?9  :p5?9  :emaFast_i
+emaSlow  = p1?20 :p2?21 :p3?21 :p4?21 :p5?21 :emaSlow_i
+emaTrend = p1?50 :p2?55 :p3?55 :p4?55 :p5?55 :emaTrend_i
+rsiLen   = p1?7  :p2?9  :p3?9  :p4?14 :p5?14 :rsiLen_i
+rsiOB    = p1?75 :p2?70 :p3?70 :p4?70 :p5?70 :rsiOB_i
+rsiOS    = p1?25 :p2?30 :p3?30 :p4?30 :p5?30 :rsiOS_i
+kdLen    = p1?5  :p2?9  :p3?9  :p4?14 :p5?14 :kdLen_i
+kdSmK    = p1?3  :p2?3  :p3?3  :p4?3  :p5?3  :kdSmK_i
+kdSmD    = p1?3  :p2?3  :p3?3  :p4?3  :p5?3  :kdSmD_i
+macdF    = p1?5  :p2?8  :p3?8  :p4?12 :p5?12 :macdF_i
+macdS    = p1?13 :p2?21 :p3?21 :p4?26 :p5?26 :macdS_i
+macdG    = p1?4  :p2?5  :p3?5  :p4?9  :p5?9  :macdG_i
+bbLen    = p1?15 :p2?20 :p3?20 :p4?20 :p5?20 :bbLen_i
+bbMult   = p1?2.0:p2?2.0:p3?2.0:p4?2.0:p5?2.0:bbMult_i
+atrLen   = p1?10 :p2?14 :p3?14 :p4?14 :p5?14 :atrLen_i
+slMult   = p1?1.2:p2?1.5:p3?1.5:p4?1.5:p5?2.0:slMult_i
+tpMult   = p1?2.0:p2?2.5:p3?2.5:p4?3.0:p5?4.0:tpMult_i
+volLen   = p1?10 :p2?14 :p3?14 :p4?20 :p5?20 :volLen_i
+pivLen   = p1?5  :p2?7  :p3?8  :p4?10 :p5?12 :pivLen_i
+chochCD  = p1?10 :p2?12 :p3?14 :p4?15 :p5?20 :chochCD_i
 
 // ══════════════════════════════════════════
 //  技術指標
@@ -683,10 +825,10 @@ volRatio = volume / avgVol
 
 vwapVal  = ta.vwap(hlc3)
 dayOpen  = request.security(syminfo.tickerid, "D", open)
-dayHigh  = ta.highest(high, 390)
-dayLow   = ta.lowest(low,  390)
+dayHigh  = request.security(syminfo.tickerid, "D", high)
+dayLow   = request.security(syminfo.tickerid, "D", low)
 
-inSess = not useSession or na(time("", "0930-1600:23456", "America/New_York")) == false
+inSess = not useSession or na(time("", "0930-1615:23456", "America/New_York")) == false
 
 // ══════════════════════════════════════════
 //  SMC 計算
@@ -737,7 +879,7 @@ smcBuyOK  = smcBull  or inDiscount or bullFVG or inBullOB
 smcSellOK = smcBear  or inPremium  or bearFVG or inBearOB
 
 // ══════════════════════════════════════════
-//  CHoCH 冷卻期（保留此過濾，拿掉Histogram）
+//  CHoCH 冷卻期
 // ══════════════════════════════════════════
 var bool prevSmcBull = na
 var bool prevSmcBear = na
@@ -802,7 +944,7 @@ if sellSignal
     sig := -1
 
 // ══════════════════════════════════════════
-//  訊號標記（拉長箭頭 + 自動避免重疊）
+//  訊號標記
 // ══════════════════════════════════════════
 var int[]   buyBarArr  = array.new_int(0)
 var float[] buyYArr    = array.new_float(0)
@@ -888,6 +1030,12 @@ scoreTxt = score >= 7  ? "強多 ▲▲" : score >= 4  ? "偏多 ▲"  :
 // ══════════════════════════════════════════
 //  資訊面板
 // ══════════════════════════════════════════
+tfLabel = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":
+          timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":
+          timeframe.period=="D"?"日K":timeframe.period
+
+emaLbl  = "EMA "+str.tostring(emaFast)+"/"+str.tostring(emaSlow)+"/"+str.tostring(emaTrend)
+
 var table T = table.new(position.top_right, 3, 21,
      bgcolor=color.new(#0d1117,0),
      border_color=#30363d, border_width=1,
@@ -896,7 +1044,7 @@ var table T = table.new(position.top_right, 3, 21,
 if barstate.islast
     ticker = syminfo.ticker
 
-    table.cell(T,0,0, ticker+" 1分K",
+    table.cell(T,0,0, ticker+" "+tfLabel+" ["+presetTF+"]",
          text_color=white, text_size=size.normal, bgcolor=#161b22)
     table.cell(T,1,0, inSess?"開市 ✓":"休市",
          text_color=inSess?green:gray, text_size=size.normal, bgcolor=#161b22)
@@ -923,7 +1071,7 @@ if barstate.islast
 
     emaAlignTxt = emaFull?"多頭 ▲":emaF<emaS and emaS<emaT?"空頭 ▼":emaUp?"快>慢 偏多":"快<慢 偏空"
     emaAlignCol = emaFull?green:emaF<emaS and emaS<emaT?red:emaUp?color.new(green,40):color.new(red,40)
-    table.cell(T,0,4, "EMA 9/20/50", text_color=gray, text_size=size.small)
+    table.cell(T,0,4, emaLbl, text_color=gray, text_size=size.small)
     table.cell(T,1,4, str.tostring(math.round(emaF,1))+" / "+
                       str.tostring(math.round(emaS,1))+" / "+
                       str.tostring(math.round(emaT,1)), text_color=white, text_size=size.tiny)
@@ -1776,6 +1924,16 @@ fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, ste
 _hqBg()  => math.min(95, obFillTransp + 15)
 _hqOvl() => math.min(98, obFillTransp + 33)
 
+grp6 = "推進塊 PB"
+showPB       = input.bool(true,    "顯示推進塊 PB",      group=grp6)
+pbSearchN    = input.int(25,       "OB 往前搜尋K數",     group=grp6, minval=5, maxval=100)
+pbBullCol    = input.color(#22c55e,"+PB 顏色",            group=grp6)
+pbBearCol    = input.color(#ef4444,"-PB 顏色",            group=grp6)
+pbFillTransp = input.int(80,       "填充透明度",          group=grp6, minval=0, maxval=100)
+pbBrdTransp  = input.int(10,       "邊框透明度",          group=grp6, minval=0, maxval=100)
+pbExtR       = input.int(20,       "右延伸K數",           group=grp6, minval=1, maxval=500)
+showPBLbl    = input.bool(true,    "顯示標籤",            group=grp6)
+
 _autoTfKey = switch timeframe.period
     "1"   => "1M"
     "3"   => "5M"
@@ -1883,6 +2041,59 @@ if not na(phH)
     lastPH := phH
 if not na(plL)
     lastPL := plL
+
+var float pbPrevPL = na
+var float pbPrevPH = na
+
+if showPB
+    if not na(plL)
+        if not na(pbPrevPL) and plL > pbPrevPL
+            obH = float(na)
+            obL = float(na)
+            obI = int(na)
+            for i = 1 to pbSearchN
+                off = _pivR + i
+                if off < bar_index
+                    if close[off] < open[off]
+                        obH := high[off]
+                        obL := low[off]
+                        obI := bar_index - off
+                        break
+            if not na(obI)
+                box.new(obI, obH, bar_index + pbExtR, obL,
+                    border_color=color.new(pbBullCol, pbBrdTransp),
+                    bgcolor     =color.new(pbBullCol, pbFillTransp),
+                    border_width=1,
+                    text        =showPBLbl?"+PB":"",
+                    text_color  =color.new(pbBullCol, 0),
+                    text_size   =size.small,
+                    text_halign =text.align_right,
+                    text_valign =text.align_top)
+        pbPrevPL := plL
+    if not na(phH)
+        if not na(pbPrevPH) and phH < pbPrevPH
+            obH = float(na)
+            obL = float(na)
+            obI = int(na)
+            for i = 1 to pbSearchN
+                off = _pivR + i
+                if off < bar_index
+                    if close[off] > open[off]
+                        obH := high[off]
+                        obL := low[off]
+                        obI := bar_index - off
+                        break
+            if not na(obI)
+                box.new(obI, obH, bar_index + pbExtR, obL,
+                    border_color=color.new(pbBearCol, pbBrdTransp),
+                    bgcolor     =color.new(pbBearCol, pbFillTransp),
+                    border_width=1,
+                    text        =showPBLbl?"-PB":"",
+                    text_color  =color.new(pbBearCol, 0),
+                    text_size   =size.small,
+                    text_halign =text.align_right,
+                    text_valign =text.align_bottom)
+        pbPrevPH := phH
 
 bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
 bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
