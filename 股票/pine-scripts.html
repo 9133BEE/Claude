@@ -61,6 +61,7 @@ a:hover{text-decoration:underline}
 .tips-box ul{padding-left:16px}
 
 .badge-unicorn{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
+.badge-dashboard{background:rgba(6,182,212,.15);color:#22d3ee;border:1px solid rgba(6,182,212,.3)}
 .hidden{display:none!important}
 
 .ver-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
@@ -111,311 +112,47 @@ a:hover{text-decoration:underline}
 
 <div class="filters">
   <button class="filter-btn active" onclick="filt('all',this)">全部</button>
-  <button class="filter-btn" data-cat="trend" onclick="filt('trend',this)">盤面趨勢</button>
-  <button class="filter-btn" data-cat="signal" onclick="filt('signal',this)">即時訊號</button>
-  <button class="filter-btn" data-cat="gap" onclick="filt('gap',this)">跳空區間</button>
-  <button class="filter-btn" data-cat="dmi" onclick="filt('dmi',this)">DMI 趨勢</button>
-  <button class="filter-btn" data-cat="unicorn" onclick="filt('unicorn',this)">獨角獸模型</button>
+  <button class="filter-btn" data-cat="unicorn" onclick="filt('unicorn',this)">Unicorn</button>
+  <button class="filter-btn" data-cat="dashboard" onclick="filt('dashboard',this)">市場儀表板</button>
 </div>
 
 <div class="grid" id="grid">
 
-<!-- ─── 盤面趨勢總覽 ─── -->
-<div class="scard" data-cat="trend">
+
+
+<!-- ─── 市場儀表板 ─── -->
+<div class="scard" data-cat="dashboard">
   <div class="scard-header">
-    <span class="scard-badge badge-trend">盤面趨勢</span>
+    <span class="scard-badge badge-dashboard">市場儀表板</span>
     <div class="scard-meta">
-      <div class="scard-title">盤面趨勢總覽（Table 資訊欄）</div>
-      <div class="scard-desc">在圖表角落顯示多時間週期多空判斷表格，整合 EMA/VWAP/RSI/ATR/OBV/ADX，一眼掌握盤面方向</div>
+      <div class="scard-title">市場儀表板 1分K + SMC</div>
+      <div class="scard-desc">美期1分K綜合分析面板：EMA三線、RSI/KD/MACD、布林帶、VWAP + SMC結構，自動偵測BUY/SELL訊號並計算ATR停損目標與美元損益（支援MNQ/NQ/MES/ES）</div>
     </div>
   </div>
   <div class="scard-body">
     <div class="info-grid">
-      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">台股 / 美股 / 期貨</div></div>
-      <div class="info-item"><div class="info-label">週期覆蓋</div><div class="info-val">5m / 30m / 日 / 週</div></div>
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">美期 MNQ/NQ/MES/ES/YM</div></div>
+      <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">EMA / RSI / KD / MACD / VWAP / SMC</div></div>
       <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
-      <div class="info-item"><div class="info-label">位置</div><div class="info-val">右上角 Table</div></div>
+      <div class="info-item"><div class="info-label">時框</div><div class="info-val">1分K 優化</div></div>
     </div>
-    <div style="position:relative;margin-top:12px">
-      <button class="copy-btn" onclick="copyCode(this)">複製</button>
-      <div class="code-block"><span class="cmt">//@version=5</span>
-<span class="kw">indicator</span>(<span class="str">"盤面趨勢總覽"</span>, overlay=<span class="kw">true</span>)
-
-<span class="cmt">// ── 參數 ──</span>
-ema_fast = <span class="fn">input.int</span>(<span class="num">9</span>,  <span class="str">"快線 EMA"</span>)
-ema_slow = <span class="fn">input.int</span>(<span class="num">21</span>, <span class="str">"慢線 EMA"</span>)
-rsi_len  = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"RSI 週期"</span>)
-adx_len  = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"ADX 週期"</span>)
-
-<span class="cmt">// ── 計算 ──</span>
-ema9  = <span class="fn">ta.ema</span>(close, ema_fast)
-ema21 = <span class="fn">ta.ema</span>(close, ema_slow)
-vwap  = <span class="fn">ta.vwap</span>(close)
-rsi   = <span class="fn">ta.rsi</span>(close, rsi_len)
-[di_p, di_m, adx] = <span class="fn">ta.dmi</span>(adx_len, adx_len)
-obv   = <span class="fn">ta.obv</span>
-atr   = <span class="fn">ta.atr</span>(<span class="num">14</span>)
-
-<span class="cmt">// ── 多空判斷 ──</span>
-trend_ema  = ema9 > ema21 ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
-trend_vwap = close > vwap  ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
-rsi_str    = rsi >= <span class="num">50</span> ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
-adx_str    = adx >= <span class="num">25</span> ? (di_p > di_m ? <span class="str">"強多"</span> : <span class="str">"強空"</span>) : <span class="str">"震盪"</span>
-obv_str    = obv > obv[<span class="num">1</span>] ? <span class="str">"買壓"</span> : <span class="str">"賣壓"</span>
-atr_str    = <span class="fn">str.tostring</span>(<span class="fn">math.floor</span>(atr * <span class="num">100</span>) / <span class="num">100</span>)
-
-col_bull = <span class="fn">color.new</span>(color.green, <span class="num">0</span>)
-col_bear = <span class="fn">color.new</span>(color.red,   <span class="num">0</span>)
-col_neu  = <span class="fn">color.new</span>(color.gray,  <span class="num">0</span>)
-
-<span class="fn">f_col</span>(s) =>
-    s == <span class="str">"多▲"</span> or s == <span class="str">"強多"</span> or s == <span class="str">"買壓"</span> ? col_bull :
-     s == <span class="str">"空▼"</span> or s == <span class="str">"強空"</span> or s == <span class="str">"賣壓"</span> ? col_bear : col_neu
-
-<span class="cmt">// ── Table ──</span>
-<span class="kw">var</span> t = <span class="fn">table.new</span>(position.top_right, <span class="num">2</span>, <span class="num">7</span>,
-     bgcolor=#161b22, border_color=#30363d, border_width=<span class="num">1</span>, frame_color=#30363d, frame_width=<span class="num">1</span>)
-
-<span class="fn">f_cell</span>(r, lbl, val, vc) =>
-    <span class="fn">table.cell</span>(t, <span class="num">0</span>, r, lbl, text_color=#8b949e, text_size=size.small, bgcolor=#1a1f2e)
-    <span class="fn">table.cell</span>(t, <span class="num">1</span>, r, val, text_color=vc,      text_size=size.small, bgcolor=#161b22)
-
-<span class="fn">f_cell</span>(<span class="num">0</span>, <span class="str">"EMA 趨勢"</span>, trend_ema,  <span class="fn">f_col</span>(trend_ema))
-<span class="fn">f_cell</span>(<span class="num">1</span>, <span class="str">"VWAP"</span>,     trend_vwap, <span class="fn">f_col</span>(trend_vwap))
-<span class="fn">f_cell</span>(<span class="num">2</span>, <span class="str">"RSI"</span>,      rsi_str,    <span class="fn">f_col</span>(rsi_str))
-<span class="fn">f_cell</span>(<span class="num">3</span>, <span class="str">"ADX"</span>,      adx_str,    <span class="fn">f_col</span>(adx_str))
-<span class="fn">f_cell</span>(<span class="num">4</span>, <span class="str">"OBV"</span>,      obv_str,    <span class="fn">f_col</span>(obv_str))
-<span class="fn">f_cell</span>(<span class="num">5</span>, <span class="str">"ATR"</span>,      atr_str,    col_neu)</div>
+    <div class="ver-log" style="margin:10px 0">
+      <span class="vl-dot">›</span> <b>9欄 × 21列資訊面板</b>：VWAP位置、今日區間、EMA三線排列、RSI/KD/MACD、布林帶%、ATR、量能、SMC結構、停損/目標<br>
+      <span class="vl-dot">›</span> <b>CHoCH 冷卻機制</b>：多/空翻轉後保護 N 根K棒（預設10），有效阻止反向假突破連續觸發<br>
+      <span class="vl-dot">›</span> <b>自動計算停損/目標（美元）</b>：依 ATR 倍數計算，並依合約點值換算損益<br>
+      <span class="vl-dot">›</span> <b>美股主力時段過濾</b>：可選僅在 09:30–16:00 ET 內觸發訊號，有效避開盤前盤後雜訊
     </div>
-    <div class="tips-box" style="margin-top:10px">
-      <h4>使用說明</h4>
-      <ul>
-        <li>貼到 TradingView → Pine 編輯器 → 儲存 → 加到圖表</li>
-        <li>EMA、VWAP、RSI 同時顯示多▲ = 趨勢確認，可加大部位</li>
-        <li>ADX &lt; 25 顯示「震盪」，此時趨勢訊號準確率降低</li>
-      </ul>
-    </div>
+    <button class="copy-bar-btn" onclick="copyDashboard(this)">一鍵複製腳本</button>
+    <div class="code-block" id="dashboard-code"></div>
   </div>
 </div>
 
-<!-- ─── 即時動能訊號 ─── -->
-<div class="scard" data-cat="signal">
-  <div class="scard-header">
-    <span class="scard-badge badge-signal">即時訊號</span>
-    <div class="scard-meta">
-      <div class="scard-title">即時動能訊號欄（1分K補足版）</div>
-      <div class="scard-desc">專為美股 1 分 K 設計的資訊欄，整合多空力道、RSI、EMA 斜率、成交量異常，補足原生數據欄不足</div>
-    </div>
-  </div>
-  <div class="scard-body">
-    <div class="info-grid">
-      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">美股 1分K</div></div>
-      <div class="info-item"><div class="info-label">核心指標</div><div class="info-val">RSI / EMA / OBV / ATR</div></div>
-      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
-      <div class="info-item"><div class="info-label">顯示</div><div class="info-val">右下角 Table</div></div>
-    </div>
-    <div style="position:relative;margin-top:12px">
-      <button class="copy-btn" onclick="copyCode(this)">複製</button>
-      <div class="code-block"><span class="cmt">//@version=5</span>
-<span class="kw">indicator</span>(<span class="str">"即時動能訊號欄"</span>, overlay=<span class="kw">true</span>)
-
-rsi_len = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"RSI 週期"</span>)
-vol_ma  = <span class="fn">input.int</span>(<span class="num">20</span>, <span class="str">"成交量均線"</span>)
-
-rsi     = <span class="fn">ta.rsi</span>(close, rsi_len)
-ema9    = <span class="fn">ta.ema</span>(close, <span class="num">9</span>)
-ema21   = <span class="fn">ta.ema</span>(close, <span class="num">21</span>)
-vol_avg = <span class="fn">ta.sma</span>(volume, vol_ma)
-obv     = <span class="fn">ta.obv</span>
-atr     = <span class="fn">ta.atr</span>(<span class="num">14</span>)
-
-<span class="cmt">// 動能方向</span>
-momentum = close - close[<span class="num">3</span>]
-mom_str  = momentum > <span class="num">0</span> ? <span class="str">"上▲"</span> : <span class="str">"下▼"</span>
-
-<span class="cmt">// RSI 評估（顯示數值+評估）</span>
-rsi_val  = <span class="fn">math.floor</span>(rsi * <span class="num">100</span>) / <span class="num">100</span>
-rsi_disp = <span class="fn">str.tostring</span>(rsi_val) + (rsi >= <span class="num">70</span> ? <span class="str">"(超買)"</span> : rsi <= <span class="num">30</span> ? <span class="str">"(超賣)"</span> : rsi >= <span class="num">50</span> ? <span class="str">"(偏多)"</span> : <span class="str">"(偏空)"</span>)
-
-<span class="cmt">// EMA 多空</span>
-ema_str  = ema9 > ema21 ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
-
-<span class="cmt">// 成交量</span>
-vol_str  = volume > vol_avg * <span class="num">1.5</span> ? <span class="str">"爆量!"</span> : volume > vol_avg ? <span class="str">"放量"</span> : <span class="str">"縮量"</span>
-
-<span class="cmt">// OBV 方向</span>
-obv_str  = obv > obv[<span class="num">1</span>] ? <span class="str">"買▲"</span> : <span class="str">"賣▼"</span>
-
-<span class="cmt">// ATR</span>
-atr_disp = <span class="fn">str.tostring</span>(<span class="fn">math.floor</span>(atr * <span class="num">100</span>) / <span class="num">100</span>)
-
-col_g = <span class="fn">color.new</span>(color.green, <span class="num">0</span>)
-col_r = <span class="fn">color.new</span>(color.red,   <span class="num">0</span>)
-col_y = <span class="fn">color.new</span>(color.yellow,<span class="num">0</span>)
-col_w = <span class="fn">color.new</span>(color.white, <span class="num">0</span>)
-col_gr= <span class="fn">color.new</span>(color.gray,  <span class="num">0</span>)
-
-<span class="kw">var</span> t = <span class="fn">table.new</span>(position.bottom_right, <span class="num">2</span>, <span class="num">6</span>,
-     bgcolor=#161b22, border_color=#30363d, border_width=<span class="num">1</span>, frame_color=#30363d, frame_width=<span class="num">1</span>)
-
-<span class="fn">f_cell</span>(r, lbl, val, vc) =>
-    <span class="fn">table.cell</span>(t, <span class="num">0</span>, r, lbl, text_color=#8b949e, text_size=size.small, bgcolor=#1a1f2e)
-    <span class="fn">table.cell</span>(t, <span class="num">1</span>, r, val, text_color=vc,      text_size=size.small, bgcolor=#161b22)
-
-<span class="fn">f_cell</span>(<span class="num">0</span>, <span class="str">"動能"</span>,   mom_str,  momentum > <span class="num">0</span> ? col_g : col_r)
-<span class="fn">f_cell</span>(<span class="num">1</span>, <span class="str">"RSI"</span>,    rsi_disp, rsi >= <span class="num">70</span> ? col_r : rsi <= <span class="num">30</span> ? col_g : rsi >= <span class="num">50</span> ? col_g : col_r)
-<span class="fn">f_cell</span>(<span class="num">2</span>, <span class="str">"EMA"</span>,    ema_str,  ema9 > ema21 ? col_g : col_r)
-<span class="fn">f_cell</span>(<span class="num">3</span>, <span class="str">"成交量"</span>, vol_str,  vol_str == <span class="str">"爆量!"</span> ? col_y : vol_str == <span class="str">"放量"</span> ? col_g : col_gr)
-<span class="fn">f_cell</span>(<span class="num">4</span>, <span class="str">"OBV"</span>,    obv_str,  obv > obv[<span class="num">1</span>] ? col_g : col_r)
-<span class="fn">f_cell</span>(<span class="num">5</span>, <span class="str">"ATR"</span>,    atr_disp, col_w)</div>
-    </div>
-    <div class="tips-box" style="margin-top:10px">
-      <h4>使用說明</h4>
-      <ul>
-        <li>動能＋EMA＋OBV 三者同向 = 順勢進場強訊號</li>
-        <li>「爆量!」出現在關鍵價位附近 = 機構介入訊號</li>
-        <li>RSI 超買 + 動能下▼ = 短線轉弱，考慮減碼</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- ─── 跳空區間 ─── -->
-<div class="scard" data-cat="gap">
-  <div class="scard-header">
-    <span class="scard-badge badge-gap">跳空區間</span>
-    <div class="scard-meta">
-      <div class="scard-title">跳空壓力 / 支撐區間框</div>
-      <div class="scard-desc">自動偵測 K 棒跳空缺口，用紅框（跳空壓力）與綠框（跳空支撐）標示在圖上，缺口填補後自動消失</div>
-    </div>
-  </div>
-  <div class="scard-body">
-    <div class="info-grid">
-      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">所有標的</div></div>
-      <div class="info-item"><div class="info-label">偵測邏輯</div><div class="info-val">K棒缺口（非日缺口）</div></div>
-      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
-      <div class="info-item"><div class="info-label">顯示</div><div class="info-val">圖表上方/下方方框</div></div>
-    </div>
-    <div style="position:relative;margin-top:12px">
-      <button class="copy-btn" onclick="copyCode(this)">複製</button>
-      <div class="code-block"><span class="cmt">//@version=5</span>
-<span class="kw">indicator</span>(<span class="str">"跳空壓力支撐區間"</span>, overlay=<span class="kw">true</span>, max_boxes_count=<span class="num">200</span>)
-
-min_gap_pct = <span class="fn">input.float</span>(<span class="num">0.1</span>, <span class="str">"最小缺口比例(%)"</span>, minval=<span class="num">0.01</span>, step=<span class="num">0.05</span>) / <span class="num">100</span>
-max_bars    = <span class="fn">input.int</span>(<span class="num">100</span>, <span class="str">"最多保留幾根K棒"</span>, minval=<span class="num">10</span>)
-col_up_gap  = <span class="fn">input.color</span>(<span class="fn">color.new</span>(color.green, <span class="num">80</span>), <span class="str">"跳空支撐填色"</span>)
-col_dn_gap  = <span class="fn">input.color</span>(<span class="fn">color.new</span>(color.red,   <span class="num">80</span>), <span class="str">"跳空壓力填色"</span>)
-border_up   = <span class="fn">input.color</span>(color.green, <span class="str">"跳空支撐邊框"</span>)
-border_dn   = <span class="fn">input.color</span>(color.red,   <span class="str">"跳空壓力邊框"</span>)
-
-<span class="cmt">// 跳空向上（支撐缺口）: 本K低點 > 前K高點</span>
-gap_up = low > high[<span class="num">1</span>] and (low - high[<span class="num">1</span>]) / high[<span class="num">1</span>] >= min_gap_pct
-
-<span class="cmt">// 跳空向下（壓力缺口）: 本K高點 < 前K低點</span>
-gap_dn = high < low[<span class="num">1</span>] and (low[<span class="num">1</span>] - high) / low[<span class="num">1</span>] >= min_gap_pct
-
-<span class="kw">if</span> gap_up
-    <span class="fn">box.new</span>(bar_index - <span class="num">1</span>, low, bar_index + max_bars, high[<span class="num">1</span>],
-         bgcolor=col_up_gap, border_color=border_up, border_width=<span class="num">1</span>)
-
-<span class="kw">if</span> gap_dn
-    <span class="fn">box.new</span>(bar_index - <span class="num">1</span>, low[<span class="num">1</span>], bar_index + max_bars, high,
-         bgcolor=col_dn_gap, border_color=border_dn, border_width=<span class="num">1</span>)
-
-<span class="cmt">// 缺口填補後延伸框至當前 bar</span>
-<span class="kw">var</span> boxes = array.new_box()
-<span class="fn">array.push</span>(boxes, gap_up ? <span class="fn">box.new</span>(bar_index,low,bar_index,high[<span class="num">1</span>],border_color=color.na) : box.na)
-
-<span class="fn">plotshape</span>(gap_up, style=shape.triangleup,   location=location.belowbar, color=color.green, size=size.tiny, title=<span class="str">"跳空支撐"</span>)
-<span class="fn">plotshape</span>(gap_dn, style=shape.triangledown, location=location.abovebar, color=color.red,   size=size.tiny, title=<span class="str">"跳空壓力"</span>)</div>
-    </div>
-    <div class="tips-box" style="margin-top:10px">
-      <h4>使用說明</h4>
-      <ul>
-        <li>綠框 = 跳空支撐（回測此區域時考慮買進）</li>
-        <li>紅框 = 跳空壓力（上漲遇此區域考慮減碼）</li>
-        <li>調整「最小缺口比例」可過濾雜訊（建議 0.1–0.3%）</li>
-        <li>「最多保留幾根K棒」決定缺口框延伸長度</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- ─── DMI 週期多空判斷 ─── -->
-<div class="scard" data-cat="dmi">
-  <div class="scard-header">
-    <span class="scard-badge badge-dmi">DMI 趨勢</span>
-    <div class="scard-meta">
-      <div class="scard-title">多週期多空判斷表（DMI + ADX）</div>
-      <div class="scard-desc">同時顯示 5分/30分/日/5日/10日/20日 六個週期的多空狀態，整合 DMI+ADX，以中文顯示趨勢強度</div>
-    </div>
-  </div>
-  <div class="scard-body">
-    <div class="info-grid">
-      <div class="info-item"><div class="info-label">週期</div><div class="info-val">5m / 30m / D / 5D / 10D / 20D</div></div>
-      <div class="info-item"><div class="info-label">核心</div><div class="info-val">DI+ DI- ADX</div></div>
-      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
-      <div class="info-item"><div class="info-label">顯示</div><div class="info-val">左上角 Table</div></div>
-    </div>
-    <div style="position:relative;margin-top:12px">
-      <button class="copy-btn" onclick="copyCode(this)">複製</button>
-      <div class="code-block"><span class="cmt">//@version=5</span>
-<span class="kw">indicator</span>(<span class="str">"多週期多空判斷（DMI）"</span>, overlay=<span class="kw">true</span>)
-
-adx_len = <span class="fn">input.int</span>(<span class="num">14</span>, <span class="str">"ADX 週期"</span>)
-adx_thr = <span class="fn">input.int</span>(<span class="num">25</span>, <span class="str">"趨勢強度門檻"</span>)
-
-<span class="fn">f_dmi</span>(tf) =>
-    [di_p, di_m, adx_v] = <span class="fn">request.security</span>(syminfo.tickerid, tf,
-         <span class="fn">ta.dmi</span>(adx_len, adx_len), lookahead=barmerge.lookahead_off)
-    label = di_p > di_m ? <span class="str">"多▲"</span> : <span class="str">"空▼"</span>
-    strength = adx_v >= adx_thr ? (di_p > di_m ? <span class="str">"強多"</span> : <span class="str">"強空"</span>) : <span class="str">"震盪"</span>
-    adx_disp = <span class="fn">str.tostring</span>(<span class="fn">math.floor</span>(adx_v * <span class="num">100</span>) / <span class="num">100</span>)
-    full = strength + <span class="str">" ADX:"</span> + adx_disp
-    col  = di_p > di_m ? <span class="fn">color.new</span>(color.green,<span class="num">0</span>) : <span class="fn">color.new</span>(color.red,<span class="num">0</span>)
-    [full, col]
-
-[s5m,  c5m]  = <span class="fn">f_dmi</span>(<span class="str">"5"</span>)
-[s30m, c30m] = <span class="fn">f_dmi</span>(<span class="str">"30"</span>)
-[s1d,  c1d]  = <span class="fn">f_dmi</span>(<span class="str">"D"</span>)
-[s5d,  c5d]  = <span class="fn">f_dmi</span>(<span class="str">"5D"</span>)
-[s10d, c10d] = <span class="fn">f_dmi</span>(<span class="str">"10D"</span>)
-[s20d, c20d] = <span class="fn">f_dmi</span>(<span class="str">"20D"</span>)
-
-<span class="kw">var</span> t = <span class="fn">table.new</span>(position.top_left, <span class="num">2</span>, <span class="num">7</span>,
-     bgcolor=#161b22, border_color=#30363d, border_width=<span class="num">1</span>, frame_color=#30363d, frame_width=<span class="num">1</span>)
-
-<span class="fn">f_cell</span>(r, lbl, val, vc) =>
-    <span class="fn">table.cell</span>(t, <span class="num">0</span>, r, lbl, text_color=#8b949e, text_size=size.small, bgcolor=#1a1f2e)
-    <span class="fn">table.cell</span>(t, <span class="num">1</span>, r, val, text_color=vc,      text_size=size.small, bgcolor=#161b22)
-
-<span class="fn">table.cell</span>(t, <span class="num">0</span>, <span class="num">0</span>, <span class="str">"週期"</span>,  text_color=#e6edf3, bgcolor=#21262d, text_size=size.small)
-<span class="fn">table.cell</span>(t, <span class="num">1</span>, <span class="num">0</span>, <span class="str">"多空/ADX"</span>, text_color=#e6edf3, bgcolor=#21262d, text_size=size.small)
-<span class="fn">f_cell</span>(<span class="num">1</span>, <span class="str">"5分"</span>,  s5m,  c5m)
-<span class="fn">f_cell</span>(<span class="num">2</span>, <span class="str">"30分"</span>, s30m, c30m)
-<span class="fn">f_cell</span>(<span class="num">3</span>, <span class="str">"日"</span>,   s1d,  c1d)
-<span class="fn">f_cell</span>(<span class="num">4</span>, <span class="str">"5日"</span>,  s5d,  c5d)
-<span class="fn">f_cell</span>(<span class="num">5</span>, <span class="str">"10日"</span>, s10d, c10d)
-<span class="fn">f_cell</span>(<span class="num">6</span>, <span class="str">"20日"</span>, s20d, c20d)</div>
-    </div>
-    <div class="tips-box" style="margin-top:10px">
-      <h4>使用說明</h4>
-      <ul>
-        <li>多個週期同時顯示「強多」= 趨勢共振，勝率最高</li>
-        <li>ADX &lt; 25 顯示「震盪」，此時不追趨勢單</li>
-        <li>短中長週期「強多→震盪→空▼」= 趨勢正在弱化，準備出場</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-
-<!-- ─── Unicorn Model HQOB ─── -->
+<!-- ─── Unicorn ─── -->
 <div class="scard" data-cat="unicorn">
   <div class="scard-header">
-    <span class="scard-badge badge-unicorn">獨角獸模型</span>
+    <span class="scard-badge badge-unicorn">Unicorn</span>
     <div class="scard-meta">
-      <div class="scard-title">Unicorn Model HQOB — 高品質訂單塊獨角獸</div>
+      <div class="scard-title">Unicorn</div>
       <div class="scard-desc">基於 ICT/SMC 理論自動識別高品質訂單塊（OB），回測觸發時發出獨角獸進場訊號；結構反轉時自動顯示出場警示，同步顯示 1H/4H/1D 多時框 OB 與 FVG 區間</div>
     </div>
   </div>
@@ -891,6 +628,435 @@ if showDash and barstate.islast
 </div><!-- /grid -->
 
 <script>
+/* -- 市場儀表板 腳本 -- */
+const DASHBOARD_V1 = `//@version=5
+indicator("市場儀表板 1分K + SMC", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500)
+
+// ══════════════════════════════════════════
+//  參數（1分K 優化版）
+// ══════════════════════════════════════════
+emaFast  = input.int(9,   "快線 EMA",  group="均線")
+emaSlow  = input.int(20,  "慢線 EMA",  group="均線")
+emaTrend = input.int(50,  "趨勢 EMA",  group="均線")
+rsiLen   = input.int(7,   "RSI 週期",  group="RSI")
+rsiOB    = input.int(75,  "超買",      group="RSI")
+rsiOS    = input.int(25,  "超賣",      group="RSI")
+kdLen    = input.int(5,   "KD 週期",   group="KD")
+kdSmK    = input.int(3,   "K 平滑",    group="KD")
+kdSmD    = input.int(3,   "D 平滑",    group="KD")
+macdF    = input.int(5,   "MACD 快",   group="MACD")
+macdS    = input.int(13,  "MACD 慢",   group="MACD")
+macdG    = input.int(4,   "信號線",    group="MACD")
+bbLen    = input.int(15,  "BB 週期",   group="布林帶")
+bbMult   = input.float(2.0,"BB 倍數",  group="布林帶")
+atrLen   = input.int(10,  "ATR 週期",  group="ATR / 停損")
+slMult   = input.float(1.2,"停損 ATR", group="ATR / 停損", step=0.1)
+tpMult   = input.float(2.0,"目標 ATR", group="ATR / 停損", step=0.1)
+volLen   = input.int(10,  "均量週期",  group="成交量")
+pivLen   = input.int(5,   "SMC 樞紐K數",    group="SMC")
+chochCD  = input.int(10,  "CHoCH 冷卻根數", group="SMC", minval=5, maxval=30)
+useSession = input.bool(true, "僅美股主力時段 09:30–16:00 ET", group="時段")
+
+// ══════════════════════════════════════════
+//  技術指標
+// ══════════════════════════════════════════
+emaF = ta.ema(close, emaFast)
+emaS = ta.ema(close, emaSlow)
+emaT = ta.ema(close, emaTrend)
+rsi  = ta.rsi(close, rsiLen)
+
+stochRaw = ta.stoch(close, high, low, kdLen)
+k = ta.sma(stochRaw, kdSmK)
+d = ta.sma(k, kdSmD)
+
+[macdLine, sigLine, hist] = ta.macd(close, macdF, macdS, macdG)
+
+bbBasis  = ta.sma(close, bbLen)
+bbDev    = ta.stdev(close, bbLen) * bbMult
+bbUpper  = bbBasis + bbDev
+bbLower  = bbBasis - bbDev
+bbPos    = (close - bbLower) / (bbUpper - bbLower) * 100
+
+atr      = ta.atr(atrLen)
+avgVol   = ta.sma(volume, volLen)
+volRatio = volume / avgVol
+
+vwapVal  = ta.vwap(hlc3)
+dayOpen  = request.security(syminfo.tickerid, "D", open)
+dayHigh  = ta.highest(high, 390)
+dayLow   = ta.lowest(low,  390)
+
+inSess = not useSession or na(time("", "0930-1600:23456", "America/New_York")) == false
+
+// ══════════════════════════════════════════
+//  SMC 計算
+// ══════════════════════════════════════════
+ph = ta.pivothigh(high, pivLen, pivLen)
+pl = ta.pivotlow(low,  pivLen, pivLen)
+
+var float lastSH = na
+var float prevSH = na
+var float lastSL = na
+var float prevSL = na
+
+if not na(ph)
+    prevSH := lastSH
+    lastSH := ph
+if not na(pl)
+    prevSL := lastSL
+    lastSL := pl
+
+smcBull = not na(lastSH) and not na(prevSH) and not na(lastSL) and not na(prevSL) and
+          lastSH > prevSH and lastSL > prevSL
+smcBear = not na(lastSH) and not na(prevSH) and not na(lastSL) and not na(prevSL) and
+          lastSH < prevSH and lastSL < prevSL
+
+equi       = not na(lastSH) and not na(lastSL) ? (lastSH + lastSL) / 2 : na
+inDiscount = not na(equi) and close < equi
+inPremium  = not na(equi) and close > equi
+
+bullFVG = high[2] < low[0]
+bearFVG = low[2]  > high[0]
+
+var float bullOBHigh = na
+var float bullOBLow  = na
+var float bearOBHigh = na
+var float bearOBLow  = na
+
+if close[1] < open[1] and close > open and (close - open) > atr * 0.8
+    bullOBHigh := high[1]
+    bullOBLow  := low[1]
+if close[1] > open[1] and close < open and (open - close) > atr * 0.8
+    bearOBHigh := high[1]
+    bearOBLow  := low[1]
+
+inBullOB = not na(bullOBHigh) and close <= bullOBHigh and close >= bullOBLow
+inBearOB = not na(bearOBHigh) and close <= bearOBHigh and close >= bearOBLow
+
+smcBuyOK  = smcBull  or inDiscount or bullFVG or inBullOB
+smcSellOK = smcBear  or inPremium  or bearFVG or inBearOB
+
+// ══════════════════════════════════════════
+//  CHoCH 冷卻期（保留此過濾，拿掉Histogram）
+// ══════════════════════════════════════════
+var bool prevSmcBull = na
+var bool prevSmcBear = na
+var int  chochBullBar = na
+var int  chochBearBar = na
+
+if smcBull and not prevSmcBull
+    chochBullBar := bar_index
+if smcBear and not prevSmcBear
+    chochBearBar := bar_index
+
+prevSmcBull := smcBull
+prevSmcBear := smcBear
+
+inBullCooldown = not na(chochBullBar) and (bar_index - chochBullBar) <= chochCD
+inBearCooldown = not na(chochBearBar) and (bar_index - chochBearBar) <= chochCD
+
+// ══════════════════════════════════════════
+//  訊號邏輯
+// ══════════════════════════════════════════
+emaUp   = emaF > emaS
+emaDown = emaF < emaS
+emaFull = emaF > emaS and emaS > emaT
+macdGold = macdLine > sigLine
+macdDead = macdLine < sigLine
+macdMom  = hist > hist[1]
+kdGold   = k > d and k[1] <= d[1]
+kdDead   = k < d and k[1] >= d[1]
+
+macdCrossUp   = ta.crossover(macdLine,  sigLine)
+macdCrossDown = ta.crossunder(macdLine, sigLine)
+
+var int lastDir = 0
+
+buyRaw  = (macdCrossUp   or kdGold) and emaUp   and rsi < rsiOB and inSess
+          and smcBuyOK  and close > vwapVal
+          and not inBearCooldown
+
+sellRaw = (macdCrossDown or kdDead)  and emaDown and rsi > rsiOS and inSess
+          and smcSellOK and close < vwapVal
+          and not inBullCooldown
+
+buySignal  = buyRaw  and lastDir != 1
+sellSignal = sellRaw and lastDir != -1
+
+if buySignal
+    lastDir := 1
+if sellSignal
+    lastDir := -1
+
+var float sl  = na
+var float tp  = na
+var int   sig = 0
+
+if buySignal
+    sl  := close - atr * slMult
+    tp  := close + atr * tpMult
+    sig := 1
+if sellSignal
+    sl  := close + atr * slMult
+    tp  := close - atr * tpMult
+    sig := -1
+
+// ══════════════════════════════════════════
+//  訊號標記（拉長箭頭 + 自動避免重疊）
+// ══════════════════════════════════════════
+var int[]   buyBarArr  = array.new_int(0)
+var float[] buyYArr    = array.new_float(0)
+var int[]   sellBarArr = array.new_int(0)
+var float[] sellYArr   = array.new_float(0)
+
+labelBase  = atr * 1.2
+avoidRange = atr * 2.5
+checkBars  = 20
+
+if buySignal
+    targetY = low - labelBase
+    sz = array.size(buyBarArr)
+    if sz > 0
+        for i = 0 to sz - 1
+            if bar_index - array.get(buyBarArr, i) <= checkBars
+                nearY = array.get(buyYArr, i)
+                if math.abs(targetY - nearY) < avoidRange
+                    targetY := math.min(targetY, nearY) - avoidRange
+    line.new(bar_index, low, bar_index, targetY + atr * 0.4,
+         color=color.new(#22c55e, 40), width=1, style=line.style_dashed)
+    label.new(bar_index, targetY,
+         text="▲ BUY",
+         style=label.style_label_up,
+         color=#22c55e, textcolor=color.white, size=size.small)
+    array.push(buyBarArr, bar_index)
+    array.push(buyYArr,   targetY)
+    if array.size(buyBarArr) > 50
+        array.shift(buyBarArr)
+        array.shift(buyYArr)
+
+if sellSignal
+    targetY = high + labelBase
+    sz = array.size(sellBarArr)
+    if sz > 0
+        for i = 0 to sz - 1
+            if bar_index - array.get(sellBarArr, i) <= checkBars
+                nearY = array.get(sellYArr, i)
+                if math.abs(targetY - nearY) < avoidRange
+                    targetY := math.max(targetY, nearY) + avoidRange
+    line.new(bar_index, high, bar_index, targetY - atr * 0.4,
+         color=color.new(#ef4444, 40), width=1, style=line.style_dashed)
+    label.new(bar_index, targetY,
+         text="▼ SELL",
+         style=label.style_label_down,
+         color=#ef4444, textcolor=color.white, size=size.small)
+    array.push(sellBarArr, bar_index)
+    array.push(sellYArr,   targetY)
+    if array.size(sellBarArr) > 50
+        array.shift(sellBarArr)
+        array.shift(sellYArr)
+
+// ══════════════════════════════════════════
+//  綜合評分
+// ══════════════════════════════════════════
+score = 0
+score := score + (emaFull ? 2 : emaUp ? 1 : emaDown ? -1 : -2)
+score := score + (macdGold ? 1 : -1)
+score := score + (macdMom  ? 1 : -1)
+score := score + (rsi > 55 ? 1 : rsi < 45 ? -1 : 0)
+score := score + (k > d    ? 1 : -1)
+score := score + (close > bbBasis ? 1 : -1)
+score := score + (smcBull  ? 1 : smcBear  ? -1 : 0)
+score := score + (inDiscount ? 1 : inPremium ? -1 : 0)
+score := score + (close > vwapVal ? 1 : -1)
+
+// ══════════════════════════════════════════
+//  顏色
+// ══════════════════════════════════════════
+green  = #22c55e
+red    = #ef4444
+yellow = #f59e0b
+gray   = #6b7280
+white  = #e6edf3
+purple = #c4b5fd
+
+scoreCol = score >= 7  ? green  : score <= -7 ? red    :
+           score >= 4  ? color.new(green,40)  :
+           score <= -4 ? color.new(red,40)    : yellow
+scoreTxt = score >= 7  ? "強多 ▲▲" : score >= 4  ? "偏多 ▲"  :
+           score <= -7 ? "強空 ▼▼" : score <= -4 ? "偏空 ▼"  : "中性 —"
+
+// ══════════════════════════════════════════
+//  資訊面板
+// ══════════════════════════════════════════
+var table T = table.new(position.top_right, 3, 21,
+     bgcolor=color.new(#0d1117,0),
+     border_color=#30363d, border_width=1,
+     frame_color=#30363d, frame_width=1)
+
+if barstate.islast
+    ticker = syminfo.ticker
+
+    table.cell(T,0,0, ticker+" 1分K",
+         text_color=white, text_size=size.normal, bgcolor=#161b22)
+    table.cell(T,1,0, inSess?"開市 ✓":"休市",
+         text_color=inSess?green:gray, text_size=size.normal, bgcolor=#161b22)
+    table.cell(T,2,0, scoreTxt,
+         text_color=scoreCol, text_size=size.normal, bgcolor=#161b22)
+
+    table.cell(T,0,1, "指標", text_color=gray, text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,1,1, "數值", text_color=gray, text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,2,1, "狀態", text_color=gray, text_size=size.small, bgcolor=#0d1117)
+
+    vwapDiff   = close - vwapVal
+    vwapCol    = close > vwapVal ? green : red
+    vwapPosTxt = close > vwapVal ? "VWAP之上 ▲" : "VWAP之下 ▼"
+    table.cell(T,0,2, "VWAP", text_color=purple, text_size=size.small)
+    table.cell(T,1,2, str.tostring(math.round(vwapVal,2))+"  ("+
+               (vwapDiff>=0?"+":"")+str.tostring(math.round(vwapDiff,2))+")",
+         text_color=vwapCol, text_size=size.tiny)
+    table.cell(T,2,2, vwapPosTxt, text_color=vwapCol, text_size=size.small)
+
+    table.cell(T,0,3, "今日區間", text_color=gray, text_size=size.small)
+    table.cell(T,1,3, "H:"+str.tostring(math.round(dayHigh,2))+"  L:"+str.tostring(math.round(dayLow,2)),
+         text_color=white, text_size=size.tiny)
+    table.cell(T,2,3, "開:"+str.tostring(math.round(dayOpen,2)), text_color=gray, text_size=size.tiny)
+
+    emaAlignTxt = emaFull?"多頭 ▲":emaF<emaS and emaS<emaT?"空頭 ▼":emaUp?"快>慢 偏多":"快<慢 偏空"
+    emaAlignCol = emaFull?green:emaF<emaS and emaS<emaT?red:emaUp?color.new(green,40):color.new(red,40)
+    table.cell(T,0,4, "EMA 9/20/50", text_color=gray, text_size=size.small)
+    table.cell(T,1,4, str.tostring(math.round(emaF,1))+" / "+
+                      str.tostring(math.round(emaS,1))+" / "+
+                      str.tostring(math.round(emaT,1)), text_color=white, text_size=size.tiny)
+    table.cell(T,2,4, emaAlignTxt, text_color=emaAlignCol, text_size=size.small)
+
+    vsF   = close>emaF?"▲":"▼"
+    vsS   = close>emaS?"▲":"▼"
+    vsT   = close>emaT?"▲":"▼"
+    vsCol = close>emaT?green:red
+    table.cell(T,0,5, "收盤位置", text_color=gray, text_size=size.small)
+    table.cell(T,1,5, "快"+vsF+" 慢"+vsS+" 趨"+vsT, text_color=vsCol, text_size=size.small)
+    table.cell(T,2,5, close>emaT?"趨勢之上":"趨勢之下", text_color=vsCol, text_size=size.small)
+
+    rsiCol  = rsi>=rsiOB?red:rsi<=rsiOS?green:rsi>55?color.new(green,30):rsi<45?color.new(red,30):white
+    rsiStat = rsi>=rsiOB?"超買 ⚠":rsi<=rsiOS?"超賣 ⚠":rsi>55?"偏多":rsi<45?"偏空":"中性"
+    table.cell(T,0,6, "RSI("+str.tostring(rsiLen)+")", text_color=gray,   text_size=size.small)
+    table.cell(T,1,6, str.tostring(math.round(rsi,1)),  text_color=rsiCol, text_size=size.small)
+    table.cell(T,2,6, rsiStat,                           text_color=rsiCol, text_size=size.small)
+
+    kdCol     = k>=80?red:k<=20?green:k>d?color.new(green,30):color.new(red,30)
+    kdStatTxt = kdGold?"金叉 ↑":kdDead?"死叉 ↓":k>d?"K>D 偏多":"K<D 偏空"
+    kdStatCol = kdGold?green:kdDead?red:k>d?color.new(green,30):color.new(red,30)
+    table.cell(T,0,7, "KD("+str.tostring(kdLen)+")", text_color=gray, text_size=size.small)
+    table.cell(T,1,7, "K:"+str.tostring(math.round(k,1))+"  D:"+str.tostring(math.round(d,1)),
+         text_color=kdCol, text_size=size.small)
+    table.cell(T,2,7, kdStatTxt, text_color=kdStatCol, text_size=size.small)
+
+    macdStatCol = macdGold?green:red
+    table.cell(T,0,8, "MACD", text_color=gray, text_size=size.small)
+    table.cell(T,1,8, (macdGold?"金叉":"死叉")+"  "+(macdMom?"動能↑":"動能↓"),
+         text_color=macdStatCol, text_size=size.small)
+    table.cell(T,2,8, str.tostring(math.round(hist,2)),
+         text_color=hist>=0?green:red, text_size=size.small)
+
+    bbPosTxt = bbPos>=80?"近上軌 ⚠":bbPos<=20?"近下軌 ⚠":bbPos>=50?"上半部":"下半部"
+    bbPosCol = bbPos>=80?red:bbPos<=20?green:bbPos>=50?color.new(green,40):color.new(red,40)
+    table.cell(T,0,9, "布林帶", text_color=gray, text_size=size.small)
+    table.cell(T,1,9, str.tostring(math.round(bbPos,1))+"%", text_color=bbPosCol, text_size=size.small)
+    table.cell(T,2,9, bbPosTxt, text_color=bbPosCol, text_size=size.small)
+
+    atrPct = atr / close * 100
+    table.cell(T,0,10, "ATR("+str.tostring(atrLen)+")", text_color=gray, text_size=size.small)
+    table.cell(T,1,10, str.tostring(math.round(atr,2)), text_color=white, text_size=size.small)
+    table.cell(T,2,10, str.tostring(math.round(atrPct,3))+"%", text_color=gray, text_size=size.small)
+
+    volCol = volRatio>=2.0?red:volRatio>=1.5?yellow:volRatio>=1.0?green:gray
+    volTxt = volRatio>=2.0?"爆量 🔥":volRatio>=1.5?"大量":volRatio>=1.0?"放量":"縮量"
+    table.cell(T,0,11, "量能",  text_color=gray,   text_size=size.small)
+    table.cell(T,1,11, str.tostring(math.round(volRatio,2))+"x", text_color=volCol, text_size=size.small)
+    table.cell(T,2,11, volTxt,  text_color=volCol, text_size=size.small)
+
+    smcStructTxt = smcBull?"HH+HL 多頭":smcBear?"LH+LL 空頭":"結構不明"
+    smcStructCol = smcBull?green:smcBear?red:gray
+    chochTxt     = inBullCooldown?"🔒空翻多冷卻":inBearCooldown?"🔒多翻空冷卻":"--"
+    chochCol     = inBullCooldown?green:inBearCooldown?red:gray
+    table.cell(T,0,12, "市場結構",   text_color=gray,         text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,1,12, smcStructTxt, text_color=smcStructCol, text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,2,12, chochTxt,     text_color=chochCol,     text_size=size.tiny,  bgcolor=#1a1f2e)
+
+    zoneTxt = inDiscount?"折價區 (買區)":inPremium?"溢價區 (賣區)":"均衡區"
+    zoneCol = inDiscount?green:inPremium?red:gray
+    zonePct = not na(equi) and not na(lastSH) and not na(lastSL) and (lastSH-lastSL)>0 ?
+              str.tostring(math.round((close-lastSL)/(lastSH-lastSL)*100,1))+"%" : "--"
+    table.cell(T,0,13, "價格位置", text_color=gray,    text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,1,13, zoneTxt,    text_color=zoneCol, text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,2,13, zonePct,    text_color=zoneCol, text_size=size.tiny,  bgcolor=#1a1f2e)
+
+    fvgTxt = bullFVG?"多方FVG ↑":bearFVG?"空方FVG ↓":"無FVG"
+    fvgCol = bullFVG?green:bearFVG?red:gray
+    obTxt  = inBullOB?"多方OB ✓":inBearOB?"空方OB ✓":"OB未觸及"
+    obCol  = inBullOB?green:inBearOB?red:gray
+    table.cell(T,0,14, "FVG/OB", text_color=gray,   text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,1,14, fvgTxt,   text_color=fvgCol, text_size=size.small, bgcolor=#1a1f2e)
+    table.cell(T,2,14, obTxt,    text_color=obCol,  text_size=size.small, bgcolor=#1a1f2e)
+
+    resTxt  = not na(lastSH)?str.tostring(math.round(lastSH,1)):"--"
+    supTxt  = not na(lastSL)?str.tostring(math.round(lastSL,1)):"--"
+    resDist = not na(lastSH)?lastSH-close:na
+    table.cell(T,0,15, "壓力/支撐", text_color=gray, text_size=size.small, bgcolor=#161b22)
+    table.cell(T,1,15, "↑"+resTxt+"  ↓"+supTxt, text_color=white, text_size=size.tiny, bgcolor=#161b22)
+    table.cell(T,2,15, not na(resDist)?"距壓"+str.tostring(math.round(resDist,1)):"--",
+         text_color=not na(resDist) and resDist<atr?red:gray, text_size=size.tiny, bgcolor=#161b22)
+
+    ticker2 = syminfo.ticker
+    pv = str.contains(ticker2,"MES")?5.0 :str.contains(ticker2,"ES") ?50.0:
+         str.contains(ticker2,"MNQ")?2.0 :str.contains(ticker2,"NQ") ?20.0:
+         str.contains(ticker2,"MYM")?0.5 :str.contains(ticker2,"YM") ?5.0 :
+         str.contains(ticker2,"MBT")?1.0 :str.contains(ticker2,"MGC")?1.0 :
+         str.contains(ticker2,"GC") ?100.0:str.contains(ticker2,"DJ") ?5.0 :1.0
+
+    slUSD  = math.abs(close-sl)*pv
+    tpUSD  = math.abs(close-tp)*pv
+    sigTxt = sig==1?"做多 ▲":sig==-1?"做空 ▼":"--"
+    sigCol = sig==1?green:sig==-1?red:gray
+
+    table.cell(T,0,16, "訊號",  text_color=gray,   text_size=size.small, bgcolor=#161b22)
+    table.cell(T,1,16, sigTxt,  text_color=sigCol, text_size=size.small, bgcolor=#161b22)
+    table.cell(T,2,16, "",      bgcolor=#161b22)
+
+    table.cell(T,0,17, "停損", text_color=gray, text_size=size.small)
+    table.cell(T,1,17, na(sl)?"--":str.tostring(math.round(sl,1)), text_color=#f87171, text_size=size.small)
+    table.cell(T,2,17, na(sl)?""  :"-$"+str.tostring(math.round(slUSD,0)), text_color=#f87171, text_size=size.small)
+
+    table.cell(T,0,18, "目標", text_color=gray, text_size=size.small)
+    table.cell(T,1,18, na(tp)?"--":str.tostring(math.round(tp,1)), text_color=#4ade80, text_size=size.small)
+    table.cell(T,2,18, na(tp)?""  :"+$"+str.tostring(math.round(tpUSD,0)), text_color=#4ade80, text_size=size.small)
+
+    recTxt = score>=7?"考慮做多":score<=-7?"考慮做空":
+             score>=4?"偏多，等確認":score<=-4?"偏空，等確認":"觀望，勿進場"
+    recCol = score>=4?green:score<=-4?red:yellow
+    table.cell(T,0,19, "建議",  text_color=gray,     text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,1,19, recTxt,  text_color=recCol,   text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,2,19, str.tostring(score)+"/10  "+scoreTxt,
+         text_color=scoreCol, text_size=size.small, bgcolor=#0d1117)
+
+    chochStatTxt = inBullCooldown?"🔒多頭保護中":inBearCooldown?"🔒空頭保護中":"無冷卻"
+    chochStatCol = inBullCooldown?green:inBearCooldown?red:gray
+    table.cell(T,0,20, "CHoCH",       text_color=gray,         text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,1,20, chochStatTxt,  text_color=chochStatCol, text_size=size.small, bgcolor=#0d1117)
+    table.cell(T,2,20, "冷卻"+str.tostring(chochCD)+"根",
+         text_color=gray, text_size=size.tiny, bgcolor=#0d1117)
+
+alertcondition(buySignal,  "BUY",  "{{ticker}} ▲ BUY @ {{close}}")
+alertcondition(sellSignal, "SELL", "{{ticker}} ▼ SELL @ {{close}}")`;
+document.getElementById('dashboard-code').textContent = DASHBOARD_V1;
+
+function copyDashboard(btn) {
+  navigator.clipboard.writeText(DASHBOARD_V1).then(() => {
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
+  });
+}
+
 /* -- Unicorn Model v2.0 腳本 -- */
 const UNICORN_V2 = `//@version=5
 indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=200)
