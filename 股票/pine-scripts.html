@@ -2581,7 +2581,7 @@ pbPivLen     = input.int(15,       "PB樞紐靈敏度K數",     group=grp6, minv
 maxPBs       = input.int(3,        "最多顯示PB數量",      group=grp6, minval=1,  maxval=10)
 pbDays       = input.int(3,        "顯示天數",            group=grp6, minval=1,  maxval=30,  tooltip="只顯示最近 N 天內的 PB（與OB顯示天數對齊）")
 pbTxtSize    = input.string("Small","PB文字大小",         options=["Tiny","Small","Normal","Large"],group=grp6)
-pbTxtHAlign  = input.string("置右", "PB文字對齊",         options=["置中","置左","置右"],            group=grp6)
+pbTxtHAlign  = input.string("置中", "PB文字對齊",         options=["置中","置左","置右"],            group=grp6)
 
 _obTxtSz = obTxtSize=="Tiny"?size.tiny:obTxtSize=="Normal"?size.normal:obTxtSize=="Large"?size.large:size.small
 _obHAl   = obTxtHAlign=="置左"?text.align_left:obTxtHAlign=="置右"?text.align_right:text.align_center
