@@ -2703,6 +2703,8 @@ var float pbPrevPL = na
 var float pbPrevPH = na
 var box[] pbBullBoxes = array.new_box()
 var box[] pbBearBoxes = array.new_box()
+var bool hasMSSBull = false
+var bool hasMSSBear = false
 
 if showPB
     pbCutoff = bar_index - pbDays * barsPerDay
@@ -2757,8 +2759,6 @@ if showPB
 
 bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
 bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
-var bool hasMSSBull=false
-var bool hasMSSBear=false
 if bullMSS
     hasMSSBull := true
     hasMSSBear := false
