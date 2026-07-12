@@ -850,59 +850,86 @@ const SUP_SET_V1 = `//@version=5
 indicator("SUP SET", overlay=true, max_lines_count=500, max_labels_count=200)
 
 // ════════════════════════════════════════════════
-//  ① SH SL ZigZag（單一折線，SH↔SL 交替連接）
+//  ① SH SL ZigZag（真正交替：連續同向取極值）
 // ════════════════════════════════════════════════
 grp1         = "① SH SL 輔助線"
-showSHSL     = input.bool(true,    "顯示",             group=grp1)
-shslLen      = input.int(5,        "樞紐K數",           group=grp1, minval=2, maxval=30)
-shCol        = input.color(#ef4444,"SH 線顏色（下降段）",group=grp1)
-slCol        = input.color(#22c55e,"SL 線顏色（上升段）",group=grp1)
-shslTransp   = input.int(0,        "透明度",            group=grp1, minval=0, maxval=90)
-shslWidth    = input.int(1,        "線條粗細",          group=grp1, minval=1, maxval=4)
-shslStyleStr = input.string("Solid","線條樣式",         group=grp1, options=["Solid","Dashed","Dotted"])
-showSHSLLbl  = input.bool(true,    "顯示 SH/SL 標籤",  group=grp1)
+showSHSL     = input.bool(true,    "顯示",              group=grp1)
+shslLen      = input.int(5,        "樞紐K數",            group=grp1, minval=2, maxval=30)
+shCol        = input.color(#ef4444,"SH 線顏色（下降段）", group=grp1)
+slCol        = input.color(#22c55e,"SL 線顏色（上升段）", group=grp1)
+shslTransp   = input.int(0,        "透明度",             group=grp1, minval=0, maxval=90)
+shslWidth    = input.int(1,        "線條粗細",           group=grp1, minval=1, maxval=4)
+shslStyleStr = input.string("Solid","線條樣式",          group=grp1, options=["Solid","Dashed","Dotted"])
+showSHSLLbl  = input.bool(true,    "顯示 SH/SL 標籤",   group=grp1)
 
 f_lsty(s) => s == "Dashed" ? line.style_dashed : s == "Dotted" ? line.style_dotted : line.style_solid
 
 ph = ta.pivothigh(high, shslLen, shslLen)
 pl = ta.pivotlow(low,   shslLen, shslLen)
-
 phBar = bar_index - shslLen
 plBar = bar_index - shslLen
 
-var float lastPivVal = na
-var int   lastPivBar = na
-var line  extLine    = na
+// ── Zigzag 狀態 ──────────────────────────────────
+var float lastSHVal = na   // 當前上升段最高 SH
+var int   lastSHBar = na
+var float lastSLVal = na   // 當前下降段最低 SL
+var int   lastSLBar = na
+var int   pivDir    = 0    // 1=上一個錨點是SH；-1=SL；0=尚未
+var line  curLine   = na   // 當前可被替換的線段
+var line  extLine   = na   // 即時延伸虛線
 
 if showSHSL
     lsty = f_lsty(shslStyleStr)
 
     if not na(ph)
-        if not na(lastPivVal)
-            zigCol = ph > lastPivVal ? color.new(slCol, shslTransp) : color.new(shCol, shslTransp)
-            line.new(lastPivBar, lastPivVal, phBar, ph, color=zigCol, width=shslWidth, style=lsty)
-        if showSHSLLbl
-            label.new(phBar, ph, "SH", color=color.new(shCol, 60), textcolor=color.white, style=label.style_label_down, size=size.tiny)
-        lastPivVal := ph
-        lastPivBar := phBar
+        if pivDir != 1
+            // 方向切換 (SL→SH)：畫永久線，舊 curLine 留著
+            if pivDir == -1
+                curLine := line.new(lastSLBar, lastSLVal, phBar, ph, color=color.new(slCol, shslTransp), width=shslWidth, style=lsty)
+                if showSHSLLbl
+                    label.new(phBar, ph, "SH", color=color.new(shCol, 60), textcolor=color.white, style=label.style_label_down, size=size.tiny)
+            lastSHVal := ph
+            lastSHBar := phBar
+            pivDir    := 1
+        else if ph > lastSHVal
+            // 連續 SH 且更高：刪舊線，從同一 SL 重畫到新高
+            if not na(curLine)
+                line.delete(curLine)
+            curLine := line.new(lastSLBar, lastSLVal, phBar, ph, color=color.new(slCol, shslTransp), width=shslWidth, style=lsty)
+            lastSHVal := ph
+            lastSHBar := phBar
 
     if not na(pl)
-        if not na(lastPivVal)
-            zigCol = pl > lastPivVal ? color.new(slCol, shslTransp) : color.new(shCol, shslTransp)
-            line.new(lastPivBar, lastPivVal, plBar, pl, color=zigCol, width=shslWidth, style=lsty)
-        if showSHSLLbl
-            label.new(plBar, pl, "SL", color=color.new(slCol, 60), textcolor=color.white, style=label.style_label_up, size=size.tiny)
-        lastPivVal := pl
-        lastPivBar := plBar
+        if pivDir != -1
+            // 方向切換 (SH→SL)：畫永久線，舊 curLine 留著
+            if pivDir == 1
+                curLine := line.new(lastSHBar, lastSHVal, plBar, pl, color=color.new(shCol, shslTransp), width=shslWidth, style=lsty)
+                if showSHSLLbl
+                    label.new(plBar, pl, "SL", color=color.new(slCol, 60), textcolor=color.white, style=label.style_label_up, size=size.tiny)
+            lastSLVal := pl
+            lastSLBar := plBar
+            pivDir    := -1
+        else if pl < lastSLVal
+            // 連續 SL 且更低：刪舊線，從同一 SH 重畫到新低
+            if not na(curLine)
+                line.delete(curLine)
+            curLine := line.new(lastSHBar, lastSHVal, plBar, pl, color=color.new(shCol, shslTransp), width=shslWidth, style=lsty)
+            lastSLVal := pl
+            lastSLBar := plBar
 
-    if not na(lastPivVal)
+    // 即時延伸線（從最後錨點到當前收盤）
+    anchorVal = pivDir == 1 ? lastSHVal : pivDir == -1 ? lastSLVal : na
+    anchorBar = pivDir == 1 ? lastSHBar : pivDir == -1 ? lastSLBar : na
+    extCol    = pivDir == 1 ? color.new(shCol, 60) : color.new(slCol, 60)
+    if not na(anchorVal)
         if na(extLine)
-            extLine := line.new(lastPivBar, lastPivVal, bar_index, close, color=color.new(color.gray, 40), width=shslWidth, style=line.style_dotted)
+            extLine := line.new(anchorBar, anchorVal, bar_index, close, color=extCol, width=shslWidth, style=line.style_dotted)
         else
-            line.set_x1(extLine, lastPivBar)
-            line.set_y1(extLine, lastPivVal)
+            line.set_x1(extLine, anchorBar)
+            line.set_y1(extLine, anchorVal)
             line.set_x2(extLine, bar_index)
-            line.set_y2(extLine, close)`;
+            line.set_y2(extLine, close)
+            line.set_color(extLine, extCol)`;
 document.getElementById('supset-code').textContent = SUP_SET_V1;
 
 function copySUPSET(btn) {
