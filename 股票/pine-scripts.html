@@ -3523,7 +3523,8 @@ if not na(_swPivHi)
 if showS and barstate.isconfirmed
     _szB = array.size(_eqlLvl)
     if _szB > 0
-        for _i = _szB - 1 to 0 by -1
+        for _ii = 0 to _szB - 1
+            _i = _szB - 1 - _ii
             _lvl = array.get(_eqlLvl, _i)
             _pb  = array.get(_eqlBar, _i)
             if low < _lvl and close > _lvl and (_lvl - low) >= _swAtr * sWickMin
@@ -3540,7 +3541,8 @@ if showS and barstate.isconfirmed
 
     _szR = array.size(_eqhLvl)
     if _szR > 0
-        for _i = _szR - 1 to 0 by -1
+        for _ii = 0 to _szR - 1
+            _i = _szR - 1 - _ii
             _lvl = array.get(_eqhLvl, _i)
             _pb  = array.get(_eqhBar, _i)
             if high > _lvl and close < _lvl and (high - _lvl) >= _swAtr * sWickMin
