@@ -1684,8 +1684,7 @@ var table T = table.new(position.top_right, 3, 21,
 if barstate.islast
     ticker = syminfo.ticker
 
-    _dispPreset = presetTF == "自動" ? "自動→"+_activePreset : _activePreset
-    table.cell(T,0,0, ticker+" 時區("+tfLabel+") ["+_dispPreset+"]",
+    table.cell(T,0,0, ticker+" "+_tfKey,
          text_color=white, text_size=size.normal, bgcolor=#161b22)
     table.cell(T,1,0, inSess?"開市 ✓":"休市",
          text_color=inSess?green:gray, text_size=size.normal, bgcolor=#161b22)
