@@ -841,9 +841,9 @@ if strategy.position_size < 0 and strategy.opentrades > 0
     if bar_index - entryBar >= maxHoldBars
         strategy.close("Short", comment="超時平倉")
 
-if not na(activeObTop)
-    boxCol = activeIsLong ? color.new(#22c55e,80) : color.new(#ef4444,80)
-    box.new(bar_index-1, activeObTop, bar_index+10, activeObBot, border_color=boxCol, bgcolor=boxCol, border_width=1)`;
+// 進場點小箭頭（不蓋K棒）
+plotshape(strategy.position_size > 0 and strategy.position_size[1] == 0, title="Long Entry",  location=location.belowbar, style=shape.triangleup,   color=#22c55e, size=size.small)
+plotshape(strategy.position_size < 0 and strategy.position_size[1] == 0, title="Short Entry", location=location.abovebar, style=shape.triangledown, color=#ef4444, size=size.small)`;
 
 /* -- 市場儀表板 腳本 -- */
 const SUP_SET_V1 = `//@version=5
