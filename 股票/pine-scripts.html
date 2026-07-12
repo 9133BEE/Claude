@@ -1118,7 +1118,7 @@ var float[] buyYArr    = array.new_float(0)
 var int[]   sellBarArr = array.new_int(0)
 var float[] sellYArr   = array.new_float(0)
 
-labelBase  = atr * 1.2
+ labelBase  = atr * 0.2
 avoidRange = atr * 2.5
 checkBars  = 20
 
@@ -1131,10 +1131,10 @@ if buySignal
                 nearY = array.get(buyYArr, i)
                 if math.abs(targetY - nearY) < avoidRange
                     targetY := math.min(targetY, nearY) - avoidRange
-    line.new(bar_index, low, bar_index, targetY + atr * 0.4,
-         color=color.new(#22c55e, 40), width=1, style=line.style_dashed)
+
+
     label.new(bar_index, targetY,
-         text="▲ BUY",
+         text="B",
          style=label.style_label_up,
          color=#22c55e, textcolor=color.white, size=size.small)
     array.push(buyBarArr, bar_index)
@@ -1152,10 +1152,10 @@ if sellSignal
                 nearY = array.get(sellYArr, i)
                 if math.abs(targetY - nearY) < avoidRange
                     targetY := math.max(targetY, nearY) + avoidRange
-    line.new(bar_index, high, bar_index, targetY - atr * 0.4,
-         color=color.new(#ef4444, 40), width=1, style=line.style_dashed)
+
+
     label.new(bar_index, targetY,
-         text="▼ SELL",
+         text="S",
          style=label.style_label_down,
          color=#ef4444, textcolor=color.white, size=size.small)
     array.push(sellBarArr, bar_index)
@@ -1591,7 +1591,7 @@ var float[] buyYArr    = array.new_float(0)
 var int[]   sellBarArr = array.new_int(0)
 var float[] sellYArr   = array.new_float(0)
 
-labelBase  = atr * 1.2
+ labelBase  = atr * 0.2
 avoidRange = atr * 2.5
 checkBars  = 20
 
@@ -1604,10 +1604,10 @@ if buySignal
                 nearY = array.get(buyYArr, i)
                 if math.abs(targetY - nearY) < avoidRange
                     targetY := math.min(targetY, nearY) - avoidRange
-    line.new(bar_index, low, bar_index, targetY + atr * 0.4,
-         color=color.new(#22c55e, 40), width=1, style=line.style_dashed)
+
+
     label.new(bar_index, targetY,
-         text="▲ BUY",
+         text="B",
          style=label.style_label_up,
          color=#22c55e, textcolor=color.white, size=size.small)
     array.push(buyBarArr, bar_index)
@@ -1625,10 +1625,10 @@ if sellSignal
                 nearY = array.get(sellYArr, i)
                 if math.abs(targetY - nearY) < avoidRange
                     targetY := math.max(targetY, nearY) + avoidRange
-    line.new(bar_index, high, bar_index, targetY - atr * 0.4,
-         color=color.new(#ef4444, 40), width=1, style=line.style_dashed)
+
+
     label.new(bar_index, targetY,
-         text="▼ SELL",
+         text="S",
          style=label.style_label_down,
          color=#ef4444, textcolor=color.white, size=size.small)
     array.push(sellBarArr, bar_index)
@@ -2541,6 +2541,8 @@ allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="�
 sigCooldown    = input.int(5,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
 
 grp3 = "HTF區間顯示"
+show5MOB  = input.bool(false,"顯示 5M OB",  group=grp3)
+m5Days    = input.int(1,  "5M 顯示天數", minval=1,maxval=5,   group=grp3)
 show1HOB  = input.bool(false,"顯示 1H OB",  group=grp3)
 show1HFVG = input.bool(true, "顯示 1H FVG", group=grp3)
 h1Days    = input.int(1,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
@@ -2659,6 +2661,7 @@ f_htf_fvg_setup() =>
     [_bFvgT, _bFvgB, _rFvgT, _rFvgB]
 
 [h1BT,h1BB,h1RT,h1RB] = request.security(syminfo.tickerid,"60",  f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[m5BT,m5BB,m5RT,m5RB] = request.security(syminfo.tickerid,"5",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
 [h4BT,h4BB,h4RT,h4RB] = request.security(syminfo.tickerid,"240", f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
 [d1BT,d1BB,d1RT,d1RB] = request.security(syminfo.tickerid,"D",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
 
@@ -3000,13 +3003,37 @@ h1W = math.max(bar_index - h1Days*barsPerDay, 1)
 h4W = math.max(bar_index - h4Days*barsPerDay, 1)
 d1W = math.max(bar_index - d1Days*barsPerDay, 1)
 ZR  = bar_index + htfExtR
+m5W = math.max(bar_index - m5Days*barsPerDay, 1)
 
 var box h1BullBox=na, var box h1BearBox=na
 var box h4BullBox=na, var box h4BearBox=na
 var box d1BullBox=na, var box d1BearBox=na
+var box m5BullBox=na, var box m5BearBox=na
 var box h1BullFvgBox=na, var box h1BearFvgBox=na
 var box h4BullFvgBox=na, var box h4BearFvgBox=na
 var box d1BullFvgBox=na, var box d1BearFvgBox=na
+
+if show5MOB and not na(m5BT) and not na(m5BB)
+    if na(m5BullBox)
+        m5BullBox := box.new(m5W,m5BT,ZR,m5BB,border_color=color.new(#AB47BC,20),bgcolor=color.new(#AB47BC,htfFillTransp),border_width=1,text="5M+OB",text_color=color.new(#CE93D8,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if m5W > 1
+            box.set_left(m5BullBox, m5W)
+        box.set_right(m5BullBox, ZR)
+        box.set_top(m5BullBox, m5BT)
+        box.set_bottom(m5BullBox, m5BB)
+        box.set_bgcolor(m5BullBox, color.new(#AB47BC,htfFillTransp))
+
+if show5MOB and not na(m5RT) and not na(m5RB)
+    if na(m5BearBox)
+        m5BearBox := box.new(m5W,m5RT,ZR,m5RB,border_color=color.new(#F06292,20),bgcolor=color.new(#F06292,htfFillTransp),border_width=1,text="5M-OB",text_color=color.new(#F48FB1,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if m5W > 1
+            box.set_left(m5BearBox, m5W)
+        box.set_right(m5BearBox, ZR)
+        box.set_top(m5BearBox, m5RT)
+        box.set_bottom(m5BearBox, m5RB)
+        box.set_bgcolor(m5BearBox, color.new(#F06292,htfFillTransp))
 
 if show1HOB and not na(h1BT) and not na(h1BB)
     if na(h1BullBox)
