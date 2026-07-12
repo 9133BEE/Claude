@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -2564,6 +2564,8 @@ grp5 = "透明度設定"
 obFillTransp  = input.int(60, "OB方框填色透明度",  minval=0, maxval=95, step=5, group=grp5)
 htfFillTransp = input.int(88, "HTF OB填色透明度",  minval=0, maxval=98, step=2, group=grp5)
 fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, step=2, group=grp5)
+showDeadOB    = input.bool(true, "顯示失效OB（灰色）", group=grp5)
+deadOBTransp  = input.int(80,   "失效OB透明度",        group=grp5, minval=0, maxval=95, step=5)
 _hqBg()  => math.min(95, obFillTransp + 15)
 _hqOvl() => math.min(98, obFillTransp + 33)
 
@@ -2711,6 +2713,8 @@ var box[]   rb_fbox     = array.new_box()
 var box[]   rb_hqbox    = array.new_box()
 var bool[]  rb_signaled = array.new_bool()
 var bool[]  rb_isHQ     = array.new_bool()
+var box[]   bb_dead     = array.new_box()
+var box[]   rb_dead     = array.new_box()
 
 var label[] sigLabels   = array.new_label()
 var int[]   sigBars     = array.new_int()
@@ -2730,10 +2734,18 @@ while array.size(sigBars) > 0
     else
         break
 
-f_bull_shift() =>
+f_bull_shift(toGrey = false) =>
     _bx = array.shift(bb_box)
     if not na(_bx)
-        box.delete(_bx)
+        if toGrey and showDeadOB
+            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
+            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
+            box.set_text_color(_bx,    color.new(color.gray, 30))
+            array.push(bb_dead, _bx)
+            if array.size(bb_dead) > 10
+                box.delete(array.shift(bb_dead))
+        else
+            box.delete(_bx)
     _f = array.shift(bb_fbox)
     if not na(_f)
         box.delete(_f)
@@ -2744,10 +2756,18 @@ f_bull_shift() =>
     array.shift(bb_fvgT), array.shift(bb_fvgB)
     array.shift(bb_signaled), array.shift(bb_isHQ)
 
-f_bear_shift() =>
+f_bear_shift(toGrey = false) =>
     _bx = array.shift(rb_box)
     if not na(_bx)
-        box.delete(_bx)
+        if toGrey and showDeadOB
+            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
+            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
+            box.set_text_color(_bx,    color.new(color.gray, 30))
+            array.push(rb_dead, _bx)
+            if array.size(rb_dead) > 10
+                box.delete(array.shift(rb_dead))
+        else
+            box.delete(_bx)
     _f = array.shift(rb_fbox)
     if not na(_f)
         box.delete(_f)
@@ -2761,7 +2781,7 @@ f_bear_shift() =>
 if bullMSS and lastMSSDir != 1
     lastMSSDir := 1
     while array.size(rb) > 0
-        f_bear_shift()
+        f_bear_shift(true)
     if array.size(bb) >= maxOBs
         f_bull_shift()
     for i = 1 to _bbSrch
@@ -2811,7 +2831,7 @@ if bullMSS and lastMSSDir != 1
 if bearMSS and lastMSSDir != -1
     lastMSSDir := -1
     while array.size(bb) > 0
-        f_bull_shift()
+        f_bull_shift(true)
     if array.size(rb) >= maxOBs
         f_bear_shift()
     for i = 1 to _bbSrch
