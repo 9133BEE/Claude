@@ -2532,6 +2532,8 @@ obExtR_m     = input.int(5,"OB右延伸K數",minval=1,maxval=30,group=grp1)
 minScore     = input.int(0, "最低品質分(0-4)",minval=0,maxval=4,group=grp1)
 hqMin        = input.int(3, "HQ門檻(分)",minval=2,maxval=4,group=grp1)
 maxOBs       = input.int(1, "每方向最多OB數",minval=1,maxval=5,group=grp1)
+obTxtSize    = input.string("Small","OB文字大小",options=["Tiny","Small","Normal","Large"],group=grp1)
+obTxtHAlign  = input.string("置中", "OB文字對齊",options=["置中","置左","置右"],          group=grp1)
 
 grp2 = "獨角獸模型"
 unicornNeedHTF = input.bool(false,"需要HTF PDA確認",group=grp2)
@@ -2578,6 +2580,13 @@ showPBLbl    = input.bool(true,    "顯示標籤",            group=grp6)
 pbPivLen     = input.int(15,       "PB樞紐靈敏度K數",     group=grp6, minval=5,  maxval=50,  tooltip="越大=PB越少，減少重疊，建議10-20")
 maxPBs       = input.int(3,        "最多顯示PB數量",      group=grp6, minval=1,  maxval=10)
 pbDays       = input.int(3,        "顯示天數",            group=grp6, minval=1,  maxval=30,  tooltip="只顯示最近 N 天內的 PB（與OB顯示天數對齊）")
+pbTxtSize    = input.string("Small","PB文字大小",         options=["Tiny","Small","Normal","Large"],group=grp6)
+pbTxtHAlign  = input.string("置右", "PB文字對齊",         options=["置中","置左","置右"],            group=grp6)
+
+_obTxtSz = obTxtSize=="Tiny"?size.tiny:obTxtSize=="Normal"?size.normal:obTxtSize=="Large"?size.large:size.small
+_obHAl   = obTxtHAlign=="置左"?text.align_left:obTxtHAlign=="置右"?text.align_right:text.align_center
+_pbTxtSz = pbTxtSize=="Tiny"?size.tiny:pbTxtSize=="Normal"?size.normal:pbTxtSize=="Large"?size.large:size.small
+_pbHAl   = pbTxtHAlign=="置左"?text.align_left:pbTxtHAlign=="置中"?text.align_center:text.align_right
 
 _autoTfKey = switch timeframe.period
     "1"   => "1M"
@@ -2721,7 +2730,7 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI) and obI >= pbCutoff
-                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_top)
+                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_top)
                 array.push(pbBullBoxes, bx)
                 if array.size(pbBullBoxes) > maxPBs
                     box.delete(array.shift(pbBullBoxes))
@@ -2740,7 +2749,7 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI) and obI >= pbCutoff
-                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=size.small, text_halign=text.align_right, text_valign=text.align_bottom)
+                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_bottom)
                 array.push(pbBearBoxes, bx)
                 if array.size(pbBearBoxes) > maxPBs
                     box.delete(array.shift(pbBearBoxes))
@@ -2857,7 +2866,7 @@ if bullMSS and lastMSSDir != 1
                     _bc = isHQ?color.new(#9C27B0,0):color.new(#1E88E5,0)
                     _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#1E88E5,obFillTransp)
                     _tc = isHQ?color.new(#E1BEE7,0):color.new(#BBDEFB,0)
-                    array.push(bb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="+OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=size.small,text_halign=text.align_center,text_valign=text.align_center))
+                    array.push(bb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="+OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
                     if fvgOk
                         array.push(bb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#64B5F6,30),bgcolor=color.new(#64B5F6,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#90CAF9,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
                     else
@@ -2907,7 +2916,7 @@ if bearMSS and lastMSSDir != -1
                     _bc = isHQ?color.new(#9C27B0,0):color.new(#FF8C00,0)
                     _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#FF8C00,obFillTransp)
                     _tc = isHQ?color.new(#E1BEE7,0):color.new(#FFE0B2,0)
-                    array.push(rb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="-OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=size.small,text_halign=text.align_center,text_valign=text.align_center))
+                    array.push(rb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="-OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
                     if fvgOk
                         array.push(rb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#FFB74D,30),bgcolor=color.new(#FFB74D,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#FFCC80,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
                     else
