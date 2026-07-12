@@ -1717,7 +1717,7 @@ var table T = table.new(position.top_right, 3, 21,
 if barstate.islast
     ticker = syminfo.ticker
 
-    table.cell(T,0,0, ticker+" "+_tfKey,
+    table.cell(T,0,0, ticker+" "+_activePreset,
          text_color=white, text_size=size.normal, bgcolor=#161b22)
     table.cell(T,1,0, inSess?"開市 ✓":"休市",
          text_color=inSess?green:gray, text_size=size.normal, bgcolor=#161b22)
@@ -3413,7 +3413,7 @@ showS = input.bool(true, "顯示 SWEEP", group=grpS)
 sLB   = input.int(20, "回看K數", minval=5, maxval=100, group=grpS)
 sColB = input.color(#06b6d4, "Bull 顏色", group=grpS)
 sColR = input.color(#f97316, "Bear 顏色", group=grpS)
-sTrp  = input.int(65, "透明度", minval=0, maxval=95, step=5, group=grpS)
+sTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpS)
 
 // ══════════════════════════════════════════════════════════════
 // 大時框 FVG 設定
@@ -3476,22 +3476,18 @@ bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
 bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
 
 if showM and bullMSS
-    _mH = ta.atr(14) * 0.15
-    box.new(lastPHBar, lastPH + _mH, bar_index + 5, lastPH - _mH,
-         border_color=color.new(mColB, mTrp),
-         bgcolor=color.new(mColB, math.min(95, mTrp + 55)),
-         border_width=gLnW,
-         text="MSS", text_color=color.white, text_size=_sz,
-         text_halign=text.align_right, text_valign=text.align_center)
+    line.new(lastPHBar, lastPH, bar_index + 10, lastPH,
+         color=color.new(mColB, mTrp), width=gLnW, style=_lst)
+    label.new(bar_index + 10, lastPH, "mss",
+         style=label.style_none,
+         textcolor=color.new(mColB, mTrp), size=_sz)
 
 if showM and bearMSS
-    _mH = ta.atr(14) * 0.15
-    box.new(lastPLBar, lastPL + _mH, bar_index + 5, lastPL - _mH,
-         border_color=color.new(mColR, mTrp),
-         bgcolor=color.new(mColR, math.min(95, mTrp + 55)),
-         border_width=gLnW,
-         text="MSS", text_color=color.white, text_size=_sz,
-         text_halign=text.align_right, text_valign=text.align_center)
+    line.new(lastPLBar, lastPL, bar_index + 10, lastPL,
+         color=color.new(mColR, mTrp), width=gLnW, style=_lst)
+    label.new(bar_index + 10, lastPL, "mss",
+         style=label.style_none,
+         textcolor=color.new(mColR, mTrp), size=_sz)
 
 // ══════════════════════════════════════════════════════════════
 // SWEEP 偵測 + 繪製
@@ -3502,20 +3498,16 @@ bullSW = low < _swL  and close > _swL
 bearSW = high > _swH and close < _swH
 
 if showS and bullSW
-    box.new(bar_index, _swL, bar_index + 15, low,
-         border_color=color.new(sColB, math.max(0, sTrp - 30)),
-         bgcolor=color.new(sColB, sTrp),
-         border_width=gLnW,
-         text="SWEEP", text_color=color.white, text_size=_sz,
-         text_halign=text.align_center, text_valign=text.align_center)
+    label.new(bar_index, low, "s",
+         style=label.style_none,
+         textcolor=color.new(sColB, sTrp), size=_sz,
+         yloc=yloc.belowbar)
 
 if showS and bearSW
-    box.new(bar_index, high, bar_index + 15, _swH,
-         border_color=color.new(sColR, math.max(0, sTrp - 30)),
-         bgcolor=color.new(sColR, sTrp),
-         border_width=gLnW,
-         text="SWEEP", text_color=color.white, text_size=_sz,
-         text_halign=text.align_center, text_valign=text.align_center)
+    label.new(bar_index, high, "s",
+         style=label.style_none,
+         textcolor=color.new(sColR, sTrp), size=_sz,
+         yloc=yloc.abovebar)
 
 // ══════════════════════════════════════════════════════════════
 // 大時框 FVG — request.security
