@@ -3408,12 +3408,13 @@ mTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpM)
 // ══════════════════════════════════════════════════════════════
 // SWEEP 設定
 // ══════════════════════════════════════════════════════════════
-grpS  = "SWEEP 流動性獵取"
-showS = input.bool(true, "顯示 SWEEP", group=grpS)
-sLB   = input.int(20, "回看K數", minval=5, maxval=100, group=grpS)
-sColB = input.color(#06b6d4, "Bull 顏色", group=grpS)
-sColR = input.color(#f97316, "Bear 顏色", group=grpS)
-sTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpS)
+grpS     = "SWEEP 流動性獵取"
+showS    = input.bool(true, "顯示 SWEEP", group=grpS)
+sLB      = input.int(5, "Pivot 確認K棒數（左=右）", minval=2, maxval=20, group=grpS)
+sWickMin = input.float(0.25, "最小影線/ATR 倍數", minval=0.0, step=0.05, group=grpS)
+sColB    = input.color(#26a69a, "Bull Sweep 顏色", group=grpS)
+sColR    = input.color(#ef5350, "Bear Sweep 顏色", group=grpS)
+sMax     = input.int(20, "最多顯示條數", minval=5, maxval=50, group=grpS)
 
 // ══════════════════════════════════════════════════════════════
 // 大時框 FVG 設定
@@ -3490,24 +3491,69 @@ if showM and bearMSS
          textcolor=color.new(mColR, mTrp), size=_sz)
 
 // ══════════════════════════════════════════════════════════════
-// SWEEP 偵測 + 繪製
+// SWEEP 偵測（ICT 流動性獵取）
+// 邏輯：Pivot Swing 確認流動性池 → 影線穿越 + 收盤反向 + ATR過濾
+// 顯示：水平虛線（從 Pivot 到觸發K棒）+ 右端小字 "s"
 // ══════════════════════════════════════════════════════════════
-_swL  = ta.lowest(low[1],  sLB)
-_swH  = ta.highest(high[1], sLB)
-bullSW = low < _swL  and close > _swL
-bearSW = high > _swH and close < _swH
+_swPivLo = ta.pivotlow (low,  sLB, sLB)
+_swPivHi = ta.pivothigh(high, sLB, sLB)
+_swAtr   = ta.atr(14)
 
-if showS and bullSW
-    label.new(bar_index, low, "s",
-         style=label.style_none,
-         textcolor=color.new(sColB, sTrp), size=_sz,
-         yloc=yloc.belowbar)
+var float[] _eqlLvl = array.new_float()
+var int[]   _eqlBar = array.new_int()
+var float[] _eqhLvl = array.new_float()
+var int[]   _eqhBar = array.new_int()
+var line[]  _swLns  = array.new_line()
+var label[] _swLbs  = array.new_label()
 
-if showS and bearSW
-    label.new(bar_index, high, "s",
-         style=label.style_none,
-         textcolor=color.new(sColR, sTrp), size=_sz,
-         yloc=yloc.abovebar)
+if not na(_swPivLo)
+    array.push(_eqlLvl, _swPivLo)
+    array.push(_eqlBar, bar_index - sLB)
+    if array.size(_eqlLvl) > 15
+        array.shift(_eqlLvl)
+        array.shift(_eqlBar)
+
+if not na(_swPivHi)
+    array.push(_eqhLvl, _swPivHi)
+    array.push(_eqhBar, bar_index - sLB)
+    if array.size(_eqhLvl) > 15
+        array.shift(_eqhLvl)
+        array.shift(_eqhBar)
+
+if showS and barstate.isconfirmed
+    _szB = array.size(_eqlLvl)
+    if _szB > 0
+        for _i = _szB - 1 to 0 by -1
+            _lvl = array.get(_eqlLvl, _i)
+            _pb  = array.get(_eqlBar, _i)
+            if low < _lvl and close > _lvl and (_lvl - low) >= _swAtr * sWickMin
+                array.push(_swLns, line.new(_pb, _lvl, bar_index, _lvl,
+                     color=sColB, width=gLnW, style=line.style_dashed))
+                array.push(_swLbs, label.new(bar_index, _lvl, "s",
+                     style=label.style_none, textcolor=sColB, size=_sz))
+                while array.size(_swLns) > sMax
+                    line.delete(array.shift(_swLns))
+                    label.delete(array.shift(_swLbs))
+                array.remove(_eqlLvl, _i)
+                array.remove(_eqlBar, _i)
+                break
+
+    _szR = array.size(_eqhLvl)
+    if _szR > 0
+        for _i = _szR - 1 to 0 by -1
+            _lvl = array.get(_eqhLvl, _i)
+            _pb  = array.get(_eqhBar, _i)
+            if high > _lvl and close < _lvl and (high - _lvl) >= _swAtr * sWickMin
+                array.push(_swLns, line.new(_pb, _lvl, bar_index, _lvl,
+                     color=sColR, width=gLnW, style=line.style_dashed))
+                array.push(_swLbs, label.new(bar_index, _lvl, "s",
+                     style=label.style_none, textcolor=sColR, size=_sz))
+                while array.size(_swLns) > sMax
+                    line.delete(array.shift(_swLns))
+                    label.delete(array.shift(_swLbs))
+                array.remove(_eqhLvl, _i)
+                array.remove(_eqhBar, _i)
+                break
 
 // ══════════════════════════════════════════════════════════════
 // 大時框 FVG — request.security
