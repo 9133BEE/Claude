@@ -2567,25 +2567,8 @@ fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, ste
 _hqBg()  => math.min(95, obFillTransp + 15)
 _hqOvl() => math.min(98, obFillTransp + 33)
 
-grp6 = "推進塊 PB"
-showPB       = input.bool(true,    "顯示推進塊 PB",      group=grp6)
-pbSearchN    = input.int(25,       "OB 往前搜尋K數",     group=grp6, minval=5, maxval=100)
-pbBullCol    = input.color(#22c55e,"+PB 顏色",            group=grp6)
-pbBearCol    = input.color(#ef4444,"-PB 顏色",            group=grp6)
-pbFillTransp = input.int(80,       "填充透明度",          group=grp6, minval=0, maxval=100)
-pbBrdTransp  = input.int(10,       "邊框透明度",          group=grp6, minval=0, maxval=100)
-pbExtR       = input.int(20,       "右延伸K數",           group=grp6, minval=1, maxval=500)
-showPBLbl    = input.bool(true,    "顯示標籤",            group=grp6)
-pbPivLen     = input.int(15,       "PB樞紐靈敏度K數",     group=grp6, minval=5,  maxval=50,  tooltip="越大=PB越少，減少重疊，建議10-20")
-maxPBs       = input.int(3,        "最多顯示PB數量",      group=grp6, minval=1,  maxval=10)
-pbDays       = input.int(3,        "顯示天數",            group=grp6, minval=1,  maxval=30,  tooltip="只顯示最近 N 天內的 PB（與OB顯示天數對齊）")
-pbTxtSize    = input.string("Small","PB文字大小",         options=["Tiny","Small","Normal","Large"],group=grp6)
-pbTxtHAlign  = input.string("置中", "PB文字對齊",         options=["置中","置左","置右"],            group=grp6)
-
 _obTxtSz = obTxtSize=="Tiny"?size.tiny:obTxtSize=="Normal"?size.normal:obTxtSize=="Large"?size.large:size.small
 _obHAl   = obTxtHAlign=="置左"?text.align_left:obTxtHAlign=="置右"?text.align_right:text.align_center
-_pbTxtSz = pbTxtSize=="Tiny"?size.tiny:pbTxtSize=="Normal"?size.normal:pbTxtSize=="Large"?size.large:size.small
-_pbHAl   = pbTxtHAlign=="置左"?text.align_left:pbTxtHAlign=="置中"?text.align_center:text.align_right
 
 _autoTfKey = switch timeframe.period
     "1"   => "1M"
@@ -2695,66 +2678,8 @@ if not na(phH)
 if not na(plL)
     lastPL := plL
 
-pbPH = ta.pivothigh(high, pbPivLen, pbPivLen)
-pbPL = ta.pivotlow(low,   pbPivLen, pbPivLen)
-
-var float pbPrevPL = na
-var float pbPrevPH = na
-var box[] pbBullBoxes = array.new_box()
-var box[] pbBearBoxes = array.new_box()
 var bool hasMSSBull = false
 var bool hasMSSBear = false
-
-if showPB
-    pbCutoff = bar_index - pbDays * barsPerDay
-    while array.size(pbBullBoxes) > 0
-        if box.get_left(array.get(pbBullBoxes, 0)) < pbCutoff
-            box.delete(array.shift(pbBullBoxes))
-        else
-            break
-    while array.size(pbBearBoxes) > 0
-        if box.get_left(array.get(pbBearBoxes, 0)) < pbCutoff
-            box.delete(array.shift(pbBearBoxes))
-        else
-            break
-    if not na(pbPL)
-        if not na(pbPrevPL) and pbPL > pbPrevPL and hasMSSBull
-            obH = float(na)
-            obL = float(na)
-            obI = int(na)
-            for i = 1 to pbSearchN
-                off = pbPivLen + i
-                if off < bar_index
-                    if close[off] < open[off]
-                        obH := high[off]
-                        obL := low[off]
-                        obI := bar_index - off
-                        break
-            if not na(obI) and obI >= pbCutoff
-                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_center)
-                array.push(pbBullBoxes, bx)
-                if array.size(pbBullBoxes) > maxPBs
-                    box.delete(array.shift(pbBullBoxes))
-        pbPrevPL := pbPL
-    if not na(pbPH)
-        if not na(pbPrevPH) and pbPH < pbPrevPH and hasMSSBear
-            obH = float(na)
-            obL = float(na)
-            obI = int(na)
-            for i = 1 to pbSearchN
-                off = pbPivLen + i
-                if off < bar_index
-                    if close[off] > open[off]
-                        obH := high[off]
-                        obL := low[off]
-                        obI := bar_index - off
-                        break
-            if not na(obI) and obI >= pbCutoff
-                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_center)
-                array.push(pbBearBoxes, bx)
-                if array.size(pbBearBoxes) > maxPBs
-                    box.delete(array.shift(pbBearBoxes))
-        pbPrevPH := pbPH
 
 bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
 bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
