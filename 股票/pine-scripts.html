@@ -63,6 +63,7 @@ a:hover{text-decoration:underline}
 .badge-unicorn{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
 .badge-dashboard{background:rgba(6,182,212,.15);color:#22d3ee;border:1px solid rgba(6,182,212,.3)}
 .badge-supset{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.badge-entry{background:rgba(234,179,8,.15);color:#facc15;border:1px solid rgba(234,179,8,.3)}
 .hidden{display:none!important}
 
 .ver-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
@@ -122,6 +123,7 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="dashboard" onclick="filt('dashboard',this)">期貨儀表板</button>
   <button class="filter-btn" data-cat="supset" onclick="filt('supset',this)">SUP SET</button>
   <button class="filter-btn" data-cat="strategy" onclick="filt('strategy',this)">回測工具</button>
+  <button class="filter-btn" data-cat="entry" onclick="filt('entry',this)">進場模型</button>
 </div>
 
 <div class="grid" id="grid">
@@ -681,6 +683,37 @@ if showDash and barstate.islast
         <li>止損建議放在 OB 另一端（頂部或底部）外側 1–2 個 tick</li>
       </ul>
     </div>
+  </div>
+</div>
+
+<!-- ─── Entry Model ─── -->
+<div class="scard" data-cat="entry">
+  <div class="scard-header">
+    <span class="scard-badge badge-entry">進場模型</span>
+    <div class="scard-meta">
+      <div class="scard-title">Entry Model — MSS · SWEEP · HTF FVG · OB</div>
+      <div class="scard-desc">ICT/SMC 進場模型三要素：MSS（結構突破）+ SWEEP（流動性獵取）+ 大時框FVG + 當前時框OB，時框自動對應（5分→1H FVG、15分→4H FVG、1H→日線FVG 等）</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">所有標的</div></div>
+      <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">MSS / SWEEP / HTF FVG / OB</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
+      <div class="info-item"><div class="info-label">時框支援</div><div class="info-val">1M – D（自動對應）</div></div>
+    </div>
+    <div class="ver-log" style="margin:10px 0">
+      <span class="vl-dot">›</span> <b>MSS / CHoCH</b>：偵測結構突破，畫水平線 + MSS 標籤，可調左右側K數、顏色、透明度、線條樣式粗細<br>
+      <span class="vl-dot">›</span> <b>SWEEP 流動性獵取</b>：偵測下破回收（Bull Sweep）或上刺回收（Bear Sweep），即時標籤顯示<br>
+      <span class="vl-dot">›</span> <b>大時框 FVG</b>（request.security）：自動對應高時框 FVG 方框，依當前時框顯示 "1H FVG" / "4H FVG" / "D FVG" 等標籤<br>
+      <span class="vl-dot">›</span> <b>當前時框 OB</b>：MSS 觸發後自動找最後一根反向K棒作為 OB，方框隨K棒右延伸，顯示 "5M OB" / "15M OB" 等
+    </div>
+    <div class="tips-box">
+      <h4>時框對應邏輯</h4>
+      <p>1M/3M → 15M FVG｜5M/10M → 1H FVG｜15M/30M/45M → 4H FVG｜1H/2H → D FVG｜4H → W FVG｜D → M FVG</p>
+    </div>
+    <button class="copy-bar-btn" onclick="copyEntryModel(this)" style="margin-top:10px">一鍵複製腳本</button>
+    <div class="code-block" id="entry-model-code"></div>
   </div>
 </div>
 
@@ -3282,6 +3315,313 @@ function copyCode(btn) {
   });
 }
 
+const ENTRY_MODEL_V1 = `//@version=5
+indicator("ENTRY MODEL",
+     overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ══════════════════════════════════════════════════════════════
+// 時框自動對應
+// 當前TF → 大時框FVG  |  OB使用當前TF
+// 1M/3M → 15M | 5M/10M → 1H | 15M~45M → 4H | 1H/2H → D | 4H → W | D → M
+// ══════════════════════════════════════════════════════════════
+_htfTF = switch timeframe.period
+    "1"   => "15"
+    "2"   => "15"
+    "3"   => "15"
+    "5"   => "60"
+    "10"  => "60"
+    "15"  => "240"
+    "30"  => "240"
+    "45"  => "240"
+    "60"  => "D"
+    "120" => "D"
+    "240" => "W"
+    "D"   => "M"
+    => "W"
+
+_htfLbl = switch timeframe.period
+    "1"   => "15M"
+    "2"   => "15M"
+    "3"   => "15M"
+    "5"   => "1H"
+    "10"  => "1H"
+    "15"  => "4H"
+    "30"  => "4H"
+    "45"  => "4H"
+    "60"  => "D"
+    "120" => "D"
+    "240" => "W"
+    "D"   => "M"
+    => "W"
+
+_curLbl = switch timeframe.period
+    "1"   => "1M"
+    "2"   => "2M"
+    "3"   => "3M"
+    "5"   => "5M"
+    "10"  => "10M"
+    "15"  => "15M"
+    "30"  => "30M"
+    "45"  => "45M"
+    "60"  => "1H"
+    "120" => "2H"
+    "240" => "4H"
+    "D"   => "D"
+    "W"   => "W"
+    => timeframe.period
+
+// ══════════════════════════════════════════════════════════════
+// 全局樣式
+// ══════════════════════════════════════════════════════════════
+grpG  = "全局樣式"
+gSzSt = input.string("small", "字體大小",
+     options=["tiny","small","normal","large","huge"], group=grpG)
+gLnW  = input.int(1, "線條粗細", minval=1, maxval=4, group=grpG)
+gLnSt = input.string("solid", "線條樣式",
+     options=["solid","dashed","dotted"], group=grpG)
+
+_sz = switch gSzSt
+    "tiny"   => size.tiny
+    "small"  => size.small
+    "normal" => size.normal
+    "large"  => size.large
+    "huge"   => size.huge
+    => size.small
+
+_lst = switch gLnSt
+    "solid"  => line.style_solid
+    "dashed" => line.style_dashed
+    "dotted" => line.style_dotted
+    => line.style_solid
+
+// ══════════════════════════════════════════════════════════════
+// MSS 設定
+// ══════════════════════════════════════════════════════════════
+grpM  = "MSS / CHoCH"
+showM = input.bool(true, "顯示 MSS", group=grpM)
+mPivL = input.int(5, "左側K數", minval=2, maxval=20, group=grpM)
+mPivR = input.int(3, "右側K數", minval=1, maxval=10, group=grpM)
+mColB = input.color(#22c55e, "Bull 顏色", group=grpM)
+mColR = input.color(#ef4444, "Bear 顏色", group=grpM)
+mTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpM)
+
+// ══════════════════════════════════════════════════════════════
+// SWEEP 設定
+// ══════════════════════════════════════════════════════════════
+grpS  = "SWEEP 流動性獵取"
+showS = input.bool(true, "顯示 SWEEP", group=grpS)
+sLB   = input.int(20, "回看K數", minval=5, maxval=100, group=grpS)
+sColB = input.color(#06b6d4, "Bull 顏色", group=grpS)
+sColR = input.color(#f97316, "Bear 顏色", group=grpS)
+sTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpS)
+
+// ══════════════════════════════════════════════════════════════
+// 大時框 FVG 設定
+// ══════════════════════════════════════════════════════════════
+grpF  = "大時框 FVG（自動對應）"
+showF = input.bool(true, "顯示 HTF FVG", group=grpF)
+fDays = input.int(3, "顯示天數", minval=1, maxval=10, group=grpF)
+fColB = input.color(#22c55e, "Bull 顏色", group=grpF)
+fColR = input.color(#ef4444, "Bear 顏色", group=grpF)
+fTrp  = input.int(85, "填充透明度", minval=0, maxval=95, step=5, group=grpF)
+
+// ══════════════════════════════════════════════════════════════
+// 小時框 OB 設定
+// ══════════════════════════════════════════════════════════════
+grpO  = "小時框 OB（當前時框）"
+showO = input.bool(true, "顯示 OB", group=grpO)
+oDays = input.int(2, "顯示天數", minval=1, maxval=10, group=grpO)
+oColB = input.color(#3b82f6, "Bull 顏色", group=grpO)
+oColR = input.color(#a855f7, "Bear 顏色", group=grpO)
+oTrp  = input.int(85, "填充透明度", minval=0, maxval=95, step=5, group=grpO)
+
+// ══════════════════════════════════════════════════════════════
+// 共用 — 每日K棒數估算
+// ══════════════════════════════════════════════════════════════
+_bpd = switch timeframe.period
+    "1"   => 1440
+    "2"   => 720
+    "3"   => 480
+    "5"   => 288
+    "10"  => 144
+    "15"  => 96
+    "30"  => 48
+    "45"  => 32
+    "60"  => 24
+    "120" => 12
+    "240" => 6
+    "D"   => 1
+    => 24
+
+// ══════════════════════════════════════════════════════════════
+// MSS 偵測 + 繪製
+// ══════════════════════════════════════════════════════════════
+phH = ta.pivothigh(high, mPivL, mPivR)
+plL = ta.pivotlow(low,  mPivL, mPivR)
+
+var float lastPH    = na
+var int   lastPHBar = na
+var float lastPL    = na
+var int   lastPLBar = na
+
+if not na(phH)
+    lastPH    := phH
+    lastPHBar := bar_index - mPivR
+
+if not na(plL)
+    lastPL    := plL
+    lastPLBar := bar_index - mPivR
+
+bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
+bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
+
+if showM and bullMSS
+    line.new(lastPHBar, lastPH, bar_index, lastPH,
+         color=color.new(mColB, mTrp), width=gLnW, style=_lst)
+    label.new(bar_index, lastPH, "MSS",
+         style=label.style_label_down,
+         color=color.new(mColB, 70), textcolor=color.white, size=_sz)
+
+if showM and bearMSS
+    line.new(lastPLBar, lastPL, bar_index, lastPL,
+         color=color.new(mColR, mTrp), width=gLnW, style=_lst)
+    label.new(bar_index, lastPL, "MSS",
+         style=label.style_label_up,
+         color=color.new(mColR, 70), textcolor=color.white, size=_sz)
+
+// ══════════════════════════════════════════════════════════════
+// SWEEP 偵測 + 繪製
+// ══════════════════════════════════════════════════════════════
+_swL  = ta.lowest(low[1],  sLB)
+_swH  = ta.highest(high[1], sLB)
+bullSW = low < _swL  and close > _swL
+bearSW = high > _swH and close < _swH
+
+if showS and bullSW
+    label.new(bar_index, low, "SWEEP",
+         style=label.style_label_up, yloc=yloc.belowbar,
+         color=color.new(sColB, sTrp), textcolor=color.white, size=_sz)
+
+if showS and bearSW
+    label.new(bar_index, high, "SWEEP",
+         style=label.style_label_down, yloc=yloc.abovebar,
+         color=color.new(sColR, sTrp), textcolor=color.white, size=_sz)
+
+// ══════════════════════════════════════════════════════════════
+// 大時框 FVG — request.security
+// 偵測最近一個多方FVG（high[i+1]<low[i-1]）與空方FVG（low[i+1]>high[i-1]）
+// ══════════════════════════════════════════════════════════════
+f_fvg() =>
+    bT = float(na), bB = float(na)
+    rT = float(na), rB = float(na)
+    for i = 2 to 200
+        if na(bT) and high[i+1] < low[i-1]
+            bT := low[i-1]
+            bB := high[i+1]
+        if na(rT) and low[i+1] > high[i-1]
+            rT := low[i+1]
+            rB := high[i-1]
+        if not na(bT) and not na(rT)
+            break
+    [bT, bB, rT, rB]
+
+[htfBT, htfBB, htfRT, htfRB] = request.security(
+     syminfo.tickerid, _htfTF, f_fvg(), lookahead=barmerge.lookahead_off)
+
+fvgL = math.max(bar_index - fDays * _bpd, 1)
+fvgR = bar_index + 10
+
+var box fvgBBx = na
+var box fvgRBx = na
+
+if showF
+    if not na(htfBT) and not na(htfBB)
+        if na(fvgBBx)
+            fvgBBx := box.new(fvgL, htfBT, fvgR, htfBB,
+                 border_color=color.new(fColB, math.max(0, fTrp - 50)),
+                 bgcolor=color.new(fColB, fTrp),
+                 border_width=gLnW,
+                 text=_htfLbl + " FVG",
+                 text_color=color.white, text_size=_sz,
+                 text_halign=text.align_right, text_valign=text.align_center)
+        else
+            box.set_top(fvgBBx, htfBT)
+            box.set_bottom(fvgBBx, htfBB)
+            box.set_right(fvgBBx, fvgR)
+            box.set_left(fvgBBx, fvgL)
+
+    if not na(htfRT) and not na(htfRB)
+        if na(fvgRBx)
+            fvgRBx := box.new(fvgL, htfRT, fvgR, htfRB,
+                 border_color=color.new(fColR, math.max(0, fTrp - 50)),
+                 bgcolor=color.new(fColR, fTrp),
+                 border_width=gLnW,
+                 text=_htfLbl + " FVG",
+                 text_color=color.white, text_size=_sz,
+                 text_halign=text.align_right, text_valign=text.align_center)
+        else
+            box.set_top(fvgRBx, htfRT)
+            box.set_bottom(fvgRBx, htfRB)
+            box.set_right(fvgRBx, fvgR)
+            box.set_left(fvgRBx, fvgL)
+
+// ══════════════════════════════════════════════════════════════
+// 小時框 OB — MSS 觸發後找最後一根反向K棒
+// Bull OB：bullMSS 後找最近的陰線（close<open）
+// Bear OB：bearMSS 後找最近的陽線（close>open）
+// ══════════════════════════════════════════════════════════════
+var float bullObT = na
+var float bullObB = na
+var int   bullObL = na
+var float bearObT = na
+var float bearObB = na
+var int   bearObL = na
+var box   obBBx   = na
+var box   obRBx   = na
+
+if bullMSS
+    for i = 1 to 300
+        if close[i] < open[i]
+            bullObT := high[i]
+            bullObB := low[i]
+            bullObL := bar_index - i
+            break
+    if showO and not na(bullObT)
+        if not na(obBBx)
+            box.delete(obBBx)
+        obBBx := box.new(bullObL, bullObT, bar_index + 5, bullObB,
+             border_color=color.new(oColB, math.max(0, oTrp - 50)),
+             bgcolor=color.new(oColB, oTrp),
+             border_width=gLnW,
+             text=_curLbl + " OB",
+             text_color=color.white, text_size=_sz,
+             text_halign=text.align_right, text_valign=text.align_center)
+
+if bearMSS
+    for i = 1 to 300
+        if close[i] > open[i]
+            bearObT := high[i]
+            bearObB := low[i]
+            bearObL := bar_index - i
+            break
+    if showO and not na(bearObT)
+        if not na(obRBx)
+            box.delete(obRBx)
+        obRBx := box.new(bearObL, bearObT, bar_index + 5, bearObB,
+             border_color=color.new(oColR, math.max(0, oTrp - 50)),
+             bgcolor=color.new(oColR, oTrp),
+             border_width=gLnW,
+             text=_curLbl + " OB",
+             text_color=color.white, text_size=_sz,
+             text_halign=text.align_right, text_valign=text.align_center)
+
+// 每根K棒更新右邊界
+if showO
+    if not na(obBBx)
+        box.set_right(obBBx, bar_index + 5)
+    if not na(obRBx)
+        box.set_right(obRBx, bar_index + 5)`;
+
 const VERSION_DEFS = {
   unicorn: [
     { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
@@ -3372,6 +3712,14 @@ renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
 document.getElementById('strategy-code').textContent = STRATEGY_TESTER;
+document.getElementById('entry-model-code').textContent = ENTRY_MODEL_V1;
+
+function copyEntryModel(btn) {
+  navigator.clipboard.writeText(ENTRY_MODEL_V1).then(() => {
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
+  });
+}
 
 function copyStrategy(btn) {
   navigator.clipboard.writeText(STRATEGY_TESTER).then(() => {
