@@ -3479,16 +3479,18 @@ bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
 if showM and bullMSS
     line.new(lastPHBar, lastPH, bar_index + 10, lastPH,
          color=color.new(mColB, mTrp), width=gLnW, style=_lst)
-    label.new(bar_index + 10, lastPH, "mss",
-         style=label.style_none,
-         textcolor=color.new(mColB, mTrp), size=_sz)
+    label.new(math.round((lastPHBar + bar_index) / 2), lastPH, "mss",
+         style=label.style_none, yloc=yloc.price,
+         textcolor=color.new(mColB, mTrp), size=_sz,
+         textalign=text.align_center)
 
 if showM and bearMSS
     line.new(lastPLBar, lastPL, bar_index + 10, lastPL,
          color=color.new(mColR, mTrp), width=gLnW, style=_lst)
-    label.new(bar_index + 10, lastPL, "mss",
-         style=label.style_none,
-         textcolor=color.new(mColR, mTrp), size=_sz)
+    label.new(math.round((lastPLBar + bar_index) / 2), lastPL, "mss",
+         style=label.style_none, yloc=yloc.price,
+         textcolor=color.new(mColR, mTrp), size=_sz,
+         textalign=text.align_center)
 
 // ══════════════════════════════════════════════════════════════
 // SWEEP 偵測（ICT 流動性獵取）
@@ -3506,20 +3508,56 @@ var int[]   _eqhBar = array.new_int()
 var line[]  _swLns  = array.new_line()
 var label[] _swLbs  = array.new_label()
 
-if not na(_swPivLo)
-    array.push(_eqlLvl, _swPivLo)
-    array.push(_eqlBar, bar_index - sLB)
-    if array.size(_eqlLvl) > 15
-        array.shift(_eqlLvl)
-        array.shift(_eqlBar)
+// Pivot 確認時立即回溯掃描確認視窗內是否已有掃除
+if showS and not na(_swPivLo)
+    _lvl = _swPivLo
+    _pb  = bar_index - sLB
+    _swept = false
+    for _jj = 0 to sLB
+        _j = sLB - _jj
+        if low[_j] < _lvl and close[_j] > _lvl and (_lvl - low[_j]) >= _swAtr * sWickMin
+            _sweepBar = bar_index - _j
+            array.push(_swLns, line.new(_pb, _lvl, _sweepBar, _lvl,
+                 color=sColB, width=gLnW, style=line.style_dashed))
+            array.push(_swLbs, label.new(_sweepBar, _lvl, "s",
+                 style=label.style_none, textcolor=sColB, size=_sz))
+            while array.size(_swLns) > sMax
+                line.delete(array.shift(_swLns))
+                label.delete(array.shift(_swLbs))
+            _swept := true
+            break
+    if not _swept
+        array.push(_eqlLvl, _lvl)
+        array.push(_eqlBar, _pb)
+        if array.size(_eqlLvl) > 15
+            array.shift(_eqlLvl)
+            array.shift(_eqlBar)
 
-if not na(_swPivHi)
-    array.push(_eqhLvl, _swPivHi)
-    array.push(_eqhBar, bar_index - sLB)
-    if array.size(_eqhLvl) > 15
-        array.shift(_eqhLvl)
-        array.shift(_eqhBar)
+if showS and not na(_swPivHi)
+    _lvl = _swPivHi
+    _pb  = bar_index - sLB
+    _swept = false
+    for _jj = 0 to sLB
+        _j = sLB - _jj
+        if high[_j] > _lvl and close[_j] < _lvl and (high[_j] - _lvl) >= _swAtr * sWickMin
+            _sweepBar = bar_index - _j
+            array.push(_swLns, line.new(_pb, _lvl, _sweepBar, _lvl,
+                 color=sColR, width=gLnW, style=line.style_dashed))
+            array.push(_swLbs, label.new(_sweepBar, _lvl, "s",
+                 style=label.style_none, textcolor=sColR, size=_sz))
+            while array.size(_swLns) > sMax
+                line.delete(array.shift(_swLns))
+                label.delete(array.shift(_swLbs))
+            _swept := true
+            break
+    if not _swept
+        array.push(_eqhLvl, _lvl)
+        array.push(_eqhBar, _pb)
+        if array.size(_eqhLvl) > 15
+            array.shift(_eqhLvl)
+            array.shift(_eqhBar)
 
+// 對已追蹤水位做即時掃除偵測
 if showS and barstate.isconfirmed
     _szB = array.size(_eqlLvl)
     if _szB > 0
