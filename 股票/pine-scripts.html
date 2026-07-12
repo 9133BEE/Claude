@@ -718,11 +718,17 @@ maxHoldBars    = input.int(50,"最長持倉K數",minval=5,maxval=500,group=grp2)
 oneTradePerMSS = input.bool(true,"每次 MSS 只進場一次",group=grp2)
 
 _autoTf = switch timeframe.period
-    "1"   => "1M"  ; "3"   => "1M"  ; "5"   => "1M"
-    "15"  => "15M" ; "30"  => "15M" ; "45"  => "15M"
-    "60"  => "1H"  ; "120" => "1H"
+    "1"   => "1M"
+    "3"   => "1M"
+    "5"   => "1M"
+    "15"  => "15M"
+    "30"  => "15M"
+    "45"  => "15M"
+    "60"  => "1H"
+    "120" => "1H"
     "240" => "4H"
-    "D"   => "1D"  ; "W"   => "1D"
+    "D"   => "1D"
+    "W"   => "1D"
     => "1D"
 _tfKey = tfPreset == "Auto" ? _autoTf : tfPreset
 _pivL  = _tfKey=="1M"?5 :_tfKey=="5M"?7 :_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8 :_tfKey=="1D"?5 :pivL_m
