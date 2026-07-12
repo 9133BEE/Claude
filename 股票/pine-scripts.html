@@ -2731,7 +2731,7 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI) and obI >= pbCutoff
-                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_top)
+                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBullCol, pbBrdTransp), bgcolor=color.new(pbBullCol, pbFillTransp), border_width=1, text=showPBLbl?"+PB":"", text_color=color.new(pbBullCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_center)
                 array.push(pbBullBoxes, bx)
                 if array.size(pbBullBoxes) > maxPBs
                     box.delete(array.shift(pbBullBoxes))
@@ -2750,7 +2750,7 @@ if showPB
                         obI := bar_index - off
                         break
             if not na(obI) and obI >= pbCutoff
-                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_bottom)
+                bx = box.new(obI, obH, bar_index + pbExtR, obL, border_color=color.new(pbBearCol, pbBrdTransp), bgcolor=color.new(pbBearCol, pbFillTransp), border_width=1, text=showPBLbl?"-PB":"", text_color=color.new(pbBearCol, 0), text_size=_pbTxtSz, text_halign=_pbHAl, text_valign=text.align_center)
                 array.push(pbBearBoxes, bx)
                 if array.size(pbBearBoxes) > maxPBs
                     box.delete(array.shift(pbBearBoxes))
