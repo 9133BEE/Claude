@@ -3307,7 +3307,7 @@ const UNICORN_V4 = UNICORN_V3;
 const UNICORN_V4_STRAT = UNICORN_V3
   .replace(
     'indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)',
-    'strategy("Unicorn V4 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500,\n    default_qty_type=strategy.percent_of_equity, default_qty_value=10,\n    commission_type=strategy.commission.percent, commission_value=0.05)\n\ngrpS   = "Strategy回測設定"\ntpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)\nslATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)\natrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)'
+    'strategy("Unicorn V4 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.percent, commission_value=0.05)\n\ngrpS   = "Strategy回測設定"\ntpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)\nslATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)\natrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)'
   )
   .replace(
     'alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")\nalertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")\nalertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")',
