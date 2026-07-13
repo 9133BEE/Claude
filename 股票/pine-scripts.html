@@ -246,6 +246,11 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
+        <div id="unicorn-log-v4s" class="ver-log">
+          <span class="vl-dot">›</span> <b>Strategy 回測版本</b>：同 V4 邏輯，改用 strategy() 讓 TradingView Strategy Tester 能直接計算勝率<br>
+          <span class="vl-dot">›</span> <b>停利/停損</b>：ATR倍數設定（預設 TP=2× ATR、SL=1× ATR），可在指標設定調整<br>
+          <span class="vl-dot">›</span> <b>使用方式</b>：貼上後圖表下方出現 Strategy Tester 分頁 → 查看勝率、最大回撤
+        </div>
         <div id="unicorn-log-v4" class="ver-log">
           <span class="vl-dot">›</span> <b>HTF MSS方向過濾</b>：新增 htfMSSDir，要求 HTF 結構多頭才允許多方訊號、空頭才允許空方訊號，解決順勢問題<br>
           <span class="vl-dot">›</span> <b>HTF OB精確度過濾</b>：htfOBPrecision(預設0.5)，只在OB底部半段觸發多方、頂部半段觸發空方<br>
@@ -270,6 +275,9 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
+        <div id="unicorn-v4s-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v4s-code"></div>
+        </div>
         <div id="unicorn-v4-wrap">
           <div class="code-block" id="unicorn-v4-code"></div>
         </div>
@@ -3296,13 +3304,24 @@ if showDash and barstate.islast
 
 const UNICORN_V4 = UNICORN_V3;
 
+const UNICORN_V4_STRAT = UNICORN_V3
+  .replace(
+    'indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)',
+    'strategy("Unicorn V4 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500,\n    default_qty_type=strategy.percent_of_equity, default_qty_value=10,\n    commission_type=strategy.commission.percent, commission_value=0.05)\n\ngrpS   = "Strategy回測設定"\ntpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)\nslATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)\natrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)'
+  )
+  .replace(
+    'alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")\nalertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")\nalertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")',
+    '_atr = ta.atr(atrLen)\nif fireBull and barstate.isconfirmed\n    strategy.entry("L", strategy.long)\n    strategy.exit("L_TP", "L", limit=close + _atr * tpATR, stop=close - _atr * slATR)\nif fireBear and barstate.isconfirmed\n    strategy.entry("S", strategy.short)\n    strategy.exit("S_TP", "S", limit=close - _atr * tpATR, stop=close + _atr * slATR)'
+  );
+
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 document.getElementById('unicorn-v3-code').textContent = UNICORN_V3;
 document.getElementById('unicorn-v4-code').textContent = UNICORN_V4;
+document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -3725,6 +3744,7 @@ const VERSION_DEFS = {
     { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
     { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
+    { key: 'u_v4s', date: '2026-07-13', sub: 'Strategy回測版 TP/SL ATR自動計算', contentId: 'unicorn-v4s-wrap', logId: 'unicorn-log-v4s' },
     { key: 'u_v4', date: '2026-07-13', sub: 'HTF MSS方向+OB精確度過濾 收盤確認', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
   ],
   dashboard: [
@@ -3806,7 +3826,7 @@ function tvc(key, el) {
 
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
-renderVerTabs('unicorn', 'u_v3');
+renderVerTabs('unicorn', 'u_v4s');
 renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
