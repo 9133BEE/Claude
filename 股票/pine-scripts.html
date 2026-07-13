@@ -246,7 +246,12 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
-        <div id="unicorn-log-v3" class="ver-log">
+        <div id="unicorn-log-v4" class="ver-log">
+          <span class="vl-dot">›</span> <b>訊號僅於K棒收盤確認</b>：label/alertcondition 加入 barstate.isconfirmed，消除盤中假訊號<br>
+          <span class="vl-dot">›</span> <b>max_labels_count 200→500</b>：修正標籤溢出導致進場訊號被覆蓋的問題<br>
+          <span class="vl-dot">›</span> 訊號標籤固定落在 K 棒低/高點，不受 OB 底部偏移影響
+        </div>
+        <div id="unicorn-log-v3" class="ver-log" style="display:none">
           <span class="vl-dot">›</span> <b>HQ評分修正</b>：第3項改用 OB 高低差 ≥ avgBody，排除幾乎永遠成立的假分<br>
           <span class="vl-dot">›</span> <b>進場區收窄</b>：需同時滿足 low≤OB頂 AND high≥OB底，避免只蜻蜓點水觸邊<br>
           <span class="vl-dot">›</span> 多空雙向同步修正，整體訊號品質提升
@@ -263,7 +268,10 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
-        <div id="unicorn-v3-wrap">
+        <div id="unicorn-v4-wrap">
+          <div class="code-block" id="unicorn-v4-code"></div>
+        </div>
+        <div id="unicorn-v3-wrap" style="display:none">
           <div class="code-block" id="unicorn-v3-code"></div>
         </div>
         <div id="unicorn-v2-wrap" style="display:none">
@@ -271,7 +279,7 @@ a:hover{text-decoration:underline}
         </div>
         <div id="unicorn-v1-wrap" style="display:none">
           <div class="code-block" id="unicorn-v1-code">//@version=5
-indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=200)
+indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)
 
 grp1 = "訂單塊設定"
 tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
@@ -1881,7 +1889,7 @@ function copyDashboard(btn, ver) {
 
 /* -- Unicorn Model v2.0 腳本 -- */
 const UNICORN_V2 = `//@version=5
-indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=200)
+indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)
 
 grp1 = "訂單塊設定"
 tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
@@ -2291,33 +2299,29 @@ if fireBull and fireBear
     fireBull := lastMSSDir >= 0
     fireBear := lastMSSDir < 0
 
-if fireBull
+if fireBull and barstate.isconfirmed
     if not allowRepeat
         array.set(bb_signaled, trigBullIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(bb_isHQ, trigBullIdx)
-    _obBot = array.get(bl, trigBullIdx)
-    _yPos  = math.min(low, _obBot)
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#1E88E5,0)
     _lt    = _isHQ ? "HQ UM⭡" : "UM⭡"
-    _lbl   = label.new(bar_index, _yPos, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
+    _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
 
-if fireBear
+if fireBear and barstate.isconfirmed
     if not allowRepeat
         array.set(rb_signaled, trigBearIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(rb_isHQ, trigBearIdx)
-    _obTop = array.get(rb, trigBearIdx)
-    _yPos  = math.max(high, _obTop)
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#FF8C00,0)
     _lt    = _isHQ ? "HQ UM⭣" : "UM⭣"
-    _lbl   = label.new(bar_index, _yPos, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
+    _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
 
-alertcondition(fireBull or fireBear, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
-alertcondition(fireBull,             title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
-alertcondition(fireBear,             title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
+alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
+alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
+alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
 
 bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
 
@@ -2553,7 +2557,7 @@ if showDash and barstate.islast
 
 /* ── Unicorn Model v3.0 腳本 ── */
 const UNICORN_V3 = `//@version=5
-indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=200)
+indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)
 
 grp1 = "訂單塊設定"
 tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
@@ -3002,33 +3006,29 @@ if fireBull and fireBear
     fireBull := lastMSSDir >= 0
     fireBear := lastMSSDir < 0
 
-if fireBull
+if fireBull and barstate.isconfirmed
     if not allowRepeat
         array.set(bb_signaled, trigBullIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(bb_isHQ, trigBullIdx)
-    _obBot = array.get(bl, trigBullIdx)
-    _yPos  = low
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#1E88E5,0)
     _lt    = _isHQ ? "HQ UM⭡" : "UM⭡"
-    _lbl   = label.new(bar_index, _yPos, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
+    _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
 
-if fireBear
+if fireBear and barstate.isconfirmed
     if not allowRepeat
         array.set(rb_signaled, trigBearIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(rb_isHQ, trigBearIdx)
-    _obTop = array.get(rb, trigBearIdx)
-    _yPos  = high
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#FF8C00,0)
     _lt    = _isHQ ? "HQ UM⭣" : "UM⭣"
-    _lbl   = label.new(bar_index, _yPos, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
+    _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
 
-alertcondition(fireBull or fireBear, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
-alertcondition(fireBull,             title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
-alertcondition(fireBear,             title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
+alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
+alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
+alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
 
 bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
 
@@ -3285,14 +3285,15 @@ if showDash and barstate.islast
     table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
+const UNICORN_V4 = UNICORN_V3;
+
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 document.getElementById('unicorn-v3-code').textContent = UNICORN_V3;
-
-
+document.getElementById('unicorn-v4-code').textContent = UNICORN_V4;
 
 function copyUnicornCode(btn) {
-  const ak = VER_ACTIVE.unicorn || 'u_v3';
-  const text = ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
+  const ak = VER_ACTIVE.unicorn || 'u_v4';
+  const text = ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -3715,6 +3716,7 @@ const VERSION_DEFS = {
     { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
     { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
+    { key: 'u_v4', date: '2026-07-13', sub: '訊號收盤確認 labels×500', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
