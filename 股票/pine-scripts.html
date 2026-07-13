@@ -252,8 +252,8 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> <b>使用方式</b>：貼上後圖表下方出現 Strategy Tester 分頁 → 查看勝率、最大回撤
         </div>
         <div id="unicorn-log-v4" class="ver-log">
-          <span class="vl-dot">›</span> <b>回退至 V2 邏輯</b>：HTF MSS 方向過濾與 OB 精確度過濾訊號太少，改回 V2 原始訊號邏輯<br>
-          <span class="vl-dot">›</span> V2 訊號頻率較高，適合實盤觀察，搭配個人判斷過濾方向
+          <span class="vl-dot">›</span> <b>訊號頻率恢復</b>：HTF PDA 確認預設關閉，訊號頻率回 V2 水準，可手動開啟加過濾<br>
+          <span class="vl-dot">›</span> <b>保留 V3 所有標示改進</b>：MSS 線置中、SWEEP 回溯偵測、barstate.isconfirmed、labels×500
         </div>
         <div id="unicorn-log-v3" class="ver-log" style="display:none">
           <span class="vl-dot">›</span> <b>HQ評分修正</b>：第3項改用 OB 高低差 ≥ avgBody，排除幾乎永遠成立的假分<br>
@@ -3299,7 +3299,11 @@ if showDash and barstate.islast
     table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
-const UNICORN_V4 = UNICORN_V2;
+const UNICORN_V4 = UNICORN_V3
+  .replace(
+    'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
+    'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
+  );
 
 const UNICORN_V4_STRAT = UNICORN_V3
   .replace(
@@ -3742,7 +3746,7 @@ const VERSION_DEFS = {
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
     { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
     { key: 'u_v4s', date: '2026-07-13', sub: 'Strategy回測版 TP/SL ATR自動計算', contentId: 'unicorn-v4s-wrap', logId: 'unicorn-log-v4s' },
-    { key: 'u_v4', date: '2026-07-13', sub: '回退V2邏輯 訊號頻率恢復', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
+    { key: 'u_v4', date: '2026-07-13', sub: 'V3標示+V2訊號頻率 HTF過濾預設關閉', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
