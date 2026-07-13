@@ -252,11 +252,8 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> <b>使用方式</b>：貼上後圖表下方出現 Strategy Tester 分頁 → 查看勝率、最大回撤
         </div>
         <div id="unicorn-log-v4" class="ver-log">
-          <span class="vl-dot">›</span> <b>HTF MSS方向過濾</b>：新增 htfMSSDir，要求 HTF 結構多頭才允許多方訊號、空頭才允許空方訊號，解決順勢問題<br>
-          <span class="vl-dot">›</span> <b>HTF OB精確度過濾</b>：htfOBPrecision(預設0.5)，只在OB底部半段觸發多方、頂部半段觸發空方<br>
-          <span class="vl-dot">›</span> <b>1M Pivot加嚴</b>：左5右3 → 左8右5，降低1分K假MSS觸發率<br>
-          <span class="vl-dot">›</span> <b>訊號僅於K棒收盤確認</b>：label/alertcondition 加入 barstate.isconfirmed，消除盤中假訊號<br>
-          <span class="vl-dot">›</span> <b>max_labels_count 200→500</b>：修正標籤溢出導致進場訊號被覆蓋的問題
+          <span class="vl-dot">›</span> <b>回退至 V2 邏輯</b>：HTF MSS 方向過濾與 OB 精確度過濾訊號太少，改回 V2 原始訊號邏輯<br>
+          <span class="vl-dot">›</span> V2 訊號頻率較高，適合實盤觀察，搭配個人判斷過濾方向
         </div>
         <div id="unicorn-log-v3" class="ver-log" style="display:none">
           <span class="vl-dot">›</span> <b>HQ評分修正</b>：第3項改用 OB 高低差 ≥ avgBody，排除幾乎永遠成立的假分<br>
@@ -3302,7 +3299,7 @@ if showDash and barstate.islast
     table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
-const UNICORN_V4 = UNICORN_V3;
+const UNICORN_V4 = UNICORN_V2;
 
 const UNICORN_V4_STRAT = UNICORN_V3
   .replace(
@@ -3745,7 +3742,7 @@ const VERSION_DEFS = {
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
     { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
     { key: 'u_v4s', date: '2026-07-13', sub: 'Strategy回測版 TP/SL ATR自動計算', contentId: 'unicorn-v4s-wrap', logId: 'unicorn-log-v4s' },
-    { key: 'u_v4', date: '2026-07-13', sub: 'HTF MSS方向+OB精確度過濾 收盤確認', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
+    { key: 'u_v4', date: '2026-07-13', sub: '回退V2邏輯 訊號頻率恢復', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
