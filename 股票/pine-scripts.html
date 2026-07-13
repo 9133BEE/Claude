@@ -247,9 +247,11 @@ a:hover{text-decoration:underline}
       </div>
       <div class="ver-main">
         <div id="unicorn-log-v4" class="ver-log">
+          <span class="vl-dot">›</span> <b>HTF MSS方向過濾</b>：新增 htfMSSDir，要求 HTF 結構多頭才允許多方訊號、空頭才允許空方訊號，解決順勢問題<br>
+          <span class="vl-dot">›</span> <b>HTF OB精確度過濾</b>：htfOBPrecision(預設0.5)，只在OB底部半段觸發多方、頂部半段觸發空方<br>
+          <span class="vl-dot">›</span> <b>1M Pivot加嚴</b>：左5右3 → 左8右5，降低1分K假MSS觸發率<br>
           <span class="vl-dot">›</span> <b>訊號僅於K棒收盤確認</b>：label/alertcondition 加入 barstate.isconfirmed，消除盤中假訊號<br>
-          <span class="vl-dot">›</span> <b>max_labels_count 200→500</b>：修正標籤溢出導致進場訊號被覆蓋的問題<br>
-          <span class="vl-dot">›</span> 訊號標籤固定落在 K 棒低/高點，不受 OB 底部偏移影響
+          <span class="vl-dot">›</span> <b>max_labels_count 200→500</b>：修正標籤溢出導致進場訊號被覆蓋的問題
         </div>
         <div id="unicorn-log-v3" class="ver-log" style="display:none">
           <span class="vl-dot">›</span> <b>HQ評分修正</b>：第3項改用 OB 高低差 ≥ avgBody，排除幾乎永遠成立的假分<br>
@@ -2572,7 +2574,8 @@ obTxtSize    = input.string("Small","OB文字大小",options=["Tiny","Small","No
 obTxtHAlign  = input.string("置中", "OB文字對齊",options=["置中","置左","置右"],          group=grp1)
 
 grp2 = "獨角獸模型"
-unicornNeedHTF = input.bool(false,"需要HTF PDA確認",group=grp2)
+unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需HTF為多方結構，空方訊號需HTF為空方結構，有效過濾逆勢假訊號")
+htfOBPrecision = input.float(0.5,"HTF OB 觸及精確度（0=全區間，0.5=靠支撐半段）",minval=0.0,maxval=1.0,step=0.1,group=grp2)
 unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
 allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
 sigCooldown    = input.int(5,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
@@ -2626,8 +2629,8 @@ _autoTfKey = switch timeframe.period
     => "1D"
 _tfKey = tfPreset == "Auto" ? _autoTfKey : tfPreset
 
-_pivL   = _tfKey=="1M"?5:_tfKey=="5M"?7:_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8:_tfKey=="1D"?5:pivL_m
-_pivR   = _tfKey=="1M"?3:_tfKey=="5M"?3:_tfKey=="15M"?5:_tfKey=="1H"?5:_tfKey=="4H"?4:_tfKey=="1D"?3:pivR_m
+_pivL   = _tfKey=="1M"?8:_tfKey=="5M"?7:_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8:_tfKey=="1D"?5:pivL_m
+_pivR   = _tfKey=="1M"?5:_tfKey=="5M"?3:_tfKey=="15M"?5:_tfKey=="1H"?5:_tfKey=="4H"?4:_tfKey=="1D"?3:pivR_m
 _bbSrch = _tfKey=="1M"?200:_tfKey=="5M"?150:_tfKey=="15M"?120:_tfKey=="1H"?100:_tfKey=="4H"?60:_tfKey=="1D"?30:bbSearchBars
 _obExtR = obExtR_m
 
@@ -2654,6 +2657,7 @@ f_htf_ob_setup() =>
     var float _lpH=na, var float _lpL=na
     var float _bTop=na, var float _bBot=na
     var float _rTop=na, var float _rBot=na
+    var int   _dir=0
     _ph = ta.pivothigh(high,5,5)
     _pl = ta.pivotlow(low,5,5)
     if not na(_ph)
@@ -2663,6 +2667,7 @@ f_htf_ob_setup() =>
     if not na(_lpH) and close > _lpH and not (close[1] > _lpH)
         _rTop := na
         _rBot := na
+        _dir  := 1
         for i = 1 to 20
             if close[i] < open[i]
                 _bTop := high[i]
@@ -2671,12 +2676,13 @@ f_htf_ob_setup() =>
     if not na(_lpL) and close < _lpL and not (close[1] < _lpL)
         _bTop := na
         _bBot := na
+        _dir  := -1
         for i = 1 to 20
             if close[i] > open[i]
                 _rTop := high[i]
                 _rBot := low[i]
                 break
-    [_bTop, _bBot, _rTop, _rBot]
+    [_bTop, _bBot, _rTop, _rBot, _dir]
 
 f_htf_fvg_setup() =>
     var float _bFvgT = na
@@ -2697,10 +2703,10 @@ f_htf_fvg_setup() =>
         _rFvgB := high[0]
     [_bFvgT, _bFvgB, _rFvgT, _rFvgB]
 
-[h1BT,h1BB,h1RT,h1RB] = request.security(syminfo.tickerid,"60",  f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
-[m5BT,m5BB,m5RT,m5RB] = request.security(syminfo.tickerid,"5",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
-[h4BT,h4BB,h4RT,h4RB] = request.security(syminfo.tickerid,"240", f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
-[d1BT,d1BB,d1RT,d1RB] = request.security(syminfo.tickerid,"D",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[h1BT,h1BB,h1RT,h1RB,h1MSSDir] = request.security(syminfo.tickerid,"60",  f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[m5BT,m5BB,m5RT,m5RB,m5MSSDir] = request.security(syminfo.tickerid,"5",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[h4BT,h4BB,h4RT,h4RB,h4MSSDir] = request.security(syminfo.tickerid,"240", f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[d1BT,d1BB,d1RT,d1RB,d1MSSDir] = request.security(syminfo.tickerid,"D",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
 
 [h1BFvgT,h1BFvgB,h1RFvgT,h1RFvgB] = request.security(syminfo.tickerid,"60",  f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
 [h4BFvgT,h4BFvgB,h4RFvgT,h4RFvgB] = request.security(syminfo.tickerid,"240", f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
@@ -2710,6 +2716,7 @@ htfBullTop = autoHTF=="60"?h1BT:autoHTF=="240"?h4BT:d1BT
 htfBullBot = autoHTF=="60"?h1BB:autoHTF=="240"?h4BB:d1BB
 htfBearTop = autoHTF=="60"?h1RT:autoHTF=="240"?h4RT:d1RT
 htfBearBot = autoHTF=="60"?h1RB:autoHTF=="240"?h4RB:d1RB
+htfMSSDir  = autoHTF=="60"?h1MSSDir:autoHTF=="240"?h4MSSDir:d1MSSDir
 
 phH = ta.pivothigh(high,_pivL,_pivR)
 plL = ta.pivotlow(low, _pivL,_pivR)
@@ -2918,8 +2925,10 @@ if bearMSS and lastMSSDir != -1
                     array.push(sigLabels,_hl), array.push(sigBars,bar_index)
             break
 
-inHTFBull = not na(htfBullTop) and not na(htfBullBot) and close >= htfBullBot and close <= htfBullTop
-inHTFBear = not na(htfBearTop) and not na(htfBearBot) and close >= htfBearBot and close <= htfBearTop
+_htfBullAllow = not na(htfBullTop) and not na(htfBullBot) ? htfBullBot + (htfBullTop - htfBullBot) * (1.0 - htfOBPrecision) : htfBullTop
+_htfBearAllow = not na(htfBearTop) and not na(htfBearBot) ? htfBearTop - (htfBearTop - htfBearBot) * (1.0 - htfOBPrecision) : htfBearBot
+inHTFBull = not na(htfBullTop) and not na(htfBullBot) and low >= htfBullBot and low <= _htfBullAllow and htfMSSDir == 1
+inHTFBear = not na(htfBearTop) and not na(htfBearBot) and high <= htfBearTop and high >= _htfBearAllow and htfMSSDir == -1
 htfOkBull = unicornNeedHTF ? inHTFBull : true
 htfOkBear = unicornNeedHTF ? inHTFBear : true
 
@@ -3716,7 +3725,7 @@ const VERSION_DEFS = {
     { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
     { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
-    { key: 'u_v4', date: '2026-07-13', sub: '訊號收盤確認 labels×500', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
+    { key: 'u_v4', date: '2026-07-13', sub: 'HTF MSS方向+OB精確度過濾 收盤確認', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
