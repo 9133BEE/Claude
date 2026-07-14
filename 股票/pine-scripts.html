@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -2792,7 +2792,9 @@ var int     lastAnySigBar = -999
 avgBody = ta.sma(math.abs(close-open),20)
 rng50   = ta.highest(high,50) - ta.lowest(low,50)
 mid50   = ta.lowest(low,50) + rng50*0.5
-var int lastMSSDir = 0
+var int   lastMSSDir    = 0
+var float _lastBullOBPh = na
+var float _lastBearOBPl = na
 
 f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
 
@@ -2846,11 +2848,14 @@ f_bear_shift(toGrey = false) =>
     array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
     array.shift(rb_fvgT), array.shift(rb_fvgB)
     array.shift(rb_signaled), array.shift(rb_isHQ)
-
-if bullMSS and lastMSSDir != 1
+_prevMSSDir = lastMSSDir
+if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
+    _lastBullOBPh := ph1
+    _lastBearOBPl := na
     lastMSSDir := 1
-    while array.size(rb) > 0
-        f_bear_shift(true)
+    if _prevMSSDir != 1
+        while array.size(rb) > 0
+            f_bear_shift(true)
     if array.size(bb) >= maxOBs
         f_bull_shift()
     for i = 1 to _bbSrch
@@ -2897,10 +2902,13 @@ if bullMSS and lastMSSDir != 1
                     array.push(sigLabels,_hl), array.push(sigBars,bar_index)
             break
 
-if bearMSS and lastMSSDir != -1
+if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
+    _lastBearOBPl := pl1
+    _lastBullOBPh := na
     lastMSSDir := -1
-    while array.size(bb) > 0
-        f_bull_shift(true)
+    if _prevMSSDir != -1
+        while array.size(bb) > 0
+            f_bull_shift(true)
     if array.size(rb) >= maxOBs
         f_bear_shift()
     for i = 1 to _bbSrch
