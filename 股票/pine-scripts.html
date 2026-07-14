@@ -294,7 +294,7 @@ a:hover{text-decoration:underline}
         </div>
         <div id="unicorn-v1-wrap" style="display:none">
           <div class="code-block" id="unicorn-v1-code">//@version=5
-indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)
+indicator("Unicorn Model HQOB (V1)", overlay=true, max_boxes_count=500, max_labels_count=500)
 
 grp1 = "訂單塊設定"
 tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
@@ -1904,7 +1904,7 @@ function copyDashboard(btn, ver) {
 
 /* -- Unicorn Model v2.0 腳本 -- */
 const UNICORN_V2 = `//@version=5
-indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)
+indicator("Unicorn Model HQOB (V2)", overlay=true, max_boxes_count=500, max_labels_count=500)
 
 grp1 = "訂單塊設定"
 tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
@@ -2572,7 +2572,7 @@ if showDash and barstate.islast
 
 /* ── Unicorn Model v3.0 腳本 ── */
 const UNICORN_V3 = `//@version=5
-indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)
+indicator("Unicorn Model HQOB (V3)", overlay=true, max_boxes_count=500, max_labels_count=500)
 
 grp1 = "訂單塊設定"
 tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
@@ -3328,17 +3328,17 @@ const UNICORN_V6 = UNICORN_V3
   .replace(
     'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
     'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
-  );
-
+  )
+  .replace('Unicorn Model HQOB (V3)', 'Unicorn Model HQOB (V6)');
 const UNICORN_V4 = UNICORN_V3
   .replace(
     'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
     'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
-  );
-
+  )
+  .replace('Unicorn Model HQOB (V3)', 'Unicorn Model HQOB (V4)');
 const UNICORN_V4_STRAT = UNICORN_V3
   .replace(
-    'indicator("Unicorn Model HQOB", overlay=true, max_boxes_count=500, max_labels_count=500)',
+    'indicator("Unicorn Model HQOB (V3)", overlay=true, max_boxes_count=500, max_labels_count=500)',
     'strategy("Unicorn V4 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.percent, commission_value=0.05)\n\ngrpS   = "Strategy回測設定"\ntpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)\nslATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)\natrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)'
   )
   .replace(
