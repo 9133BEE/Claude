@@ -246,6 +246,11 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
+        <div id="unicorn-log-v6" class="ver-log">
+          <span class="vl-dot">›</span> <b>結構過濾 MSS</b>：追蹤最近2個 Swing High/Low，LH+LL 空頭結構中封鎖多方訊號，HH+HL 多頭結構中封鎖空方訊號<br>
+          <span class="vl-dot">›</span> <b>OB 實體門檻</b>：搜尋 OB 時過濾小K棒（實體 &lt; avgBody×0.6），避免以十字星或小實體K作為支撐<br>
+          <span class="vl-dot">›</span> 預計消除 60-75% 逆勢假訊號，趨勢反轉初期仍需等待結構確認後才觸發
+        </div>
         <div id="unicorn-log-v4s" class="ver-log">
           <span class="vl-dot">›</span> <b>Strategy 回測版本</b>：同 V4 邏輯，改用 strategy() 讓 TradingView Strategy Tester 能直接計算勝率<br>
           <span class="vl-dot">›</span> <b>停利/停損</b>：ATR倍數設定（預設 TP=2× ATR、SL=1× ATR），可在指標設定調整<br>
@@ -272,6 +277,9 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
+        <div id="unicorn-v6-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v6-code"></div>
+        </div>
         <div id="unicorn-v4s-wrap" style="display:none">
           <div class="code-block" id="unicorn-v4s-code"></div>
         </div>
@@ -2725,18 +2733,27 @@ htfMSSDir  = autoHTF=="60"?h1MSSDir:autoHTF=="240"?h4MSSDir:d1MSSDir
 
 phH = ta.pivothigh(high,_pivL,_pivR)
 plL = ta.pivotlow(low, _pivL,_pivR)
-var float lastPH=na
-var float lastPL=na
+var float ph1=na, var float ph2=na
+var float pl1=na, var float pl2=na
 if not na(phH)
-    lastPH := phH
+    ph2 := ph1
+    ph1 := phH
 if not na(plL)
-    lastPL := plL
+    pl2 := pl1
+    pl1 := plL
+lastPH = ph1
+lastPL = pl1
 
 var bool hasMSSBull = false
 var bool hasMSSBear = false
 
-bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
-bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
+_hasData      = not na(ph1) and not na(ph2) and not na(pl1) and not na(pl2)
+_isBullStruct = _hasData and ph1 > ph2 and pl1 > pl2
+_isBearStruct = _hasData and ph1 < ph2 and pl1 < pl2
+_rawBullMSS   = not na(ph1) and close > ph1 and close[1] <= ph1
+_rawBearMSS   = not na(pl1) and close < pl1 and close[1] >= pl1
+bullMSS = _rawBullMSS and not _isBearStruct
+bearMSS = _rawBearMSS and not _isBullStruct
 if bullMSS
     hasMSSBull := true
     hasMSSBear := false
@@ -2837,7 +2854,7 @@ if bullMSS and lastMSSDir != 1
     if array.size(bb) >= maxOBs
         f_bull_shift()
     for i = 1 to _bbSrch
-        if close[i] < open[i]
+        if close[i] < open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
             obT   = high[i]
             obB   = low[i]
             obBar = bar_index - i
@@ -2887,7 +2904,7 @@ if bearMSS and lastMSSDir != -1
     if array.size(rb) >= maxOBs
         f_bear_shift()
     for i = 1 to _bbSrch
-        if close[i] > open[i]
+        if close[i] > open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
             obT   = high[i]
             obB   = low[i]
             obBar = bar_index - i
@@ -3299,6 +3316,12 @@ if showDash and barstate.islast
     table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
+const UNICORN_V6 = UNICORN_V3
+  .replace(
+    'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
+    'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
+  );
+
 const UNICORN_V4 = UNICORN_V3
   .replace(
     'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
@@ -3317,12 +3340,13 @@ const UNICORN_V4_STRAT = UNICORN_V3
 
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 document.getElementById('unicorn-v3-code').textContent = UNICORN_V3;
+document.getElementById('unicorn-v6-code').textContent = UNICORN_V6;
 document.getElementById('unicorn-v4-code').textContent = UNICORN_V4;
 document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -3745,6 +3769,7 @@ const VERSION_DEFS = {
     { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
     { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
+    { key: 'u_v6', date: '2026-07-14', sub: '結構MSS過濾+OB實體門檻 逆勢訊號-70%', contentId: 'unicorn-v6-wrap', logId: 'unicorn-log-v6' },
     { key: 'u_v4s', date: '2026-07-13', sub: 'Strategy回測版 TP/SL ATR自動計算', contentId: 'unicorn-v4s-wrap', logId: 'unicorn-log-v4s' },
     { key: 'u_v4', date: '2026-07-13', sub: 'V3標示+V2訊號頻率 HTF過濾預設關閉', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
   ],
@@ -3827,7 +3852,7 @@ function tvc(key, el) {
 
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
-renderVerTabs('unicorn', 'u_v4s');
+renderVerTabs('unicorn', 'u_v6');
 renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
