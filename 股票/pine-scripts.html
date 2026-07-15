@@ -759,8 +759,8 @@ if showDash and barstate.islast
     </div>
     <div class="ver-log" style="margin:10px 0">
       <span class="vl-dot">›</span> <b>商品專屬參數預設</b>：商品類型下拉(NQ/ES/GC/EURUSD-6E)+套用預設開關,開啟後覆蓋時段字串/確認窗口/實體比例,皆為起始建議值,非保證有效,務必自行回測調整<br>
-      <span class="vl-dot">›</span> <b>結構偵測(BOS/CHOCH)</b>：ta.pivothigh/pivotlow抓擺盪高低點,延續原趨勢的突破標BOS、反轉標CHOCH,pivot根數可調<br>
-      <span class="vl-dot">›</span> <b>Order Block / FVG</b>：三根K棒缺口自動畫框,回補後變灰;OB為動能K棒(實體比例+ATR位移門檻)前最後一根反向K棒的簡化判斷<br>
+      <span class="vl-dot">›</span> <b>結構偵測(BOS/CHOCH)</b>：ta.pivothigh/pivotlow抓擺盪高低點,從被突破的swing畫實際水平線到突破當根(BOS實線、CHOCH虛線),線末端保留ATR偏移小標籤輔助辨識,不是只靠文字標籤讓人腦補位置<br>
+      <span class="vl-dot">›</span> <b>Order Block / FVG</b>：三根K棒缺口改用頂/底兩條平行線表示區間(不再是實心方框填色),線條樣式(實線/虛線)可調且OB/FVG共用同一設定;FVG回補後線變灰,OB被完全貫穿則直接失效刪除<br>
       <span class="vl-dot">›</span> <b>月線關鍵價位</b>：新增前一月高低 PMH/PML,比照原本PDH/PDL/PWH/PWL的畫法<br>
       <span class="vl-dot">›</span> <b>RSI/OBV背離</b>：獨立於CVD背離之外另計,CVD/RSI/OBV三個來源在儀表板分開列出各自是否成立,不合併成單一籠統背離<br>
       <span class="vl-dot">›</span> <b>儀表板風險數據</b>：新增「距昨日高低%」(目前價格在前一日區間的相對位置)與ATR(14),輔助自行抓部位大小<br>
@@ -4002,14 +4002,15 @@ chochColor    = input.color(color.new(color.red, 0), "CHOCH顏色", group="結�
 
 // ========================= Order Block / FVG =========================
 enableFVG        = input.bool(true, "顯示FVG缺口", group="Order Block / FVG")
-fvgBullColor     = input.color(color.new(color.blue, 70), "多方FVG顏色", group="Order Block / FVG")
-fvgBearColor     = input.color(color.new(color.red, 70), "空方FVG顏色", group="Order Block / FVG")
-fvgFilledColor   = input.color(color.new(color.gray, 85), "已回補顏色", group="Order Block / FVG")
+fvgBullColor     = input.color(color.new(color.blue, 20), "多方FVG顏色", group="Order Block / FVG")
+fvgBearColor     = input.color(color.new(color.red, 20), "空方FVG顏色", group="Order Block / FVG")
+fvgFilledColor   = input.color(color.new(color.gray, 50), "已回補顏色", group="Order Block / FVG")
 enableOB         = input.bool(true, "顯示Order Block(簡化判斷)", group="Order Block / FVG", tooltip="Order Block判斷為簡化版:動能K棒(實體比例高且相對ATR有明顯位移)之前最後一根反向K棒,並非真實訂單簿/機構持倉資料,僅供結構參考")
 obImpulseBodyRatio = input.float(0.6, "動能K棒最小實體比例", minval=0.0, maxval=1.0, step=0.05, group="Order Block / FVG")
 obDisplaceATRMult  = input.float(1.2, "動能K棒位移門檻(ATR倍數)", minval=0.1, maxval=5.0, step=0.1, group="Order Block / FVG")
-obBullColor      = input.color(color.new(color.aqua, 70), "多方OB顏色", group="Order Block / FVG")
-obBearColor      = input.color(color.new(color.maroon, 70), "空方OB顏色", group="Order Block / FVG")
+obBullColor      = input.color(color.new(color.aqua, 20), "多方OB顏色", group="Order Block / FVG")
+obBearColor      = input.color(color.new(color.maroon, 20), "空方OB顏色", group="Order Block / FVG")
+obfvgLineStyleInput = input.string("實線", "區間線條樣式(OB/FVG共用)", options=["實線", "虛線"], group="Order Block / FVG")
 maxFVGBoxes      = input.int(20, "最多保留FVG數量", minval=5, maxval=100, group="Order Block / FVG")
 maxOBBoxes       = input.int(20, "最多保留OB數量", minval=5, maxval=100, group="Order Block / FVG")
 
@@ -4036,6 +4037,7 @@ dashTextSize = dashTextSizeInput == "tiny" ? size.tiny : dashTextSizeInput == "s
 // ATR用於訊號標籤的動態間距(依商品/週期波動度自動抓合理偏移量,不用固定點數避免不同商品比例失真)
 atr14       = ta.atr(14)
 labelOffset = atr14 * 0.3
+obfvgLineStyle = obfvgLineStyleInput == "實線" ? line.style_solid : line.style_dashed
 
 // ========================= 亞洲盤 =========================
 inAsian = not na(time(timeframe.period, asianSessFinal, tzInput))
@@ -4191,20 +4193,26 @@ plotshape(showRsiObvLabels and obvBearDiv ? high : na, title="OBV背離(空)", s
 plotshape(showRsiObvLabels and obvBullDiv ? low : na, title="OBV背離(多)", style=shape.triangleup, location=location.belowbar, color=color.new(color.fuchsia, 0), size=size.tiny)
 
 // ========================= BOS/CHOCH 結構偵測(簡化版) =========================
+// BOS/CHOCH以實際水平線呈現(從被突破的swing pivot畫到突破當根),不是只靠文字標籤讓人自己腦補位置
+// BOS用實線、CHOCH用虛線,線末端保留小標籤(沿用ATR偏移)輔助辨識名稱
 ph = ta.pivothigh(high, pivotLenInput, pivotLenInput)
 pl = ta.pivotlow(low, pivotLenInput, pivotLenInput)
 
-var float swingHighLevel  = na
-var float swingLowLevel   = na
-var bool  swingHighBroken = true
-var bool  swingLowBroken  = true
-var string structTrend    = "尚未定義"
+var float swingHighLevel    = na
+var float swingLowLevel     = na
+var int   swingHighBarIndex = na
+var int   swingLowBarIndex  = na
+var bool  swingHighBroken   = true
+var bool  swingLowBroken    = true
+var string structTrend      = "尚未定義"
 
 if not na(ph)
     swingHighLevel := ph
+    swingHighBarIndex := bar_index - pivotLenInput
     swingHighBroken := false
 if not na(pl)
     swingLowLevel := pl
+    swingLowBarIndex := bar_index - pivotLenInput
     swingLowBroken := false
 
 breakUp   = enableStructure and not na(swingHighLevel) and not swingHighBroken and close > swingHighLevel
@@ -4232,17 +4240,24 @@ if breakDown
     structTrend := "空頭結構"
 
 if enableStructure and bosUp
+    line.new(swingHighBarIndex, swingHighLevel, bar_index, swingHighLevel, color=bosColor, style=line.style_solid, width=2)
     label.new(bar_index, high + labelOffset, "BOS", style=label.style_label_down, color=bosColor, textcolor=color.white, size=size.tiny)
 if enableStructure and chochUp
+    line.new(swingHighBarIndex, swingHighLevel, bar_index, swingHighLevel, color=chochColor, style=line.style_dashed, width=2)
     label.new(bar_index, high + labelOffset, "CHOCH", style=label.style_label_down, color=chochColor, textcolor=color.white, size=size.tiny)
 if enableStructure and bosDown
+    line.new(swingLowBarIndex, swingLowLevel, bar_index, swingLowLevel, color=bosColor, style=line.style_solid, width=2)
     label.new(bar_index, low - labelOffset, "BOS", style=label.style_label_up, color=bosColor, textcolor=color.white, size=size.tiny)
 if enableStructure and chochDown
+    line.new(swingLowBarIndex, swingLowLevel, bar_index, swingLowLevel, color=chochColor, style=line.style_dashed, width=2)
     label.new(bar_index, low - labelOffset, "CHOCH", style=label.style_label_up, color=chochColor, textcolor=color.white, size=size.tiny)
 
 // ========================= FVG(三根K棒缺口,簡化判斷) =========================
-var array<box> bullFVGBoxes = array.new<box>()
-var array<box> bearFVGBoxes = array.new<box>()
+// 改用兩條平行水平線(頂/底)表示區間,不再用實心box填色;回補後線變灰並停止延伸,樣式(實線/虛線)可調,與OB共用同一個設定
+var array<line> bullFVGTopLines = array.new<line>()
+var array<line> bullFVGBotLines = array.new<line>()
+var array<line> bearFVGTopLines = array.new<line>()
+var array<line> bearFVGBotLines = array.new<line>()
 
 fvgBullCond = enableFVG and low > high[2]
 fvgBearCond = enableFVG and high < low[2]
@@ -4250,44 +4265,59 @@ fvgBearCond = enableFVG and high < low[2]
 if fvgBullCond
     topFVG = low
     botFVG = high[2]
-    newFVG = box.new(bar_index - 2, topFVG, bar_index, botFVG, border_color=color.new(fvgBullColor, 40), bgcolor=fvgBullColor)
-    array.push(bullFVGBoxes, newFVG)
-    if array.size(bullFVGBoxes) > maxFVGBoxes
-        box.delete(array.shift(bullFVGBoxes))
+    fvgTopLine = line.new(bar_index - 2, topFVG, bar_index, topFVG, color=fvgBullColor, style=obfvgLineStyle, width=1)
+    fvgBotLine = line.new(bar_index - 2, botFVG, bar_index, botFVG, color=fvgBullColor, style=obfvgLineStyle, width=1)
+    array.push(bullFVGTopLines, fvgTopLine)
+    array.push(bullFVGBotLines, fvgBotLine)
+    if array.size(bullFVGTopLines) > maxFVGBoxes
+        line.delete(array.shift(bullFVGTopLines))
+        line.delete(array.shift(bullFVGBotLines))
 
 if fvgBearCond
     topFVG2 = low[2]
     botFVG2 = high
-    newFVG2 = box.new(bar_index - 2, topFVG2, bar_index, botFVG2, border_color=color.new(fvgBearColor, 40), bgcolor=fvgBearColor)
-    array.push(bearFVGBoxes, newFVG2)
-    if array.size(bearFVGBoxes) > maxFVGBoxes
-        box.delete(array.shift(bearFVGBoxes))
+    fvgTopLine2 = line.new(bar_index - 2, topFVG2, bar_index, topFVG2, color=fvgBearColor, style=obfvgLineStyle, width=1)
+    fvgBotLine2 = line.new(bar_index - 2, botFVG2, bar_index, botFVG2, color=fvgBearColor, style=obfvgLineStyle, width=1)
+    array.push(bearFVGTopLines, fvgTopLine2)
+    array.push(bearFVGBotLines, fvgBotLine2)
+    if array.size(bearFVGTopLines) > maxFVGBoxes
+        line.delete(array.shift(bearFVGTopLines))
+        line.delete(array.shift(bearFVGBotLines))
 
-if array.size(bullFVGBoxes) > 0
-    for i = array.size(bullFVGBoxes) - 1 to 0
-        b = array.get(bullFVGBoxes, i)
-        topB = box.get_top(b)
-        if low <= topB
-            box.set_bgcolor(b, fvgFilledColor)
-            box.set_border_color(b, color.new(color.gray, 50))
-            array.remove(bullFVGBoxes, i)
+if array.size(bullFVGTopLines) > 0
+    for i = array.size(bullFVGTopLines) - 1 to 0
+        topL = array.get(bullFVGTopLines, i)
+        botL = array.get(bullFVGBotLines, i)
+        topPrice = line.get_price(topL, bar_index)
+        if low <= topPrice
+            line.set_color(topL, fvgFilledColor)
+            line.set_color(botL, fvgFilledColor)
+            array.remove(bullFVGTopLines, i)
+            array.remove(bullFVGBotLines, i)
         else
-            box.set_right(b, bar_index)
+            line.set_x2(topL, bar_index)
+            line.set_x2(botL, bar_index)
 
-if array.size(bearFVGBoxes) > 0
-    for i = array.size(bearFVGBoxes) - 1 to 0
-        b = array.get(bearFVGBoxes, i)
-        botB = box.get_bottom(b)
-        if high >= botB
-            box.set_bgcolor(b, fvgFilledColor)
-            box.set_border_color(b, color.new(color.gray, 50))
-            array.remove(bearFVGBoxes, i)
+if array.size(bearFVGTopLines) > 0
+    for i = array.size(bearFVGTopLines) - 1 to 0
+        topL = array.get(bearFVGTopLines, i)
+        botL = array.get(bearFVGBotLines, i)
+        botPrice = line.get_price(botL, bar_index)
+        if high >= botPrice
+            line.set_color(topL, fvgFilledColor)
+            line.set_color(botL, fvgFilledColor)
+            array.remove(bearFVGTopLines, i)
+            array.remove(bearFVGBotLines, i)
         else
-            box.set_right(b, bar_index)
+            line.set_x2(topL, bar_index)
+            line.set_x2(botL, bar_index)
 
 // ========================= Order Block(簡化判斷:動能K棒前最後一根反向K棒) =========================
-var array<box> bullOBBoxes = array.new<box>()
-var array<box> bearOBBoxes = array.new<box>()
+// 同樣改用頂/底兩條平行線表示OB區間,不疊實心填色;完全被收盤價貫穿視為失效,直接刪除線段
+var array<line> bullOBTopLines = array.new<line>()
+var array<line> bullOBBotLines = array.new<line>()
+var array<line> bearOBTopLines = array.new<line>()
+var array<line> bearOBBotLines = array.new<line>()
 
 displacement = math.abs(close - close[1])
 impulseUp    = close > open and bodyRatio >= obImpulseBodyRatio and displacement >= atr14 * obDisplaceATRMult
@@ -4297,36 +4327,50 @@ obBullCond = enableOB and impulseUp and close[1] < open[1]
 obBearCond = enableOB and impulseDown and close[1] > open[1]
 
 if obBullCond
-    newOB = box.new(bar_index - 1, high[1], bar_index, low[1], border_color=color.new(obBullColor, 40), bgcolor=obBullColor)
-    array.push(bullOBBoxes, newOB)
-    if array.size(bullOBBoxes) > maxOBBoxes
-        box.delete(array.shift(bullOBBoxes))
+    obTopLine = line.new(bar_index - 1, high[1], bar_index, high[1], color=obBullColor, style=obfvgLineStyle, width=1)
+    obBotLine = line.new(bar_index - 1, low[1], bar_index, low[1], color=obBullColor, style=obfvgLineStyle, width=1)
+    array.push(bullOBTopLines, obTopLine)
+    array.push(bullOBBotLines, obBotLine)
+    if array.size(bullOBTopLines) > maxOBBoxes
+        line.delete(array.shift(bullOBTopLines))
+        line.delete(array.shift(bullOBBotLines))
 
 if obBearCond
-    newOB2 = box.new(bar_index - 1, high[1], bar_index, low[1], border_color=color.new(obBearColor, 40), bgcolor=obBearColor)
-    array.push(bearOBBoxes, newOB2)
-    if array.size(bearOBBoxes) > maxOBBoxes
-        box.delete(array.shift(bearOBBoxes))
+    obTopLine2 = line.new(bar_index - 1, high[1], bar_index, high[1], color=obBearColor, style=obfvgLineStyle, width=1)
+    obBotLine2 = line.new(bar_index - 1, low[1], bar_index, low[1], color=obBearColor, style=obfvgLineStyle, width=1)
+    array.push(bearOBTopLines, obTopLine2)
+    array.push(bearOBBotLines, obBotLine2)
+    if array.size(bearOBTopLines) > maxOBBoxes
+        line.delete(array.shift(bearOBTopLines))
+        line.delete(array.shift(bearOBBotLines))
 
-if array.size(bullOBBoxes) > 0
-    for i = array.size(bullOBBoxes) - 1 to 0
-        b = array.get(bullOBBoxes, i)
-        obB = box.get_bottom(b)
-        if close < obB
-            box.delete(b)
-            array.remove(bullOBBoxes, i)
+if array.size(bullOBTopLines) > 0
+    for i = array.size(bullOBTopLines) - 1 to 0
+        topL = array.get(bullOBTopLines, i)
+        botL = array.get(bullOBBotLines, i)
+        obBotPrice = line.get_price(botL, bar_index)
+        if close < obBotPrice
+            line.delete(topL)
+            line.delete(botL)
+            array.remove(bullOBTopLines, i)
+            array.remove(bullOBBotLines, i)
         else
-            box.set_right(b, bar_index)
+            line.set_x2(topL, bar_index)
+            line.set_x2(botL, bar_index)
 
-if array.size(bearOBBoxes) > 0
-    for i = array.size(bearOBBoxes) - 1 to 0
-        b = array.get(bearOBBoxes, i)
-        obT = box.get_top(b)
-        if close > obT
-            box.delete(b)
-            array.remove(bearOBBoxes, i)
+if array.size(bearOBTopLines) > 0
+    for i = array.size(bearOBTopLines) - 1 to 0
+        topL = array.get(bearOBTopLines, i)
+        botL = array.get(bearOBBotLines, i)
+        obTopPrice = line.get_price(topL, bar_index)
+        if close > obTopPrice
+            line.delete(topL)
+            line.delete(botL)
+            array.remove(bearOBTopLines, i)
+            array.remove(bearOBBotLines, i)
         else
-            box.set_right(b, bar_index)
+            line.set_x2(topL, bar_index)
+            line.set_x2(botL, bar_index)
 
 // ========================= 多層確認訊號 =========================
 // 三層獨立證據,缺一不觸發:
