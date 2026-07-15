@@ -124,7 +124,7 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="supset" onclick="filt('supset',this)">SUP SET</button>
   <button class="filter-btn" data-cat="strategy" onclick="filt('strategy',this)">回測工具</button>
   <button class="filter-btn" data-cat="entry" onclick="filt('entry',this)">進場模型</button>
-  <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">AMDX訂單流</button>
+  <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">ATO訂單流</button>
 </div>
 
 <div class="grid" id="grid">
@@ -741,12 +741,12 @@ if showDash and barstate.islast
   </div>
 </div>
 
-<!-- ─── AMDX V1 ─── -->
+<!-- ─── ATO V1 ─── -->
 <div class="scard" data-cat="amdx">
   <div class="scard-header">
     <span class="scard-badge badge-dmi">AMDX主指標</span>
     <div class="scard-meta">
-      <div class="scard-title">AMDX V1</div>
+      <div class="scard-title">ATO V1</div>
       <div class="scard-desc">AMDX時段框(Accumulation/Manipulation/Distribution) + TDA日/週/月關鍵價位 + CVD/Delta近似訂單流 + 多層確認訊號,擴充商品專屬預設、BOS/CHOCH結構偵測、Order Block/FVG自動標示、RSI/OBV背離、風險儀表板</div>
     </div>
   </div>
@@ -770,16 +770,16 @@ if showDash and barstate.islast
       <h4>誠實揭露(務必閱讀)</h4>
       <p>BOS/CHOCH、Order Block都是用pivot高低點與K棒實體比例/ATR位移門檻做的簡化判斷,不是機構訂單簿或真正逐筆成交資料,強趨勢或低流動性時段可能延遲或誤判。RSI/OBV背離用固定回看根數比較高低點,不是嚴格pivot對pivot的常規背離。CVD/Delta同樣是近似值(靠K棒收盤位置推算),Pine Script沒有真正的bid/ask footprint資料。多層確認訊號只是把雜訊訊號濾掉,不代表任何保證勝率——真實表現請用下方的Strategy Tester回測版,對你實際要交易的商品與週期分開跑歷史數據。</p>
     </div>
-    <button class="copy-bar-btn" onclick="copyAmdxV1(this)" style="margin-top:10px">一鍵複製腳本</button>
-    <div class="code-block" id="amdx-v1-code"></div>
+    <button class="copy-bar-btn" onclick="copyAtoV1(this)" style="margin-top:10px">一鍵複製腳本</button>
+    <div class="code-block" id="ato-v1-code"></div>
   </div>
 </div>
 
-<!-- ─── AMDX V1s ─── -->
+<!-- ─── ATO V1s ─── -->
 <div class="scard" data-cat="strategy">
   <div class="scard-header">
     <span class="scard-badge" style="background:#0ea5e9;color:#fff">回測</span>
-    <span class="scard-title">AMDX V1s</span>
+    <span class="scard-title">ATO V1s</span>
   </div>
   <div class="scard-body">
     <div class="ver-log">
@@ -789,8 +789,8 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>部位大小</b>：固定口數或風險百分比(依每點/每檔價值換算口數)兩種模式可選<br>
       <span class="vl-dot">›</span> 想知道這套邏輯的真實勝率,自己對NQ/ES/GC/FX分開回測、分開檢查不同年份區間,過去表現不保證未來,務必留意樣本數與是否過擬合
     </div>
-    <button class="copy-bar-btn" onclick="copyAmdxV1s(this)">一鍵複製腳本</button>
-    <div class="code-block" id="amdx-v1s-code"></div>
+    <button class="copy-bar-btn" onclick="copyAtoV1s(this)">一鍵複製腳本</button>
+    <div class="code-block" id="ato-v1s-code"></div>
   </div>
 </div>
 
@@ -3935,9 +3935,9 @@ function copyStrategy(btn) {
   });
 }
 
-/* -- AMDX V1 (主指標) -- */
-const AMDX_V1 = `//@version=6
-indicator("AMDX V1", overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+/* -- ATO V1 (主指標) -- */
+const ATO_V1 = `//@version=6
+indicator("ATO V1", overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
 
 // ========================= 時區與自動模式 =========================
 tzInput  = input.string("Asia/Taipei", "時區(僅用於判斷時段)", options=["Asia/Taipei", "America/New_York", "Europe/London", "UTC", "Asia/Shanghai", "Asia/Tokyo"], group="時區與自動模式")
@@ -4445,9 +4445,9 @@ if showDashboard and barstate.islast
     table.cell(dash, 1, 10, obvDivText, text_color = (obvBearDiv or obvBullDiv) ? color.fuchsia : color.gray, text_size=dashTextSize)
 `;
 
-/* -- AMDX V1s (Strategy Tester 回測版) -- */
-const AMDX_V1S = `//@version=6
-strategy("AMDX V1s", overlay=true, initial_capital=100000, default_qty_type=strategy.fixed, default_qty_value=1, max_boxes_count=500, max_labels_count=500, calc_on_every_tick=false)
+/* -- ATO V1s (Strategy Tester 回測版) -- */
+const ATO_V1S = `//@version=6
+strategy("ATO V1s", overlay=true, initial_capital=100000, default_qty_type=strategy.fixed, default_qty_value=1, max_boxes_count=500, max_labels_count=500, calc_on_every_tick=false)
 
 // ========================= 時區與時段 =========================
 tzInput    = input.string("Asia/Taipei", "時區(僅用於判斷時段)", options=["Asia/Taipei", "America/New_York", "Europe/London", "UTC", "Asia/Shanghai", "Asia/Tokyo"], group="時區與時段")
@@ -4564,18 +4564,18 @@ plot(longInvalidLevel, "多單失效位", color=color.new(color.lime, 40), style
 plot(shortInvalidLevel, "空單失效位", color=color.new(color.fuchsia, 40), style=plot.style_linebr)
 `;
 
-document.getElementById('amdx-v1-code').textContent = AMDX_V1;
-document.getElementById('amdx-v1s-code').textContent = AMDX_V1S;
+document.getElementById('ato-v1-code').textContent = ATO_V1;
+document.getElementById('ato-v1s-code').textContent = ATO_V1S;
 
-function copyAmdxV1(btn) {
-  navigator.clipboard.writeText(AMDX_V1).then(() => {
+function copyAtoV1(btn) {
+  navigator.clipboard.writeText(ATO_V1).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
   });
 }
 
-function copyAmdxV1s(btn) {
-  navigator.clipboard.writeText(AMDX_V1S).then(() => {
+function copyAtoV1s(btn) {
+  navigator.clipboard.writeText(ATO_V1S).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
   });
