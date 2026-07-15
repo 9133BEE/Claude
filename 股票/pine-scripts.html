@@ -3985,12 +3985,13 @@ function renderVerTabs(cardKey, activeKey) {
   if (!visible.length) return;
   const activeVer = visible.find(v => v.key === activeKey) || visible[visible.length - 1];
   VER_ACTIVE[cardKey] = activeVer.key;
-  // display newest first (reverse), but number from oldest (original index)
+  // display newest first (reverse); label derived from key (u_v8s → V8s)
   vtabs.innerHTML = [...visible].reverse().map(v => {
     const i = visible.indexOf(v);
     const isLatest = i === visible.length - 1;
     const isActive = v.key === activeVer.key;
-    return `<button class="ver-tab${isActive ? ' active' : ''}" onclick="switchVer('${cardKey}','${v.key}',this)"><span class="ver-check-btn" data-ver-key="${v.key}" onclick="event.stopPropagation();tvc('${v.key}',this)">☐</span>V${i + 1}${isLatest ? ' <span class="ver-latest-badge">最新</span>' : ''}<span class="ver-del-btn" onclick="event.stopPropagation();delVer('${cardKey}','${v.key}')" title="移除版本">🗑</span><span class="ver-sub">${v.date}</span><span class="ver-sub">${v.sub}</span></button>`;
+    const verLabel = v.key.replace(/^[a-z]_v/, 'V');
+    return `<button class="ver-tab${isActive ? ' active' : ''}" onclick="switchVer('${cardKey}','${v.key}',this)"><span class="ver-check-btn" data-ver-key="${v.key}" onclick="event.stopPropagation();tvc('${v.key}',this)">☐</span>${verLabel}${isLatest ? ' <span class="ver-latest-badge">最新</span>' : ''}<span class="ver-del-btn" onclick="event.stopPropagation();delVer('${cardKey}','${v.key}')" title="移除版本">🗑</span><span class="ver-sub">${v.date}</span><span class="ver-sub">${v.sub}</span></button>`;
   }).join('');
   vtabs.querySelectorAll('.ver-check-btn[data-ver-key]').forEach(el => {
     if (localStorage.getItem('verok_' + el.dataset.verKey) === '1') {
