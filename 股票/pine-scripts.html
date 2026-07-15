@@ -3461,6 +3461,7 @@ const UNICORN_V4_STRAT = UNICORN_V3
     '_atr = ta.atr(atrLen)\nif fireBull and barstate.isconfirmed\n    strategy.entry("L", strategy.long)\n    strategy.exit("L_TP", "L", limit=close + _atr * tpATR, stop=close - _atr * slATR)\nif fireBear and barstate.isconfirmed\n    strategy.entry("S", strategy.short)\n    strategy.exit("S_TP", "S", limit=close - _atr * tpATR, stop=close + _atr * slATR)\n\nbgcolor(showBgColor and unicornBull'
   );
 
+document.getElementById('unicorn-v7-code').textContent = UNICORN_V7;
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 document.getElementById('unicorn-v3-code').textContent = UNICORN_V3;
 document.getElementById('unicorn-v6-code').textContent = UNICORN_V6;
