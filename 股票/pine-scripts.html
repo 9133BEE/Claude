@@ -4033,6 +4033,10 @@ showConfirm     = enableConfirmSignal and (not autoMode or tfSec <= 300)
 dashPosition = dashPositionInput == "右上" ? position.top_right : dashPositionInput == "右下" ? position.bottom_right : dashPositionInput == "左上" ? position.top_left : position.bottom_left
 dashTextSize = dashTextSizeInput == "tiny" ? size.tiny : dashTextSizeInput == "small" ? size.small : size.normal
 
+// ATR用於訊號標籤的動態間距(依商品/週期波動度自動抓合理偏移量,不用固定點數避免不同商品比例失真)
+atr14       = ta.atr(14)
+labelOffset = atr14 * 0.3
+
 // ========================= 亞洲盤 =========================
 inAsian = not na(time(timeframe.period, asianSessFinal, tzInput))
 var box   asianBox = na
@@ -4047,7 +4051,7 @@ if inAsian and not asianWasIn
     asianLo := low
     asianBox := showSessions ? box.new(bar_index, high, bar_index, low, border_color=color.new(accumColor, 60), bgcolor=accumColor) : na
     if showSessions and showSessionLabels
-        label.new(bar_index, high, "Accumulation", style=label.style_label_down, color=color.new(accumColor, 40), textcolor=color.white, size=size.small)
+        label.new(bar_index, high + labelOffset, "Accumulation", style=label.style_label_down, color=color.new(accumColor, 40), textcolor=color.white, size=size.small)
 if inAsian
     asianHi := math.max(asianHi, high)
     asianLo := math.min(asianLo, low)
@@ -4072,7 +4076,7 @@ if inLondon and not londonWasIn
     londonLo := low
     londonBox := showSessions ? box.new(bar_index, high, bar_index, low, border_color=color.new(manipColor, 60), bgcolor=manipColor) : na
     if showSessions and showSessionLabels
-        label.new(bar_index, high, "Manipulation", style=label.style_label_down, color=color.new(manipColor, 40), textcolor=color.white, size=size.small)
+        label.new(bar_index, high + labelOffset, "Manipulation", style=label.style_label_down, color=color.new(manipColor, 40), textcolor=color.white, size=size.small)
 if inLondon
     londonHi := math.max(londonHi, high)
     londonLo := math.min(londonLo, low)
@@ -4094,7 +4098,7 @@ if inNY and not nyWasIn
     nyLo := low
     nyBox := showSessions ? box.new(bar_index, high, bar_index, low, border_color=color.new(distColor, 60), bgcolor=distColor) : na
     if showSessions and showSessionLabels
-        label.new(bar_index, low, "Distribution / Expansion", style=label.style_label_up, color=color.new(distColor, 40), textcolor=color.white, size=size.small)
+        label.new(bar_index, low - labelOffset, "Distribution / Expansion", style=label.style_label_up, color=color.new(distColor, 40), textcolor=color.white, size=size.small)
 if inNY
     nyHi := math.max(nyHi, high)
     nyLo := math.min(nyLo, low)
@@ -4109,9 +4113,9 @@ sweepLow  = inLondon and not na(asianLowFixed) and low < asianLowFixed and close
 sweepHigh = inLondon and not na(asianHighFixed) and high > asianHighFixed and close < asianHighFixed
 
 if showSessions and showSweepMarks and sweepLow
-    label.new(bar_index, low, "Sweep Low", style=label.style_label_up, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
+    label.new(bar_index, low - labelOffset, "Sweep Low", style=label.style_label_up, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
 if showSessions and showSweepMarks and sweepHigh
-    label.new(bar_index, high, "Sweep High", style=label.style_label_down, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
+    label.new(bar_index, high + labelOffset, "Sweep High", style=label.style_label_down, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
 
 // ========================= TDA 日/週/月 高低 =========================
 [pdh, pdl] = request.security(syminfo.tickerid, "D", [high[1], low[1]], lookahead=barmerge.lookahead_off)
@@ -4155,7 +4159,6 @@ buyVol  = range_ == 0 ? volume / 2 : volume * (close - low) / range_
 sellVol = volume - buyVol
 delta   = buyVol - sellVol
 cvd     = ta.cum(delta)
-atr14   = ta.atr(14)
 
 body      = math.abs(close - open)
 barRange  = high - low
@@ -4229,13 +4232,13 @@ if breakDown
     structTrend := "空頭結構"
 
 if enableStructure and bosUp
-    label.new(bar_index, high, "BOS", style=label.style_label_down, color=bosColor, textcolor=color.white, size=size.tiny)
+    label.new(bar_index, high + labelOffset, "BOS", style=label.style_label_down, color=bosColor, textcolor=color.white, size=size.tiny)
 if enableStructure and chochUp
-    label.new(bar_index, high, "CHOCH", style=label.style_label_down, color=chochColor, textcolor=color.white, size=size.tiny)
+    label.new(bar_index, high + labelOffset, "CHOCH", style=label.style_label_down, color=chochColor, textcolor=color.white, size=size.tiny)
 if enableStructure and bosDown
-    label.new(bar_index, low, "BOS", style=label.style_label_up, color=bosColor, textcolor=color.white, size=size.tiny)
+    label.new(bar_index, low - labelOffset, "BOS", style=label.style_label_up, color=bosColor, textcolor=color.white, size=size.tiny)
 if enableStructure and chochDown
-    label.new(bar_index, low, "CHOCH", style=label.style_label_up, color=chochColor, textcolor=color.white, size=size.tiny)
+    label.new(bar_index, low - labelOffset, "CHOCH", style=label.style_label_up, color=chochColor, textcolor=color.white, size=size.tiny)
 
 // ========================= FVG(三根K棒缺口,簡化判斷) =========================
 var array<box> bullFVGBoxes = array.new<box>()
@@ -4369,9 +4372,9 @@ longConfirm  = showConfirm and longConfirmRaw
 shortConfirm = showConfirm and shortConfirmRaw
 
 if longConfirm
-    label.new(bar_index, low, "多方確認", style=label.style_label_up, color=longConfirmColor, textcolor=color.white, size=size.small)
+    label.new(bar_index, low - labelOffset, "多方確認", style=label.style_label_up, color=longConfirmColor, textcolor=color.white, size=size.small)
 if shortConfirm
-    label.new(bar_index, high, "空方確認", style=label.style_label_down, color=shortConfirmColor, textcolor=color.white, size=size.small)
+    label.new(bar_index, high + labelOffset, "空方確認", style=label.style_label_down, color=shortConfirmColor, textcolor=color.white, size=size.small)
 
 // ========================= Webhook JSON 警報 =========================
 alertcondition(longConfirmRaw, title="多方確認訊號", message="{\\"symbol\\":\\"{{ticker}}\\",\\"action\\":\\"long_confirm\\",\\"price\\":{{close}},\\"time\\":\\"{{time}}\\"}")
