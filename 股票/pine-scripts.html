@@ -247,6 +247,15 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
+        <div id="unicorn-log-v8s" class="ver-log">
+          <span class="vl-dot">›</span> <b>Strategy Tester 版（基於 V8）</b>：SMC狀態機+PB+OB位置修正，可直接在 TradingView Strategy Tester 計算勝率<br>
+          <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）
+        </div>
+        <div id="unicorn-log-v8" class="ver-log">
+          <span class="vl-dot">›</span> <b>SMC 狀態機結構偵測</b>：改用 LuxAlgo 式 _smcTrend 狀態機（≠1才觸發bullMSS），CHoCH判斷與 SMC 指標完全一致<br>
+          <span class="vl-dot">›</span> <b>消除雙重判斷延遲</b>：不再需要等到 HH+HL 或 LH+LL 各兩個 pivot 確認，一次結構轉換立即有效<br>
+          <span class="vl-dot">›</span> 繼承 V7 全部功能：CHoCH-only OB登記、PB推進塊、OB位置修正（swing low/high K棒）
+        </div>
         <div id="unicorn-log-v7s" class="ver-log">
           <span class="vl-dot">›</span> <b>Strategy Tester 版（基於 V7）</b>：CHoCH修正+PB+OB位置修正，可直接在 TradingView Strategy Tester 計算勝率<br>
           <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）
@@ -287,6 +296,12 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
+        <div id="unicorn-v8s-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v8s-code"></div>
+        </div>
+        <div id="unicorn-v8-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v8-code"></div>
+        </div>
         <div id="unicorn-v7s-wrap" style="display:none">
           <div class="code-block" id="unicorn-v7s-code"></div>
         </div>
@@ -2825,13 +2840,15 @@ lastPL = pl1
 var bool hasMSSBull = false
 var bool hasMSSBear = false
 
-_hasData      = not na(ph1) and not na(ph2) and not na(pl1) and not na(pl2)
-_isBullStruct = _hasData and ph1 > ph2 and pl1 > pl2
-_isBearStruct = _hasData and ph1 < ph2 and pl1 < pl2
-_rawBullMSS   = not na(ph1) and close > ph1 and close[1] <= ph1
-_rawBearMSS   = not na(pl1) and close < pl1 and close[1] >= pl1
-bullMSS = _rawBullMSS and (_isBearStruct or not _hasData)
-bearMSS = _rawBearMSS and (_isBullStruct or not _hasData)
+var int _smcTrend = 0
+_rawBullMSS   = not na(lastPH) and close > lastPH and close[1] <= lastPH
+_rawBearMSS   = not na(lastPL) and close < lastPL and close[1] >= lastPL
+bullMSS = _rawBullMSS and _smcTrend != 1
+bearMSS = _rawBearMSS and _smcTrend != -1
+if _rawBullMSS
+    _smcTrend := 1
+if _rawBearMSS
+    _smcTrend := -1
 if bullMSS
     hasMSSBull := true
     hasMSSBear := false
@@ -3471,6 +3488,23 @@ const UNICORN_V7_STRAT = UNICORN_V7
     '_atr = ta.atr(atrLen)\nif fireBull and barstate.isconfirmed\n    strategy.entry("L", strategy.long)\n    strategy.exit("L_TP", "L", limit=close + _atr * tpATR, stop=close - _atr * slATR)\nif fireBear and barstate.isconfirmed\n    strategy.entry("S", strategy.short)\n    strategy.exit("S_TP", "S", limit=close - _atr * tpATR, stop=close + _atr * slATR)\n\nbgcolor(showBgColor and unicornBull'
   );
 
+const UNICORN_V8 = UNICORN_V3
+  .replace(
+    'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
+    'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
+  )
+  .replace('Unicorn Model HQOB (V3)', 'Unicorn Model HQOB (V8)');
+
+const UNICORN_V8_STRAT = UNICORN_V8
+  .replace(
+    'indicator("Unicorn Model HQOB (V8)", overlay=true, max_boxes_count=500, max_labels_count=500)',
+    'strategy("Unicorn V8 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.percent, commission_value=0.05)\n\ngrpS   = "Strategy回測設定"\ntpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)\nslATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)\natrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)'
+  )
+  .replace(
+    'bgcolor(showBgColor and unicornBull',
+    '_atr = ta.atr(atrLen)\nif fireBull and barstate.isconfirmed\n    strategy.entry("L", strategy.long)\n    strategy.exit("L_TP", "L", limit=close + _atr * tpATR, stop=close - _atr * slATR)\nif fireBear and barstate.isconfirmed\n    strategy.entry("S", strategy.short)\n    strategy.exit("S_TP", "S", limit=close - _atr * tpATR, stop=close + _atr * slATR)\n\nbgcolor(showBgColor and unicornBull'
+  );
+
 const UNICORN_V4 = UNICORN_V3
   .replace(
     'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
@@ -3487,6 +3521,8 @@ const UNICORN_V4_STRAT = UNICORN_V3
     '_atr = ta.atr(atrLen)\nif fireBull and barstate.isconfirmed\n    strategy.entry("L", strategy.long)\n    strategy.exit("L_TP", "L", limit=close + _atr * tpATR, stop=close - _atr * slATR)\nif fireBear and barstate.isconfirmed\n    strategy.entry("S", strategy.short)\n    strategy.exit("S_TP", "S", limit=close - _atr * tpATR, stop=close + _atr * slATR)\n\nbgcolor(showBgColor and unicornBull'
   );
 
+document.getElementById('unicorn-v8-code').textContent = UNICORN_V8;
+document.getElementById('unicorn-v8s-code').textContent = UNICORN_V8_STRAT;
 document.getElementById('unicorn-v7-code').textContent = UNICORN_V7;
 document.getElementById('unicorn-v7s-code').textContent = UNICORN_V7_STRAT;
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
@@ -3497,7 +3533,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v8s' ? UNICORN_V8_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -3925,6 +3961,8 @@ const VERSION_DEFS = {
     { key: 'u_v6', date: '2026-07-14', sub: '結構MSS過濾+OB實體門檻 逆勢訊號-70%', contentId: 'unicorn-v6-wrap', logId: 'unicorn-log-v6' },
     { key: 'u_v7', date: '2026-07-15', sub: 'CHoCH修正+PB推進塊 OB位置修正', contentId: 'unicorn-v7-wrap', logId: 'unicorn-log-v7' },
     { key: 'u_v7s', date: '2026-07-15', sub: 'V7 Strategy回測版 CHoCH+PB+OB位置', contentId: 'unicorn-v7s-wrap', logId: 'unicorn-log-v7s' },
+    { key: 'u_v8', date: '2026-07-15', sub: 'SMC狀態機結構偵測 與LuxAlgo一致', contentId: 'unicorn-v8-wrap', logId: 'unicorn-log-v8' },
+    { key: 'u_v8s', date: '2026-07-15', sub: 'V8 Strategy回測版', contentId: 'unicorn-v8s-wrap', logId: 'unicorn-log-v8s' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
@@ -4005,7 +4043,7 @@ function tvc(key, el) {
 
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
-renderVerTabs('unicorn', 'u_v7');
+renderVerTabs('unicorn', 'u_v8s');
 renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
