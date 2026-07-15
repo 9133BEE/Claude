@@ -247,6 +247,11 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
+        <div id="unicorn-log-v7" class="ver-log">
+          <span class="vl-dot">›</span> <b>CHoCH 修正</b>：只有真正的結構轉換（空頭結構中向上突破 / 多頭結構中向下突破）才登記OB，消除 BOS 假訊號<br>
+          <span class="vl-dot">›</span> <b>推進塊 PB</b>：OB 被確認後回測時畫出第二個訂單塊（推進塊），提供更高品質的二次進場機會<br>
+          <span class="vl-dot">›</span> HTF過濾預設關閉，可手動開啟做額外確認
+        </div>
         <div id="unicorn-log-v6" class="ver-log">
           <span class="vl-dot">›</span> <b>結構過濾 MSS</b>：追蹤最近2個 Swing High/Low，LH+LL 空頭結構中封鎖多方訊號，HH+HL 多頭結構中封鎖空方訊號<br>
           <span class="vl-dot">›</span> <b>OB 實體門檻</b>：搜尋 OB 時過濾小K棒（實體 &lt; avgBody×0.6），避免以十字星或小實體K作為支撐<br>
@@ -278,6 +283,9 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
+        <div id="unicorn-v7-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v7-code"></div>
+        </div>
         <div id="unicorn-v6-wrap" style="display:none">
           <div class="code-block" id="unicorn-v6-code"></div>
         </div>
@@ -2197,7 +2205,7 @@ if bullMSS and lastMSSDir != 1
     if array.size(bb) >= maxOBs
         f_bull_shift()
     for i = 1 to _bbSrch
-        if close[i] < open[i]
+        if low[i] == lastPL
             obT   = high[i]
             obB   = low[i]
             obBar = bar_index - i
@@ -2242,7 +2250,7 @@ if bearMSS and lastMSSDir != -1
     if array.size(rb) >= maxOBs
         f_bear_shift()
     for i = 1 to _bbSrch
-        if close[i] > open[i]
+        if high[i] == lastPH
             obT   = high[i]
             obB   = low[i]
             obBar = bar_index - i
@@ -2806,8 +2814,8 @@ _isBullStruct = _hasData and ph1 > ph2 and pl1 > pl2
 _isBearStruct = _hasData and ph1 < ph2 and pl1 < pl2
 _rawBullMSS   = not na(ph1) and close > ph1 and close[1] <= ph1
 _rawBearMSS   = not na(pl1) and close < pl1 and close[1] >= pl1
-bullMSS = _rawBullMSS and not _isBearStruct
-bearMSS = _rawBearMSS and not _isBullStruct
+bullMSS = _rawBullMSS and (_isBearStruct or not _hasData)
+bearMSS = _rawBearMSS and (_isBullStruct or not _hasData)
 if bullMSS
     hasMSSBull := true
     hasMSSBear := false
@@ -2825,6 +2833,9 @@ var box[]   bb_fbox     = array.new_box()
 var box[]   bb_hqbox    = array.new_box()
 var bool[]  bb_signaled = array.new_bool()
 var bool[]  bb_isHQ     = array.new_bool()
+var bool[]  bb_pbDep    = array.new_bool()
+var bool[]  bb_pbSig    = array.new_bool()
+var box[]   bb_pbbox    = array.new_box()
 
 var float[] rb          = array.new_float()
 var float[] rl          = array.new_float()
@@ -2836,6 +2847,9 @@ var box[]   rb_fbox     = array.new_box()
 var box[]   rb_hqbox    = array.new_box()
 var bool[]  rb_signaled = array.new_bool()
 var bool[]  rb_isHQ     = array.new_bool()
+var bool[]  rb_pbDep    = array.new_bool()
+var bool[]  rb_pbSig    = array.new_bool()
+var box[]   rb_pbbox    = array.new_box()
 var box[]   bb_dead     = array.new_box()
 var box[]   rb_dead     = array.new_box()
 
@@ -2880,6 +2894,10 @@ f_bull_shift(toGrey = false) =>
     array.shift(bb), array.shift(bl), array.shift(bb_hasFVG)
     array.shift(bb_fvgT), array.shift(bb_fvgB)
     array.shift(bb_signaled), array.shift(bb_isHQ)
+    _pbBx2 = array.shift(bb_pbbox)
+    if not na(_pbBx2)
+        box.delete(_pbBx2)
+    array.shift(bb_pbDep), array.shift(bb_pbSig)
 
 f_bear_shift(toGrey = false) =>
     _bx = array.shift(rb_box)
@@ -2902,6 +2920,10 @@ f_bear_shift(toGrey = false) =>
     array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
     array.shift(rb_fvgT), array.shift(rb_fvgB)
     array.shift(rb_signaled), array.shift(rb_isHQ)
+    _pbBx3 = array.shift(rb_pbbox)
+    if not na(_pbBx3)
+        box.delete(_pbBx3)
+    array.shift(rb_pbDep), array.shift(rb_pbSig)
 _prevMSSDir = lastMSSDir
 if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
     _lastBullOBPh := ph1
@@ -2934,6 +2956,7 @@ if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
                 array.push(bb_hasFVG, fvgOk)
                 array.push(bb_fvgT, fvgT), array.push(bb_fvgB, fvgB)
                 array.push(bb_signaled, false), array.push(bb_isHQ, isHQ)
+                array.push(bb_pbDep, false), array.push(bb_pbSig, false), array.push(bb_pbbox, na)
                 if showBull
                     _bc = isHQ?color.new(#9C27B0,0):color.new(#1E88E5,0)
                     _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#1E88E5,obFillTransp)
@@ -2987,6 +3010,7 @@ if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
                 array.push(rb_hasFVG, fvgOk)
                 array.push(rb_fvgT, fvgT), array.push(rb_fvgB, fvgB)
                 array.push(rb_signaled, false), array.push(rb_isHQ, isHQ)
+                array.push(rb_pbDep, false), array.push(rb_pbSig, false), array.push(rb_pbbox, na)
                 if showBear
                     _bc = isHQ?color.new(#9C27B0,0):color.new(#FF8C00,0)
                     _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#FF8C00,obFillTransp)
@@ -3056,6 +3080,21 @@ if array.size(bb) > 0 and lastMSSDir == 1
             if zone and htfOkBull
                 unicornBull := true
                 trigBullIdx := i
+        pbDep = array.get(bb_pbDep, i)
+        pbSig = array.get(bb_pbSig, i)
+        pbBx  = array.get(bb_pbbox, i)
+        if not na(pbBx)
+            box.set_right(pbBx, bar_index + _obExtR)
+        if signaled and close > obT and not pbDep
+            array.set(bb_pbDep, i, true)
+        if pbDep and not pbSig and close >= obB
+            inOBpb = low <= obT and high >= obB
+            if inOBpb and htfOkBull
+                _pbT = math.max(open, close)
+                _pbB = math.min(open, close)
+                _pbBx4 = box.new(bar_index, _pbT, bar_index + _obExtR, _pbB, border_color=color.new(#00BCD4,0), bgcolor=color.new(#00BCD4,75), border_width=1, border_style=line.style_dashed, text="+PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
+                array.set(bb_pbbox, i, _pbBx4)
+                array.set(bb_pbSig, i, true)
 
 if array.size(rb) > 0 and lastMSSDir == -1
     for i = 0 to array.size(rb)-1
@@ -3088,6 +3127,21 @@ if array.size(rb) > 0 and lastMSSDir == -1
             if zone and htfOkBear
                 unicornBear := true
                 trigBearIdx := i
+        pbDepR = array.get(rb_pbDep, i)
+        pbSigR = array.get(rb_pbSig, i)
+        pbBxR  = array.get(rb_pbbox, i)
+        if not na(pbBxR)
+            box.set_right(pbBxR, bar_index + _obExtR)
+        if signaled and close < obB and not pbDepR
+            array.set(rb_pbDep, i, true)
+        if pbDepR and not pbSigR and close <= obT
+            inOBpbR = high >= obB and low <= obT
+            if inOBpbR and htfOkBear
+                _pbTR = math.max(open, close)
+                _pbBR = math.min(open, close)
+                _pbBx5 = box.new(bar_index, _pbTR, bar_index + _obExtR, _pbBR, border_color=color.new(#FF5252,0), bgcolor=color.new(#FF5252,75), border_width=1, border_style=line.style_dashed, text="-PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
+                array.set(rb_pbbox, i, _pbBx5)
+                array.set(rb_pbSig, i, true)
 
 uBullEdge = unicornBull and not unicornBull[1]
 uBearEdge = unicornBear and not unicornBear[1]
@@ -3384,6 +3438,13 @@ const UNICORN_V6 = UNICORN_V3
     'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
   )
   .replace('Unicorn Model HQOB (V3)', 'Unicorn Model HQOB (V6)');
+
+const UNICORN_V7 = UNICORN_V3
+  .replace(
+    'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
+    'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
+  )
+  .replace('Unicorn Model HQOB (V3)', 'Unicorn Model HQOB (V7)');
 const UNICORN_V4 = UNICORN_V3
   .replace(
     'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
@@ -3408,7 +3469,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -3831,6 +3892,7 @@ const VERSION_DEFS = {
     { key: 'u_v1', date: '2026-07-06', sub: '出場警示版',      contentId: 'unicorn-v1-wrap', logId: 'unicorn-log-v1' },
     { key: 'u_v2', date: '2026-07-09', sub: '669行 sigCooldown', contentId: 'unicorn-v2-wrap', logId: 'unicorn-log-v2' },
     { key: 'u_v3', date: '2026-07-12', sub: 'SSL/BSL濾網 理論勝率~73%', contentId: 'unicorn-v3-wrap', logId: 'unicorn-log-v3' },
+    { key: 'u_v7', date: '2026-07-15', sub: 'CHoCH修正+PB推進塊 HTF過濾預設關閉', contentId: 'unicorn-v7-wrap', logId: 'unicorn-log-v7' },
     { key: 'u_v6', date: '2026-07-14', sub: '結構MSS過濾+OB實體門檻 逆勢訊號-70%', contentId: 'unicorn-v6-wrap', logId: 'unicorn-log-v6' },
     { key: 'u_v4s', date: '2026-07-13', sub: 'Strategy回測版 TP/SL ATR自動計算', contentId: 'unicorn-v4s-wrap', logId: 'unicorn-log-v4s' },
     { key: 'u_v4', date: '2026-07-13', sub: 'V3標示+V2訊號頻率 HTF過濾預設關閉', contentId: 'unicorn-v4-wrap', logId: 'unicorn-log-v4' },
@@ -3914,7 +3976,7 @@ function tvc(key, el) {
 
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
-renderVerTabs('unicorn', 'u_v6');
+renderVerTabs('unicorn', 'u_v7');
 renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
