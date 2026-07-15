@@ -392,7 +392,7 @@ barsPerDay = math.max(1, math.round(86400 / timeframe.in_seconds()))
 sigBarsMax = sigDays * barsPerDay
 tfStr = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":timeframe.period=="D"?"日":timeframe.period=="W"?"週":timeframe.period+"T"
 autoHTF = switch timeframe.period
-    "1" => "240" ; "3" => "240" ; "5" => "240" ; "15" => "240"
+    "1" => "60" ; "3" => "60" ; "5" => "60" ; "15" => "240"
     "30" => "240" ; "45" => "240" ; "60" => "D" ; "120" => "D"
     "240" => "W" ; "D" => "W" => "W"
 htfStr = autoHTF=="60"?"1H":autoHTF=="240"?"4H":autoHTF=="D"?"日":"週"
@@ -2059,9 +2059,9 @@ sigBarsMax = sigDays * barsPerDay
 tfStr = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":timeframe.period=="D"?"日":timeframe.period=="W"?"週":timeframe.period+"T"
 
 autoHTF = switch timeframe.period
-    "1"   => "240"
-    "3"   => "240"
-    "5"   => "240"
+    "1"   => "60"
+    "3"   => "60"
+    "5"   => "60"
     "15"  => "240"
     "30"  => "240"
     "45"  => "240"
@@ -2746,9 +2746,9 @@ sigBarsMax = sigDays * barsPerDay
 tfStr = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":timeframe.period=="D"?"日":timeframe.period=="W"?"週":timeframe.period+"T"
 
 autoHTF = switch timeframe.period
-    "1"   => "240"
-    "3"   => "240"
-    "5"   => "240"
+    "1"   => "60"
+    "3"   => "60"
+    "5"   => "60"
     "15"  => "240"
     "30"  => "240"
     "45"  => "240"
