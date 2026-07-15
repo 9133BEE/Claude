@@ -247,6 +247,10 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
+        <div id="unicorn-log-v7s" class="ver-log">
+          <span class="vl-dot">›</span> <b>Strategy Tester 版（基於 V7）</b>：CHoCH修正+PB+OB位置修正，可直接在 TradingView Strategy Tester 計算勝率<br>
+          <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）
+        </div>
         <div id="unicorn-log-v7" class="ver-log">
           <span class="vl-dot">›</span> <b>CHoCH 修正</b>：只有真正的結構轉換（空頭結構中向上突破 / 多頭結構中向下突破）才登記OB，消除 BOS 假訊號<br>
           <span class="vl-dot">›</span> <b>推進塊 PB</b>：OB 被確認後回測時畫出第二個訂單塊（推進塊），提供更高品質的二次進場機會<br>
@@ -283,6 +287,9 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 1H/4H/1D 多時框OB+FVG方框、Auto時框偵測、9欄儀表板
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
+        <div id="unicorn-v7s-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v7s-code"></div>
+        </div>
         <div id="unicorn-v7-wrap" style="display:none">
           <div class="code-block" id="unicorn-v7-code"></div>
         </div>
@@ -2160,6 +2167,8 @@ avgBody = ta.sma(math.abs(close-open),20)
 rng50   = ta.highest(high,50) - ta.lowest(low,50)
 mid50   = ta.lowest(low,50) + rng50*0.5
 var int lastMSSDir = 0
+var float _lastBullOBPh = na
+var float _lastBearOBPl = na
 
 f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
 
@@ -2198,10 +2207,14 @@ f_bear_shift() =>
     array.shift(rb_fvgT), array.shift(rb_fvgB)
     array.shift(rb_signaled), array.shift(rb_isHQ)
 
-if bullMSS and lastMSSDir != 1
+_prevMSSDir = lastMSSDir
+if bullMSS and (na(_lastBullOBPh) or lastPH > _lastBullOBPh)
+    _lastBullOBPh := lastPH
+    _lastBearOBPl := na
     lastMSSDir := 1
-    while array.size(rb) > 0
-        f_bear_shift()
+    if _prevMSSDir != 1
+        while array.size(rb) > 0
+            f_bear_shift()
     if array.size(bb) >= maxOBs
         f_bull_shift()
     for i = 1 to _bbSrch
@@ -2243,10 +2256,13 @@ if bullMSS and lastMSSDir != 1
                     array.push(sigLabels,_hl), array.push(sigBars,bar_index)
             break
 
-if bearMSS and lastMSSDir != -1
+if bearMSS and (na(_lastBearOBPl) or lastPL < _lastBearOBPl)
+    _lastBearOBPl := lastPL
+    _lastBullOBPh := na
     lastMSSDir := -1
-    while array.size(bb) > 0
-        f_bull_shift()
+    if _prevMSSDir != -1
+        while array.size(bb) > 0
+            f_bull_shift()
     if array.size(rb) >= maxOBs
         f_bear_shift()
     for i = 1 to _bbSrch
@@ -3445,6 +3461,16 @@ const UNICORN_V7 = UNICORN_V3
     'unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認'
   )
   .replace('Unicorn Model HQOB (V3)', 'Unicorn Model HQOB (V7)');
+const UNICORN_V7_STRAT = UNICORN_V7
+  .replace(
+    'indicator("Unicorn Model HQOB (V7)", overlay=true, max_boxes_count=500, max_labels_count=500)',
+    'strategy("Unicorn V7 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.percent, commission_value=0.05)\n\ngrpS   = "Strategy回測設定"\ntpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)\nslATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)\natrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)'
+  )
+  .replace(
+    'bgcolor(showBgColor and unicornBull',
+    '_atr = ta.atr(atrLen)\nif fireBull and barstate.isconfirmed\n    strategy.entry("L", strategy.long)\n    strategy.exit("L_TP", "L", limit=close + _atr * tpATR, stop=close - _atr * slATR)\nif fireBear and barstate.isconfirmed\n    strategy.entry("S", strategy.short)\n    strategy.exit("S_TP", "S", limit=close - _atr * tpATR, stop=close + _atr * slATR)\n\nbgcolor(showBgColor and unicornBull'
+  );
+
 const UNICORN_V4 = UNICORN_V3
   .replace(
     'unicornNeedHTF = input.bool(true, "需要HTF PDA+MSS確認',
@@ -3462,6 +3488,7 @@ const UNICORN_V4_STRAT = UNICORN_V3
   );
 
 document.getElementById('unicorn-v7-code').textContent = UNICORN_V7;
+document.getElementById('unicorn-v7s-code').textContent = UNICORN_V7_STRAT;
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
 document.getElementById('unicorn-v3-code').textContent = UNICORN_V3;
 document.getElementById('unicorn-v6-code').textContent = UNICORN_V6;
@@ -3470,7 +3497,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -3897,6 +3924,7 @@ const VERSION_DEFS = {
     { key: 'u_v4s', date: '2026-07-13', sub: 'Strategy回測版 TP/SL ATR自動計算', contentId: 'unicorn-v4s-wrap', logId: 'unicorn-log-v4s' },
     { key: 'u_v6', date: '2026-07-14', sub: '結構MSS過濾+OB實體門檻 逆勢訊號-70%', contentId: 'unicorn-v6-wrap', logId: 'unicorn-log-v6' },
     { key: 'u_v7', date: '2026-07-15', sub: 'CHoCH修正+PB推進塊 OB位置修正', contentId: 'unicorn-v7-wrap', logId: 'unicorn-log-v7' },
+    { key: 'u_v7s', date: '2026-07-15', sub: 'V7 Strategy回測版 CHoCH+PB+OB位置', contentId: 'unicorn-v7s-wrap', logId: 'unicorn-log-v7s' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
