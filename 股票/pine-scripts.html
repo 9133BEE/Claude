@@ -124,6 +124,7 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="supset" onclick="filt('supset',this)">SUP SET</button>
   <button class="filter-btn" data-cat="strategy" onclick="filt('strategy',this)">回測工具</button>
   <button class="filter-btn" data-cat="entry" onclick="filt('entry',this)">進場模型</button>
+  <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">AMDX訂單流</button>
 </div>
 
 <div class="grid" id="grid">
@@ -737,6 +738,59 @@ if showDash and barstate.islast
     </div>
     <button class="copy-bar-btn" onclick="copyEntryModel(this)" style="margin-top:10px">一鍵複製腳本</button>
     <div class="code-block" id="entry-model-code"></div>
+  </div>
+</div>
+
+<!-- ─── AMDX V1 ─── -->
+<div class="scard" data-cat="amdx">
+  <div class="scard-header">
+    <span class="scard-badge badge-dmi">AMDX主指標</span>
+    <div class="scard-meta">
+      <div class="scard-title">AMDX V1</div>
+      <div class="scard-desc">AMDX時段框(Accumulation/Manipulation/Distribution) + TDA日/週/月關鍵價位 + CVD/Delta近似訂單流 + 多層確認訊號,擴充商品專屬預設、BOS/CHOCH結構偵測、Order Block/FVG自動標示、RSI/OBV背離、風險儀表板</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">NQ / ES / GC / EURUSD(6E)</div></div>
+      <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">AMDX / TDA / CVD / BOS-CHOCH / OB-FVG</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v6</div></div>
+      <div class="info-item"><div class="info-label">時框支援</div><div class="info-val">1M – 4H以上(自動切換顯示深度)</div></div>
+    </div>
+    <div class="ver-log" style="margin:10px 0">
+      <span class="vl-dot">›</span> <b>商品專屬參數預設</b>：商品類型下拉(NQ/ES/GC/EURUSD-6E)+套用預設開關,開啟後覆蓋時段字串/確認窗口/實體比例,皆為起始建議值,非保證有效,務必自行回測調整<br>
+      <span class="vl-dot">›</span> <b>結構偵測(BOS/CHOCH)</b>：ta.pivothigh/pivotlow抓擺盪高低點,延續原趨勢的突破標BOS、反轉標CHOCH,pivot根數可調<br>
+      <span class="vl-dot">›</span> <b>Order Block / FVG</b>：三根K棒缺口自動畫框,回補後變灰;OB為動能K棒(實體比例+ATR位移門檻)前最後一根反向K棒的簡化判斷<br>
+      <span class="vl-dot">›</span> <b>月線關鍵價位</b>：新增前一月高低 PMH/PML,比照原本PDH/PDL/PWH/PWL的畫法<br>
+      <span class="vl-dot">›</span> <b>RSI/OBV背離</b>：獨立於CVD背離之外另計,CVD/RSI/OBV三個來源在儀表板分開列出各自是否成立,不合併成單一籠統背離<br>
+      <span class="vl-dot">›</span> <b>儀表板風險數據</b>：新增「距昨日高低%」(目前價格在前一日區間的相對位置)與ATR(14),輔助自行抓部位大小<br>
+      <span class="vl-dot">›</span> <b>Webhook JSON警報</b>：多方/空方確認訊號的alertcondition訊息改為JSON字串,方便串接自動化工具(webhook URL仍需自行在TradingView警報視窗設定)
+    </div>
+    <div class="tips-box">
+      <h4>誠實揭露(務必閱讀)</h4>
+      <p>BOS/CHOCH、Order Block都是用pivot高低點與K棒實體比例/ATR位移門檻做的簡化判斷,不是機構訂單簿或真正逐筆成交資料,強趨勢或低流動性時段可能延遲或誤判。RSI/OBV背離用固定回看根數比較高低點,不是嚴格pivot對pivot的常規背離。CVD/Delta同樣是近似值(靠K棒收盤位置推算),Pine Script沒有真正的bid/ask footprint資料。多層確認訊號只是把雜訊訊號濾掉,不代表任何保證勝率——真實表現請用下方的Strategy Tester回測版,對你實際要交易的商品與週期分開跑歷史數據。</p>
+    </div>
+    <button class="copy-bar-btn" onclick="copyAmdxV1(this)" style="margin-top:10px">一鍵複製腳本</button>
+    <div class="code-block" id="amdx-v1-code"></div>
+  </div>
+</div>
+
+<!-- ─── AMDX V1s ─── -->
+<div class="scard" data-cat="strategy">
+  <div class="scard-header">
+    <span class="scard-badge" style="background:#0ea5e9;color:#fff">回測</span>
+    <span class="scard-title">AMDX V1s</span>
+  </div>
+  <div class="scard-body">
+    <div class="ver-log">
+      <span class="vl-dot">›</span> <b>TradingView Strategy Tester 專用</b>,非即時看盤指標;拿掉儀表板/BOS-CHOCH/OB-FVG/RSI-OBV等視覺模組,只保留核心結構+訂單流確認+進出場<br>
+      <span class="vl-dot">›</span> <b>進場</b>：亞洲盤高低點被掃 + CVD/Delta背離或轉向 + 價格收回區間/前日高低之上下 + 實體比例過濾,三層同時成立才進場<br>
+      <span class="vl-dot">›</span> <b>出場</b>：跌破/漲破失效位(亞洲盤區間與前日高低取極值)<br>
+      <span class="vl-dot">›</span> <b>部位大小</b>：固定口數或風險百分比(依每點/每檔價值換算口數)兩種模式可選<br>
+      <span class="vl-dot">›</span> 想知道這套邏輯的真實勝率,自己對NQ/ES/GC/FX分開回測、分開檢查不同年份區間,過去表現不保證未來,務必留意樣本數與是否過擬合
+    </div>
+    <button class="copy-bar-btn" onclick="copyAmdxV1s(this)">一鍵複製腳本</button>
+    <div class="code-block" id="amdx-v1s-code"></div>
   </div>
 </div>
 
@@ -3876,6 +3930,652 @@ function copyEntryModel(btn) {
 
 function copyStrategy(btn) {
   navigator.clipboard.writeText(STRATEGY_TESTER).then(() => {
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
+  });
+}
+
+/* -- AMDX V1 (主指標) -- */
+const AMDX_V1 = `//@version=6
+indicator("AMDX V1", overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ========================= 時區與自動模式 =========================
+tzInput  = input.string("Asia/Taipei", "時區(僅用於判斷時段)", options=["Asia/Taipei", "America/New_York", "Europe/London", "UTC", "Asia/Shanghai", "Asia/Tokyo"], group="時區與自動模式")
+autoMode = input.bool(true, "依K棒週期自動調整顯示", group="時區與自動模式", tooltip="1M~5M顯示全部細節(含Delta背離標記與多層確認訊號);15M~1H顯示時段框+TDA+CVD;4H以上只保留TDA關鍵價位,自動隱藏時段框與CVD")
+
+// ========================= 商品專屬參數預設 =========================
+instTypeInput  = input.string("NQ", "商品類型", options=["NQ", "ES", "GC", "EURUSD/6E"], group="商品專屬參數預設")
+useInstPreset  = input.bool(false, "套用商品預設值(覆蓋時段/確認窗口/實體比例)", group="商品專屬參數預設", tooltip="開啟後,依商品類型使用內建起始建議值覆蓋下方時段字串、掃單確認窗口根數、最小實體比例。這些只是起始建議值,不是保證有效的參數,務必自行在Strategy Tester回測調整。關閉時完全採用你手動輸入的數值。")
+
+// ========================= AMDX 時段框 =========================
+showSessionsInput = input.bool(true, "顯示時段框", group="AMDX 時段框")
+asianSess  = input.session("0000-0800", "亞洲盤 Accumulation", group="AMDX 時段框")
+londonSess = input.session("1500-2000", "倫敦盤 Manipulation", group="AMDX 時段框")
+nySess     = input.session("2030-0500", "紐約盤 Distribution/Expansion", group="AMDX 時段框")
+accumColor = input.color(color.new(color.blue, 85), "吸籌區顏色", group="AMDX 時段框")
+manipColor = input.color(color.new(color.orange, 80), "誘多誘空區顏色", group="AMDX 時段框")
+distColor  = input.color(color.new(color.green, 80), "派發/擴張區顏色", group="AMDX 時段框")
+showSessionLabels = input.bool(true, "顯示時段文字標籤", group="AMDX 時段框")
+showSweepMarks    = input.bool(true, "顯示掃單標記(Manipulation)", group="AMDX 時段框")
+
+// ========================= TDA 關鍵價位 =========================
+showTDA       = input.bool(true, "顯示TDA關鍵價位", group="TDA 關鍵價位")
+showPDHL      = input.bool(true, "前一日高低", group="TDA 關鍵價位")
+showPWHL      = input.bool(true, "前一週高低", group="TDA 關鍵價位")
+showPMHL      = input.bool(true, "前一月高低", group="TDA 關鍵價位")
+pdhlColor     = input.color(color.new(color.gray, 20), "日高低顏色", group="TDA 關鍵價位")
+pwhlColor     = input.color(color.new(color.purple, 20), "週高低顏色", group="TDA 關鍵價位")
+pmhlColor     = input.color(color.new(color.maroon, 20), "月高低顏色", group="TDA 關鍵價位")
+showTDALabels = input.bool(true, "顯示價位文字標籤", group="TDA 關鍵價位")
+
+// ========================= 訂單流(近似值) =========================
+showCVDInput      = input.bool(true, "顯示CVD累積量差線", group="訂單流(近似值)")
+cvdUpColor        = input.color(color.new(color.teal, 0), "CVD上升顏色", group="訂單流(近似值)")
+cvdDnColor        = input.color(color.new(color.red, 0), "CVD下降顏色", group="訂單流(近似值)")
+showDeltaLabelsIn = input.bool(false, "顯示Delta背離標記", group="訂單流(近似值)")
+
+// ========================= 訊號確認設定 =========================
+enableConfirmSignal = input.bool(true, "啟用多層確認訊號", group="訊號確認設定", tooltip="需同時滿足:①結構掃單 ②訂單流背離/delta轉向 ③價格收回區間內,三層都成立才畫出多方確認/空方確認,僅為訊號精細化,不代表任何未來勝率保證")
+confirmWindowBars   = input.int(5, "掃單後確認窗口(根數)", minval=1, maxval=20, group="訊號確認設定", tooltip="掃單發生後,幾根K棒內出現訂單流轉向+價格收回才算有效確認,超過此窗口視為掃單失敗不再確認")
+minBodyRatio        = input.float(0.5, "確認K棒最小實體比例", minval=0.0, maxval=1.0, step=0.05, group="訊號確認設定", tooltip="確認訊號當根K棒的實體需佔當根高低區間至少此比例,避免十字線/長影線雜訊K棒觸發")
+longConfirmColor    = input.color(color.new(color.lime, 0), "多方確認顏色", group="訊號確認設定")
+shortConfirmColor   = input.color(color.new(color.fuchsia, 0), "空方確認顏色", group="訊號確認設定")
+
+// 依商品類型的起始建議值(非保證,務必自行回測):覆蓋時段字串/確認窗口/實體比例
+presetAsianSess     = instTypeInput == "GC" ? "0100-0800" : instTypeInput == "EURUSD/6E" ? "0000-0700" : "0000-0800"
+presetLondonSess    = instTypeInput == "GC" ? "1500-2000" : instTypeInput == "EURUSD/6E" ? "1500-1900" : "1500-2000"
+presetNYSess        = instTypeInput == "GC" ? "2030-0500" : instTypeInput == "EURUSD/6E" ? "2030-0430" : "2030-0500"
+presetConfirmWindow = instTypeInput == "GC" ? 8 : instTypeInput == "EURUSD/6E" ? 6 : instTypeInput == "ES" ? 5 : 4
+presetMinBodyRatio  = instTypeInput == "GC" ? 0.45 : instTypeInput == "EURUSD/6E" ? 0.40 : instTypeInput == "ES" ? 0.50 : 0.55
+
+asianSessFinal         = useInstPreset ? presetAsianSess     : asianSess
+londonSessFinal        = useInstPreset ? presetLondonSess    : londonSess
+nySessFinal            = useInstPreset ? presetNYSess        : nySess
+confirmWindowBarsFinal = useInstPreset ? presetConfirmWindow : confirmWindowBars
+minBodyRatioFinal      = useInstPreset ? presetMinBodyRatio  : minBodyRatio
+
+// ========================= 結構偵測(BOS/CHOCH) =========================
+enableStructure = input.bool(true, "啟用BOS/CHOCH偵測", group="結構偵測(BOS/CHOCH)", tooltip="以ta.pivothigh/pivotlow抓取擺盪高低點做簡化版結構判斷,並非機構級演算法,pivot根數設太小會雜訊多、設太大會延遲確認,僅供輔助參考,不能單獨當進出場依據")
+pivotLenInput = input.int(5, "Pivot左右根數", minval=1, maxval=20, group="結構偵測(BOS/CHOCH)")
+bosColor      = input.color(color.new(color.blue, 0), "BOS顏色", group="結構偵測(BOS/CHOCH)")
+chochColor    = input.color(color.new(color.red, 0), "CHOCH顏色", group="結構偵測(BOS/CHOCH)")
+
+// ========================= Order Block / FVG =========================
+enableFVG        = input.bool(true, "顯示FVG缺口", group="Order Block / FVG")
+fvgBullColor     = input.color(color.new(color.blue, 70), "多方FVG顏色", group="Order Block / FVG")
+fvgBearColor     = input.color(color.new(color.red, 70), "空方FVG顏色", group="Order Block / FVG")
+fvgFilledColor   = input.color(color.new(color.gray, 85), "已回補顏色", group="Order Block / FVG")
+enableOB         = input.bool(true, "顯示Order Block(簡化判斷)", group="Order Block / FVG", tooltip="Order Block判斷為簡化版:動能K棒(實體比例高且相對ATR有明顯位移)之前最後一根反向K棒,並非真實訂單簿/機構持倉資料,僅供結構參考")
+obImpulseBodyRatio = input.float(0.6, "動能K棒最小實體比例", minval=0.0, maxval=1.0, step=0.05, group="Order Block / FVG")
+obDisplaceATRMult  = input.float(1.2, "動能K棒位移門檻(ATR倍數)", minval=0.1, maxval=5.0, step=0.1, group="Order Block / FVG")
+obBullColor      = input.color(color.new(color.aqua, 70), "多方OB顏色", group="Order Block / FVG")
+obBearColor      = input.color(color.new(color.maroon, 70), "空方OB顏色", group="Order Block / FVG")
+maxFVGBoxes      = input.int(20, "最多保留FVG數量", minval=5, maxval=100, group="Order Block / FVG")
+maxOBBoxes       = input.int(20, "最多保留OB數量", minval=5, maxval=100, group="Order Block / FVG")
+
+// ========================= RSI/OBV背離 =========================
+enableRsiObvDiv   = input.bool(true, "啟用RSI/OBV背離偵測", group="RSI/OBV背離", tooltip="以固定回看根數比較價格新高/新低與指標是否同步創高/創低,屬於簡化版背離判斷(非嚴格pivot對pivot的常規背離),CVD/RSI/OBV三個來源分開列出,不合併成單一背離結論")
+rsiLenInput       = input.int(14, "RSI週期", minval=2, maxval=50, group="RSI/OBV背離")
+divLookbackInput  = input.int(5, "背離比較回看根數", minval=2, maxval=50, group="RSI/OBV背離")
+showRsiObvLabels  = input.bool(false, "顯示RSI/OBV背離標記(圖上)", group="RSI/OBV背離")
+
+// ========================= 儀表板 =========================
+showDashboard     = input.bool(true, "顯示儀表板", group="儀表板", tooltip="面板內容會依目前圖表週期自動切換顯示不同資訊,不需要手動調整")
+dashPositionInput = input.string("右上", "儀表板位置", options=["右上", "右下", "左上", "左下"], group="儀表板")
+dashTextSizeInput = input.string("small", "文字大小", options=["tiny", "small", "normal"], group="儀表板")
+
+tfSec = timeframe.in_seconds(timeframe.period)
+showSessions    = showSessionsInput and (not autoMode or tfSec <= 3600)
+showCVD         = showCVDInput and (not autoMode or tfSec <= 3600)
+showDeltaLabels = showDeltaLabelsIn and (not autoMode or tfSec <= 300)
+showConfirm     = enableConfirmSignal and (not autoMode or tfSec <= 300)
+
+dashPosition = dashPositionInput == "右上" ? position.top_right : dashPositionInput == "右下" ? position.bottom_right : dashPositionInput == "左上" ? position.top_left : position.bottom_left
+dashTextSize = dashTextSizeInput == "tiny" ? size.tiny : dashTextSizeInput == "small" ? size.small : size.normal
+
+// ========================= 亞洲盤 =========================
+inAsian = not na(time(timeframe.period, asianSessFinal, tzInput))
+var box   asianBox = na
+var float asianHi = na
+var float asianLo = na
+var bool  asianWasIn = false
+var float asianHighFixed = na
+var float asianLowFixed  = na
+
+if inAsian and not asianWasIn
+    asianHi := high
+    asianLo := low
+    asianBox := showSessions ? box.new(bar_index, high, bar_index, low, border_color=color.new(accumColor, 60), bgcolor=accumColor) : na
+    if showSessions and showSessionLabels
+        label.new(bar_index, high, "Accumulation", style=label.style_label_down, color=color.new(accumColor, 40), textcolor=color.white, size=size.small)
+if inAsian
+    asianHi := math.max(asianHi, high)
+    asianLo := math.min(asianLo, low)
+    if not na(asianBox)
+        box.set_top(asianBox, asianHi)
+        box.set_bottom(asianBox, asianLo)
+        box.set_right(asianBox, bar_index)
+if asianWasIn and not inAsian
+    asianHighFixed := asianHi
+    asianLowFixed  := asianLo
+asianWasIn := inAsian
+
+// ========================= 倫敦盤 =========================
+inLondon = not na(time(timeframe.period, londonSessFinal, tzInput))
+var box  londonBox = na
+var float londonHi = na
+var float londonLo = na
+var bool  londonWasIn = false
+
+if inLondon and not londonWasIn
+    londonHi := high
+    londonLo := low
+    londonBox := showSessions ? box.new(bar_index, high, bar_index, low, border_color=color.new(manipColor, 60), bgcolor=manipColor) : na
+    if showSessions and showSessionLabels
+        label.new(bar_index, high, "Manipulation", style=label.style_label_down, color=color.new(manipColor, 40), textcolor=color.white, size=size.small)
+if inLondon
+    londonHi := math.max(londonHi, high)
+    londonLo := math.min(londonLo, low)
+    if not na(londonBox)
+        box.set_top(londonBox, londonHi)
+        box.set_bottom(londonBox, londonLo)
+        box.set_right(londonBox, bar_index)
+londonWasIn := inLondon
+
+// ========================= 紐約盤 =========================
+inNY = not na(time(timeframe.period, nySessFinal, tzInput))
+var box  nyBox = na
+var float nyHi = na
+var float nyLo = na
+var bool  nyWasIn = false
+
+if inNY and not nyWasIn
+    nyHi := high
+    nyLo := low
+    nyBox := showSessions ? box.new(bar_index, high, bar_index, low, border_color=color.new(distColor, 60), bgcolor=distColor) : na
+    if showSessions and showSessionLabels
+        label.new(bar_index, low, "Distribution / Expansion", style=label.style_label_up, color=color.new(distColor, 40), textcolor=color.white, size=size.small)
+if inNY
+    nyHi := math.max(nyHi, high)
+    nyLo := math.min(nyLo, low)
+    if not na(nyBox)
+        box.set_top(nyBox, nyHi)
+        box.set_bottom(nyBox, nyLo)
+        box.set_right(nyBox, bar_index)
+nyWasIn := inNY
+
+// ========================= 掃單標記 =========================
+sweepLow  = inLondon and not na(asianLowFixed) and low < asianLowFixed and close > asianLowFixed
+sweepHigh = inLondon and not na(asianHighFixed) and high > asianHighFixed and close < asianHighFixed
+
+if showSessions and showSweepMarks and sweepLow
+    label.new(bar_index, low, "Sweep Low", style=label.style_label_up, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
+if showSessions and showSweepMarks and sweepHigh
+    label.new(bar_index, high, "Sweep High", style=label.style_label_down, color=color.new(color.orange, 20), textcolor=color.white, size=size.tiny)
+
+// ========================= TDA 日/週/月 高低 =========================
+[pdh, pdl] = request.security(syminfo.tickerid, "D", [high[1], low[1]], lookahead=barmerge.lookahead_off)
+[pwh, pwl] = request.security(syminfo.tickerid, "W", [high[1], low[1]], lookahead=barmerge.lookahead_off)
+[pmh, pml] = request.security(syminfo.tickerid, "M", [high[1], low[1]], lookahead=barmerge.lookahead_off)
+
+plot(showTDA and showPDHL ? pdh : na, "前日高 PDH", color=pdhlColor, style=plot.style_linebr, linewidth=1)
+plot(showTDA and showPDHL ? pdl : na, "前日低 PDL", color=pdhlColor, style=plot.style_linebr, linewidth=1)
+plot(showTDA and showPWHL ? pwh : na, "前週高 PWH", color=pwhlColor, style=plot.style_linebr, linewidth=2)
+plot(showTDA and showPWHL ? pwl : na, "前週低 PWL", color=pwhlColor, style=plot.style_linebr, linewidth=2)
+plot(showTDA and showPMHL ? pmh : na, "前月高 PMH", color=pmhlColor, style=plot.style_linebr, linewidth=3)
+plot(showTDA and showPMHL ? pml : na, "前月低 PML", color=pmhlColor, style=plot.style_linebr, linewidth=3)
+
+var label pdhLabel = na
+var label pdlLabel = na
+var label pwhLabel = na
+var label pwlLabel = na
+var label pmhLabel = na
+var label pmlLabel = na
+
+if barstate.islast
+    label.delete(pdhLabel)
+    label.delete(pdlLabel)
+    label.delete(pwhLabel)
+    label.delete(pwlLabel)
+    label.delete(pmhLabel)
+    label.delete(pmlLabel)
+    if showTDA and showTDALabels and showPDHL
+        pdhLabel := label.new(bar_index + 3, pdh, "PDH", color=color.new(color.white, 100), textcolor=pdhlColor, style=label.style_label_left, size=size.small)
+        pdlLabel := label.new(bar_index + 3, pdl, "PDL", color=color.new(color.white, 100), textcolor=pdhlColor, style=label.style_label_left, size=size.small)
+    if showTDA and showTDALabels and showPWHL
+        pwhLabel := label.new(bar_index + 3, pwh, "PWH", color=color.new(color.white, 100), textcolor=pwhlColor, style=label.style_label_left, size=size.small)
+        pwlLabel := label.new(bar_index + 3, pwl, "PWL", color=color.new(color.white, 100), textcolor=pwhlColor, style=label.style_label_left, size=size.small)
+    if showTDA and showTDALabels and showPMHL
+        pmhLabel := label.new(bar_index + 3, pmh, "PMH", color=color.new(color.white, 100), textcolor=pmhlColor, style=label.style_label_left, size=size.small)
+        pmlLabel := label.new(bar_index + 3, pml, "PML", color=color.new(color.white, 100), textcolor=pmhlColor, style=label.style_label_left, size=size.small)
+
+// ========================= 量能/訂單流/ATR/實體比例(共用計算) =========================
+range_  = high - low
+buyVol  = range_ == 0 ? volume / 2 : volume * (close - low) / range_
+sellVol = volume - buyVol
+delta   = buyVol - sellVol
+cvd     = ta.cum(delta)
+atr14   = ta.atr(14)
+
+body      = math.abs(close - open)
+barRange  = high - low
+bodyRatio = barRange == 0 ? 0.0 : body / barRange
+
+plot(showCVD ? cvd : na, "CVD (近似訂單流)", color = cvd >= cvd[1] ? cvdUpColor : cvdDnColor, linewidth=2)
+
+// ========================= CVD/Delta 背離 =========================
+divBear = high > high[1] and delta < delta[1] and delta < 0
+divBull = low < low[1] and delta > delta[1] and delta > 0
+
+plotshape(showDeltaLabels and divBear ? high : na, title="Delta背離(空)", style=shape.triangledown, location=location.abovebar, color=cvdDnColor, size=size.tiny)
+plotshape(showDeltaLabels and divBull ? low : na, title="Delta背離(多)", style=shape.triangleup, location=location.belowbar, color=cvdUpColor, size=size.tiny)
+
+// ========================= RSI/OBV 背離(獨立來源,不與CVD合併) =========================
+rsiVal = ta.rsi(close, rsiLenInput)
+obv    = ta.cum(math.sign(close - close[1]) * volume)
+
+priceHH  = high >= ta.highest(high, divLookbackInput)[1]
+priceLL  = low  <= ta.lowest(low, divLookbackInput)[1]
+
+rsiBearDiv = enableRsiObvDiv and priceHH and rsiVal < ta.highest(rsiVal, divLookbackInput)[1]
+rsiBullDiv = enableRsiObvDiv and priceLL and rsiVal > ta.lowest(rsiVal, divLookbackInput)[1]
+obvBearDiv = enableRsiObvDiv and priceHH and obv < ta.highest(obv, divLookbackInput)[1]
+obvBullDiv = enableRsiObvDiv and priceLL and obv > ta.lowest(obv, divLookbackInput)[1]
+
+plotshape(showRsiObvLabels and rsiBearDiv ? high : na, title="RSI背離(空)", style=shape.triangledown, location=location.abovebar, color=color.new(color.orange, 0), size=size.tiny)
+plotshape(showRsiObvLabels and rsiBullDiv ? low : na, title="RSI背離(多)", style=shape.triangleup, location=location.belowbar, color=color.new(color.orange, 0), size=size.tiny)
+plotshape(showRsiObvLabels and obvBearDiv ? high : na, title="OBV背離(空)", style=shape.triangledown, location=location.abovebar, color=color.new(color.fuchsia, 0), size=size.tiny)
+plotshape(showRsiObvLabels and obvBullDiv ? low : na, title="OBV背離(多)", style=shape.triangleup, location=location.belowbar, color=color.new(color.fuchsia, 0), size=size.tiny)
+
+// ========================= BOS/CHOCH 結構偵測(簡化版) =========================
+ph = ta.pivothigh(high, pivotLenInput, pivotLenInput)
+pl = ta.pivotlow(low, pivotLenInput, pivotLenInput)
+
+var float swingHighLevel  = na
+var float swingLowLevel   = na
+var bool  swingHighBroken = true
+var bool  swingLowBroken  = true
+var string structTrend    = "尚未定義"
+
+if not na(ph)
+    swingHighLevel := ph
+    swingHighBroken := false
+if not na(pl)
+    swingLowLevel := pl
+    swingLowBroken := false
+
+breakUp   = enableStructure and not na(swingHighLevel) and not swingHighBroken and close > swingHighLevel
+breakDown = enableStructure and not na(swingLowLevel)  and not swingLowBroken  and close < swingLowLevel
+
+bosUp     = false
+chochUp   = false
+bosDown   = false
+chochDown = false
+
+if breakUp
+    swingHighBroken := true
+    if structTrend == "空頭結構" or structTrend == "尚未定義"
+        chochUp := true
+    else
+        bosUp := true
+    structTrend := "多頭結構"
+
+if breakDown
+    swingLowBroken := true
+    if structTrend == "多頭結構" or structTrend == "尚未定義"
+        chochDown := true
+    else
+        bosDown := true
+    structTrend := "空頭結構"
+
+if enableStructure and bosUp
+    label.new(bar_index, high, "BOS", style=label.style_label_down, color=bosColor, textcolor=color.white, size=size.tiny)
+if enableStructure and chochUp
+    label.new(bar_index, high, "CHOCH", style=label.style_label_down, color=chochColor, textcolor=color.white, size=size.tiny)
+if enableStructure and bosDown
+    label.new(bar_index, low, "BOS", style=label.style_label_up, color=bosColor, textcolor=color.white, size=size.tiny)
+if enableStructure and chochDown
+    label.new(bar_index, low, "CHOCH", style=label.style_label_up, color=chochColor, textcolor=color.white, size=size.tiny)
+
+// ========================= FVG(三根K棒缺口,簡化判斷) =========================
+var array<box> bullFVGBoxes = array.new<box>()
+var array<box> bearFVGBoxes = array.new<box>()
+
+fvgBullCond = enableFVG and low > high[2]
+fvgBearCond = enableFVG and high < low[2]
+
+if fvgBullCond
+    topFVG = low
+    botFVG = high[2]
+    newFVG = box.new(bar_index - 2, topFVG, bar_index, botFVG, border_color=color.new(fvgBullColor, 40), bgcolor=fvgBullColor)
+    array.push(bullFVGBoxes, newFVG)
+    if array.size(bullFVGBoxes) > maxFVGBoxes
+        box.delete(array.shift(bullFVGBoxes))
+
+if fvgBearCond
+    topFVG2 = low[2]
+    botFVG2 = high
+    newFVG2 = box.new(bar_index - 2, topFVG2, bar_index, botFVG2, border_color=color.new(fvgBearColor, 40), bgcolor=fvgBearColor)
+    array.push(bearFVGBoxes, newFVG2)
+    if array.size(bearFVGBoxes) > maxFVGBoxes
+        box.delete(array.shift(bearFVGBoxes))
+
+if array.size(bullFVGBoxes) > 0
+    for i = array.size(bullFVGBoxes) - 1 to 0
+        b = array.get(bullFVGBoxes, i)
+        topB = box.get_top(b)
+        if low <= topB
+            box.set_bgcolor(b, fvgFilledColor)
+            box.set_border_color(b, color.new(color.gray, 50))
+            array.remove(bullFVGBoxes, i)
+        else
+            box.set_right(b, bar_index)
+
+if array.size(bearFVGBoxes) > 0
+    for i = array.size(bearFVGBoxes) - 1 to 0
+        b = array.get(bearFVGBoxes, i)
+        botB = box.get_bottom(b)
+        if high >= botB
+            box.set_bgcolor(b, fvgFilledColor)
+            box.set_border_color(b, color.new(color.gray, 50))
+            array.remove(bearFVGBoxes, i)
+        else
+            box.set_right(b, bar_index)
+
+// ========================= Order Block(簡化判斷:動能K棒前最後一根反向K棒) =========================
+var array<box> bullOBBoxes = array.new<box>()
+var array<box> bearOBBoxes = array.new<box>()
+
+displacement = math.abs(close - close[1])
+impulseUp    = close > open and bodyRatio >= obImpulseBodyRatio and displacement >= atr14 * obDisplaceATRMult
+impulseDown  = close < open and bodyRatio >= obImpulseBodyRatio and displacement >= atr14 * obDisplaceATRMult
+
+obBullCond = enableOB and impulseUp and close[1] < open[1]
+obBearCond = enableOB and impulseDown and close[1] > open[1]
+
+if obBullCond
+    newOB = box.new(bar_index - 1, high[1], bar_index, low[1], border_color=color.new(obBullColor, 40), bgcolor=obBullColor)
+    array.push(bullOBBoxes, newOB)
+    if array.size(bullOBBoxes) > maxOBBoxes
+        box.delete(array.shift(bullOBBoxes))
+
+if obBearCond
+    newOB2 = box.new(bar_index - 1, high[1], bar_index, low[1], border_color=color.new(obBearColor, 40), bgcolor=obBearColor)
+    array.push(bearOBBoxes, newOB2)
+    if array.size(bearOBBoxes) > maxOBBoxes
+        box.delete(array.shift(bearOBBoxes))
+
+if array.size(bullOBBoxes) > 0
+    for i = array.size(bullOBBoxes) - 1 to 0
+        b = array.get(bullOBBoxes, i)
+        obB = box.get_bottom(b)
+        if close < obB
+            box.delete(b)
+            array.remove(bullOBBoxes, i)
+        else
+            box.set_right(b, bar_index)
+
+if array.size(bearOBBoxes) > 0
+    for i = array.size(bearOBBoxes) - 1 to 0
+        b = array.get(bearOBBoxes, i)
+        obT = box.get_top(b)
+        if close > obT
+            box.delete(b)
+            array.remove(bearOBBoxes, i)
+        else
+            box.set_right(b, bar_index)
+
+// ========================= 多層確認訊號 =========================
+// 三層獨立證據,缺一不觸發:
+// 第一層 結構  — sweepLow/sweepHigh(亞洲盤高低點被掃)
+// 第二層 訂單流 — 掃單後confirmWindowBarsFinal根內,divBull/divBear成立,或delta由負轉正/由正轉負(近似值,非真實逐筆數據)
+// 第三層 價格結構 — 收回亞洲盤區間內,或站回PDL之上/跌破PDH之下,證明掃單後真的被買回/賣回,不是繼續破
+
+var int lastSweepLowBar  = na
+var int lastSweepHighBar = na
+var bool longFired  = false
+var bool shortFired = false
+
+if sweepLow
+    lastSweepLowBar := bar_index
+    longFired := false
+if sweepHigh
+    lastSweepHighBar := bar_index
+    shortFired := false
+
+deltaFlipBull = delta > 0 and delta[1] <= 0
+deltaFlipBear = delta < 0 and delta[1] >= 0
+
+ofConfirmBull = divBull or deltaFlipBull
+ofConfirmBear = divBear or deltaFlipBear
+
+bodyOk = bodyRatio >= minBodyRatioFinal
+
+priceReclaimLong  = (not na(asianLowFixed)  and close > asianLowFixed)  or close > pdl
+priceReclaimShort = (not na(asianHighFixed) and close < asianHighFixed) or close < pdh
+
+withinLongWindow  = not na(lastSweepLowBar)  and (bar_index - lastSweepLowBar)  <= confirmWindowBarsFinal
+withinShortWindow = not na(lastSweepHighBar) and (bar_index - lastSweepHighBar) <= confirmWindowBarsFinal
+
+longConfirmRaw  = withinLongWindow  and ofConfirmBull and priceReclaimLong  and bodyOk and close > open and not longFired
+shortConfirmRaw = withinShortWindow and ofConfirmBear and priceReclaimShort and bodyOk and close < open and not shortFired
+
+if longConfirmRaw
+    longFired := true
+if shortConfirmRaw
+    shortFired := true
+
+longConfirm  = showConfirm and longConfirmRaw
+shortConfirm = showConfirm and shortConfirmRaw
+
+if longConfirm
+    label.new(bar_index, low, "多方確認", style=label.style_label_up, color=longConfirmColor, textcolor=color.white, size=size.small)
+if shortConfirm
+    label.new(bar_index, high, "空方確認", style=label.style_label_down, color=shortConfirmColor, textcolor=color.white, size=size.small)
+
+// ========================= Webhook JSON 警報 =========================
+alertcondition(longConfirmRaw, title="多方確認訊號", message="{\\"symbol\\":\\"{{ticker}}\\",\\"action\\":\\"long_confirm\\",\\"price\\":{{close}},\\"time\\":\\"{{time}}\\"}")
+alertcondition(shortConfirmRaw, title="空方確認訊號", message="{\\"symbol\\":\\"{{ticker}}\\",\\"action\\":\\"short_confirm\\",\\"price\\":{{close}},\\"time\\":\\"{{time}}\\"}")
+
+var string lastSignalText = "尚無訊號"
+if longConfirmRaw
+    lastSignalText := "多方確認 @" + str.tostring(close, "#.##")
+if shortConfirmRaw
+    lastSignalText := "空方確認 @" + str.tostring(close, "#.##")
+
+// ========================= 儀表板 =========================
+var table dash = table.new(dashPosition, 2, 11, bgcolor=color.new(color.black, 80), border_width=1, border_color=color.new(color.gray, 40))
+
+if showDashboard and barstate.islast
+    sessionPhase = inAsian ? "Accumulation" : inLondon ? "Manipulation" : inNY ? "Distribution/Expansion" : "盤外"
+    dailyBias  = close > pdh ? "偏多(站上前日高)" : close < pdl ? "偏空(跌破前日低)" : "區間內"
+    weeklyBias = close > pwh ? "偏多(站上前週高)" : close < pwl ? "偏空(跌破前週低)" : "區間內"
+
+    table.cell(dash, 0, 0, "週期", text_color=color.white, text_size=dashTextSize, bgcolor=color.new(color.gray, 40))
+    table.cell(dash, 1, 0, timeframe.period, text_color=color.white, text_size=dashTextSize, bgcolor=color.new(color.gray, 40))
+
+    if tfSec <= 300
+        table.cell(dash, 0, 1, "模式", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 1, "細節(1M-5M)", text_color=color.yellow, text_size=dashTextSize)
+        table.cell(dash, 0, 2, "時段階段", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 2, sessionPhase, text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 0, 3, "CVD", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 3, str.tostring(cvd, "#.##"), text_color = cvd >= cvd[1] ? cvdUpColor : cvdDnColor, text_size=dashTextSize)
+        table.cell(dash, 0, 4, "Delta", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 4, str.tostring(delta, "#.##"), text_color = delta >= 0 ? cvdUpColor : cvdDnColor, text_size=dashTextSize)
+        table.cell(dash, 0, 5, "最近訊號", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 5, lastSignalText, text_color=color.white, text_size=dashTextSize)
+    else if tfSec <= 3600
+        table.cell(dash, 0, 1, "模式", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 1, "時段+結構(15M-1H)", text_color=color.yellow, text_size=dashTextSize)
+        table.cell(dash, 0, 2, "時段階段", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 2, sessionPhase, text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 0, 3, "CVD趨勢", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 3, cvd >= cvd[1] ? "上升" : "下降", text_color = cvd >= cvd[1] ? cvdUpColor : cvdDnColor, text_size=dashTextSize)
+        table.cell(dash, 0, 4, "前日高/低", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 4, str.tostring(pdl, "#.##") + " / " + str.tostring(pdh, "#.##"), text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 0, 5, "最近訊號", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 5, lastSignalText, text_color=color.white, text_size=dashTextSize)
+    else
+        table.cell(dash, 0, 1, "模式", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 1, "大方向(4H以上)", text_color=color.yellow, text_size=dashTextSize)
+        table.cell(dash, 0, 2, "日線判斷", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 2, dailyBias, text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 0, 3, "週線判斷", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 3, weeklyBias, text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 0, 4, "前日高/低", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 4, str.tostring(pdl, "#.##") + " / " + str.tostring(pdh, "#.##"), text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 0, 5, "前週高/低", text_color=color.white, text_size=dashTextSize)
+        table.cell(dash, 1, 5, str.tostring(pwl, "#.##") + " / " + str.tostring(pwh, "#.##"), text_color=color.white, text_size=dashTextSize)
+
+    distancePct = pdh != pdl ? (close - pdl) / (pdh - pdl) * 100 : na
+    cvdDivText  = divBear ? "空頭背離" : divBull ? "多頭背離" : "無"
+    rsiDivText  = rsiBearDiv ? "空頭背離" : rsiBullDiv ? "多頭背離" : "無"
+    obvDivText  = obvBearDiv ? "空頭背離" : obvBullDiv ? "多頭背離" : "無"
+
+    table.cell(dash, 0, 6, "距昨日高低%", text_color=color.white, text_size=dashTextSize)
+    table.cell(dash, 1, 6, na(distancePct) ? "N/A" : str.tostring(distancePct, "#.#") + "%", text_color=color.white, text_size=dashTextSize)
+    table.cell(dash, 0, 7, "ATR(14)", text_color=color.white, text_size=dashTextSize)
+    table.cell(dash, 1, 7, str.tostring(atr14, "#.##"), text_color=color.white, text_size=dashTextSize)
+    table.cell(dash, 0, 8, "CVD背離(近似)", text_color=color.white, text_size=dashTextSize)
+    table.cell(dash, 1, 8, cvdDivText, text_color = divBear ? cvdDnColor : divBull ? cvdUpColor : color.gray, text_size=dashTextSize)
+    table.cell(dash, 0, 9, "RSI背離", text_color=color.white, text_size=dashTextSize)
+    table.cell(dash, 1, 9, rsiDivText, text_color = (rsiBearDiv or rsiBullDiv) ? color.orange : color.gray, text_size=dashTextSize)
+    table.cell(dash, 0, 10, "OBV背離", text_color=color.white, text_size=dashTextSize)
+    table.cell(dash, 1, 10, obvDivText, text_color = (obvBearDiv or obvBullDiv) ? color.fuchsia : color.gray, text_size=dashTextSize)
+`;
+
+/* -- AMDX V1s (Strategy Tester 回測版) -- */
+const AMDX_V1S = `//@version=6
+strategy("AMDX V1s", overlay=true, initial_capital=100000, default_qty_type=strategy.fixed, default_qty_value=1, max_boxes_count=500, max_labels_count=500, calc_on_every_tick=false)
+
+// ========================= 時區與時段 =========================
+tzInput    = input.string("Asia/Taipei", "時區(僅用於判斷時段)", options=["Asia/Taipei", "America/New_York", "Europe/London", "UTC", "Asia/Shanghai", "Asia/Tokyo"], group="時區與時段")
+asianSess  = input.session("0000-0800", "亞洲盤 Accumulation", group="時區與時段")
+londonSess = input.session("1500-2000", "倫敦盤 Manipulation", group="時區與時段")
+
+// ========================= 訊號確認設定 =========================
+confirmWindowBars = input.int(5, "掃單後確認窗口(根數)", minval=1, maxval=20, group="訊號確認設定")
+minBodyRatio      = input.float(0.5, "確認K棒最小實體比例", minval=0.0, maxval=1.0, step=0.05, group="訊號確認設定")
+
+// ========================= 部位大小 =========================
+sizeModeInput   = input.string("固定口數", "部位大小模式", options=["固定口數", "風險百分比"], group="部位大小")
+fixedQtyInput   = input.int(1, "固定口數", minval=1, group="部位大小")
+riskPctInput    = input.float(1.0, "每筆風險 %(帳戶權益)", minval=0.1, maxval=10.0, step=0.1, group="部位大小")
+pointValueInput = input.float(20.0, "每點/每檔價值(NQ約20,ES約50,GC約100,6E約125000,依實際商品規格調整)", minval=0.01, group="部位大小")
+
+// ========================= 亞洲盤區間 =========================
+inAsian = not na(time(timeframe.period, asianSess, tzInput))
+var float asianHi = na
+var float asianLo = na
+var bool  asianWasIn = false
+var float asianHighFixed = na
+var float asianLowFixed  = na
+
+if inAsian and not asianWasIn
+    asianHi := high
+    asianLo := low
+if inAsian
+    asianHi := math.max(asianHi, high)
+    asianLo := math.min(asianLo, low)
+if asianWasIn and not inAsian
+    asianHighFixed := asianHi
+    asianLowFixed  := asianLo
+asianWasIn := inAsian
+
+// ========================= 倫敦盤掃單 =========================
+inLondon = not na(time(timeframe.period, londonSess, tzInput))
+
+sweepLow  = inLondon and not na(asianLowFixed) and low < asianLowFixed and close > asianLowFixed
+sweepHigh = inLondon and not na(asianHighFixed) and high > asianHighFixed and close < asianHighFixed
+
+// ========================= 前日高低 =========================
+[pdh, pdl] = request.security(syminfo.tickerid, "D", [high[1], low[1]], lookahead=barmerge.lookahead_off)
+
+// ========================= 訂單流近似值 =========================
+range_  = high - low
+buyVol  = range_ == 0 ? volume / 2 : volume * (close - low) / range_
+sellVol = volume - buyVol
+delta   = buyVol - sellVol
+
+divBear = high > high[1] and delta < delta[1] and delta < 0
+divBull = low < low[1] and delta > delta[1] and delta > 0
+
+// ========================= 多層確認訊號 =========================
+var int lastSweepLowBar  = na
+var int lastSweepHighBar = na
+var bool longFired  = false
+var bool shortFired = false
+
+if sweepLow
+    lastSweepLowBar := bar_index
+    longFired := false
+if sweepHigh
+    lastSweepHighBar := bar_index
+    shortFired := false
+
+deltaFlipBull = delta > 0 and delta[1] <= 0
+deltaFlipBear = delta < 0 and delta[1] >= 0
+
+ofConfirmBull = divBull or deltaFlipBull
+ofConfirmBear = divBear or deltaFlipBear
+
+body      = math.abs(close - open)
+barRange  = high - low
+bodyRatio = barRange == 0 ? 0.0 : body / barRange
+bodyOk    = bodyRatio >= minBodyRatio
+
+priceReclaimLong  = (not na(asianLowFixed)  and close > asianLowFixed)  or close > pdl
+priceReclaimShort = (not na(asianHighFixed) and close < asianHighFixed) or close < pdh
+
+withinLongWindow  = not na(lastSweepLowBar)  and (bar_index - lastSweepLowBar)  <= confirmWindowBars
+withinShortWindow = not na(lastSweepHighBar) and (bar_index - lastSweepHighBar) <= confirmWindowBars
+
+longConfirmRaw  = withinLongWindow  and ofConfirmBull and priceReclaimLong  and bodyOk and close > open and not longFired
+shortConfirmRaw = withinShortWindow and ofConfirmBear and priceReclaimShort and bodyOk and close < open and not shortFired
+
+if longConfirmRaw
+    longFired := true
+if shortConfirmRaw
+    shortFired := true
+
+// ========================= 失效位(出場依據 + 風險百分比部位計算) =========================
+longInvalidLevel  = na(asianLowFixed)  ? pdl : math.min(asianLowFixed, pdl)
+shortInvalidLevel = na(asianHighFixed) ? pdh : math.max(asianHighFixed, pdh)
+
+riskPerContractLong  = math.max(math.abs(close - longInvalidLevel), syminfo.mintick) * pointValueInput
+riskPerContractShort = math.max(math.abs(shortInvalidLevel - close), syminfo.mintick) * pointValueInput
+
+qtyLong  = sizeModeInput == "風險百分比" ? math.max(math.floor(strategy.equity * riskPctInput / 100 / riskPerContractLong), 1) : fixedQtyInput
+qtyShort = sizeModeInput == "風險百分比" ? math.max(math.floor(strategy.equity * riskPctInput / 100 / riskPerContractShort), 1) : fixedQtyInput
+
+// ========================= 進出場 =========================
+if longConfirmRaw
+    strategy.entry("Long", strategy.long, qty=qtyLong)
+if shortConfirmRaw
+    strategy.entry("Short", strategy.short, qty=qtyShort)
+
+if strategy.position_size > 0 and close < longInvalidLevel
+    strategy.close("Long", comment="失效出場")
+if strategy.position_size < 0 and close > shortInvalidLevel
+    strategy.close("Short", comment="失效出場")
+
+plot(longInvalidLevel, "多單失效位", color=color.new(color.lime, 40), style=plot.style_linebr)
+plot(shortInvalidLevel, "空單失效位", color=color.new(color.fuchsia, 40), style=plot.style_linebr)
+`;
+
+document.getElementById('amdx-v1-code').textContent = AMDX_V1;
+document.getElementById('amdx-v1s-code').textContent = AMDX_V1S;
+
+function copyAmdxV1(btn) {
+  navigator.clipboard.writeText(AMDX_V1).then(() => {
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
+  });
+}
+
+function copyAmdxV1s(btn) {
+  navigator.clipboard.writeText(AMDX_V1S).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
   });
