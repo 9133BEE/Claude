@@ -7401,7 +7401,7 @@ if showDash and barstate.islast
     table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
 const UNICORN_V8_STRAT = `//@version=5
-strategy("Unicorn V8 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.percent, commission_value=0.05)
+strategy("Unicorn V8 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
 
 grpS   = "Strategy回測設定"
 tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
@@ -10454,6 +10454,7 @@ minBodyRatioFinal      = useInstPreset ? presetMinBodyRatio  : minBodyRatio
 // ========================= 結構偵測(BOS/CHOCH) =========================
 enableStructure = input.bool(true, "啟用BOS/CHOCH偵測", group="結構偵測(BOS/CHOCH)", tooltip="以ta.pivothigh/pivotlow抓取擺盪高低點做簡化版結構判斷,並非機構級演算法,pivot根數設太小會雜訊多、設太大會延遲確認,僅供輔助參考,不能單獨當進出場依據")
 pivotLenInput = input.int(5, "Pivot左右根數", minval=1, maxval=20, group="結構偵測(BOS/CHOCH)")
+structDays    = input.int(3, "顯示天數(BOS/CHOCH)", minval=1, maxval=30, group="結構偵測(BOS/CHOCH)", tooltip="只顯示最近N天內發生的BOS/CHOCH標籤與線段")
 bosColor      = input.color(color.new(color.blue, 0), "BOS顏色", group="結構偵測(BOS/CHOCH)")
 chochColor    = input.color(color.new(color.red, 0), "CHOCH顏色", group="結構偵測(BOS/CHOCH)")
 
@@ -10696,18 +10697,23 @@ if breakDown
         bosDown := true
     structTrend := "空頭結構"
 
-if enableStructure and bosUp
+_structBarsMax = structDays * math.max(1, math.round(86400 / timeframe.in_seconds()))
+if enableStructure and bosUp and (bar_index - swingHighBarIndex) <= _structBarsMax
+    _midBar = math.round((swingHighBarIndex + bar_index) / 2)
     line.new(swingHighBarIndex, swingHighLevel, bar_index, swingHighLevel, color=bosColor, style=line.style_solid, width=2)
-    label.new(bar_index, high + labelOffset, "BOS", style=label.style_label_down, color=bosColor, textcolor=color.white, size=size.tiny)
-if enableStructure and chochUp
+    label.new(_midBar, swingHighLevel, "BOS", style=label.style_label_down, color=bosColor, textcolor=color.white, size=size.tiny)
+if enableStructure and chochUp and (bar_index - swingHighBarIndex) <= _structBarsMax
+    _midBar = math.round((swingHighBarIndex + bar_index) / 2)
     line.new(swingHighBarIndex, swingHighLevel, bar_index, swingHighLevel, color=chochColor, style=line.style_dashed, width=2)
-    label.new(bar_index, high + labelOffset, "CHOCH", style=label.style_label_down, color=chochColor, textcolor=color.white, size=size.tiny)
-if enableStructure and bosDown
+    label.new(_midBar, swingHighLevel, "CHoCH", style=label.style_label_down, color=chochColor, textcolor=color.white, size=size.tiny)
+if enableStructure and bosDown and (bar_index - swingLowBarIndex) <= _structBarsMax
+    _midBar = math.round((swingLowBarIndex + bar_index) / 2)
     line.new(swingLowBarIndex, swingLowLevel, bar_index, swingLowLevel, color=bosColor, style=line.style_solid, width=2)
-    label.new(bar_index, low - labelOffset, "BOS", style=label.style_label_up, color=bosColor, textcolor=color.white, size=size.tiny)
-if enableStructure and chochDown
+    label.new(_midBar, swingLowLevel, "BOS", style=label.style_label_up, color=bosColor, textcolor=color.white, size=size.tiny)
+if enableStructure and chochDown and (bar_index - swingLowBarIndex) <= _structBarsMax
+    _midBar = math.round((swingLowBarIndex + bar_index) / 2)
     line.new(swingLowBarIndex, swingLowLevel, bar_index, swingLowLevel, color=chochColor, style=line.style_dashed, width=2)
-    label.new(bar_index, low - labelOffset, "CHOCH", style=label.style_label_up, color=chochColor, textcolor=color.white, size=size.tiny)
+    label.new(_midBar, swingLowLevel, "CHoCH", style=label.style_label_up, color=chochColor, textcolor=color.white, size=size.tiny)
 
 // ========================= FVG(三根K棒缺口,簡化判斷) =========================
 // 改用兩條平行水平線(頂/底)表示區間,不再用實心box填色;回補後線變灰並停止延伸,樣式(實線/虛線)可調,與OB共用同一個設定
