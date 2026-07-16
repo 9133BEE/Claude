@@ -7936,13 +7936,33 @@ if fireBull and fireBear
     fireBull := lastMSSDir >= 0
     fireBear := lastMSSDir < 0
 
+var int _lTot = 0
+var int _lWin = 0
+var int _sTot = 0
+var int _sWin = 0
+if strategy.closedtrades > strategy.closedtrades[1]
+    _nNew = strategy.closedtrades - strategy.closedtrades[1]
+    for _ci = strategy.closedtrades - _nNew to strategy.closedtrades - 1
+        _cpnl = strategy.closedtrades.profit(_ci)
+        _ceid = strategy.closedtrades.entry_id(_ci)
+        if _ceid == "L"
+            _lTot += 1
+            if _cpnl > 0
+                _lWin += 1
+        else
+            _sTot += 1
+            if _cpnl > 0
+                _sWin += 1
+_lWrStr = _lTot > 0 ? str.tostring(math.round(_lWin * 100.0 / _lTot)) + "% (" + str.tostring(_lWin) + "/" + str.tostring(_lTot) + ")" : "暫無"
+_sWrStr = _sTot > 0 ? str.tostring(math.round(_sWin * 100.0 / _sTot)) + "% (" + str.tostring(_sWin) + "/" + str.tostring(_sTot) + ")" : "暫無"
+
 if fireBull and barstate.isconfirmed
     if not allowRepeat
         array.set(bb_signaled, trigBullIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(bb_isHQ, trigBullIdx)
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#1E88E5,0)
-    _lt    = _isHQ ? "HQ UM⭡" : "UM⭡"
+    _lt    = (_isHQ ? "HQ UM⭡" : "UM⭡") + "\n多方歷史勝率:" + _lWrStr
     _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
 
@@ -7952,7 +7972,7 @@ if fireBear and barstate.isconfirmed
     lastAnySigBar := bar_index
     _isHQ  = array.get(rb_isHQ, trigBearIdx)
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#FF8C00,0)
-    _lt    = _isHQ ? "HQ UM⭣" : "UM⭣"
+    _lt    = (_isHQ ? "HQ UM⭣" : "UM⭣") + "\n空方歷史勝率:" + _sWrStr
     _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
 
