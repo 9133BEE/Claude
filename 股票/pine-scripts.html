@@ -7404,7 +7404,7 @@ const UNICORN_V8_STRAT = `//@version=5
 strategy("Unicorn V8 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
 
 grpS   = "Strategy回測設定"
-tpATR  = input.float(3.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
+tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
 slATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)
 atrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)
 
@@ -7422,6 +7422,7 @@ obTxtHAlign  = input.string("置中", "OB文字對齊",options=["置中","置左
 
 grp2 = "獨角獸模型"
 unicornNeedHTF = input.bool(true,  "需要HTF PDA+MSS確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需HTF為多方結構，空方訊號需HTF為空方結構，有效過濾逆勢假訊號")
+needD1Confirm  = input.bool(true,  "需要日線MSS趨勢確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需日線MSS看多，空方訊號需日線MSS看空；有效過濾逆日線大趨勢的假訊號（上升趨勢中只做多，下降趨勢中只做空）")
 htfOBPrecision = input.float(0.5,"HTF OB 觸及精確度（0=全區間，0.5=靠支撐半段）",minval=0.0,maxval=1.0,step=0.1,group=grp2)
 unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
 allowRepeat    = input.bool(false,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
@@ -7819,6 +7820,8 @@ inHTFBull = not na(htfBullTop) and not na(htfBullBot) and low >= htfBullBot and 
 inHTFBear = not na(htfBearTop) and not na(htfBearBot) and high <= htfBearTop and high >= _htfBearAllow and htfMSSDir == -1
 htfOkBull = unicornNeedHTF ? inHTFBull : true
 htfOkBear = unicornNeedHTF ? inHTFBear : true
+d1OkBull  = needD1Confirm ? d1MSSDir == 1  : true
+d1OkBear  = needD1Confirm ? d1MSSDir == -1 : true
 
 var bool unicornBull = false
 var bool unicornBear = false
@@ -7926,8 +7929,8 @@ if array.size(rb) > 0 and lastMSSDir == -1
 uBullEdge = unicornBull and not unicornBull[1]
 uBearEdge = unicornBear and not unicornBear[1]
 
-bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown
-bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown
+bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBull
+bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear
 
 if fireBull and fireBear
     fireBull := lastMSSDir >= 0
