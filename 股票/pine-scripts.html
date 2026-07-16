@@ -249,26 +249,31 @@ a:hover{text-decoration:underline}
       <div class="ver-main">
         <div id="unicorn-log-v8s" class="ver-log">
           <span class="vl-dot">›</span> <b>Strategy Tester 版（基於 V8）</b>：SMC狀態機+PB+OB位置修正，可直接在 TradingView Strategy Tester 計算勝率<br>
-          <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）
+          <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）<br>
+          <span class="vl-dot">›</span> 已含 strictMSSGate 嚴格反趨勢結構閘門開關（預設關閉）
         </div>
         <div id="unicorn-log-v8" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC 狀態機結構偵測</b>：改用 LuxAlgo 式 _smcTrend 狀態機（≠1才觸發bullMSS），CHoCH判斷與 SMC 指標完全一致<br>
           <span class="vl-dot">›</span> <b>消除雙重判斷延遲</b>：不再需要等到 HH+HL 或 LH+LL 各兩個 pivot 確認，一次結構轉換立即有效<br>
-          <span class="vl-dot">›</span> 繼承 V7 全部功能：CHoCH-only OB登記、PB推進塊、OB位置修正（swing low/high K棒）
+          <span class="vl-dot">›</span> 繼承 V7 全部功能：CHoCH-only OB登記、PB推進塊、OB位置修正（swing low/high K棒）<br>
+          <span class="vl-dot">›</span> <b>找回：嚴格反趨勢結構閘門開關</b>：新增 strictMSSGate 輸入（預設關閉），開啟後恢復V6當初的 HH+HL/LH+LL 雙pivot結構確認，跟現行 _smcTrend 去重機制疊加使用，不是互斥覆蓋。預設關閉是為了不讓現有訊號頻率被突然改變，想比較V6那種更保守判斷法的人可自行開啟做A/B測試
         </div>
         <div id="unicorn-log-v7s" class="ver-log">
           <span class="vl-dot">›</span> <b>Strategy Tester 版（基於 V7）</b>：CHoCH修正+PB+OB位置修正，可直接在 TradingView Strategy Tester 計算勝率<br>
-          <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）
+          <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）<br>
+          <span class="vl-dot">›</span> 已含 strictMSSGate 嚴格反趨勢結構閘門開關（預設關閉）
         </div>
         <div id="unicorn-log-v7" class="ver-log">
           <span class="vl-dot">›</span> <b>CHoCH 修正</b>：只有真正的結構轉換（空頭結構中向上突破 / 多頭結構中向下突破）才登記OB，消除 BOS 假訊號<br>
           <span class="vl-dot">›</span> <b>推進塊 PB</b>：OB 被確認後回測時畫出第二個訂單塊（推進塊），提供更高品質的二次進場機會<br>
-          <span class="vl-dot">›</span> HTF過濾預設關閉，可手動開啟做額外確認
+          <span class="vl-dot">›</span> HTF過濾預設關閉，可手動開啟做額外確認<br>
+          <span class="vl-dot">›</span> 已補回 strictMSSGate 嚴格反趨勢結構閘門開關（預設關閉，詳見V8說明）
         </div>
         <div id="unicorn-log-v6" class="ver-log">
           <span class="vl-dot">›</span> <b>結構過濾 MSS</b>：追蹤最近2個 Swing High/Low，LH+LL 空頭結構中封鎖多方訊號，HH+HL 多頭結構中封鎖空方訊號<br>
           <span class="vl-dot">›</span> <b>OB 實體門檻</b>：搜尋 OB 時過濾小K棒（實體 &lt; avgBody×0.6），避免以十字星或小實體K作為支撐<br>
-          <span class="vl-dot">›</span> 預計消除 60-75% 逆勢假訊號，趨勢反轉初期仍需等待結構確認後才觸發
+          <span class="vl-dot">›</span> 預計消除 60-75% 逆勢假訊號，趨勢反轉初期仍需等待結構確認後才觸發<br>
+          <span class="vl-dot">›</span> 這道 HH+HL/LH+LL 結構閘門後來在 V8 被拿掉，現已做成 strictMSSGate 開關補回（預設關閉，詳見V8說明）
         </div>
         <div id="unicorn-log-v4s" class="ver-log">
           <span class="vl-dot">›</span> <b>Strategy 回測版本</b>：同 V4 邏輯，改用 strategy() 讓 TradingView Strategy Tester 能直接計算勝率<br>
@@ -277,7 +282,8 @@ a:hover{text-decoration:underline}
         </div>
         <div id="unicorn-log-v4" class="ver-log">
           <span class="vl-dot">›</span> <b>訊號頻率恢復</b>：HTF PDA 確認預設關閉，訊號頻率回 V2 水準，可手動開啟加過濾<br>
-          <span class="vl-dot">›</span> <b>保留 V3 所有標示改進</b>：MSS 線置中、SWEEP 回溯偵測、barstate.isconfirmed、labels×500
+          <span class="vl-dot">›</span> <b>保留 V3 所有標示改進</b>：MSS 線置中、SWEEP 回溯偵測、barstate.isconfirmed、labels×500<br>
+          <span class="vl-dot">›</span> 已補回 strictMSSGate 嚴格反趨勢結構閘門開關（預設關閉，詳見V8說明）
         </div>
         <div id="unicorn-log-v3" class="ver-log" style="display:none">
           <span class="vl-dot">›</span> <b>HQ評分修正</b>：第3項改用 OB 高低差 ≥ avgBody，排除幾乎永遠成立的假分<br>
@@ -2685,6 +2691,7 @@ htfOBPrecision = input.float(0.5,"HTF OB 觸及精確度（0=全區間，0.5=靠
 unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
 allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
 sigCooldown    = input.int(5,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
+strictMSSGate  = input.bool(false,"啟用嚴格反趨勢結構閘門(HH+HL/LH+LL)",group=grp2,tooltip="V6曾用HH+HL(多頭)/LH+LL(空頭)雙pivot結構確認：只有當下結構真的與新方向相反（或尚無結構）才放行MSS。V8為了讓CHoCH時序與LuxAlgo SMC指標對齊而拿掉這道濾網，改成只做同方向去重(_smcTrend)。開啟=恢復V6這道較嚴格的反趨勢過濾，訊號會變少但更排除逆勢假訊號；關閉=維持V8現行邏輯，訊號較密集。預設關閉以維持既有訊號頻率不被突然改變，建議自行切換A/B比較兩種狀態何者較準。")
 
 grp3 = "HTF區間顯示"
 show5MOB  = input.bool(false,"顯示 5M OB",  group=grp3)
@@ -2841,10 +2848,15 @@ var bool hasMSSBull = false
 var bool hasMSSBear = false
 
 var int _smcTrend = 0
-_rawBullMSS   = not na(lastPH) and close > lastPH and close[1] <= lastPH
-_rawBearMSS   = not na(lastPL) and close < lastPL and close[1] >= lastPL
-bullMSS = _rawBullMSS and _smcTrend != 1
-bearMSS = _rawBearMSS and _smcTrend != -1
+_hasData        = not na(ph1) and not na(ph2) and not na(pl1) and not na(pl2)
+_isBullStruct   = _hasData and ph1 > ph2 and pl1 > pl2
+_isBearStruct   = _hasData and ph1 < ph2 and pl1 < pl2
+_rawBullMSS     = not na(lastPH) and close > lastPH and close[1] <= lastPH
+_rawBearMSS     = not na(lastPL) and close < lastPL and close[1] >= lastPL
+_structGateBull = strictMSSGate ? (_isBearStruct or not _hasData) : true
+_structGateBear = strictMSSGate ? (_isBullStruct or not _hasData) : true
+bullMSS = _rawBullMSS and _smcTrend != 1 and _structGateBull
+bearMSS = _rawBearMSS and _smcTrend != -1 and _structGateBear
 if _rawBullMSS
     _smcTrend := 1
 if _rawBearMSS
