@@ -7937,28 +7937,51 @@ if fireBull and fireBear
     fireBull := lastMSSDir > 0
     fireBear := lastMSSDir < 0
 
-var int _lTot = 0
-var int _lWin = 0
-var int _sTot = 0
-var int _sWin = 0
+var int _lTot   = 0
+var int _lWin   = 0
+var int _sTot   = 0
+var int _sWin   = 0
+var int _lHQTot = 0
+var int _lHQWin = 0
+var int _sHQTot = 0
+var int _sHQWin = 0
 if barstate.islast
-    _lTot := 0
-    _lWin := 0
-    _sTot := 0
-    _sWin := 0
-    for _ci = 0 to strategy.closedtrades - 1
-        _cpnl = strategy.closedtrades.profit(_ci)
-        _ceid = strategy.closedtrades.entry_id(_ci)
-        if _ceid == "L"
-            _lTot += 1
-            if _cpnl > 0
-                _lWin += 1
-        else
-            _sTot += 1
-            if _cpnl > 0
-                _sWin += 1
-_lWrStr = _lTot > 0 ? str.tostring(math.round(_lWin * 100.0 / _lTot)) + "% (" + str.tostring(_lWin) + "/" + str.tostring(_lTot) + ")" : "暫無"
-_sWrStr = _sTot > 0 ? str.tostring(math.round(_sWin * 100.0 / _sTot)) + "% (" + str.tostring(_sWin) + "/" + str.tostring(_sTot) + ")" : "暫無"
+    _lTot := 0, _lWin := 0, _sTot := 0, _sWin := 0
+    _lHQTot := 0, _lHQWin := 0, _sHQTot := 0, _sHQWin := 0
+    if strategy.closedtrades > 0
+        for _ci = 0 to strategy.closedtrades - 1
+            _cpnl = strategy.closedtrades.profit(_ci)
+            _ceid = strategy.closedtrades.entry_id(_ci)
+            _ciHQ = _ceid == "L_HQ" or _ceid == "S_HQ"
+            if _ceid == "L" or _ceid == "L_HQ"
+                _lTot += 1
+                if _cpnl > 0
+                    _lWin += 1
+                if _ciHQ
+                    _lHQTot += 1
+                    if _cpnl > 0
+                        _lHQWin += 1
+            else
+                _sTot += 1
+                if _cpnl > 0
+                    _sWin += 1
+                if _ciHQ
+                    _sHQTot += 1
+                    if _cpnl > 0
+                        _sHQWin += 1
+_lWrStr   = _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
+_sWrStr   = _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
+_lHQWrStr = _lHQTot > 0 ? str.tostring(math.round(_lHQWin * 100.0 / _lHQTot)) + "% (" + str.tostring(_lHQWin) + "/" + str.tostring(_lHQTot) + ")" : "暫無"
+_sHQWrStr = _sHQTot > 0 ? str.tostring(math.round(_sHQWin * 100.0 / _sHQTot)) + "% (" + str.tostring(_sHQWin) + "/" + str.tostring(_sHQTot) + ")" : "暫無"
+
+alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
+alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
+alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
+
+var line[] _tpLines = array.new_line()
+var line[] _slLines = array.new_line()
+_MAX_TPSL = 1
+_atr = ta.atr(atrLen)
 
 if fireBull and barstate.isconfirmed
     array.set(bb_signaled, trigBullIdx, true)
@@ -7968,6 +7991,16 @@ if fireBull and barstate.isconfirmed
     _lt    = _isHQ ? "HQ UM⭡" : "UM⭡"
     _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
+    _tpLev = close + _atr * tpATR
+    _slLev = close - _atr * slATR
+    _eid   = _isHQ ? "L_HQ" : "L"
+    strategy.entry(_eid, strategy.long)
+    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    _tl = line.new(bar_index, _tpLev, bar_index + 80, _tpLev, color=color.new(color.lime, 0), style=line.style_dashed, width=1)
+    _sl = line.new(bar_index, _slLev, bar_index + 80, _slLev, color=color.new(color.red,  0), style=line.style_dashed, width=1)
+    array.push(_tpLines, _tl), array.push(_slLines, _sl)
+    if array.size(_tpLines) > _MAX_TPSL
+        line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
 
 if fireBear and barstate.isconfirmed
     array.set(rb_signaled, trigBearIdx, true)
@@ -7977,33 +8010,13 @@ if fireBear and barstate.isconfirmed
     _lt    = _isHQ ? "HQ UM⭣" : "UM⭣"
     _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
-
-alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
-alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
-alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
-
-var line[] _tpLines = array.new_line()
-var line[] _slLines = array.new_line()
-_MAX_TPSL = 1
-
-_atr = ta.atr(atrLen)
-if fireBull and barstate.isconfirmed
-    _tpLev = close + _atr * tpATR
-    _slLev = close - _atr * slATR
-    strategy.entry("L", strategy.long)
-    strategy.exit("L_TP", "L", limit=_tpLev, stop=_slLev)
-    _tl = line.new(bar_index, _tpLev, bar_index + 80, _tpLev, color=color.new(color.lime,  0), style=line.style_dashed, width=1)
-    _sl = line.new(bar_index, _slLev, bar_index + 80, _slLev, color=color.new(color.red,   0), style=line.style_dashed, width=1)
-    array.push(_tpLines, _tl), array.push(_slLines, _sl)
-    if array.size(_tpLines) > _MAX_TPSL
-        line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
-if fireBear and barstate.isconfirmed
     _tpLev = close - _atr * tpATR
     _slLev = close + _atr * slATR
-    strategy.entry("S", strategy.short)
-    strategy.exit("S_TP", "S", limit=_tpLev, stop=_slLev)
-    _tl = line.new(bar_index, _tpLev, bar_index + 80, _tpLev, color=color.new(color.lime,  0), style=line.style_dashed, width=1)
-    _sl = line.new(bar_index, _slLev, bar_index + 80, _slLev, color=color.new(color.red,   0), style=line.style_dashed, width=1)
+    _eid   = _isHQ ? "S_HQ" : "S"
+    strategy.entry(_eid, strategy.short)
+    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    _tl = line.new(bar_index, _tpLev, bar_index + 80, _tpLev, color=color.new(color.lime, 0), style=line.style_dashed, width=1)
+    _sl = line.new(bar_index, _slLev, bar_index + 80, _slLev, color=color.new(color.red,  0), style=line.style_dashed, width=1)
     array.push(_tpLines, _tl), array.push(_slLines, _sl)
     if array.size(_tpLines) > _MAX_TPSL
         line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
@@ -8199,7 +8212,6 @@ if show1DFVG
         d1BearFvgBox := na
 
 step1 = inHTFBull or inHTFBear
-step2 = step1
 step3 = hasMSSBull or hasMSSBear
 step4 = array.size(bb) > 0 or array.size(rb) > 0
 var bool step5 = false
@@ -8212,69 +8224,80 @@ if array.size(rb) > 0
     for i = 0 to array.size(rb)-1
         if array.get(rb_hasFVG,i)
             step5 := true
-step6 = step4
 step7 = unicornBull or unicornBear
+var bool stepHQ = false
+stepHQ := false
+if array.size(bb) > 0
+    for i = 0 to array.size(bb)-1
+        if array.get(bb_isHQ,i)
+            stepHQ := true
+if array.size(rb) > 0
+    for i = 0 to array.size(rb)-1
+        if array.get(rb_isHQ,i)
+            stepHQ := true
 
 bullDir = hasMSSBull and (inHTFBull or not unicornNeedHTF)
 bearDir = hasMSSBear and (inHTFBear or not unicornNeedHTF)
-dirStr  = unicornBull?"▲ 做多進場":unicornBear?"▼ 做空進場":bullDir?"多方準備中":bearDir?"空方準備中":"觀望"
+dirStr  = unicornBull?"▲ 做多進場":unicornBear?"▼ 做空進場":bullDir?"多方準備":bearDir?"空方準備":"觀望"
 dirCol  = unicornBull or bullDir ? color.new(#1E88E5,0) : unicornBear or bearDir ? color.new(#FF8C00,0) : color.new(#888888,0)
 htfInfo = inHTFBull?"多方PDA":inHTFBear?"空方PDA":"未進入"
 mssInfo = hasMSSBull?"看漲":hasMSSBear?"看跌":"待確認"
 bbCnt   = array.size(bb)+array.size(rb)
-bbInfo  = bbCnt>0?str.tostring(bbCnt)+"個OB":"無"
-nextStr = not step3?"等待MSS":not step4?"等待OB":(not step5 and unicornNeedFVG)?"等待FVG":not step7?"等待回測OB":"已觸發!"
+bbInfo  = step4?str.tostring(bbCnt)+" BB":"等待"
+nextStr = not step3?"等待MSS":not step4?"等待BB":(not step5 and unicornNeedFVG)?"等待FVG":not step7?"等待進場":"已觸發!"
 
-_pos  = dashPos=="左下"?position.bottom_left:dashPos=="右下"?position.bottom_right:dashPos=="左上"?position.top_left:position.top_right
-_cbg  = color.new(#0D1117, 90)
-_chdr = color.new(#d0d3d8, 0)
-_cg   = color.new(#333333, 0)
-_co   = color.new(#333333, 0)
-_ick(v) => v ? color.new(#FF8C00, 0) : color.new(#555555, 0)
-_ckk(v) => v ? "✔" : "·"
+_pos   = dashPos=="左下"?position.bottom_left:dashPos=="右下"?position.bottom_right:dashPos=="左上"?position.top_left:position.top_right
+_cbg   = color.new(#0D1117, 0)
+_cHd   = color.new(#0f172a, 0)
+_cSep  = color.new(#1e293b, 0)
+_cGn   = color.new(#22c55e, 0)
+_cGr   = color.new(#475569, 0)
+_cGold = color.new(#fbbf24, 0)
+_cOr   = color.new(#FF8C00, 0)
+_cBl   = color.new(#1E88E5, 0)
 
 if showDash and barstate.islast
-    dash = table.new(_pos,9,4,bgcolor=_cbg,border_color=color.new(#888888,40),border_width=1,frame_color=color.new(#aaaaaa,0),frame_width=1)
-    table.cell(dash,0,0,"Unicorn·"+tfStr,text_color=_cg,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,1,0,"HTF PDA", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,2,0,"進入PDA", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,3,0,"MSS",     text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,4,0,"OB",      text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,5,0,"FVG",     text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,6,0,"突破OB",  text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,7,0,"Unicorn", text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,8,0,"進度",    text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,0,1,dirStr,       text_color=dirCol,     text_size=size.small, bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,1,1,_ckk(step1), text_color=_ick(step1),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,2,1,_ckk(step2), text_color=_ick(step2),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,3,1,_ckk(step3), text_color=_ick(step3),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,4,1,_ckk(step4), text_color=_ick(step4),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,5,1,_ckk(step5), text_color=_ick(step5),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,6,1,_ckk(step6), text_color=_ick(step6),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,7,1,_ckk(step7), text_color=_ick(step7),text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,8,1,nextStr,      text_color=color.new(#FF8C00,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_left)
-    table.cell(dash,0,2,"參考 "+htfStr,text_color=color.new(#333333,0),text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,1,2,htfInfo,      text_color=_ick(step1),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,2,2,step2?"已進入":"未進入",text_color=_ick(step2),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,3,2,mssInfo,      text_color=_ick(step3),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,4,2,bbInfo,       text_color=_ick(step4),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,5,2,step5?"有FVG":"無FVG",text_color=_ick(step5),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,6,2,step6?"已確認":"待確認",text_color=_ick(step6),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    _lWrPct  = _lTot > 0 ? _lWin * 100.0 / _lTot : -1.0
-    _sWrPct  = _sTot > 0 ? _sWin * 100.0 / _sTot : -1.0
-    _lWrCol2 = _lWrPct >= 0 ? (_lWrPct >= 50 ? color.new(#22c55e,0) : color.new(#ef4444,0)) : color.new(#888888,0)
-    _sWrCol2 = _sWrPct >= 0 ? (_sWrPct >= 50 ? color.new(#22c55e,0) : color.new(#ef4444,0)) : color.new(#888888,0)
-    table.cell(dash,0,3,"歷史勝率",  text_color=_co,text_size=size.small,bgcolor=_chdr,text_halign=text.align_center)
-    table.cell(dash,1,3,"",          text_color=_co,text_size=size.small,bgcolor=_cbg, text_halign=text.align_center)
-    table.cell(dash,2,3,"",          text_color=_co,text_size=size.small,bgcolor=_cbg, text_halign=text.align_center)
-    table.cell(dash,3,3,"",          text_color=_co,text_size=size.small,bgcolor=_cbg, text_halign=text.align_center)
-    table.cell(dash,4,3,"多▲",       text_color=color.new(#1E88E5,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,5,3,_lWrStr,     text_color=_lWrCol2,text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,6,3,"",          text_color=_co,text_size=size.small,bgcolor=_cbg, text_halign=text.align_center)
-    table.cell(dash,7,3,"空▼",       text_color=color.new(#FF8C00,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
-    table.cell(dash,8,3,_sWrStr,     text_color=_sWrCol2,text_size=size.normal,bgcolor=_cbg,text_halign=text.align_center)`;
+    dash = table.new(_pos, 2, 16, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
+    table.cell(dash, 0, 0, "Unicorn V9s · " + tfStr, text_color=color.white, text_size=size.small, bgcolor=_cHd, text_halign=text.align_left)
+    table.cell(dash, 1, 0, "參考 " + htfStr,          text_color=_cGr,        text_size=size.small, bgcolor=_cHd, text_halign=text.align_right)
+    table.cell(dash, 0, 1, "方向",                     text_color=_cGr,        text_size=size.small, bgcolor=_cHd, text_halign=text.align_left)
+    table.cell(dash, 1, 1, dirStr,                     text_color=dirCol,      text_size=size.small, bgcolor=_cHd, text_halign=text.align_right)
+    table.cell(dash, 0, 2, "Unicorn 核心",             text_color=_cGr,        text_size=size.tiny,  bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 2, "MSS → BB → FVG → 進場",   text_color=_cGr,        text_size=size.tiny,  bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 0, 3, (step3?"✔":"·") + " MSS 結構",   text_color=step3?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 3, mssInfo,                          text_color=step3?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 4, (step4?"✔":"·") + " Breaker (BB)", text_color=step4?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 4, bbInfo,                             text_color=step4?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 5, (step5?"✔":"·") + " FVG 缺口",    text_color=step5?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 5, step5?"有FVG":"無FVG",              text_color=step5?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 6, (step7?"✔":"·") + " 好的進場位",   text_color=step7?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 6, step7?"進入區間!":"等待回測",        text_color=step7?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 7, "下一步",  text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_left)
+    table.cell(dash, 1, 7, nextStr,   text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_right)
+    table.cell(dash, 0, 8, "品質過濾 (HQ OB)",  text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 8, "額外篩選條件",        text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 0, 9, (stepHQ?"★":"·") + " HQ品質 OB", text_color=stepHQ?_cGold:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 9, stepHQ?"高品質 ✔":"普通",           text_color=stepHQ?_cGold:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 10, (step1?"✔":"·") + " HTF PDA",  text_color=step1?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 10, htfInfo,                         text_color=step1?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 11, "勝率比較",    text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 11, "全部 vs HQ★", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _lWrPct   = _lTot   > 0 ? _lWin   * 100.0 / _lTot   : -1.0
+    _sWrPct   = _sTot   > 0 ? _sWin   * 100.0 / _sTot   : -1.0
+    _lHQWrPct = _lHQTot > 0 ? _lHQWin * 100.0 / _lHQTot : -1.0
+    _sHQWrPct = _sHQTot > 0 ? _sHQWin * 100.0 / _sHQTot : -1.0
+    _lWrC2    = _lWrPct   >= 0 ? (_lWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    _sWrC2    = _sWrPct   >= 0 ? (_sWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    _lHQWrC2  = _lHQWrPct >= 0 ? (_lHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    _sHQWrC2  = _sHQWrPct >= 0 ? (_sHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    table.cell(dash, 0, 12, "多▲ 全部", text_color=_cBl,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 12, _lWrStr,    text_color=_lWrC2,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 13, "多▲ HQ★",  text_color=_cGold,  text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 13, _lHQWrStr,  text_color=_lHQWrC2, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 14, "空▼ 全部", text_color=_cOr,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 14, _sWrStr,    text_color=_sWrC2,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 15, "空▼ HQ★",  text_color=_cGold,  text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 15, _sHQWrStr,  text_color=_sHQWrC2, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)`;
 
 const UNICORN_V4 = `//@version=5
 indicator("Unicorn Model HQOB (V4)", overlay=true, max_boxes_count=500, max_labels_count=500)
