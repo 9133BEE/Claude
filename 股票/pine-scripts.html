@@ -7980,18 +7980,20 @@ if barstate.islast
                     _sHQTot += 1
                     if _cpnl > 0
                         _sHQWin += 1
-_lWrStr   = _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
-_sWrStr   = _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
-_lHQWrStr = _lHQTot > 0 ? str.tostring(math.round(_lHQWin * 100.0 / _lHQTot)) + "% (" + str.tostring(_lHQWin) + "/" + str.tostring(_lHQTot) + ")" : "暫無"
-_sHQWrStr = _sHQTot > 0 ? str.tostring(math.round(_sHQWin * 100.0 / _sHQTot)) + "% (" + str.tostring(_sHQWin) + "/" + str.tostring(_sHQTot) + ")" : "暫無"
+var string _lWrStr   = "暫無"
+var string _sWrStr   = "暫無"
+var string _lHQWrStr = "暫無"
+var string _sHQWrStr = "暫無"
+if barstate.islast
+    _lWrStr   := _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
+    _sWrStr   := _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
+    _lHQWrStr := _lHQTot > 0 ? str.tostring(math.round(_lHQWin * 100.0 / _lHQTot)) + "% (" + str.tostring(_lHQWin) + "/" + str.tostring(_lHQTot) + ")" : "暫無"
+    _sHQWrStr := _sHQTot > 0 ? str.tostring(math.round(_sHQWin * 100.0 / _sHQTot)) + "% (" + str.tostring(_sHQWin) + "/" + str.tostring(_sHQTot) + ")" : "暫無"
 
 alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
 alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
 alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
 
-var line[] _tpLines = array.new_line()
-var line[] _slLines = array.new_line()
-_MAX_TPSL = 1
 _atr = ta.atr(atrLen)
 
 if fireBull and barstate.isconfirmed
@@ -8007,11 +8009,6 @@ if fireBull and barstate.isconfirmed
     _eid   = _isHQ ? "L_HQ" : "L"
     strategy.entry(_eid, strategy.long)
     strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
-    _tl = line.new(bar_index, _tpLev, bar_index + 80, _tpLev, color=color.new(color.lime, 0), style=line.style_dashed, width=1)
-    _sl = line.new(bar_index, _slLev, bar_index + 80, _slLev, color=color.new(color.red,  0), style=line.style_dashed, width=1)
-    array.push(_tpLines, _tl), array.push(_slLines, _sl)
-    if array.size(_tpLines) > _MAX_TPSL
-        line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
 
 if fireBear and barstate.isconfirmed
     array.set(rb_signaled, trigBearIdx, true)
@@ -8026,11 +8023,6 @@ if fireBear and barstate.isconfirmed
     _eid   = _isHQ ? "S_HQ" : "S"
     strategy.entry(_eid, strategy.short)
     strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
-    _tl = line.new(bar_index, _tpLev, bar_index + 80, _tpLev, color=color.new(color.lime, 0), style=line.style_dashed, width=1)
-    _sl = line.new(bar_index, _slLev, bar_index + 80, _slLev, color=color.new(color.red,  0), style=line.style_dashed, width=1)
-    array.push(_tpLines, _tl), array.push(_slLines, _sl)
-    if array.size(_tpLines) > _MAX_TPSL
-        line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
 
 bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
 
@@ -8290,8 +8282,10 @@ _cGnBg = color.new(#14532d, 0)
 _cAmBg = color.new(#451a03, 0)
 _fsz   = dashFont=="Tiny"?size.tiny:dashFont=="Normal"?size.normal:dashFont=="Large"?size.large:size.small
 
-if showDash and barstate.islast
-    dash = table.new(_pos, 2, 18, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
+var table dash = na
+if showDash
+    if na(dash)
+        dash := table.new(_pos, 2, 18, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
     table.cell(dash, 0, 0, "Unicorn V9s · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
     table.cell(dash, 1, 0, "參考 " + htfStr, text_color=_cGr, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_right)
     _dirBg = unicornBull?color.new(#0c2a47,0):unicornBear?color.new(#3b0f05,0):_cHd
