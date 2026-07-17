@@ -7451,6 +7451,7 @@ dashFont    = input.string("Small","儀表板字體",options=["Tiny","Small","No
 showBull    = input.bool(true,"顯示多方OB方框",group=grp4)
 showBear    = input.bool(true,"顯示空方OB方框",group=grp4)
 sigDays     = input.int(30,"訊號顯示天數",minval=1,maxval=90,group=grp4)
+showTPSL    = input.bool(true,"顯示TP/SL線",group=grp4)
 showBgColor = input.bool(false,"顯示條件背景色",group=grp4)
 
 grp5 = "透明度設定"
@@ -7995,6 +7996,11 @@ alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unico
 alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
 
 _atr = ta.atr(atrLen)
+var line[] _tpLines = array.new_line()
+var line[] _slLines = array.new_line()
+var label[] _tpLbls = array.new_label()
+var label[] _slLbls = array.new_label()
+_MAX_TPSL = 1
 
 if fireBull and barstate.isconfirmed
     array.set(bb_signaled, trigBullIdx, true)
@@ -8009,6 +8015,16 @@ if fireBull and barstate.isconfirmed
     _eid   = _isHQ ? "L_HQ" : "L"
     strategy.entry(_eid, strategy.long)
     strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    if showTPSL
+        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
+        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
+        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
+        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
+        array.push(_tpLines,_tl), array.push(_slLines,_sl)
+        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
+        if array.size(_tpLines) > _MAX_TPSL
+            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
+            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
 
 if fireBear and barstate.isconfirmed
     array.set(rb_signaled, trigBearIdx, true)
@@ -8023,6 +8039,16 @@ if fireBear and barstate.isconfirmed
     _eid   = _isHQ ? "S_HQ" : "S"
     strategy.entry(_eid, strategy.short)
     strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    if showTPSL
+        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
+        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
+        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
+        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
+        array.push(_tpLines,_tl), array.push(_slLines,_sl)
+        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
+        if array.size(_tpLines) > _MAX_TPSL
+            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
+            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
 
 bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
 
