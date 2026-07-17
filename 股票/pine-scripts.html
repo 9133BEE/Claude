@@ -7402,7 +7402,7 @@ if showDash and barstate.islast
     table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
 const UNICORN_V9_STRAT = `//@version=5
-strategy("Unicorn V9 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
+strategy("Unicorn V9s Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
 
 grpS   = "Strategy回測設定"
 tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
