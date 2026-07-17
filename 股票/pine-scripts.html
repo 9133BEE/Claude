@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -7447,6 +7447,7 @@ htfExtR   = input.int(30, "HTF右延伸K數",minval=5,             group=grp3)
 grp4 = "訊號顯示"
 showDash    = input.bool(true,"顯示儀表板",group=grp4)
 dashPos     = input.string("右下","儀表板位置",options=["左下","右下","左上","右上"],group=grp4)
+dashFont    = input.string("Small","儀表板字體",options=["Tiny","Small","Normal","Large"],group=grp4)
 showBull    = input.bool(true,"顯示多方OB方框",group=grp4)
 showBear    = input.bool(true,"顯示空方OB方框",group=grp4)
 sigDays     = input.int(30,"訊號顯示天數",minval=1,maxval=90,group=grp4)
@@ -7615,6 +7616,9 @@ var box[]   bb_fbox     = array.new_box()
 var box[]   bb_hqbox    = array.new_box()
 var bool[]  bb_signaled = array.new_bool()
 var bool[]  bb_isHQ     = array.new_bool()
+var bool[]  bb_hqBig   = array.new_bool()
+var bool[]  bb_hqLiq   = array.new_bool()
+var bool[]  bb_hqPDA   = array.new_bool()
 var bool[]  bb_pbDep    = array.new_bool()
 var bool[]  bb_pbSig    = array.new_bool()
 var box[]   bb_pbbox    = array.new_box()
@@ -7629,6 +7633,9 @@ var box[]   rb_fbox     = array.new_box()
 var box[]   rb_hqbox    = array.new_box()
 var bool[]  rb_signaled = array.new_bool()
 var bool[]  rb_isHQ     = array.new_bool()
+var bool[]  rb_hqBig   = array.new_bool()
+var bool[]  rb_hqLiq   = array.new_bool()
+var bool[]  rb_hqPDA   = array.new_bool()
 var bool[]  rb_pbDep    = array.new_bool()
 var bool[]  rb_pbSig    = array.new_bool()
 var box[]   rb_pbbox    = array.new_box()
@@ -7676,6 +7683,7 @@ f_bull_shift(toGrey = false) =>
     array.shift(bb), array.shift(bl), array.shift(bb_hasFVG)
     array.shift(bb_fvgT), array.shift(bb_fvgB)
     array.shift(bb_signaled), array.shift(bb_isHQ)
+    array.shift(bb_hqBig),  array.shift(bb_hqLiq),  array.shift(bb_hqPDA)
     _pbBx2 = array.shift(bb_pbbox)
     if not na(_pbBx2)
         box.delete(_pbBx2)
@@ -7702,6 +7710,7 @@ f_bear_shift(toGrey = false) =>
     array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
     array.shift(rb_fvgT), array.shift(rb_fvgB)
     array.shift(rb_signaled), array.shift(rb_isHQ)
+    array.shift(rb_hqBig),  array.shift(rb_hqLiq),  array.shift(rb_hqPDA)
     _pbBx3 = array.shift(rb_pbbox)
     if not na(_pbBx3)
         box.delete(_pbBx3)
@@ -7738,6 +7747,7 @@ if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
                 array.push(bb_hasFVG, fvgOk)
                 array.push(bb_fvgT, fvgT), array.push(bb_fvgB, fvgB)
                 array.push(bb_signaled, false), array.push(bb_isHQ, isHQ)
+                array.push(bb_hqBig, big), array.push(bb_hqLiq, liqGrab), array.push(bb_hqPDA, inPDA)
                 array.push(bb_pbDep, false), array.push(bb_pbSig, false), array.push(bb_pbbox, na)
                 if showBull
                     _bc = isHQ?color.new(#9C27B0,0):color.new(#1E88E5,0)
@@ -7792,6 +7802,7 @@ if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
                 array.push(rb_hasFVG, fvgOk)
                 array.push(rb_fvgT, fvgT), array.push(rb_fvgB, fvgB)
                 array.push(rb_signaled, false), array.push(rb_isHQ, isHQ)
+                array.push(rb_hqBig, big), array.push(rb_hqLiq, liqGrab), array.push(rb_hqPDA, inPDA)
                 array.push(rb_pbDep, false), array.push(rb_pbSig, false), array.push(rb_pbbox, na)
                 if showBear
                     _bc = isHQ?color.new(#9C27B0,0):color.new(#FF8C00,0)
@@ -8225,16 +8236,36 @@ if array.size(rb) > 0
         if array.get(rb_hasFVG,i)
             step5 := true
 step7 = unicornBull or unicornBear
-var bool stepHQ = false
-stepHQ := false
+var bool stepHQ    = false
+var bool stepHQfvg = false
+var bool stepHQbig = false
+var bool stepHQLiq = false
+var bool stepHQpda = false
+stepHQ := false, stepHQfvg := false, stepHQbig := false, stepHQLiq := false, stepHQpda := false
 if array.size(bb) > 0
     for i = 0 to array.size(bb)-1
         if array.get(bb_isHQ,i)
             stepHQ := true
+        if array.get(bb_hasFVG,i)
+            stepHQfvg := true
+        if array.get(bb_hqBig,i)
+            stepHQbig := true
+        if array.get(bb_hqLiq,i)
+            stepHQLiq := true
+        if array.get(bb_hqPDA,i)
+            stepHQpda := true
 if array.size(rb) > 0
     for i = 0 to array.size(rb)-1
         if array.get(rb_isHQ,i)
             stepHQ := true
+        if array.get(rb_hasFVG,i)
+            stepHQfvg := true
+        if array.get(rb_hqBig,i)
+            stepHQbig := true
+        if array.get(rb_hqLiq,i)
+            stepHQLiq := true
+        if array.get(rb_hqPDA,i)
+            stepHQpda := true
 
 bullDir = hasMSSBull and (inHTFBull or not unicornNeedHTF)
 bearDir = hasMSSBear and (inHTFBear or not unicornNeedHTF)
@@ -8255,33 +8286,49 @@ _cGr   = color.new(#475569, 0)
 _cGold = color.new(#fbbf24, 0)
 _cOr   = color.new(#FF8C00, 0)
 _cBl   = color.new(#1E88E5, 0)
+_cGnBg = color.new(#14532d, 0)
+_cAmBg = color.new(#451a03, 0)
+_fsz   = dashFont=="Tiny"?size.tiny:dashFont=="Normal"?size.normal:dashFont=="Large"?size.large:size.small
 
 if showDash and barstate.islast
-    dash = table.new(_pos, 2, 16, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
-    table.cell(dash, 0, 0, "Unicorn V9s · " + tfStr, text_color=color.white, text_size=size.small, bgcolor=_cHd, text_halign=text.align_left)
-    table.cell(dash, 1, 0, "參考 " + htfStr,          text_color=_cGr,        text_size=size.small, bgcolor=_cHd, text_halign=text.align_right)
-    table.cell(dash, 0, 1, "方向",                     text_color=_cGr,        text_size=size.small, bgcolor=_cHd, text_halign=text.align_left)
-    table.cell(dash, 1, 1, dirStr,                     text_color=dirCol,      text_size=size.small, bgcolor=_cHd, text_halign=text.align_right)
-    table.cell(dash, 0, 2, "Unicorn 核心",             text_color=_cGr,        text_size=size.tiny,  bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 1, 2, "MSS → BB → FVG → 進場",   text_color=_cGr,        text_size=size.tiny,  bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 0, 3, (step3?"✔":"·") + " MSS 結構",   text_color=step3?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 3, mssInfo,                          text_color=step3?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 4, (step4?"✔":"·") + " Breaker (BB)", text_color=step4?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 4, bbInfo,                             text_color=step4?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 5, (step5?"✔":"·") + " FVG 缺口",    text_color=step5?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 5, step5?"有FVG":"無FVG",              text_color=step5?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 6, (step7?"✔":"·") + " 好的進場位",   text_color=step7?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 6, step7?"進入區間!":"等待回測",        text_color=step7?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 7, "下一步",  text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_left)
-    table.cell(dash, 1, 7, nextStr,   text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_right)
-    table.cell(dash, 0, 8, "品質過濾 (HQ OB)",  text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 1, 8, "額外篩選條件",        text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 0, 9, (stepHQ?"★":"·") + " HQ品質 OB", text_color=stepHQ?_cGold:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 9, stepHQ?"高品質 ✔":"普通",           text_color=stepHQ?_cGold:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 10, (step1?"✔":"·") + " HTF PDA",  text_color=step1?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 10, htfInfo,                         text_color=step1?_cGn:_cGr, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 11, "勝率比較",    text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 1, 11, "全部 vs HQ★", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    dash = table.new(_pos, 2, 18, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
+    table.cell(dash, 0, 0, "Unicorn V9s · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
+    table.cell(dash, 1, 0, "參考 " + htfStr, text_color=_cGr, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_right)
+    _dirBg = unicornBull?color.new(#0c2a47,0):unicornBear?color.new(#3b0f05,0):_cHd
+    table.cell(dash, 0, 1, "方向", text_color=_cGr, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_left)
+    table.cell(dash, 1, 1, dirStr, text_color=dirCol, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_right)
+    table.cell(dash, 0, 2, "Unicorn 核心", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 2, "MSS → BB → FVG → 進場", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _bg3 = step3?_cGnBg:_cbg
+    table.cell(dash, 0, 3, (step3?"✔":"·") + " MSS 結構", text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_left)
+    table.cell(dash, 1, 3, mssInfo, text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_right)
+    _bg4 = step4?_cGnBg:_cbg
+    table.cell(dash, 0, 4, (step4?"✔":"·") + " Breaker (BB)", text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_left)
+    table.cell(dash, 1, 4, bbInfo, text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_right)
+    _bg5 = step5?_cGnBg:_cbg
+    table.cell(dash, 0, 5, (step5?"✔":"·") + " FVG 缺口", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_left)
+    table.cell(dash, 1, 5, step5?"有FVG":"無FVG", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_right)
+    _bg6 = step7?color.new(#0a3d1f,0):_cbg
+    table.cell(dash, 0, 6, (step7?"✔":"·") + " 好的進場位", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_left)
+    table.cell(dash, 1, 6, step7?"進入區間!":"等待回測", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_right)
+    table.cell(dash, 0, 7, "下一步", text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_left)
+    table.cell(dash, 1, 7, nextStr,  text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_right)
+    table.cell(dash, 0, 8, "HQ OB 品質 (4個條件)", text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 8, "3個以上 = HQ★",         text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _bg9 = stepHQfvg?_cAmBg:_cbg
+    table.cell(dash, 0, 9,  (stepHQfvg?"★":"·") + " FVG 缺口",    text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_left)
+    table.cell(dash, 1, 9,  stepHQfvg?"✔ 有缺口":"·",              text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_right)
+    _bg10 = stepHQbig?_cAmBg:_cbg
+    table.cell(dash, 0, 10, (stepHQbig?"★":"·") + " 大實體K棒",    text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_left)
+    table.cell(dash, 1, 10, stepHQbig?"✔ 大實體":"·",               text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_right)
+    _bg11 = stepHQLiq?_cAmBg:_cbg
+    table.cell(dash, 0, 11, (stepHQLiq?"★":"·") + " SSL/BSL掃除",  text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_left)
+    table.cell(dash, 1, 11, stepHQLiq?"✔ 有掃除":"·",               text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_right)
+    _bg12 = stepHQpda?_cAmBg:_cbg
+    table.cell(dash, 0, 12, (stepHQpda?"★":"·") + " HTF PDA",      text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_left)
+    table.cell(dash, 1, 12, stepHQpda?"✔ 在PDA":"·",                text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_right)
+    table.cell(dash, 0, 13, "勝率比較",    text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 13, "全部 vs HQ★", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
     _lWrPct   = _lTot   > 0 ? _lWin   * 100.0 / _lTot   : -1.0
     _sWrPct   = _sTot   > 0 ? _sWin   * 100.0 / _sTot   : -1.0
     _lHQWrPct = _lHQTot > 0 ? _lHQWin * 100.0 / _lHQTot : -1.0
@@ -8290,14 +8337,14 @@ if showDash and barstate.islast
     _sWrC2    = _sWrPct   >= 0 ? (_sWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
     _lHQWrC2  = _lHQWrPct >= 0 ? (_lHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
     _sHQWrC2  = _sHQWrPct >= 0 ? (_sHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
-    table.cell(dash, 0, 12, "多▲ 全部", text_color=_cBl,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 12, _lWrStr,    text_color=_lWrC2,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 13, "多▲ HQ★",  text_color=_cGold,  text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 13, _lHQWrStr,  text_color=_lHQWrC2, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 14, "空▼ 全部", text_color=_cOr,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 14, _sWrStr,    text_color=_sWrC2,   text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 15, "空▼ HQ★",  text_color=_cGold,  text_size=size.small, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 15, _sHQWrStr,  text_color=_sHQWrC2, text_size=size.small, bgcolor=_cbg, text_halign=text.align_right)`;
+    table.cell(dash, 0, 14, "多▲ 全部", text_color=_cBl,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 14, _lWrStr,    text_color=_lWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 15, "多▲ HQ★",  text_color=_cGold,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 15, _lHQWrStr,  text_color=_lHQWrC2, text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 16, "空▼ 全部", text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 16, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 17, "空▼ HQ★",  text_color=_cGold,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 17, _sHQWrStr,  text_color=_sHQWrC2, text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)`;
 
 const UNICORN_V4 = `//@version=5
 indicator("Unicorn Model HQOB (V4)", overlay=true, max_boxes_count=500, max_labels_count=500)
@@ -10368,7 +10415,7 @@ const VERSION_DEFS = {
     { key: 'u_v7', date: '2026-07-15', sub: 'CHoCH修正+PB推進塊 OB位置修正', contentId: 'unicorn-v7-wrap', logId: 'unicorn-log-v7' },
     { key: 'u_v7s', date: '2026-07-15', sub: 'V7 Strategy回測版 CHoCH+PB+OB位置', contentId: 'unicorn-v7s-wrap', logId: 'unicorn-log-v7s' },
     { key: 'u_v8', date: '2026-07-15', sub: 'SMC狀態機結構偵測 與LuxAlgo一致', contentId: 'unicorn-v8-wrap', logId: 'unicorn-log-v8' },
-    { key: 'u_v9s', date: '2026-07-17', sub: 'V9s Strategy：PB修復、勝率重算、預設值優化', contentId: 'unicorn-v9s-wrap', logId: 'unicorn-log-v9s' },
+    { key: 'u_v9s', date: '2026-07-17', sub: 'V9s Strategy：儀表板列出HQ OB 4個條件、整列亮色網底、字體選擇、全部/HQ勝率拆分', contentId: 'unicorn-v9s-wrap', logId: 'unicorn-log-v9s' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
