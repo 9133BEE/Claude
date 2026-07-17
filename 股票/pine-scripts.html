@@ -7421,12 +7421,12 @@ obTxtSize    = input.string("Small","OB文字大小",options=["Tiny","Small","No
 obTxtHAlign  = input.string("置中", "OB文字對齊",options=["置中","置左","置右"],          group=grp1)
 
 grp2 = "獨角獸模型"
-unicornNeedHTF = input.bool(true,  "需要HTF PDA+MSS確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需HTF為多方結構，空方訊號需HTF為空方結構，有效過濾逆勢假訊號")
+unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需HTF為多方結構，空方訊號需HTF為空方結構，有效過濾逆勢假訊號")
 needD1Confirm  = input.bool(false, "需要日線MSS趨勢確認",group=grp2,tooltip="開啟後多方訊號需日線MSS看多，空方訊號需日線MSS看空；有效過濾逆日線大趨勢的假訊號（上升趨勢中只做多，下降趨勢中只做空）")
 htfOBPrecision = input.float(0.5,"HTF OB 觸及精確度（0=全區間，0.5=靠支撐半段）",minval=0.0,maxval=1.0,step=0.1,group=grp2)
 unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
 allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
-sigCooldown    = input.int(2,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
+sigCooldown    = input.int(10,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
 strictMSSGate  = input.bool(true,"啟用嚴格反趨勢結構閘門(HH+HL/LH+LL)",group=grp2,tooltip="V6曾用HH+HL(多頭)/LH+LL(空頭)雙pivot結構確認：只有當下結構真的與新方向相反（或尚無結構）才放行MSS。V8曾為了讓CHoCH時序與LuxAlgo SMC指標對齊而拿掉這道濾網，改成只做同方向去重(_smcTrend)。經比對669行原始版後確認此濾網對過濾逆勢假訊號有實質幫助，V8起預設改為開啟；如需回到單純_smcTrend去重（訊號較密集）可手動關閉。")
 
 grp3 = "HTF區間顯示"
@@ -7933,16 +7933,19 @@ bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_s
 bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear
 
 if fireBull and fireBear
-    fireBull := lastMSSDir >= 0
+    fireBull := lastMSSDir > 0
     fireBear := lastMSSDir < 0
 
 var int _lTot = 0
 var int _lWin = 0
 var int _sTot = 0
 var int _sWin = 0
-if strategy.closedtrades > strategy.closedtrades[1]
-    _nNew = strategy.closedtrades - strategy.closedtrades[1]
-    for _ci = strategy.closedtrades - _nNew to strategy.closedtrades - 1
+if barstate.islast
+    _lTot := 0
+    _lWin := 0
+    _sTot := 0
+    _sWin := 0
+    for _ci = 0 to strategy.closedtrades - 1
         _cpnl = strategy.closedtrades.profit(_ci)
         _ceid = strategy.closedtrades.entry_id(_ci)
         if _ceid == "L"
@@ -7957,8 +7960,7 @@ _lWrStr = _lTot > 0 ? str.tostring(math.round(_lWin * 100.0 / _lTot)) + "% (" + 
 _sWrStr = _sTot > 0 ? str.tostring(math.round(_sWin * 100.0 / _sTot)) + "% (" + str.tostring(_sWin) + "/" + str.tostring(_sTot) + ")" : "暫無"
 
 if fireBull and barstate.isconfirmed
-    if not allowRepeat
-        array.set(bb_signaled, trigBullIdx, true)
+    array.set(bb_signaled, trigBullIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(bb_isHQ, trigBullIdx)
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#1E88E5,0)
@@ -7967,8 +7969,7 @@ if fireBull and barstate.isconfirmed
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
 
 if fireBear and barstate.isconfirmed
-    if not allowRepeat
-        array.set(rb_signaled, trigBearIdx, true)
+    array.set(rb_signaled, trigBearIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(rb_isHQ, trigBearIdx)
     _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#FF8C00,0)
