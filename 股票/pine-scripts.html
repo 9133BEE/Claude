@@ -247,11 +247,12 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
       </div>
       <div class="ver-main">
-        <div id="unicorn-log-v8s" class="ver-log">
+        <div id="unicorn-log-v9s" class="ver-log">
           <span class="vl-dot">›</span> <b>Strategy Tester 版（基於 V8）</b>：SMC狀態機+PB+OB位置修正，可直接在 TradingView Strategy Tester 計算勝率<br>
           <span class="vl-dot">›</span> 進場：價格觸及 OB 立即做多/空；停利/停損：ATR 倍數（預設 TP=2×、SL=1×）<br>
           <span class="vl-dot">›</span> 已含 strictMSSGate 嚴格反趨勢結構閘門開關，並自本次起凍結為獨立版本，不再隨 V3 主體異動<br>
           <span class="vl-dot">›</span> <b>2026-07-16更新</b>：strictMSSGate 預設改為開啟（比對669行原始版後確認有實質過濾效果）；HTF區間顯示預設只開1H OB（show1HOB=true），4H/1D OB維持關閉
+          <br><span class="vl-dot">›</span> <b>2026-07-17更新（V9s）</b>：unicornNeedHTF預設改關閉；sigCooldown預設10根；多空同觸發偏向邏輯修正；PB回撤追蹤修復（allowRepeat=true時也能正常運作）；勝率統計改為最後K棒全量掃描，設定更改後自動重算
         </div>
         <div id="unicorn-log-v8" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC 狀態機結構偵測</b>：改用 LuxAlgo 式 _smcTrend 狀態機（≠1才觸發bullMSS），CHoCH判斷與 SMC 指標完全一致<br>
@@ -311,7 +312,7 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 用途：想確認「後來的版本是不是真的比較好」，都應該回頭跟這份對照，而不是跟已經被動過的 V2 tab 對照
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
-        <div id="unicorn-v8s-wrap" style="display:none">
+        <div id="unicorn-v9s-wrap" style="display:none">
           <div class="code-block" id="unicorn-v8s-code"></div>
         </div>
         <div id="unicorn-v8-wrap" style="display:none">
@@ -7400,8 +7401,8 @@ if showDash and barstate.islast
     table.cell(dash,7,2,step7?"立即進場!":"等待中",text_color=_ick(step7),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)
     table.cell(dash,8,2,"",          text_color=color.new(#555555,0),text_size=size.small,bgcolor=_cbg,text_halign=text.align_center)`;
 
-const UNICORN_V8_STRAT = `//@version=5
-strategy("Unicorn V8 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
+const UNICORN_V9_STRAT = `//@version=5
+strategy("Unicorn V9 Strategy [Backtest]", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
 
 grpS   = "Strategy回測設定"
 tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
@@ -9914,7 +9915,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v8s' ? UNICORN_V8_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -10344,7 +10345,7 @@ const VERSION_DEFS = {
     { key: 'u_v7', date: '2026-07-15', sub: 'CHoCH修正+PB推進塊 OB位置修正', contentId: 'unicorn-v7-wrap', logId: 'unicorn-log-v7' },
     { key: 'u_v7s', date: '2026-07-15', sub: 'V7 Strategy回測版 CHoCH+PB+OB位置', contentId: 'unicorn-v7s-wrap', logId: 'unicorn-log-v7s' },
     { key: 'u_v8', date: '2026-07-15', sub: 'SMC狀態機結構偵測 與LuxAlgo一致', contentId: 'unicorn-v8-wrap', logId: 'unicorn-log-v8' },
-    { key: 'u_v8s', date: '2026-07-16', sub: 'V8 Strategy回測版 5分HTF修正→1H', contentId: 'unicorn-v8s-wrap', logId: 'unicorn-log-v8s' },
+    { key: 'u_v9s', date: '2026-07-17', sub: 'V9s Strategy：PB修復、勝率重算、預設值優化', contentId: 'unicorn-v9s-wrap', logId: 'unicorn-log-v9s' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
@@ -10426,7 +10427,7 @@ function tvc(key, el) {
 
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
-renderVerTabs('unicorn', 'u_v8s');
+renderVerTabs('unicorn', 'u_v9s');
 renderVerTabs('dashboard', 'd_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
