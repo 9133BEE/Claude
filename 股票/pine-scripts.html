@@ -7581,6 +7581,9 @@ htfFvgBT    = autoHTF=="60"?h1BFvgT:autoHTF=="240"?h4BFvgT:autoHTF=="D"?d1BFvgT:
 htfFvgBB    = autoHTF=="60"?h1BFvgB:autoHTF=="240"?h4BFvgB:autoHTF=="D"?d1BFvgB:wBFvgB
 htfFvgRT    = autoHTF=="60"?h1RFvgT:autoHTF=="240"?h4RFvgT:autoHTF=="D"?d1RFvgT:wRFvgT
 htfFvgRB    = autoHTF=="60"?h1RFvgB:autoHTF=="240"?h4RFvgB:autoHTF=="D"?d1RFvgB:wRFvgB
+h1W = math.max(bar_index - h1Days*barsPerDay, 1)
+h4W = math.max(bar_index - h4Days*barsPerDay, 1)
+d1W = math.max(bar_index - d1Days*barsPerDay, 1)
 htfFvgW     = autoHTF=="60"?h1W:autoHTF=="240"?h4W:autoHTF=="D"?d1W:math.max(bar_index-d1Days*barsPerDay,1)
 phH = ta.pivothigh(high,_pivL,_pivR)
 plL = ta.pivotlow(low, _pivL,_pivR)
@@ -8585,6 +8588,9 @@ htfFvgBT    = autoHTF=="60"?h1BFvgT:autoHTF=="240"?h4BFvgT:autoHTF=="D"?d1BFvgT:
 htfFvgBB    = autoHTF=="60"?h1BFvgB:autoHTF=="240"?h4BFvgB:autoHTF=="D"?d1BFvgB:wBFvgB
 htfFvgRT    = autoHTF=="60"?h1RFvgT:autoHTF=="240"?h4RFvgT:autoHTF=="D"?d1RFvgT:wRFvgT
 htfFvgRB    = autoHTF=="60"?h1RFvgB:autoHTF=="240"?h4RFvgB:autoHTF=="D"?d1RFvgB:wRFvgB
+h1W = math.max(bar_index - h1Days*barsPerDay, 1)
+h4W = math.max(bar_index - h4Days*barsPerDay, 1)
+d1W = math.max(bar_index - d1Days*barsPerDay, 1)
 htfFvgW     = autoHTF=="60"?h1W:autoHTF=="240"?h4W:autoHTF=="D"?d1W:math.max(bar_index-d1Days*barsPerDay,1)
 phH = ta.pivothigh(high,_pivL,_pivR)
 plL = ta.pivotlow(low, _pivL,_pivR)
