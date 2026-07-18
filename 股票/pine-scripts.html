@@ -248,7 +248,11 @@ a:hover{text-decoration:underline}
       </div>
       <div class="ver-main">
         <div id="unicorn-log-v10" class="ver-log">
-          <span class="vl-dot">›</span> <b>V10 Strategy（基於 V9s）</b>：UM 訊號強制要求 FVG + HTF PDA 同時滿足才進場，訊號標籤統一為「UM⭡」/「UM⭣」，儀表板改為單一 UM 勝率
+          <span class="vl-dot">›</span> <b>V10 Strategy（基於 V9s）</b>：UM 訊號定義收緊，FVG + HTF PDA 兩項條件全部強制開啟，不再作為可選開關<br>
+          <span class="vl-dot">›</span> <b>訊號標籤統一</b>：移除 HQ 前綴，所有訊號統一顯示「UM⭡」/「UM⭣」（橘/藍），進場 ID 簡化為 L / S<br>
+          <span class="vl-dot">›</span> <b>儀表板精簡</b>：勝率區塊從「全部 vs HQ★」4 行改為「UM 多▲ / 空▼」2 行，移除 HQ 勝率追蹤變數<br>
+          <span class="vl-dot">›</span> <b>Strategy 名稱</b>：改為 Unicorn&amp;HQOB V10<br>
+          <span class="vl-dot">›</span> <b>2026-07-19 修正</b>：h1W/h4W/d1W 定義移至 htfFvgW 前，修正「未宣明標識符」及「已定義」重複錯誤
         </div>
         <div id="unicorn-log-v9s" class="ver-log">
           <span class="vl-dot">›</span> <b>Strategy Tester 版（基於 V8）</b>：SMC狀態機+PB+OB位置修正，可直接在 TradingView Strategy Tester 計算勝率<br>
@@ -8412,7 +8416,7 @@ if showDash
 
 
 const UNICORN_V10_STRAT = `//@version=5
-strategy("Unicorn&HQOB", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
+strategy("Unicorn&HQOB V10", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
 
 grpS   = "Strategy回測設定"
 tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
