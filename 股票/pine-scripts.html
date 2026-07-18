@@ -7434,7 +7434,7 @@ grp3 = "HTF區間顯示"
 show5MOB  = input.bool(false,"顯示 5M OB",  group=grp3)
 m5Days    = input.int(1,  "5M 顯示天數", minval=1,maxval=5,   group=grp3)
 show1HOB  = input.bool(true, "顯示 1H OB",  group=grp3)
-show1HFVG = input.bool(false, "顯示 1H FVG", group=grp3)
+show1HFVG = input.bool(true,  "顯示 1H FVG", group=grp3)
 h1Days    = input.int(1,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
 show4HOB  = input.bool(false,"顯示 4H OB",  group=grp3)
 show4HFVG = input.bool(false,"顯示 4H FVG", group=grp3)
@@ -8168,9 +8168,9 @@ if show1HFVG
             box.set_bottom(h1BullFvgBox, h1BFvgB)
             box.set_bgcolor(h1BullFvgBox, color.new(#26A69A,_fvgT))
     else if not na(h1BullFvgBox)
-        box.delete(h1BullFvgBox)
-        h1BullFvgBox := na
-    if not na(h1RFvgT) and not na(h1RFvgB)
+    else if not na(h1BullFvgBox)
+        box.set_bgcolor(h1BullFvgBox, color.new(color.gray, math.min(98,_fvgT+3))), box.set_border_color(h1BullFvgBox, color.new(color.gray,60)), box.set_text_color(h1BullFvgBox, color.new(color.gray,30))
+
         if na(h1BearFvgBox)
             h1BearFvgBox := box.new(h1W,h1RFvgT,ZR,h1RFvgB,border_color=color.new(#EF5350,0),bgcolor=color.new(#EF5350,_fvgT),border_style=line.style_dashed,border_width=1,text="1H FVG-",text_color=color.new(#EF9A9A,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
         else
@@ -8181,8 +8181,8 @@ if show1HFVG
             box.set_bottom(h1BearFvgBox, h1RFvgB)
             box.set_bgcolor(h1BearFvgBox, color.new(#EF5350,_fvgT))
     else if not na(h1BearFvgBox)
-        box.delete(h1BearFvgBox)
-        h1BearFvgBox := na
+    else if not na(h1BearFvgBox)
+        box.set_bgcolor(h1BearFvgBox, color.new(color.gray, math.min(98,_fvgT+3))), box.set_border_color(h1BearFvgBox, color.new(color.gray,60)), box.set_text_color(h1BearFvgBox, color.new(color.gray,30))
 
 if show4HFVG
     if not na(h4BFvgT) and not na(h4BFvgB)
@@ -8196,9 +8196,9 @@ if show4HFVG
             box.set_bottom(h4BullFvgBox, h4BFvgB)
             box.set_bgcolor(h4BullFvgBox, color.new(#00BCD4,_fvgT))
     else if not na(h4BullFvgBox)
-        box.delete(h4BullFvgBox)
-        h4BullFvgBox := na
-    if not na(h4RFvgT) and not na(h4RFvgB)
+    else if not na(h4BullFvgBox)
+        box.set_bgcolor(h4BullFvgBox, color.new(color.gray, math.min(98,_fvgT+3))), box.set_border_color(h4BullFvgBox, color.new(color.gray,60)), box.set_text_color(h4BullFvgBox, color.new(color.gray,30))
+
         if na(h4BearFvgBox)
             h4BearFvgBox := box.new(h4W,h4RFvgT,ZR,h4RFvgB,border_color=color.new(#FF5722,0),bgcolor=color.new(#FF5722,_fvgT),border_style=line.style_dashed,border_width=2,text="4H FVG-",text_color=color.new(#FF8A65,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
         else
@@ -8209,8 +8209,8 @@ if show4HFVG
             box.set_bottom(h4BearFvgBox, h4RFvgB)
             box.set_bgcolor(h4BearFvgBox, color.new(#FF5722,_fvgT))
     else if not na(h4BearFvgBox)
-        box.delete(h4BearFvgBox)
-        h4BearFvgBox := na
+    else if not na(h4BearFvgBox)
+        box.set_bgcolor(h4BearFvgBox, color.new(color.gray, math.min(98,_fvgT+3))), box.set_border_color(h4BearFvgBox, color.new(color.gray,60)), box.set_text_color(h4BearFvgBox, color.new(color.gray,30))
 
 if show1DFVG
     if not na(d1BFvgT) and not na(d1BFvgB)
@@ -8224,9 +8224,9 @@ if show1DFVG
             box.set_bottom(d1BullFvgBox, d1BFvgB)
             box.set_bgcolor(d1BullFvgBox, color.new(#4CAF50,_fvgT))
     else if not na(d1BullFvgBox)
-        box.delete(d1BullFvgBox)
-        d1BullFvgBox := na
-    if not na(d1RFvgT) and not na(d1RFvgB)
+    else if not na(d1BullFvgBox)
+        box.set_bgcolor(d1BullFvgBox, color.new(color.gray, math.min(98,_fvgT+3))), box.set_border_color(d1BullFvgBox, color.new(color.gray,60)), box.set_text_color(d1BullFvgBox, color.new(color.gray,30))
+
         if na(d1BearFvgBox)
             d1BearFvgBox := box.new(d1W,d1RFvgT,ZR,d1RFvgB,border_color=color.new(#F44336,0),bgcolor=color.new(#F44336,_fvgT),border_style=line.style_dashed,border_width=2,text="1D FVG-",text_color=color.new(#EF9A9A,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
         else
@@ -8237,8 +8237,8 @@ if show1DFVG
             box.set_bottom(d1BearFvgBox, d1RFvgB)
             box.set_bgcolor(d1BearFvgBox, color.new(#F44336,_fvgT))
     else if not na(d1BearFvgBox)
-        box.delete(d1BearFvgBox)
-        d1BearFvgBox := na
+    else if not na(d1BearFvgBox)
+        box.set_bgcolor(d1BearFvgBox, color.new(color.gray, math.min(98,_fvgT+3))), box.set_border_color(d1BearFvgBox, color.new(color.gray,60)), box.set_text_color(d1BearFvgBox, color.new(color.gray,30))
 
 step1 = inHTFBull or inHTFBear
 step3 = hasMSSBull or hasMSSBear
