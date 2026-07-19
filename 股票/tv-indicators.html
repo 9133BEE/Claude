@@ -8795,70 +8795,80 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
 @media(max-width:640px){.my-row{grid-template-columns:1fr}.my-overview-grid{grid-template-columns:1fr 1fr}.my-detail-head{padding:12px 14px}.my-detail-body{padding:12px 14px}}
 </style>
 
-<div id="stab-my-body" style="display:none">
+<style>
+.my-split-layout{display:grid;grid-template-columns:220px 1fr;gap:0;min-height:600px}
+.my-sidebar{background:#0d1117;border-right:1px solid #21262d;padding:12px 0;position:sticky;top:52px;align-self:start;max-height:calc(100vh - 100px);overflow-y:auto}
+.my-sb-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-left:2px solid transparent;transition:background .12s,border-color .12s;user-select:none}
+.my-sb-item:hover{background:#161b22}
+.my-sb-item.active{background:#161b22;border-left-color:#8b5cf6}
+.my-sb-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0}
+.my-sb-info{flex:1;min-width:0}
+.my-sb-name{font-size:.78rem;font-weight:700;color:#c9d1d9;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.my-sb-role{font-size:.7rem;color:#484f58;margin-top:1px}
+.my-sb-item.active .my-sb-name{color:#c4b5fd}
+.my-sb-divider{height:1px;background:#21262d;margin:6px 12px}
+.my-content-area{padding:20px 24px 40px;min-width:0}
+.my-panel{display:none}
+.my-panel.active{display:block}
+@media(max-width:700px){
+  .my-split-layout{grid-template-columns:1fr}
+  .my-sidebar{position:static;max-height:none;border-right:none;border-bottom:1px solid #21262d;display:flex;flex-wrap:wrap;padding:8px}
+  .my-sb-item{border-left:none;border-bottom:2px solid transparent;padding:8px 10px;border-radius:6px}
+  .my-sb-item.active{border-bottom-color:#8b5cf6;background:#161b22}
+  .my-sb-role{display:none}
+  .my-content-area{padding:14px 12px 30px}
+}
+</style>
 
-<!-- 總覽 -->
-<div class="script-section">
-  <div class="script-section-title">📌 指標總覽 — 美股期貨 1分K 組合</div>
-  <div class="my-overview-grid">
-    <div class="my-ind-card">
-      <div class="my-ind-num">#1</div>
-      <div class="my-ind-icon">🧠</div>
-      <div class="my-ind-name">AlgoAlpha Sentiment Breakout</div>
-      <div class="my-ind-role">偵測整理箱型內的多空情緒，箱型突破時發出進場訊號</div>
-      <span class="my-ind-badge bpurple">主要訊號</span>
-    </div>
-    <div class="my-ind-card">
-      <div class="my-ind-num">#2</div>
-      <div class="my-ind-icon">🔷</div>
-      <div class="my-ind-name">LuxAlgo — Smart Money Concepts</div>
-      <div class="my-ind-role">顯示 BOS、CHoCH、訂單塊、FVG 等完整 SMC 市場結構</div>
-      <span class="my-ind-badge bblue">結構分析</span>
-    </div>
-    <div class="my-ind-card">
-      <div class="my-ind-num">#3</div>
-      <div class="my-ind-icon">📊</div>
-      <div class="my-ind-name">FVG / iFVG (Nephew_Sam_)</div>
-      <div class="my-ind-role">跨多時框（15m/1h/4h/日）顯示公平價值缺口與反向 FVG</div>
-      <span class="my-ind-badge bgreen">多時框 FVG</span>
-    </div>
-    <div class="my-ind-card">
-      <div class="my-ind-num">#4</div>
-      <div class="my-ind-icon">📋</div>
-      <div class="my-ind-name">期貨儀表板</div>
-      <div class="my-ind-role">整合 EMA/RSI/MACD/KD/VWAP 自動輸出訊號、停損停利</div>
-      <span class="my-ind-badge borange">整合儀表板</span>
-    </div>
-    <div class="my-ind-card">
-      <div class="my-ind-num">#5</div>
-      <div class="my-ind-icon">📐</div>
-      <div class="my-ind-name">SUP SET</div>
-      <div class="my-ind-role">基於樞紐點自動繪製多次觸碰的關鍵支撐/壓力線</div>
-      <span class="my-ind-badge bteal">支撐壓力</span>
-    </div>
-    <div class="my-ind-card">
-      <div class="my-ind-num">#6</div>
-      <div class="my-ind-icon">🕐</div>
-      <div class="my-ind-name">ATO V1</div>
-      <div class="my-ind-role">標記亞洲盤、美股盤前、美股正盤三個時段區間高低點</div>
-      <span class="my-ind-badge bblue">時段區間</span>
-    </div>
-    <div class="my-ind-card">
-      <div class="my-ind-num">#7</div>
-      <div class="my-ind-icon">📦</div>
-      <div class="my-ind-name">FVG Volume Profile [ChartPrime]</div>
-      <div class="my-ind-role">在 FVG 區間內顯示成交量分佈，找出 FVG 內的價值區</div>
-      <span class="my-ind-badge bteal">FVG 量能</span>
-    </div>
-    <div class="my-ind-card">
-      <div class="my-ind-num">#8</div>
-      <div class="my-ind-icon">🦄</div>
-      <div class="my-ind-name">Unicorn &amp; HQOB V10</div>
-      <div class="my-ind-role">Unicorn Model 七步策略，自動找 BB、FVG，整合 HTF PDA 確認</div>
-      <span class="my-ind-badge bpurple">主力腳本</span>
-    </div>
+<div id="stab-my-body" style="display:none">
+<div class="my-split-layout">
+
+<!-- 左側欄 -->
+<div class="my-sidebar">
+  <div class="my-sb-item active" onclick="showMyInd(0)">
+    <div class="my-sb-icon">🧠</div>
+    <div class="my-sb-info"><div class="my-sb-name">AlgoAlpha</div><div class="my-sb-role">主要進場訊號</div></div>
+  </div>
+  <div class="my-sb-item" onclick="showMyInd(1)">
+    <div class="my-sb-icon">🔷</div>
+    <div class="my-sb-info"><div class="my-sb-name">LuxAlgo SMC</div><div class="my-sb-role">市場結構分析</div></div>
+  </div>
+  <div class="my-sb-item" onclick="showMyInd(2)">
+    <div class="my-sb-icon">📊</div>
+    <div class="my-sb-info"><div class="my-sb-name">FVG / iFVG</div><div class="my-sb-role">多時框 FVG</div></div>
+  </div>
+  <div class="my-sb-item" onclick="showMyInd(3)">
+    <div class="my-sb-icon">📋</div>
+    <div class="my-sb-info"><div class="my-sb-name">期貨儀表板</div><div class="my-sb-role">整合訊號面板</div></div>
+  </div>
+  <div class="my-sb-item" onclick="showMyInd(4)">
+    <div class="my-sb-icon">📐</div>
+    <div class="my-sb-info"><div class="my-sb-name">SUP SET</div><div class="my-sb-role">支撐壓力線</div></div>
+  </div>
+  <div class="my-sb-item" onclick="showMyInd(5)">
+    <div class="my-sb-icon">🕐</div>
+    <div class="my-sb-info"><div class="my-sb-name">ATO V1</div><div class="my-sb-role">時段區間</div></div>
+  </div>
+  <div class="my-sb-item" onclick="showMyInd(6)">
+    <div class="my-sb-icon">📦</div>
+    <div class="my-sb-info"><div class="my-sb-name">FVG Volume Profile</div><div class="my-sb-role">FVG 量能分佈</div></div>
+  </div>
+  <div class="my-sb-item" onclick="showMyInd(7)">
+    <div class="my-sb-icon">🦄</div>
+    <div class="my-sb-info"><div class="my-sb-name">Unicorn &amp; HQOB V10</div><div class="my-sb-role">主力自訂腳本</div></div>
+  </div>
+  <div class="my-sb-divider"></div>
+  <div class="my-sb-item" onclick="showMyInd(8)">
+    <div class="my-sb-icon">🔗</div>
+    <div class="my-sb-info"><div class="my-sb-name">協同使用流程</div><div class="my-sb-role">八大指標搭配</div></div>
   </div>
 </div>
+
+<!-- 右側內容區 -->
+<div class="my-content-area">
+
+<!-- Panel 0: AlgoAlpha -->
+<div id="my-panel-0" class="my-panel active">
 
 <!-- ① AlgoAlpha Sentiment Breakout -->
 <div class="my-detail">
@@ -9345,7 +9355,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- ② LuxAlgo SMC -->
+</div><!-- end my-panel-0 -->
+
+<!-- Panel 1: LuxAlgo -->
+<div id="my-panel-1" class="my-panel">
 <div class="my-detail">
   <div class="my-detail-head">
     <div class="my-detail-num">2</div>
@@ -9391,7 +9404,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- ③ FVG/iFVG -->
+</div><!-- end my-panel-1 -->
+
+<!-- Panel 2: FVG/iFVG -->
+<div id="my-panel-2" class="my-panel">
 <div class="my-detail">
   <div class="my-detail-head">
     <div class="my-detail-num">3</div>
@@ -9437,7 +9453,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- ④ 期貨儀表板 -->
+</div><!-- end my-panel-2 -->
+
+<!-- Panel 3: 期貨儀表板 -->
+<div id="my-panel-3" class="my-panel">
 <div class="my-detail">
   <div class="my-detail-head">
     <div class="my-detail-num">4</div>
@@ -9462,7 +9481,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- ⑤ SUP SET -->
+</div><!-- end my-panel-3 -->
+
+<!-- Panel 4: SUP SET -->
+<div id="my-panel-4" class="my-panel">
 <div class="my-detail">
   <div class="my-detail-head">
     <div class="my-detail-num">5</div>
@@ -9496,7 +9518,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- ⑥ ATO V1 -->
+</div><!-- end my-panel-4 -->
+
+<!-- Panel 5: ATO V1 -->
+<div id="my-panel-5" class="my-panel">
 <div class="my-detail">
   <div class="my-detail-head">
     <div class="my-detail-num">6</div>
@@ -9547,7 +9572,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- ⑦ FVG Volume Profile -->
+</div><!-- end my-panel-5 -->
+
+<!-- Panel 6: FVG Volume Profile -->
+<div id="my-panel-6" class="my-panel">
 <div class="my-detail">
   <div class="my-detail-head">
     <div class="my-detail-num">7</div>
@@ -9580,7 +9608,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- ⑧ Unicorn & HQOB V10 -->
+</div><!-- end my-panel-6 -->
+
+<!-- Panel 7: Unicorn & HQOB -->
+<div id="my-panel-7" class="my-panel">
 <div class="my-detail">
   <div class="my-detail-head">
     <div class="my-detail-num">8</div>
@@ -9653,7 +9684,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
-<!-- 綜合使用流程 -->
+</div><!-- end my-panel-7 -->
+
+<!-- Panel 8: 協同流程 -->
+<div id="my-panel-8" class="my-panel">
 <div class="my-synergy">
   <h3>🔗 八大指標協同使用流程（美股期貨 21:30 開盤）</h3>
   <div class="my-flow">
@@ -9687,7 +9721,10 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
     </div>
   </div>
 </div>
+</div><!-- end my-panel-8 -->
 
+</div><!-- end my-content-area -->
+</div><!-- end my-split-layout -->
 </div><!-- end stab-my-body -->
 
   </div><!-- end stab-tw-body -->
@@ -9701,6 +9738,10 @@ function switchScript(s){
     document.getElementById('stab-'+x+'-body').style.display=s===x?'':'none';
     document.getElementById('stab-'+x).classList.toggle('active',s===x);
   });
+}
+function showMyInd(idx){
+  document.querySelectorAll('.my-sb-item').forEach(function(el,i){el.classList.toggle('active',i===idx);});
+  document.querySelectorAll('.my-panel').forEach(function(el,i){el.classList.toggle('active',i===idx);});
 }
 function copyScript(id){
   var ta=document.getElementById('script-'+id);
