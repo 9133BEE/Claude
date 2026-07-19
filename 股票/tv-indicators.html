@@ -8927,6 +8927,424 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
   </div>
 </div>
 
+<!-- AlgoAlpha 完整原理 -->
+<style>
+.theory-wrap{background:#0d1117;border:1px solid #21262d;border-radius:10px;margin-bottom:20px;overflow:hidden}
+.theory-head{padding:14px 22px;border-bottom:1px solid #21262d;background:#161b22;display:flex;align-items:center;gap:10px}
+.theory-head-icon{font-size:1.1rem}
+.theory-head-title{font-size:.95rem;font-weight:700;color:#c4b5fd}
+.theory-body{padding:20px 22px}
+.theory-step{margin-bottom:28px}
+.theory-step:last-child{margin-bottom:0}
+.theory-step-title{font-size:.88rem;font-weight:700;color:#e6edf3;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.theory-step-num{width:22px;height:22px;border-radius:50%;background:rgba(139,92,246,.25);border:1px solid rgba(139,92,246,.4);color:#c4b5fd;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.theory-step-desc{font-size:.84rem;color:#8b949e;line-height:1.8;margin-bottom:10px;word-break:break-word}
+.theory-step-desc strong{color:#c9d1d9}
+.theory-svg-wrap{background:#0a0e14;border:1px solid #21262d;border-radius:7px;overflow:hidden;margin:8px 0}
+.theory-svg-cap{font-size:.74rem;color:#484f58;text-align:center;padding:6px 0 8px;letter-spacing:.04em}
+.theory-note{background:rgba(139,92,246,.07);border-left:3px solid #8b5cf6;padding:9px 14px;border-radius:0 5px 5px 0;font-size:.82rem;color:#8b949e;line-height:1.7;margin-top:8px}
+.theory-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.theory-cbox{background:#0d1117;border:1px solid #21262d;border-radius:7px;padding:12px 14px}
+.theory-cbox h5{font-size:.77rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.theory-cbox ul{list-style:none;padding:0}
+.theory-cbox li{font-size:.82rem;color:#8b949e;padding:4px 0;border-bottom:1px solid #1a1f27;line-height:1.6}
+.theory-cbox li:last-child{border-bottom:none}
+.theory-cbox li::before{content:'›  ';color:#6b7280}
+.theory-ex{background:#161b22;border:1px solid #21262d;border-radius:7px;padding:14px 16px;margin-top:10px}
+.theory-ex h5{font-size:.78rem;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.theory-ex-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:6px;font-size:.83rem;color:#8b949e;line-height:1.7}
+.theory-ex-row:last-child{margin-bottom:0}
+.theory-ex-lbl{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fbbf24;font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+@media(max-width:640px){.theory-compare{grid-template-columns:1fr}}
+</style>
+
+<div class="theory-wrap">
+  <div class="theory-head">
+    <div class="theory-head-icon">📖</div>
+    <div class="theory-head-title">AlgoAlpha Sentiment Breakout — 完整原理圖解</div>
+  </div>
+  <div class="theory-body">
+
+    <!-- STEP 1 整理區間 -->
+    <div class="theory-step">
+      <div class="theory-step-title"><div class="theory-step-num">1</div>什麼是「整理區間」？指標怎麼認定？</div>
+      <div class="theory-step-desc">
+        指標每根K棒都在檢查：<strong>過去 Box Detection Length 根K棒內，最高點和最低點之間的距離</strong>是否夠「緊縮」。當這個距離相對穩定，沒有持續走高或走低時，就判定為整理中，開始畫箱子。
+      </div>
+      <div class="theory-svg-wrap">
+        <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%">
+          <rect width="700" height="200" fill="#0a0e14"/>
+          <!-- 左邊趨勢下跌 -->
+          <line x1="30" y1="40" x2="200" y2="110" stroke="#6b7280" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- 左側K棒（下跌） -->
+          <rect x="30" y="38" width="8" height="18" fill="#ef4444" rx="1"/>
+          <line x1="34" y1="32" x2="34" y2="62" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="55" y="48" width="8" height="16" fill="#ef4444" rx="1"/>
+          <line x1="59" y1="42" x2="59" y2="70" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="80" y="58" width="8" height="18" fill="#ef4444" rx="1"/>
+          <line x1="84" y1="52" x2="84" y2="82" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="105" y="68" width="8" height="16" fill="#22c55e" rx="1"/>
+          <line x1="109" y1="62" x2="109" y2="90" stroke="#22c55e" stroke-width="1.5"/>
+          <rect x="130" y="78" width="8" height="18" fill="#ef4444" rx="1"/>
+          <line x1="134" y1="72" x2="134" y2="102" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="155" y="82" width="8" height="14" fill="#22c55e" rx="1"/>
+          <line x1="159" y1="76" x2="159" y2="102" stroke="#22c55e" stroke-width="1.5"/>
+          <text x="90" y="165" font-size="11" fill="#6b7280" text-anchor="middle">趨勢下跌 → 不整理</text>
+
+          <!-- 中間整理區（箱子區域）-->
+          <rect x="195" y="90" width="250" height="62" fill="rgba(139,92,246,0.08)" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="5,3" rx="3"/>
+          <!-- 整理K棒 -->
+          <rect x="200" y="98" width="8" height="16" fill="#ef4444" rx="1"/>
+          <line x1="204" y1="93" x2="204" y2="120" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="220" y="105" width="8" height="14" fill="#22c55e" rx="1"/>
+          <line x1="224" y1="99" x2="224" y2="124" stroke="#22c55e" stroke-width="1.5"/>
+          <rect x="240" y="95" width="8" height="18" fill="#ef4444" rx="1"/>
+          <line x1="244" y1="90" x2="244" y2="118" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="260" y="102" width="8" height="14" fill="#22c55e" rx="1"/>
+          <line x1="264" y1="97" x2="264" y2="122" stroke="#22c55e" stroke-width="1.5"/>
+          <rect x="280" y="100" width="8" height="16" fill="#ef4444" rx="1"/>
+          <line x1="284" y1="95" x2="284" y2="120" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="300" y="104" width="8" height="14" fill="#22c55e" rx="1"/>
+          <line x1="304" y1="99" x2="304" y2="123" stroke="#22c55e" stroke-width="1.5"/>
+          <rect x="320" y="97" width="8" height="18" fill="#ef4444" rx="1"/>
+          <line x1="324" y1="92" x2="324" y2="120" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="340" y="103" width="8" height="12" fill="#22c55e" rx="1"/>
+          <line x1="344" y1="98" x2="344" y2="121" stroke="#22c55e" stroke-width="1.5"/>
+          <rect x="360" y="100" width="8" height="16" fill="#ef4444" rx="1"/>
+          <line x1="364" y1="94" x2="364" y2="120" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="380" y="102" width="8" height="12" fill="#22c55e" rx="1"/>
+          <line x1="384" y1="97" x2="384" y2="119" stroke="#22c55e" stroke-width="1.5"/>
+          <rect x="400" y="98" width="8" height="16" fill="#ef4444" rx="1"/>
+          <line x1="404" y1="92" x2="404" y2="118" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="420" y="104" width="8" height="12" fill="#22c55e" rx="1"/>
+          <line x1="424" y1="99" x2="424" y2="121" stroke="#22c55e" stroke-width="1.5"/>
+          <!-- 箱子標線 -->
+          <line x1="195" y1="90" x2="445" y2="90" stroke="#c4b5fd" stroke-width="1" stroke-dasharray="4,3" opacity=".6"/>
+          <line x1="195" y1="152" x2="445" y2="152" stroke="#c4b5fd" stroke-width="1" stroke-dasharray="4,3" opacity=".6"/>
+          <text x="320" y="182" font-size="11" fill="#c4b5fd" text-anchor="middle">整理中 → 箱子形成（Box Detection Length = 15根）</text>
+          <!-- 高低標示 -->
+          <text x="450" y="94" font-size="10" fill="#8b5cf6">箱頂（高點）</text>
+          <text x="450" y="156" font-size="10" fill="#8b5cf6">箱底（低點）</text>
+          <!-- 高度標示 -->
+          <line x1="447" y1="92" x2="447" y2="150" stroke="#8b5cf6" stroke-width="1"/>
+          <line x1="443" y1="92" x2="451" y2="92" stroke="#8b5cf6" stroke-width="1"/>
+          <line x1="443" y1="150" x2="451" y2="150" stroke="#8b5cf6" stroke-width="1"/>
+
+          <!-- 右邊突破 -->
+          <rect x="450" y="140" width="9" height="28" fill="#ef4444" rx="1"/>
+          <line x1="454.5" y1="134" x2="454.5" y2="172" stroke="#ef4444" stroke-width="1.5"/>
+          <rect x="468" y="155" width="9" height="30" fill="#ef4444" rx="1"/>
+          <line x1="472.5" y1="148" x2="472.5" y2="190" stroke="#ef4444" stroke-width="1.5"/>
+          <!-- 突破三角形 -->
+          <polygon points="454,176 462,188 470,176" fill="#f87171" opacity=".9"/>
+          <text x="495" y="182" font-size="11" fill="#f87171">▼ 向下突破</text>
+        </svg>
+      </div>
+      <div class="theory-svg-cap">整理判定示意圖 — 高低點在穩定範圍內來回 = 整理，箱子形成</div>
+      <div class="theory-note">
+        <strong>關鍵：</strong>不是任意 15 根K棒就畫箱子。指標要確認這 15 根的高低點「夠穩定」（沒有持續移動的趨勢），才認定為整理。如果 15 根內有一根大陽線或大陰線突破，就不會被視為整理。
+      </div>
+    </div>
+
+    <!-- STEP 2 情緒計算 -->
+    <div class="theory-step">
+      <div class="theory-step-title"><div class="theory-step-num">2</div>箱內情緒（Sentiment）怎麼計算？</div>
+      <div class="theory-step-desc">
+        每根K棒對情緒的貢獻，看的是<strong>收盤價在這根K棒高低點之間的相對位置</strong>。收盤越靠近最高點，多方貢獻越高；越靠近最低點，空方貢獻越高。勾選 <strong>Strong Closes Only</strong> 則只計算實體方向明確的K棒。
+      </div>
+      <div class="theory-svg-wrap">
+        <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%">
+          <rect width="700" height="220" fill="#0a0e14"/>
+          <!-- 標題 -->
+          <text x="350" y="22" font-size="11" fill="#6b7280" text-anchor="middle">每根K棒的情緒貢獻分析</text>
+          <!-- K棒1：強多（收盤靠頂） -->
+          <rect x="60" y="55" width="16" height="60" fill="#ef4444" rx="1"/>
+          <line x1="68" y1="40" x2="68" y2="125" stroke="#6b7280" stroke-width="1.5"/>
+          <circle cx="68" cy="60" r="4" fill="#4ade80" stroke="#22c55e" stroke-width="1.5"/>
+          <text x="68" y="38" font-size="10" fill="#4ade80" text-anchor="middle">收盤</text>
+          <text x="68" y="145" font-size="10" fill="#22c55e" text-anchor="middle">+強多</text>
+          <text x="68" y="157" font-size="10" fill="#4ade80" text-anchor="middle">收盤近頂部</text>
+          <line x1="60" y1="60" x2="85" y2="60" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,2" opacity=".6"/>
+
+          <!-- K棒2：強空（收盤靠底） -->
+          <rect x="160" y="65" width="16" height="55" fill="#ef4444" rx="1"/>
+          <line x1="168" y1="48" x2="168" y2="130" stroke="#6b7280" stroke-width="1.5"/>
+          <circle cx="168" cy="118" r="4" fill="#f87171" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="168" y="46" font-size="10" fill="#f87171" text-anchor="middle">收盤</text>
+          <text x="168" y="145" font-size="10" fill="#f87171" text-anchor="middle">−強空</text>
+          <text x="168" y="157" font-size="10" fill="#f87171" text-anchor="middle">收盤近底部</text>
+          <line x1="160" y1="118" x2="185" y2="118" stroke="#f87171" stroke-width="1" stroke-dasharray="3,2" opacity=".6"/>
+
+          <!-- K棒3：中性（收盤在中間） -->
+          <rect x="260" y="62" width="16" height="52" fill="#22c55e" rx="1"/>
+          <line x1="268" y1="48" x2="268" y2="124" stroke="#6b7280" stroke-width="1.5"/>
+          <circle cx="268" cy="88" r="4" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+          <text x="268" y="46" font-size="10" fill="#fbbf24" text-anchor="middle">收盤</text>
+          <text x="268" y="145" font-size="10" fill="#fbbf24" text-anchor="middle">≈ 中性</text>
+          <text x="268" y="157" font-size="10" fill="#fbbf24" text-anchor="middle">收盤在中間</text>
+
+          <!-- K棒4：Strong Closes Only 下被忽略的K棒（影線大實體小） -->
+          <rect x="360" y="80" width="16" height="8" fill="#22c55e" rx="1"/>
+          <line x1="368" y1="50" x2="368" y2="130" stroke="#6b7280" stroke-width="1.5"/>
+          <circle cx="368" cy="83" r="4" fill="#6b7280" stroke="#484f58" stroke-width="1.5"/>
+          <text x="368" y="46" font-size="10" fill="#484f58" text-anchor="middle">收盤</text>
+          <text x="368" y="145" font-size="10" fill="#484f58" text-anchor="middle">≈ 被跳過</text>
+          <text x="368" y="157" font-size="10" fill="#484f58" text-anchor="middle">影線大、實體小</text>
+          <!-- 跳過標記 -->
+          <text x="368" y="170" font-size="14" fill="#484f58" text-anchor="middle">✕</text>
+          <text x="368" y="183" font-size="9" fill="#484f58" text-anchor="middle">Strong Closes</text>
+          <text x="368" y="193" font-size="9" fill="#484f58" text-anchor="middle">Only 過濾</text>
+
+          <!-- 結果說明 -->
+          <rect x="480" y="40" width="190" height="140" rx="6" fill="#161b22" stroke="#21262d" stroke-width="1"/>
+          <text x="575" y="58" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="700">情緒加總邏輯</text>
+          <text x="490" y="80" font-size="10" fill="#4ade80">● 收盤在頂部 90%</text>
+          <text x="650" y="80" font-size="10" fill="#4ade80" text-anchor="end">→ +大貢獻</text>
+          <text x="490" y="98" font-size="10" fill="#22c55e">● 收盤在頂部 60%</text>
+          <text x="650" y="98" font-size="10" fill="#22c55e" text-anchor="end">→ +小貢獻</text>
+          <text x="490" y="116" font-size="10" fill="#fbbf24">● 收盤在中間 50%</text>
+          <text x="650" y="116" font-size="10" fill="#fbbf24" text-anchor="end">→ ≈ 中性</text>
+          <text x="490" y="134" font-size="10" fill="#ef4444">● 收盤在底部 30%</text>
+          <text x="650" y="134" font-size="10" fill="#ef4444" text-anchor="end">→ −小貢獻</text>
+          <text x="490" y="152" font-size="10" fill="#f87171">● 收盤在底部 10%</text>
+          <text x="650" y="152" font-size="10" fill="#f87171" text-anchor="end">→ −大貢獻</text>
+          <line x1="490" y1="161" x2="660" y2="161" stroke="#21262d" stroke-width="1"/>
+          <text x="490" y="174" font-size="10" fill="#c4b5fd">所有K棒加總 → Overall %</text>
+        </svg>
+      </div>
+      <div class="theory-svg-cap">情緒計算示意 — 收盤位置決定每根K棒的多空貢獻值</div>
+      <div class="theory-note">
+        <strong>Normalization Length 的作用：</strong>把加總後的原始情緒值，對比過去 N 根K棒的情緒範圍，轉換成 -100% ～ +100% 的標準化百分比。設定越大，百分比越平滑但反應慢；設定越小，百分比波動大但反應快。
+      </div>
+    </div>
+
+    <!-- STEP 3 Overall vs Current -->
+    <div class="theory-step">
+      <div class="theory-step-title"><div class="theory-step-num">3</div>Overall Sentiment vs Current Sentiment — 兩個數字的差別</div>
+      <div class="theory-step-desc">
+        同一個箱子會同時顯示兩個情緒數字，<strong>代表不同時間範圍的情緒方向</strong>，必須分開解讀。
+      </div>
+      <div class="theory-svg-wrap">
+        <svg viewBox="0 0 700 185" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%">
+          <rect width="700" height="185" fill="#0a0e14"/>
+          <!-- 箱子框 -->
+          <rect x="30" y="30" width="500" height="120" fill="rgba(239,68,68,.05)" stroke="#ef4444" stroke-width="1.5" rx="3"/>
+          <!-- 時間軸 -->
+          <line x1="30" y1="165" x2="530" y2="165" stroke="#21262d" stroke-width="1"/>
+          <!-- 前半段 K棒（偏空） -->
+          <rect x="40" y="75" width="7" height="25" fill="#ef4444" rx="1"/>
+          <rect x="55" y="80" width="7" height="22" fill="#ef4444" rx="1"/>
+          <rect x="70" y="72" width="7" height="28" fill="#ef4444" rx="1"/>
+          <rect x="85" y="78" width="7" height="20" fill="#22c55e" rx="1"/>
+          <rect x="100" y="82" width="7" height="24" fill="#ef4444" rx="1"/>
+          <rect x="115" y="76" width="7" height="26" fill="#ef4444" rx="1"/>
+          <rect x="130" y="80" width="7" height="20" fill="#22c55e" rx="1"/>
+          <rect x="145" y="74" width="7" height="28" fill="#ef4444" rx="1"/>
+          <rect x="160" y="79" width="7" height="22" fill="#ef4444" rx="1"/>
+          <rect x="175" y="77" width="7" height="24" fill="#ef4444" rx="1"/>
+          <!-- 後半段K棒（偏多） -->
+          <rect x="250" y="82" width="7" height="18" fill="#22c55e" rx="1"/>
+          <rect x="265" y="78" width="7" height="22" fill="#22c55e" rx="1"/>
+          <rect x="280" y="74" width="7" height="26" fill="#22c55e" rx="1"/>
+          <rect x="295" y="70" width="7" height="24" fill="#22c55e" rx="1"/>
+          <rect x="310" y="68" width="7" height="28" fill="#22c55e" rx="1"/>
+          <rect x="325" y="65" width="7" height="26" fill="#22c55e" rx="1"/>
+          <rect x="340" y="62" width="7" height="28" fill="#22c55e" rx="1"/>
+          <rect x="355" y="64" width="7" height="26" fill="#22c55e" rx="1"/>
+          <rect x="370" y="60" width="7" height="28" fill="#22c55e" rx="1"/>
+          <rect x="385" y="62" width="7" height="24" fill="#22c55e" rx="1"/>
+          <rect x="400" y="58" width="7" height="26" fill="#22c55e" rx="1"/>
+          <rect x="415" y="55" width="7" height="28" fill="#22c55e" rx="1"/>
+          <rect x="430" y="57" width="7" height="24" fill="#22c55e" rx="1"/>
+          <rect x="445" y="54" width="7" height="26" fill="#22c55e" rx="1"/>
+          <rect x="460" y="56" width="7" height="22" fill="#22c55e" rx="1"/>
+          <!-- Overall 覆蓋整個箱子的弧形指示 -->
+          <rect x="30" y="150" width="500" height="6" rx="3" fill="url(#gradOverall)"/>
+          <defs>
+            <linearGradient id="gradOverall" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#ef4444" stop-opacity=".8"/>
+              <stop offset="50%" stop-color="#ef4444" stop-opacity=".4"/>
+              <stop offset="100%" stop-color="#22c55e" stop-opacity=".6"/>
+            </linearGradient>
+          </defs>
+          <!-- Overall 標示 -->
+          <text x="280" y="148" font-size="10" fill="#f87171" text-anchor="middle">Overall Sentiment：整個箱子的加總 → 前半空方多 → Bearish</text>
+          <!-- Current 指向最後幾根 -->
+          <rect x="400" y="20" width="130" height="22" rx="4" fill="rgba(34,197,94,.15)" stroke="#22c55e" stroke-width="1"/>
+          <text x="465" y="34" font-size="10" fill="#4ade80" text-anchor="middle">Current：最後幾根 → Bullish +42%</text>
+          <line x1="465" y1="42" x2="465" y2="55" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <!-- 中間分隔線 -->
+          <line x1="225" y1="30" x2="225" y2="150" stroke="#484f58" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="225" y="170" font-size="9" fill="#484f58" text-anchor="middle">時間中點</text>
+          <!-- 前半標籤 -->
+          <text x="127" y="20" font-size="10" fill="#f87171" text-anchor="middle">前半段：偏空</text>
+          <!-- 後半標籤 -->
+          <text x="365" y="20" font-size="10" fill="#4ade80" text-anchor="middle">後半段：偏多（短期反彈）</text>
+        </svg>
+      </div>
+      <div class="theory-svg-cap">Overall = 整個箱子的淨情緒；Current = 最近幾根K棒的即時情緒</div>
+      <div class="theory-compare">
+        <div class="theory-cbox">
+          <h5 style="color:#c4b5fd">Overall Sentiment</h5>
+          <ul>
+            <li>計算整個箱子期間所有K棒</li>
+            <li>代表這次整理的<strong style="color:#c9d1d9">主力方向</strong></li>
+            <li>突破訊號的<strong style="color:#c9d1d9">主要依據</strong></li>
+            <li>不容易被幾根K棒改變</li>
+            <li>Bearish = 整理期間賣方主導</li>
+          </ul>
+        </div>
+        <div class="theory-cbox">
+          <h5 style="color:#fbbf24">Current Sentiment %</h5>
+          <ul>
+            <li>計算最近 N 根K棒的即時情緒</li>
+            <li>反映<strong style="color:#c9d1d9">此刻的短期衝力</strong></li>
+            <li>確認突破強度的<strong style="color:#c9d1d9">輔助參考</strong></li>
+            <li>容易受幾根大K棒影響</li>
+            <li>若與 Overall 反向 → 小心陷阱</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 四種組合例子 -->
+    <div class="theory-step">
+      <div class="theory-step-title"><div class="theory-step-num">4</div>四種實際情境例子</div>
+      <div class="theory-ex">
+        <h5>例子 A ✅ 最理想：Overall Bearish + Current 大負值 + 向下突破</h5>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">情況</div>
+          <div>整個箱子期間賣方主導，當下情緒也在加速往空，箱底被跌破</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">訊號</div>
+          <div>Overall: Bearish / Current: <span style="color:#f87171">-21%</span> / ▼ 三角形出現</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">操作</div>
+          <div>▼ 出現後立刻做空，止損放箱頂，目標 = 箱子高度 × 1.5</div>
+        </div>
+      </div>
+      <div class="theory-ex" style="margin-top:10px">
+        <h5>例子 B ⚠ 陷阱：Overall Bearish + Current 大正值 + 短期上衝</h5>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">情況</div>
+          <div>整體仍是空方結構，但箱內最後幾根K棒突然多方衝上來（誘多）</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">訊號</div>
+          <div>Overall: Bearish / Current: <span style="color:#4ade80">+41%</span> / 沒有向上突破箱頂</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">操作</div>
+          <div>不要做多！等這波多方衝力衰退後，重新看空方向突破機會</div>
+        </div>
+      </div>
+      <div class="theory-ex" style="margin-top:10px">
+        <h5>例子 C ✅ 理想做多：Overall Bullish + Current 大正值 + 向上突破</h5>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">情況</div>
+          <div>整個箱子期間買方主導，當下情緒也在加速往多，箱頂被突破</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">訊號</div>
+          <div>Overall: Bullish / Current: <span style="color:#4ade80">+18%</span> / ▲ 三角形出現</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">操作</div>
+          <div>▲ 出現後做多，止損放箱底，目標 = 箱子高度 × 1.5</div>
+        </div>
+      </div>
+      <div class="theory-ex" style="margin-top:10px">
+        <h5>例子 D ❌ 不操作：Current Sentiment &lt; 5%（情緒太弱）</h5>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">情況</div>
+          <div>箱子形成了，但 Current Sentiment 只有 3.78%，情緒幾乎中性</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">訊號</div>
+          <div>Overall: Bearish / Current: <span style="color:#fbbf24">+3.78%</span>（接近零）</div>
+        </div>
+        <div class="theory-ex-row">
+          <div class="theory-ex-lbl">操作</div>
+          <div>跳過，等下一個箱子。情緒沒有累積足夠能量，突破後往往走不遠</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 旁邊的% -->
+    <div class="theory-step">
+      <div class="theory-step-title"><div class="theory-step-num">5</div>箱子旁邊的百分比數字是什麼？</div>
+      <div class="theory-step-desc">
+        箱子左側顯示的一排百分比，是<strong>迷你量能分佈（Mini Volume Profile）</strong>，顯示箱型期間各個價位的<strong>相對交易活躍程度</strong>。
+      </div>
+      <div class="theory-svg-wrap">
+        <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%">
+          <rect width="700" height="200" fill="#0a0e14"/>
+          <!-- 箱子 -->
+          <rect x="180" y="20" width="320" height="160" fill="rgba(239,68,68,.06)" stroke="#ef4444" stroke-width="1.5" rx="3"/>
+          <!-- 量能分佈條（左側） -->
+          <!-- 各列的水平條 -->
+          <rect x="60" y="22" width="40" height="14" rx="2" fill="#ef4444" opacity=".3"/>
+          <text x="55" y="32" font-size="9" fill="#6b7280" text-anchor="end">685%</text>
+          <rect x="60" y="38" width="95" height="14" rx="2" fill="#ef4444" opacity=".5"/>
+          <text x="55" y="48" font-size="9" fill="#6b7280" text-anchor="end">3500%</text>
+          <rect x="60" y="54" width="150" height="14" rx="2" fill="#ef4444" opacity=".7"/>
+          <text x="55" y="64" font-size="9" fill="#ef4444" text-anchor="end">100.00%</text>
+          <text x="215" y="64" font-size="9" fill="#ef4444">← POC（最活躍）</text>
+          <rect x="60" y="70" width="110" height="14" rx="2" fill="#ef4444" opacity=".55"/>
+          <text x="55" y="80" font-size="9" fill="#6b7280" text-anchor="end">2480%</text>
+          <rect x="60" y="86" width="70" height="14" rx="2" fill="#ef4444" opacity=".4"/>
+          <text x="55" y="96" font-size="9" fill="#6b7280" text-anchor="end">680%</text>
+          <rect x="60" y="102" width="35" height="14" rx="2" fill="#ef4444" opacity=".25"/>
+          <text x="55" y="112" font-size="9" fill="#6b7280" text-anchor="end">138%</text>
+          <rect x="60" y="118" width="20" height="14" rx="2" fill="#ef4444" opacity=".2"/>
+          <text x="55" y="128" font-size="9" fill="#6b7280" text-anchor="end">81%</text>
+          <rect x="60" y="134" width="14" height="14" rx="2" fill="#ef4444" opacity=".15"/>
+          <text x="55" y="144" font-size="9" fill="#6b7280" text-anchor="end">54%</text>
+          <rect x="60" y="150" width="8" height="14" rx="2" fill="#ef4444" opacity=".1"/>
+          <text x="55" y="160" font-size="9" fill="#6b7280" text-anchor="end">29%</text>
+          <rect x="60" y="166" width="4" height="14" rx="2" fill="#ef4444" opacity=".08"/>
+          <text x="55" y="176" font-size="9" fill="#6b7280" text-anchor="end">6%</text>
+          <!-- 右側K棒 -->
+          <rect x="210" y="60" width="8" height="30" fill="#ef4444" rx="1"/>
+          <rect x="230" y="55" width="8" height="35" fill="#ef4444" rx="1"/>
+          <rect x="250" y="58" width="8" height="28" fill="#22c55e" rx="1"/>
+          <rect x="270" y="62" width="8" height="32" fill="#ef4444" rx="1"/>
+          <rect x="290" y="56" width="8" height="34" fill="#ef4444" rx="1"/>
+          <rect x="310" y="60" width="8" height="28" fill="#22c55e" rx="1"/>
+          <rect x="330" y="63" width="8" height="30" fill="#ef4444" rx="1"/>
+          <rect x="350" y="58" width="8" height="32" fill="#ef4444" rx="1"/>
+          <rect x="370" y="62" width="8" height="28" fill="#22c55e" rx="1"/>
+          <rect x="390" y="56" width="8" height="34" fill="#ef4444" rx="1"/>
+          <rect x="410" y="60" width="8" height="30" fill="#ef4444" rx="1"/>
+          <rect x="430" y="58" width="8" height="32" fill="#ef4444" rx="1"/>
+          <rect x="450" y="62" width="8" height="28" fill="#22c55e" rx="1"/>
+          <!-- 說明標 -->
+          <rect x="530" y="30" width="150" height="130" rx="5" fill="#161b22" stroke="#21262d" stroke-width="1"/>
+          <text x="605" y="48" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="700">如何解讀</text>
+          <text x="540" y="66" font-size="9" fill="#ef4444">100%</text>
+          <text x="580" y="66" font-size="9" fill="#8b949e">= POC，最磁吸點</text>
+          <text x="540" y="82" font-size="9" fill="#6b7280">&gt;50%</text>
+          <text x="580" y="82" font-size="9" fill="#8b949e">= 有撐/有壓</text>
+          <text x="540" y="98" font-size="9" fill="#6b7280">&lt;20%</text>
+          <text x="580" y="98" font-size="9" fill="#8b949e">= 容易穿越</text>
+          <line x1="540" y1="108" x2="670" y2="108" stroke="#21262d" stroke-width="1"/>
+          <text x="540" y="122" font-size="9" fill="#c4b5fd">POC 在箱子上半</text>
+          <text x="540" y="136" font-size="9" fill="#8b949e">→ 買方強</text>
+          <text x="540" y="150" font-size="9" fill="#f87171">POC 在箱子下半</text>
+          <text x="540" y="164" font-size="9" fill="#8b949e">→ 賣方強</text>
+        </svg>
+      </div>
+      <div class="theory-svg-cap">% 數字 = 各價位相對成交量；100% = POC（最活躍價位，最重要磁吸點）</div>
+      <div class="theory-note">
+        <strong>進場前看突破方向的邊緣 %：</strong>突破那側如果 % 很低（&lt;30%），代表那裡沒有太多成交在撐著，突破更乾淨有力。如果 % 很高（&gt;70%），代表那裡有大量成交，突破後容易被吸回來形成假突破。
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ② LuxAlgo SMC -->
 <div class="my-detail">
   <div class="my-detail-head">
