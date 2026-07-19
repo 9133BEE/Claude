@@ -7566,6 +7566,7 @@ a{color:#58a6ff;text-decoration:none}
   <div class="script-subtab-bar">
     <button class="stab active" id="stab-us" onclick="switchScript('us')">🇺🇸 美股期貨 1分K</button>
     <button class="stab" id="stab-tw" onclick="switchScript('tw')">🇹🇼 台股 1分K</button>
+    <button class="stab" id="stab-my" onclick="switchScript('my')">🎯 我的指標組合</button>
   </div>
 
   <!-- ══ 美股期貨 ══ -->
@@ -8743,12 +8744,542 @@ alertcondition(sellSignal, "台股 SELL", "{{ticker}} ▼ 賣出 @ {{close}}")</
 
   </div><!-- end stab-tw-body -->
 
+<!-- ══ 我的指標組合 ══ -->
+<style>
+.my-overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:32px}
+.my-ind-card{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px 16px;position:relative}
+.my-ind-card:hover{border-color:#30363d}
+.my-ind-num{position:absolute;top:10px;right:12px;font-size:.72rem;color:#484f58;font-weight:700}
+.my-ind-icon{font-size:1.3rem;margin-bottom:8px}
+.my-ind-name{font-size:.88rem;font-weight:700;color:#c9d1d9;line-height:1.3;margin-bottom:4px}
+.my-ind-role{font-size:.76rem;color:#6b7280;line-height:1.5}
+.my-ind-badge{display:inline-block;font-size:.7rem;padding:2px 7px;border-radius:3px;margin-top:6px;font-weight:600}
+.bpurple{background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.3)}
+.bblue{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.bgreen{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.borange{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.bred{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.bteal{background:rgba(20,184,166,.15);color:#2dd4bf;border:1px solid rgba(20,184,166,.3)}
+.my-detail{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:20px;overflow:hidden}
+.my-detail-head{padding:16px 22px;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:14px;background:#0f1318}
+.my-detail-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;background:rgba(139,92,246,.2);color:#c4b5fd;border:1px solid rgba(139,92,246,.3);flex-shrink:0}
+.my-detail-title{font-size:1rem;font-weight:700;color:#e6edf3;flex:1}
+.my-detail-version{font-size:.75rem;color:#484f58}
+.my-detail-body{padding:18px 22px}
+.my-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.my-box{background:#0d1117;border:1px solid #21262d;border-radius:7px;padding:14px 16px}
+.my-box h4{font-size:.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.my-box ul{list-style:none;padding:0}
+.my-box li{font-size:.84rem;color:#8b949e;padding:5px 0;border-bottom:1px solid #1a1f27;line-height:1.65}
+.my-box li:last-child{border-bottom:none}
+.my-box li::before{content:'›  ';color:#6b7280}
+.my-rule{background:#0d1117;border:1px solid #21262d;border-radius:7px;padding:14px 16px;margin-bottom:14px;font-size:.84rem;color:#8b949e;line-height:1.85}
+.my-rule strong{color:#c9d1d9}
+.my-entry{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;margin-top:8px;align-items:start}
+.my-entry-label{font-size:.78rem;font-weight:700;color:#6b7280;white-space:nowrap;padding-top:2px}
+.my-entry-val{font-size:.84rem;color:#8b949e;line-height:1.7}
+.my-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.my-warn{background:rgba(245,158,11,.07);border-left:3px solid #f59e0b;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.82rem;color:#8b949e;line-height:1.7;margin-top:12px}
+.my-synergy{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:22px 26px;margin-bottom:20px}
+.my-synergy h3{font-size:1rem;font-weight:700;color:#c4b5fd;margin-bottom:16px}
+.my-flow{display:flex;flex-direction:column;gap:10px}
+.my-flow-step{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start}
+.my-flow-dot{width:26px;height:26px;border-radius:50%;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#c4b5fd;flex-shrink:0;margin-top:1px}
+.my-flow-text{font-size:.84rem;color:#8b949e;line-height:1.7;padding-top:3px}
+.my-flow-text strong{color:#c9d1d9}
+.my-time-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:10px}
+.my-time-card{background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:10px 14px}
+.my-time-lbl{font-size:.72rem;color:#6b7280;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.my-time-val{font-size:.88rem;font-weight:700;color:#c9d1d9}
+.my-time-note{font-size:.74rem;color:#484f58;margin-top:2px}
+@media(max-width:640px){.my-row{grid-template-columns:1fr}.my-overview-grid{grid-template-columns:1fr 1fr}.my-detail-head{padding:12px 14px}.my-detail-body{padding:12px 14px}}
+</style>
+
+<div id="stab-my-body" style="display:none">
+
+<!-- 總覽 -->
+<div class="script-section">
+  <div class="script-section-title">📌 指標總覽 — 美股期貨 1分K 組合</div>
+  <div class="my-overview-grid">
+    <div class="my-ind-card">
+      <div class="my-ind-num">#1</div>
+      <div class="my-ind-icon">🧠</div>
+      <div class="my-ind-name">AlgoAlpha Sentiment Breakout</div>
+      <div class="my-ind-role">偵測整理箱型內的多空情緒，箱型突破時發出進場訊號</div>
+      <span class="my-ind-badge bpurple">主要訊號</span>
+    </div>
+    <div class="my-ind-card">
+      <div class="my-ind-num">#2</div>
+      <div class="my-ind-icon">🔷</div>
+      <div class="my-ind-name">LuxAlgo — Smart Money Concepts</div>
+      <div class="my-ind-role">顯示 BOS、CHoCH、訂單塊、FVG 等完整 SMC 市場結構</div>
+      <span class="my-ind-badge bblue">結構分析</span>
+    </div>
+    <div class="my-ind-card">
+      <div class="my-ind-num">#3</div>
+      <div class="my-ind-icon">📊</div>
+      <div class="my-ind-name">FVG / iFVG (Nephew_Sam_)</div>
+      <div class="my-ind-role">跨多時框（15m/1h/4h/日）顯示公平價值缺口與反向 FVG</div>
+      <span class="my-ind-badge bgreen">多時框 FVG</span>
+    </div>
+    <div class="my-ind-card">
+      <div class="my-ind-num">#4</div>
+      <div class="my-ind-icon">📋</div>
+      <div class="my-ind-name">期貨儀表板</div>
+      <div class="my-ind-role">整合 EMA/RSI/MACD/KD/VWAP 自動輸出訊號、停損停利</div>
+      <span class="my-ind-badge borange">整合儀表板</span>
+    </div>
+    <div class="my-ind-card">
+      <div class="my-ind-num">#5</div>
+      <div class="my-ind-icon">📐</div>
+      <div class="my-ind-name">SUP SET</div>
+      <div class="my-ind-role">基於樞紐點自動繪製多次觸碰的關鍵支撐/壓力線</div>
+      <span class="my-ind-badge bteal">支撐壓力</span>
+    </div>
+    <div class="my-ind-card">
+      <div class="my-ind-num">#6</div>
+      <div class="my-ind-icon">🕐</div>
+      <div class="my-ind-name">ATO V1</div>
+      <div class="my-ind-role">標記亞洲盤、美股盤前、美股正盤三個時段區間高低點</div>
+      <span class="my-ind-badge bblue">時段區間</span>
+    </div>
+    <div class="my-ind-card">
+      <div class="my-ind-num">#7</div>
+      <div class="my-ind-icon">📦</div>
+      <div class="my-ind-name">FVG Volume Profile [ChartPrime]</div>
+      <div class="my-ind-role">在 FVG 區間內顯示成交量分佈，找出 FVG 內的價值區</div>
+      <span class="my-ind-badge bteal">FVG 量能</span>
+    </div>
+    <div class="my-ind-card">
+      <div class="my-ind-num">#8</div>
+      <div class="my-ind-icon">🦄</div>
+      <div class="my-ind-name">Unicorn &amp; HQOB V10</div>
+      <div class="my-ind-role">Unicorn Model 七步策略，自動找 BB、FVG，整合 HTF PDA 確認</div>
+      <span class="my-ind-badge bpurple">主力腳本</span>
+    </div>
+  </div>
+</div>
+
+<!-- ① AlgoAlpha Sentiment Breakout -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">1</div>
+    <div class="my-detail-title">AlgoAlpha — Sentiment Breakout</div>
+    <div class="my-detail-version">設定 100 / 14 / Strong Closes Only ✓</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心邏輯：</strong> 偵測價格整理箱型 → 計算箱內多空情緒百分比 → 等待突破時方向確認<br>
+      <strong>實線突破</strong> = 收盤確認（強）　<strong>虛線突破</strong> = 僅影線刺穿（弱，易假突破）
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>參數說明</h4>
+        <ul>
+          <li><strong style="color:#c9d1d9">Normalization Length 100</strong><br>情緒標準化基準 100 根，越小反應越快</li>
+          <li><strong style="color:#c9d1d9">Box Detection Length 14</strong><br>偵測 14 根K棒的整理區間</li>
+          <li><strong style="color:#c9d1d9">Strong Closes Only ✓</strong><br>只算實體方向明確的K棒，過濾影線干擾</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>讀取方式</h4>
+        <ul>
+          <li><span class="tg">Overall Sentiment: Bullish</span> → 只考慮做多</li>
+          <li><span class="tr">Overall Sentiment: Bearish</span> → 只考慮做空</li>
+          <li>Current Sentiment <span class="tg">&gt; +8%</span> → 多方訊號夠強</li>
+          <li>Current Sentiment <span class="tr">&lt; -8%</span> → 空方訊號夠強</li>
+          <li>絕對值 <span class="ty">&gt; 12%</span> → 優先進場等級</li>
+          <li>絕對值 <span class="tr">&lt; 5%</span> → 情緒太弱，跳過</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-box" style="margin-bottom:14px">
+      <h4>進場四條件（全部符合才進）</h4>
+      <div class="my-entry">
+        <div class="my-entry-label">條件①</div>
+        <div class="my-entry-val">Overall Sentiment 方向明確（Bullish 或 Bearish）</div>
+        <div class="my-entry-label">條件②</div>
+        <div class="my-entry-val">Current Sentiment 絕對值 <strong>&gt; 8%</strong>（情緒夠強）</div>
+        <div class="my-entry-label">條件③</div>
+        <div class="my-entry-val"><span class="tg">▲</span> 突破箱頂且 Bullish / <span class="tr">▼</span> 跌破箱底且 Bearish（方向一致）</div>
+        <div class="my-entry-label">條件④</div>
+        <div class="my-entry-val">時間在 <strong>21:30–22:30</strong> 或 <strong>01:00–02:30</strong> 台灣時間</div>
+      </div>
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>NQ 1分K 建議參數（開盤）</h4>
+        <ul>
+          <li>Normalization Length：<span class="tg">40</span></li>
+          <li>Box Detection Length：<span class="tg">6</span></li>
+          <li>使用時段：21:30–22:30</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>黃金 1分K 建議參數</h4>
+        <ul>
+          <li>Normalization Length：<span class="tg">60</span></li>
+          <li>Box Detection Length：<span class="tg">8</span></li>
+          <li>情緒門檻提高到 &gt;10%</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-warn">⚠ 22:30–01:00 美國午盤，Current Sentiment 常反覆跳動，此時間段不建議依此指標進場</div>
+  </div>
+</div>
+
+<!-- ② LuxAlgo SMC -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">2</div>
+    <div class="my-detail-title">LuxAlgo — Smart Money Concepts Historical</div>
+    <div class="my-detail-version">All / All / small / 10 / 1 / ATR / 2 / 0.5</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心功能：</strong> SMC 全套工具組 — 自動標記市場結構（BOS/CHoCH）、訂單塊（OB）、公平價值缺口（FVG）、流動性高低點，是整體方向判斷的主要依據。
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>主要顯示元素</h4>
+        <ul>
+          <li><span class="tp">BOS（結構突破）</span>：延續原有趨勢方向</li>
+          <li><span class="tg">CHoCH（方向轉換）</span>：趨勢可能反轉訊號</li>
+          <li><span class="ty">訂單塊 OB</span>：機構買賣區域，重要支撐壓力</li>
+          <li><span class="tg">FVG（公平價值缺口）</span>：未平衡的價格區間</li>
+          <li>流動性：EQH/EQL 等高等低，目標獵取區</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>實線 vs 虛線說明</h4>
+        <ul>
+          <li><strong>實線 BOS/CHoCH</strong>：收盤確認，強力突破 ✅</li>
+          <li><strong>虛線 BOS/CHoCH</strong>：僅影線突破，可能假突破 ⚠</li>
+          <li>ATR High/Low 設定：用 ATR 過濾太小的波動</li>
+          <li>All 顯示設定：同時顯示 Internal + Swing 兩種結構層級</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-box" style="margin-bottom:14px">
+      <h4>如何搭配使用</h4>
+      <div class="my-entry">
+        <div class="my-entry-label">看方向</div>
+        <div class="my-entry-val">最新 BOS 是多方（向上）還是空方（向下），決定交易方向</div>
+        <div class="my-entry-label">找位置</div>
+        <div class="my-entry-val">等價格回落到 OB 或 FVG 區域，而非追高追低</div>
+        <div class="my-entry-label">確認反轉</div>
+        <div class="my-entry-val">出現 CHoCH（實線）才考慮反向，虛線 CHoCH 先觀望</div>
+      </div>
+    </div>
+    <div class="my-warn">⚠ LuxAlgo 的 Historical Colored 功能會把已過期的 OB/FVG 顯示成較暗的顏色，顏色較鮮豔的才是目前有效的區域</div>
+  </div>
+</div>
+
+<!-- ③ FVG/iFVG -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">3</div>
+    <div class="my-detail-title">FVG / iFVG (Nephew_Sam_)</div>
+    <div class="my-detail-version">60 / 60 / 240 / D — 顯示 15m · 1h · 4h · 日線 FVG</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心功能：</strong> 跨多個時框同時顯示公平價值缺口（FVG）與反向 FVG（iFVG）。不同時框的 FVG 有不同的重要性，時框越大，FVG 填補後的反彈/回落幅度越大。
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>FVG vs iFVG</h4>
+        <ul>
+          <li><span class="tg">FVG（公平價值缺口）</span>：三根K棒形成的未平衡區，價格傾向回來填補</li>
+          <li><span class="ty">iFVG（反向 FVG）</span>：FVG 被填補後轉換為支撐/壓力的區域，性質相反</li>
+          <li>收盤確認（Close-based）：用收盤而非影線判斷是否形成</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>各時框重要性</h4>
+        <ul>
+          <li><span class="ty">日線 FVG</span>：最重要，影響1-3天方向</li>
+          <li><span class="tp">4h FVG</span>：次要支撐/壓力，影響半天方向</li>
+          <li><span class="tg">1h FVG</span>：日內方向指引</li>
+          <li>15m FVG：短線進場點參考</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-box" style="margin-bottom:14px">
+      <h4>1分K 使用方式</h4>
+      <div class="my-entry">
+        <div class="my-entry-label">進場點</div>
+        <div class="my-entry-val">15m FVG 區間內尋找 1分K 訊號進場，精確進場點</div>
+        <div class="my-entry-label">目標</div>
+        <div class="my-entry-val">做多目標設在上方 FVG 上緣，做空目標設在下方 FVG 下緣</div>
+        <div class="my-entry-label">確認</div>
+        <div class="my-entry-val">1h/4h FVG 方向與交易方向一致，勝率更高</div>
+        <div class="my-entry-label">iFVG 用途</div>
+        <div class="my-entry-val">iFVG 填補後轉成壓力，可作為止損上方的護盾參考</div>
+      </div>
+    </div>
+    <div class="my-warn">⚠ 最多顯示 300 個 FVG（設定值），超過的舊 FVG 會自動消失。盤中出現大量 FVG 時，優先以最新的、時框大的為準</div>
+  </div>
+</div>
+
+<!-- ④ 期貨儀表板 -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">4</div>
+    <div class="my-detail-title">期貨儀表板（自動）</div>
+    <div class="my-detail-version">EMA 9/20/50 · RSI 7(75/25) · KD 5/3/3 · MACD 5/13/4 · ATR×1.2/×2.0</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心功能：</strong> 整合多指標自動計算，在圖表上以儀表板形式顯示當前狀態、進場訊號（▲做多/▼做空）、以及自動計算的停損停利位置。
+    </div>
+    <table class="panel-table">
+      <thead><tr><th>指標</th><th>設定值</th><th>多方訊號</th><th>空方訊號</th></tr></thead>
+      <tbody>
+        <tr><td>EMA</td><td>9 / 20 / 50</td><td>9&gt;20&gt;50 多頭排列</td><td>9&lt;20&lt;50 空頭排列</td></tr>
+        <tr><td>RSI</td><td>7，超買75，超賣25</td><td>25以下反彈機會</td><td>75以上回落機會</td></tr>
+        <tr><td>KD</td><td>5 / 3 / 3</td><td>KD 金叉（低檔）</td><td>KD 死叉（高檔）</td></tr>
+        <tr><td>MACD</td><td>5 / 13 / 4</td><td>MACD 金叉</td><td>MACD 死叉</td></tr>
+        <tr><td>ATR 停損</td><td>×1.2</td><td colspan="2">進場價 ± ATR×1.2</td></tr>
+        <tr><td>ATR 目標</td><td>×2.0</td><td colspan="2">進場價 ± ATR×2.0（風報比 1:1.67）</td></tr>
+      </tbody>
+    </table>
+    <div class="my-warn" style="margin-top:10px">⚠ 訊號需同時滿足：MACD或KD金叉 + EMA多頭排列 + RSI未超買 + VWAP上方（多單）才觸發 ▲。任一條件不符就不會出訊號</div>
+  </div>
+</div>
+
+<!-- ⑤ SUP SET -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">5</div>
+    <div class="my-detail-title">SUP SET — 支撐壓力自動偵測</div>
+    <div class="my-detail-version">樞紐 5 · 回看 50 · 最少觸碰 4 次 · Solid 實線</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心功能：</strong> 自動偵測歷史上被多次觸碰（至少4次）的價格位，繪製成水平支撐/壓力線。觸碰次數越多，該價位越重要。
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>設定說明</h4>
+        <ul>
+          <li><strong>樞紐 5</strong>：以左右各 5 根K棒確認高低點</li>
+          <li><strong>回看 50</strong>：往回查找 50 根K棒內的樞紐點</li>
+          <li><strong>最少觸碰 4</strong>：同一價位至少被觸碰 4 次才畫線</li>
+          <li><strong>Solid</strong>：顯示為實線（非虛線）</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>如何使用</h4>
+        <ul>
+          <li>接近 SUP SET 線做多：用線當支撐，止損放線下</li>
+          <li>接近 SUP SET 線做空：用線當壓力，止損放線上</li>
+          <li>突破 SUP SET 線：可能有效突破，確認後順方向做</li>
+          <li>1分K 上的 S/R 線 = 當日重要整數關卡</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-warn">⚠ 在高波動開盤時期，S/R 線可能被頻繁突破又縮回。建議搭配 AlgoAlpha 或 Unicorn 訊號確認後再操作，不要只憑觸線就進場</div>
+  </div>
+</div>
+
+<!-- ⑥ ATO V1 -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">6</div>
+    <div class="my-detail-title">ATO V1 — 時段區間指標</div>
+    <div class="my-detail-version">Asia 00:00–08:00 · Pre-Market 15:00–20:00 · US 20:30–05:00（台灣時間）</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心功能：</strong> 自動標記三個主要交易時段的高低點區間，並根據 ATR 計算目標位。機構常利用時段交接時搶奪流動性，理解時段區間是 SMC 的基礎之一。
+    </div>
+    <div class="my-time-grid">
+      <div class="my-time-card">
+        <div class="my-time-lbl">亞洲盤</div>
+        <div class="my-time-val">00:00 – 08:00</div>
+        <div class="my-time-note">台灣時間，流動性低，區間小</div>
+      </div>
+      <div class="my-time-card">
+        <div class="my-time-lbl">美股盤前</div>
+        <div class="my-time-val">15:00 – 20:00</div>
+        <div class="my-time-note">重要數據與消息時段</div>
+      </div>
+      <div class="my-time-card">
+        <div class="my-time-lbl">美股正盤</div>
+        <div class="my-time-val">20:30 – 05:00</div>
+        <div class="my-time-note">主要操作時段（你的交易窗口）</div>
+      </div>
+    </div>
+    <div class="my-row" style="margin-top:14px">
+      <div class="my-box">
+        <h4>時段區間的用法</h4>
+        <ul>
+          <li>亞洲盤高點：美股開盤常來獵取（往上假突破後反轉空）</li>
+          <li>亞洲盤低點：反之，往下假突破後反轉多</li>
+          <li>美股開盤 21:30 突破亞洲盤高/低點：確認當日方向</li>
+          <li>ATR 目標線：開盤後的合理波動目標參考</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>21:30 開盤操作參考</h4>
+        <ul>
+          <li>向上突破亞洲高點 → 觀察是否假突破</li>
+          <li>假突破後縮回箱內 → 可能做空機會</li>
+          <li>真突破且站穩亞洲高點 → 追多</li>
+          <li>搭配 AlgoAlpha 情緒確認更可靠</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-warn">⚠ NQ 在 21:30 開盤後的第一根5分K方向非常重要，ATO 的亞洲盤高低點是最常被獵取流動性的位置，要特別小心假突破</div>
+  </div>
+</div>
+
+<!-- ⑦ FVG Volume Profile -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">7</div>
+    <div class="my-detail-title">FVG Volume Profile [ChartPrime]</div>
+    <div class="my-detail-version">設定 4 / 15 / 0.5</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心功能：</strong> 在 FVG 區間內顯示成交量分佈（Volume Profile），找出 FVG 裡成交量最集中的位置（Point of Control, POC），作為更精確的支撐/壓力點。
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>讀取重點</h4>
+        <ul>
+          <li>FVG 上半部量多：買方較有主導，FVG 填補後偏強勢</li>
+          <li>FVG 下半部量多：賣方較有主導，填補後偏弱勢</li>
+          <li>量最多的位置（POC）是最重要的磁吸點</li>
+          <li>若 FVG 內量很少：這個 FVG 容易被快速穿越</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>參數說明</h4>
+        <ul>
+          <li><strong>4</strong>：顯示最近 4 個 FVG 的量能分佈</li>
+          <li><strong>15</strong>：每個 FVG 區分為 15 個價格區間</li>
+          <li><strong>0.5</strong>：最小 FVG 大小過濾（ATR 的 0.5 倍）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-warn">⚠ 此指標補強了傳統 FVG 「只看區間不看量」的不足。當 FVG 內量能不均勻，進場應靠近 POC 附近，止損更緊也更安全</div>
+  </div>
+</div>
+
+<!-- ⑧ Unicorn & HQOB V10 -->
+<div class="my-detail">
+  <div class="my-detail-head">
+    <div class="my-detail-num">8</div>
+    <div class="my-detail-title">Unicorn &amp; HQOB V10 — 主力自訂腳本</div>
+    <div class="my-detail-version">Pivot 2/1/14 · BB搜尋100K · 品質分≥0 · HQ門檻3分 · maxOBs 1</div>
+  </div>
+  <div class="my-detail-body">
+    <div class="my-rule"><strong>核心功能：</strong> 結合 SMC Unicorn Model 七步策略 + 高品質訂單塊（HQOB）自動偵測。在發生 MSS（市場結構突破）後自動找 BB（Breaker Block），等待價格回測時發出進場訊號（▲/▼ unicorn）。
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>Unicorn Model 七步驟</h4>
+        <ul>
+          <li>① HTF PDA 確認方向（可選）</li>
+          <li>② 進入 PDA 區間（折價/溢價）</li>
+          <li>③ MSS 市場結構突破</li>
+          <li>④ 找到 BB（Breaker Block）訂單塊</li>
+          <li>⑤ BB 內有 FVG 最佳（可選）</li>
+          <li>⑥ 價格突破 OB 後確認</li>
+          <li>⑦ 回測 OB 時出訊號進場</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>品質分（0-4分）說明</h4>
+        <ul>
+          <li>+1 OB 內有 FVG</li>
+          <li>+1 OB 是大實體K棒（&gt;均值1.5×）</li>
+          <li>+1 OB 出現在樞紐點附近</li>
+          <li>+1 OB 在折價/溢價區（PDA）</li>
+          <li><span class="tp">★ HQ 標籤</span>：品質分≥3分才顯示紫色高品質標記</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-box" style="margin-bottom:14px">
+      <h4>儀表板狀態讀取</h4>
+      <table class="panel-table" style="margin-bottom:0">
+        <thead><tr><th>儀表板欄位</th><th>金色 ✔</th><th>灰色 ·</th></tr></thead>
+        <tbody>
+          <tr><td>HTF PDA</td><td>在 HTF 支撐/壓力區內</td><td>未進入 HTF 區域</td></tr>
+          <tr><td>MSS</td><td>市場結構已確認轉向</td><td>尚未出現結構突破</td></tr>
+          <tr><td>BB OB</td><td>已找到有效訂單塊</td><td>無有效 OB</td></tr>
+          <tr><td>FVG</td><td>OB 內含 FVG</td><td>OB 內無 FVG</td></tr>
+          <tr><td>Unicorn</td><td>進場訊號觸發！</td><td>等待中</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="my-row">
+      <div class="my-box">
+        <h4>訊號種類</h4>
+        <ul>
+          <li><span class="tg">▲ unicorn</span>：一般多方進場訊號</li>
+          <li><span class="tp">▲ HQ unicorn</span>：高品質多方訊號（品質≥3）</li>
+          <li><span class="tr">▼ unicorn</span>：一般空方進場訊號</li>
+          <li><span class="tp">▼ HQ unicorn</span>：高品質空方訊號</li>
+          <li><span class="tp">★ HQ</span>：高品質 OB 建立時標記</li>
+        </ul>
+      </div>
+      <div class="my-box">
+        <h4>主要設定說明</h4>
+        <ul>
+          <li><strong>maxOBs 1</strong>：同一方向只保留最新1個OB，避免重疊</li>
+          <li><strong>BB搜尋100K</strong>：MSS後往回找100根內的OB</li>
+          <li><strong>OB右延伸30K</strong>：OB方框延伸30根到右邊</li>
+          <li><strong>訊號顯示30天</strong>：最近30天內的訊號標籤保留</li>
+          <li><strong>HTF PDA關閉</strong>：不強制要求HTF確認（更多訊號）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="my-warn">⚠ Unicorn 訊號只有在價格觸碰到 OB 區間時才觸發，若 OB 遠離當前價格可能很久不出訊號。可觀察儀表板進度，前幾步都打勾時耐心等待最後一步</div>
+  </div>
+</div>
+
+<!-- 綜合使用流程 -->
+<div class="my-synergy">
+  <h3>🔗 八大指標協同使用流程（美股期貨 21:30 開盤）</h3>
+  <div class="my-flow">
+    <div class="my-flow-step">
+      <div class="my-flow-dot">1</div>
+      <div class="my-flow-text"><strong>21:25 盤前準備</strong>：查看 ATO V1 的亞洲盤高低點，記住這兩個關鍵位。查看日線/4h FVG/iFVG 確認大方向</div>
+    </div>
+    <div class="my-flow-step">
+      <div class="my-flow-dot">2</div>
+      <div class="my-flow-text"><strong>21:30 開盤後等待</strong>：觀察開盤是否獵取亞洲盤流動性（假突破），LuxAlgo SMC 是否出現 CHoCH 或 MSS</div>
+    </div>
+    <div class="my-flow-step">
+      <div class="my-flow-dot">3</div>
+      <div class="my-flow-text"><strong>確認方向（Unicorn 儀表板）</strong>：看 MSS 和 BB OB 是否打勾，確認交易方向。SUP SET 確認該方向有支撐</div>
+    </div>
+    <div class="my-flow-step">
+      <div class="my-flow-dot">4</div>
+      <div class="my-flow-text"><strong>等待進場訊號</strong>：<strong>AlgoAlpha</strong> 出現整理箱 + Overall Sentiment 與方向一致 + Current Sentiment &gt; 8% + 箱型突破</div>
+    </div>
+    <div class="my-flow-step">
+      <div class="my-flow-dot">5</div>
+      <div class="my-flow-text"><strong>Unicorn 訊號輔助確認</strong>：若 <strong>Unicorn&HQOB</strong> 同時出現 ▲/▼ unicorn 訊號，信心加倍。FVG Volume Profile 確認 FVG 區間有量能支撐</div>
+    </div>
+    <div class="my-flow-step">
+      <div class="my-flow-dot">6</div>
+      <div class="my-flow-text"><strong>進場執行</strong>：依期貨儀表板顯示的自動停損（ATR×1.2）和目標（ATR×2.0）設定。止損放在 OB/FVG 區間外</div>
+    </div>
+    <div class="my-flow-step">
+      <div class="my-flow-dot">7</div>
+      <div class="my-flow-text"><strong>03:30 前全部平倉</strong>：當天不留倉，避免尾盤非理性波動。若提前到達目標直接出場</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end stab-my-body -->
+
+  </div><!-- end stab-tw-body -->
+
 </div><!-- end .script-wrap -->
 </div><!-- end #tab-script -->
 
 <script>
 function switchScript(s){
-  ['us','tw'].forEach(function(x){
+  ['us','tw','my'].forEach(function(x){
     document.getElementById('stab-'+x+'-body').style.display=s===x?'':'none';
     document.getElementById('stab-'+x).classList.toggle('active',s===x);
   });
