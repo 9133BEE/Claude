@@ -755,15 +755,56 @@ if showDash and barstate.islast
     </div><!-- /.ver-layout -->
     <div class="tips-box" style="margin-top:10px">
       <h4>使用說明</h4>
+
+      <p style="margin:6px 0 4px;font-weight:600;color:#e2c97e">▍ 圖表元素說明</p>
       <ul>
-        <li>貼到 TradingView → Pine 編輯器 → 儲存 → 加到圖表</li>
-        <li><b>Auto 模式</b>：切換圖表時框時自動調整樞紐與搜尋參數，無需手動設定</li>
-        <li><b>進場邏輯</b>：等待 MSS（結構突破）→ 找到 OB → 價格回測 OB 區間 → ▲/▼ unicorn 出現再進場</li>
-        <li><b>出場邏輯</b>：結構反轉時自動出現「⚠ 多單/空單出場」標籤，提示平倉時機</li>
-        <li><b>+OB / -OB x/4</b>：品質分數，3分以上升級為 HQ（紫色），優先交易高分 OB</li>
-        <li><b>HTF OB 方框</b>（1H/4H/1D）：大時框訂單塊，可作為目標區間或進場參考</li>
-        <li><b>HTF FVG 方框</b>（虛線）：大時框公平價值缺口，被填滿後自動消失</li>
-        <li>止損建議放在 OB 另一端（頂部或底部）外側 1–2 個 tick</li>
+        <li><b>MSS 水平線</b>（Market Structure Shift）：結構突破線。多方 MSS = 空頭結構中向上突破前高，空方 MSS = 多頭結構中向下跌破前低。MSS 出現後代表方向轉換，訊號搜尋才開始啟動。</li>
+        <li><b>+OB / -OB 方框</b>（Order Block / Breaker Block）：MSS 觸發後往回找到的最後一根反向K棒作為訂單塊。<br>
+          &ensp;• 多方 OB（+OB，綠/藍）：做空最後一根K棒，回測時為做多區間<br>
+          &ensp;• 空方 OB（-OB，橘/紅）：做多最後一根K棒，回測時為做空區間<br>
+          &ensp;• 標籤右側數字 <b>x/4</b> 為 HQ 品質分數（見下方）；分數 ≥ hqMin（預設 3）顯示 HQ★
+        </li>
+        <li><b>HTF OB 方框</b>（1H / 4H / 1D，實線）：大時框訂單塊，依當前時框自動切換（5M 圖→顯示 1H OB，15M→4H OB，4H→週線 OB）。可作為進場目標區或方向偏向參考。</li>
+        <li><b>HTF FVG 方框</b>（虛線）：大時框公平價值缺口（Fair Value Gap）。FVG 被填滿後變灰色，未被填滿時為綠色（多方）/紅色（空方）。方向與 HTF OB 相同邏輯。</li>
+        <li><b>UM⭡ / UM⭣ 訊號標籤</b>（Unicorn Model）：所有進場條件同時滿足時出現。橘色向下箭頭＝空方訊號；藍色向上箭頭＝多方訊號。</li>
+        <li><b>PB 推進塊</b>（Propulsion Block）：OB 被確認回測後，進一步找到下一個潛在支撐/阻力塊。出現時代表趨勢延伸中的二次進場機會。</li>
+        <li><b>⚠ 出場標籤</b>：當 MSS 方向反轉時，自動出現「⚠ 多單出場」/「⚠ 空單出場」，提醒平倉時機。</li>
+      </ul>
+
+      <p style="margin:10px 0 4px;font-weight:600;color:#e2c97e">▍ HQ OB 品質評分（0–4 分）</p>
+      <ul>
+        <li><b>① FVG 缺口</b>：OB 形成當根K棒旁有公平價值缺口（上下影線之間有跳空）→ +1</li>
+        <li><b>② 大實體K棒</b>：OB 那根K棒實體夠大（相對 ATR）→ +1</li>
+        <li><b>③ SSL / BSL 掃除</b>：OB 形成前有掃過流動性（獵取止損）→ +1</li>
+        <li><b>④ HTF PDA 確認</b>：OB 位置落在大時框 Premium / Discount Area（折扣區或溢價區）→ +1</li>
+        <li>累計 ≥ 3 分 → 升級為 <b>HQ★</b>（高品質訂單塊），標籤變金色，優先考慮交易</li>
+      </ul>
+
+      <p style="margin:10px 0 4px;font-weight:600;color:#e2c97e">▍ Unicorn Model 訊號觸發條件（全部滿足才進場）</p>
+      <ul>
+        <li><b>Step 1 MSS</b>：出現結構突破，確定多/空方向</li>
+        <li><b>Step 2 OB</b>：MSS 後有有效訂單塊尚未被破壞</li>
+        <li><b>Step 3 FVG</b>（V10 強制）：OB 附近存在公平價值缺口</li>
+        <li><b>Step 4 HTF PDA</b>（V10 強制）：當前價格在大時框的 Discount / Premium 區間內</li>
+        <li><b>Step 5 回測進場</b>：價格回測進入 OB（或 OB+FVG 重疊）區間的第一根K棒 → 觸發 UM⭡ / UM⭣</li>
+        <li>冷卻機制：同方向訊號觸發後，sigCooldown 根K棒內不重複發訊（預設 10 根）</li>
+      </ul>
+
+      <p style="margin:10px 0 4px;font-weight:600;color:#e2c97e">▍ 儀表板解讀（右下角）</p>
+      <ul>
+        <li><b>方向列</b>：▲ 做多進場 / ▼ 做空進場 / 多方準備中 / 空方準備中 / 觀望</li>
+        <li><b>Unicorn 核心</b>四步驟（✔ = 已達成，· = 尚未）：MSS 結構 → Breaker(BB) → FVG 缺口 → 好的進場位</li>
+        <li><b>HQ OB 品質</b>四個條件：★ = 達成（金色高亮），· = 未達成；達到 ≥ 3 項即為 HQ★</li>
+        <li><b>UM 勝率</b>：多▲ UM / 空▼ UM 回測勝率，最後一根K棒自動重算（更改設定後即時更新）</li>
+      </ul>
+
+      <p style="margin:10px 0 4px;font-weight:600;color:#e2c97e">▍ 操作建議</p>
+      <ul>
+        <li>訊號出現後，進場在 OB 範圍內；止損放 OB 另一端外側 1–2 個 tick</li>
+        <li>優先選 HQ★（≥3/4）的 OB 進場，品質越高成功率越高</li>
+        <li>HTF FVG 尚未填滿時，順著 FVG 方向交易成功率較高</li>
+        <li>儀表板「下一步」欄顯示目前缺少哪個條件，方便快速判斷是否符合進場條件</li>
+        <li>貼到 TradingView → Pine 編輯器 → 儲存 → 加到<b>主圖</b>（不能加到副圖格）</li>
       </ul>
     </div>
   </div>
