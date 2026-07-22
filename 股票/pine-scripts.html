@@ -10508,6 +10508,7 @@ if showDash
     table.cell(dash, 0, 14, "多▲ UM",    text_color=_cBl,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
     table.cell(dash, 1, 14, _lWrStr,    text_color=_lWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
     table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
 
 if showFibOTE and barstate.islast and (fibIsBull or fibIsBear)
     if not na(_fibOteBox)
@@ -10533,7 +10534,7 @@ if showFibOTE and barstate.islast and (fibIsBull or fibIsBear)
     else
         _fibLblSH := label.new(fibpH1Bar, fibpH1, "Strong High", style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
         _fibLblSL := label.new(fibpL1Bar, fibpL1, "Weak Low",    style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
-    table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)`;
+`;
 const SMC_MTF = `//@version=5
 indicator("SMC 多時框結構", overlay=true)
 
