@@ -247,6 +247,12 @@ a:hover{text-decoration:underline}
     <div class="ver-layout">
       <div class="ver-sidebar">
         <div class="ver-tabs" id="unicorn-vtabs"></div>
+        <div id="unicorn-log-fibote" class="ver-log">
+          <span class="vl-dot">›</span> <b>SMC Fibonacci OTE Zone</b>：自動偵測多空結構（HH+HL=多方 / LH+LL=空方），從 Strong Low→Weak High（多）或 Strong High→Weak Low（空）量出 0.5/0.618 區間<br>
+          <span class="vl-dot">›</span> <b>多方框（綠）</b>：Strong Low 以上，Weak High 的 0.5–0.618 Fib 區間為 OTE 多單進場等候區<br>
+          <span class="vl-dot">›</span> <b>空方框（紅）</b>：Strong High 以下，Weak Low 的 0.5–0.618 Fib 區間為 OTE 空單進場等候區<br>
+          <span class="vl-dot">›</span> <b>提示音</b>：在 TradingView 建立警報時選「進入OTE區間」條件，並在警報設定中開啟聲音通知
+        </div>
         <div id="unicorn-log-smcmtf" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC 多時框結構儀表板</b>：用 request.security 抓取 1D/4H/1H/5M/1M 五個時框，偵測各時框「正在」發生的 BOS 或 CHoCH<br>
           <span class="vl-dot">›</span> <b>▲ BOS（綠）</b>：Higher High 突破，多方趨勢持續；<b>▼ BOS（紅）</b>：Lower Low 突破，空方趨勢持續<br>
@@ -329,6 +335,9 @@ a:hover{text-decoration:underline}
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
         <div id="unicorn-v10-wrap" style="display:none">
           <div class="code-block" id="unicorn-v10-code"></div>
+        </div>
+        <div id="unicorn-fibote-wrap" style="display:none">
+          <div class="code-block" id="unicorn-fibote-code"></div>
         </div>
         <div id="unicorn-smcmtf-wrap" style="display:none">
           <div class="code-block" id="unicorn-smcmtf-code"></div>
@@ -9565,6 +9574,120 @@ if barstate.islast
     table.cell(dash, 0, 5, "1M",       text_color=_wh,        text_size=_sz, bgcolor=f_bg(bm1), text_halign=text.align_center)
     table.cell(dash, 1, 5, f_txt(bm1), text_color=f_col(bm1), text_size=_sz, bgcolor=f_bg(bm1), text_halign=text.align_center)
 `;
+const FIB_OTE = `//@version=5
+indicator("SMC Fibonacci OTE Zone", shorttitle="FIB OTE", overlay=true, max_boxes_count=10, max_labels_count=10)
+
+// ─── 設定 ───
+grp     = "Fibonacci OTE"
+pivLen  = input.int(10,   "樞紐K棒數",     minval=3,  maxval=50,  group=grp)
+extR    = input.int(50,   "向右延伸K棒",   minval=5,  maxval=500, group=grp)
+bullCol = input.color(color.new(#26A69A, 75), "多方框顏色", group=grp)
+bearCol = input.color(color.new(#EF5350, 75), "空方框顏色", group=grp)
+showStr = input.bool(true, "顯示 Strong/Weak 標籤", group=grp)
+
+// ─── 樞紐偵測 ───
+ph = ta.pivothigh(high, pivLen, pivLen)
+pl = ta.pivotlow(low,  pivLen, pivLen)
+
+var float pH1 = na
+var float pH2 = na
+var float pL1 = na
+var float pL2 = na
+var int   pH1Bar = na
+var int   pL1Bar = na
+
+if not na(ph)
+    pH2 := pH1
+    pH1 := ph
+    pH1Bar := bar_index - pivLen
+if not na(pl)
+    pL2 := pL1
+    pL1 := pl
+    pL1Bar := bar_index - pivLen
+
+// ─── 結構判斷（HH+HL=多方 / LH+LL=空方） ───
+isBull = not na(pH1) and not na(pH2) and not na(pL1) and not na(pL2) and pH1 > pH2 and pL1 > pL2
+isBear = not na(pH1) and not na(pH2) and not na(pL1) and not na(pL2) and pH1 < pH2 and pL1 < pL2
+
+// ─── Fibonacci 計算 ───
+// 多方: Strong Low(pL1) → Weak High(pH1)，量 0.5/0.618（從下往上）
+// 空方: Strong High(pH1) → Weak Low(pL1)，量 0.5/0.618（從上往下）
+rng = not na(pH1) and not na(pL1) ? pH1 - pL1 : na
+
+fib05  = isBull ? pL1 + 0.500 * rng :
+         isBear ? pH1 - 0.500 * rng : na
+fib618 = isBull ? pL1 + 0.618 * rng :
+         isBear ? pH1 - 0.618 * rng : na
+
+// 多方: 0.618 在上 / 0.5 在下；空方: 0.5 在上 / 0.618 在下
+zoneHi = isBull ? fib618 : isBear ? fib05  : na
+zoneLo = isBull ? fib05  : isBear ? fib618 : na
+
+inZone = not na(zoneHi) and not na(zoneLo) and close >= zoneLo and close <= zoneHi
+
+// ─── 繪製（僅最後一根K棒更新） ───
+var box   fibBox = na
+var label lblHi  = na
+var label lblLo  = na
+var label lblSH  = na
+var label lblSL  = na
+
+if barstate.islast and (isBull or isBear)
+    if not na(fibBox) : box.delete(fibBox)
+    if not na(lblHi)  : label.delete(lblHi)
+    if not na(lblLo)  : label.delete(lblLo)
+    if not na(lblSH)  : label.delete(lblSH)
+    if not na(lblSL)  : label.delete(lblSL)
+
+    bor = isBull ? color.new(#26A69A, 0) : color.new(#EF5350, 0)
+    col = isBull ? bullCol : bearCol
+    dir = isBull ? "多▲" : "空▼"
+    boxL = math.max(isBull ? pH1Bar : pL1Bar, 0)
+
+    fibBox := box.new(
+        left         = boxL,
+        top          = zoneHi,
+        right        = bar_index + extR,
+        bottom       = zoneLo,
+        bgcolor      = col,
+        border_color = bor,
+        border_width = 1)
+
+    lblHi := label.new(bar_index + extR, zoneHi,
+        text      = dir + " 0.618  " + str.tostring(zoneHi, "#.####"),
+        style     = label.style_label_left,
+        color     = bor,
+        textcolor = color.white,
+        size      = size.small)
+
+    lblLo := label.new(bar_index + extR, zoneLo,
+        text      = dir + " 0.500  " + str.tostring(zoneLo, "#.####"),
+        style     = label.style_label_left,
+        color     = bor,
+        textcolor = color.white,
+        size      = size.small)
+
+    if showStr
+        if isBull
+            lblSH := label.new(pH1Bar, pH1,
+                text="Weak High", style=label.style_label_down,
+                color=color.new(#EF5350, 0), textcolor=color.white, size=size.tiny)
+            lblSL := label.new(pL1Bar, pL1,
+                text="Strong Low", style=label.style_label_up,
+                color=color.new(#26A69A, 0), textcolor=color.white, size=size.tiny)
+        else
+            lblSH := label.new(pH1Bar, pH1,
+                text="Strong High", style=label.style_label_down,
+                color=color.new(#EF5350, 0), textcolor=color.white, size=size.tiny)
+            lblSL := label.new(pL1Bar, pL1,
+                text="Weak Low", style=label.style_label_up,
+                color=color.new(#26A69A, 0), textcolor=color.white, size=size.tiny)
+
+// ─── 提示音（在 TradingView 建立警報時選擇音效） ───
+alertcondition(inZone,     "進入OTE區間", "{{ticker}} 收盤進入 Fib OTE 0.5–0.618 @ {{close}}")
+alertcondition(ta.crossover(close, zoneLo),  "由下穿入OTE", "{{ticker}} 向上穿越 OTE 下緣 0.500 @ {{close}}")
+alertcondition(ta.crossunder(close, zoneHi), "由上穿入OTE", "{{ticker}} 向下穿越 OTE 上緣 0.618 @ {{close}}")`;
+
 const UNICORN_V4 = `//@version=5
 indicator("Unicorn Model HQOB (V4)", overlay=true, max_boxes_count=500, max_labels_count=500)
 
@@ -11195,6 +11318,7 @@ document.getElementById('unicorn-v8-code').textContent = UNICORN_V8;
 document.getElementById('unicorn-v9s-code').textContent = UNICORN_V9_STRAT;
 document.getElementById('unicorn-v10-code').textContent = UNICORN_V10_STRAT;
 document.getElementById('unicorn-smcmtf-code').textContent = SMC_MTF;
+document.getElementById('unicorn-fibote-code').textContent = FIB_OTE;
 document.getElementById('unicorn-v7-code').textContent = UNICORN_V7;
 document.getElementById('unicorn-v7s-code').textContent = UNICORN_V7_STRAT;
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
@@ -11206,7 +11330,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_smcmtf' ? SMC_MTF : ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_fibote' ? FIB_OTE : ak === 'u_smcmtf' ? SMC_MTF : ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -11980,6 +12104,7 @@ const VERSION_DEFS = {
     { key: 'u_v8', date: '2026-07-15', sub: 'SMC狀態機結構偵測 與LuxAlgo一致', contentId: 'unicorn-v8-wrap', logId: 'unicorn-log-v8' },
     { key: 'u_v9s', date: '2026-07-17', sub: 'V9s Strategy：儀表板列出HQ OB 4個條件、整列亮色網底、字體選擇、全部/HQ勝率拆分', contentId: 'unicorn-v9s-wrap', logId: 'unicorn-log-v9s' },
     { key: 'u_v10', date: '2026-07-19', sub: 'V10 Strategy：UM 訊號強制 FVG+HTF PDA，統一標籤 UM⭡/UM⭣，儀表板單一 UM 勝率', contentId: 'unicorn-v10-wrap', logId: 'unicorn-log-v10' },
+    { key: 'u_fibote', date: '2026-07-23', sub: 'FIB OTE Zone：偵測多空結構，自動繪製 Strong/Weak 標籤與 0.5–0.618 Fibonacci 等候區，支援提示音', contentId: 'unicorn-fibote-wrap', logId: 'unicorn-log-fibote' },
     { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
   ],
   dashboard: [
