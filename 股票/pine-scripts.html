@@ -10510,11 +10510,16 @@ if showDash
     table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
 
 if showFibOTE and barstate.islast and (fibIsBull or fibIsBear)
-    if not na(_fibOteBox) : box.delete(_fibOteBox)
-    if not na(_fibLblHi)  : label.delete(_fibLblHi)
-    if not na(_fibLblLo)  : label.delete(_fibLblLo)
-    if not na(_fibLblSH)  : label.delete(_fibLblSH)
-    if not na(_fibLblSL)  : label.delete(_fibLblSL)
+    if not na(_fibOteBox)
+        box.delete(_fibOteBox)
+    if not na(_fibLblHi)
+        label.delete(_fibLblHi)
+    if not na(_fibLblLo)
+        label.delete(_fibLblLo)
+    if not na(_fibLblSH)
+        label.delete(_fibLblSH)
+    if not na(_fibLblSL)
+        label.delete(_fibLblSL)
     _fbor = fibIsBull ? color.new(#26A69A, 0) : color.new(#EF5350, 0)
     _fcol = fibIsBull ? fibBullCol : fibBearCol
     _fdir = fibIsBull ? "多" : "空"
@@ -10680,11 +10685,16 @@ var label lblSH  = na
 var label lblSL  = na
 
 if barstate.islast and (isBull or isBear)
-    if not na(fibBox) : box.delete(fibBox)
-    if not na(lblHi)  : label.delete(lblHi)
-    if not na(lblLo)  : label.delete(lblLo)
-    if not na(lblSH)  : label.delete(lblSH)
-    if not na(lblSL)  : label.delete(lblSL)
+    if not na(fibBox)
+        box.delete(fibBox)
+    if not na(lblHi)
+        label.delete(lblHi)
+    if not na(lblLo)
+        label.delete(lblLo)
+    if not na(lblSH)
+        label.delete(lblSH)
+    if not na(lblSL)
+        label.delete(lblSL)
 
     bor = isBull ? color.new(#26A69A, 0) : color.new(#EF5350, 0)
     col = isBull ? bullCol : bearCol
