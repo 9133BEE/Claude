@@ -247,6 +247,12 @@ a:hover{text-decoration:underline}
     <div class="ver-layout">
       <div class="ver-sidebar">
         <div class="ver-tabs" id="unicorn-vtabs"></div>
+        <div id="unicorn-log-smcmtf" class="ver-log">
+          <span class="vl-dot">›</span> <b>SMC 多時框結構儀表板</b>：用 request.security 抓取 1D/4H/1H/5M/1M 五個時框，偵測各時框「正在」發生的 BOS 或 CHoCH<br>
+          <span class="vl-dot">›</span> <b>▲ BOS（綠）</b>：Higher High 突破，多方趨勢持續；<b>▼ BOS（紅）</b>：Lower Low 突破，空方趨勢持續<br>
+          <span class="vl-dot">›</span> <b>▲ CHoCH（藍）</b>：Lower High 被突破，空轉多信號；<b>▼ CHoCH（橘）</b>：Higher Low 跌破，多轉空信號<br>
+          <span class="vl-dot">›</span> 與 Unicorn&amp;HQOB 搭配使用：SMC MTF 放左側（預設左下），Unicorn 儀表板放右側，一眼看清多時框結構方向
+        </div>
       </div>
       <div class="ver-main">
         <div id="unicorn-log-v10" class="ver-log">
@@ -323,6 +329,9 @@ a:hover{text-decoration:underline}
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
         <div id="unicorn-v10-wrap" style="display:none">
           <div class="code-block" id="unicorn-v10-code"></div>
+        </div>
+        <div id="unicorn-smcmtf-wrap" style="display:none">
+          <div class="code-block" id="unicorn-smcmtf-code"></div>
         </div>
         <div id="unicorn-v9s-wrap" style="display:none">
           <div class="code-block" id="unicorn-v9s-code"></div>
@@ -9463,6 +9472,98 @@ if showDash
     table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
     table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
 
+
+const SMC_MTF = `//@version=5
+indicator("SMC 多時框結構", overlay=true)
+
+// ─── 設定 ───
+grp   = "SMC 多時框"
+_pivL = input.int(3,       "樞紐左側K",  minval=1, maxval=20, group=grp)
+_pivR = input.int(3,       "樞紐右側K",  minval=1, maxval=20, group=grp)
+dPos  = input.string("左下","儀表板位置", options=["左上","右上","左下","右下"], group=grp)
+_fsz  = input.string("Small","字體",     options=["Tiny","Small","Normal"], group=grp)
+
+// ─── SMC 結構偵測 ───
+// brk: 1=▲BOS  -1=▼BOS  2=▲CHoCH  -2=▼CHoCH  0=待確認
+f_smc() =>
+    ph = ta.pivothigh(high, _pivL, _pivR)
+    pl = ta.pivotlow(low, _pivL, _pivR)
+    var float pH1 = na
+    var float pH2 = na
+    var float pL1 = na
+    var float pL2 = na
+    var int trd = 0
+    var int brk = 0
+    if not na(ph)
+        pH2 := pH1
+        pH1 := ph
+        if not na(pH2) and pH1 > pH2
+            nb = trd == -1 ? 2 : 1
+            trd := 1
+            brk := nb
+    if not na(pl)
+        pL2 := pL1
+        pL1 := pl
+        if not na(pL2) and pL1 < pL2
+            nb = trd == 1 ? -2 : -1
+            trd := -1
+            brk := nb
+    [trd, brk]
+
+// ─── 各時框資料 ───
+[_td1, bd1] = request.security(syminfo.tickerid, "D",   f_smc(), lookahead=barmerge.lookahead_off)
+[_th4, bh4] = request.security(syminfo.tickerid, "240", f_smc(), lookahead=barmerge.lookahead_off)
+[_th1, bh1] = request.security(syminfo.tickerid, "60",  f_smc(), lookahead=barmerge.lookahead_off)
+[_tm5, bm5] = request.security(syminfo.tickerid, "5",   f_smc(), lookahead=barmerge.lookahead_off)
+[_tm1, bm1] = request.security(syminfo.tickerid, "1",   f_smc(), lookahead=barmerge.lookahead_off)
+
+// ─── 樣式 ───
+_sz  = _fsz == "Tiny" ? size.tiny : _fsz == "Normal" ? size.normal : size.small
+_pos = dPos == "左下" ? position.bottom_left  : dPos == "右下" ? position.bottom_right :
+       dPos == "左上" ? position.top_left     : position.top_right
+
+f_txt(b) =>
+    b ==  1 ? "▲ BOS"   : b == -1 ? "▼ BOS"   :
+    b ==  2 ? "▲ CHoCH" : b == -2 ? "▼ CHoCH" : "─"
+
+f_col(b) =>
+    b ==  1 ? color.new(#26A69A, 0) :
+    b == -1 ? color.new(#EF5350, 0) :
+    b ==  2 ? color.new(#42A5F5, 0) :
+    b == -2 ? color.new(#FF8C00, 0) :
+    color.new(#607080, 0)
+
+f_bg(b) =>
+    b ==  1 ? color.new(#26A69A, 85) :
+    b == -1 ? color.new(#EF5350, 85) :
+    b ==  2 ? color.new(#1E88E5, 85) :
+    b == -2 ? color.new(#FF8C00, 85) :
+    color.new(#1A1F2E, 0)
+
+// ─── 儀表板 ───
+var table dash = na
+if barstate.islast
+    dash := table.new(_pos, 2, 6,
+        bgcolor      = color.new(#0D1117, 5),
+        border_color = color.new(#1e293b, 0),
+        border_width = 1,
+        frame_color  = color.new(#334155, 0),
+        frame_width  = 1)
+    _hd = color.new(#1A1F2E, 0)
+    _gr = color.new(#64748B, 0)
+    _wh = color.new(#CBD5E1, 0)
+    table.cell(dash, 0, 0, "時框",    text_color=_gr, text_size=_sz, bgcolor=_hd, text_halign=text.align_center)
+    table.cell(dash, 1, 0, "SMC結構", text_color=_gr, text_size=_sz, bgcolor=_hd, text_halign=text.align_center)
+    table.cell(dash, 0, 1, "1D",       text_color=_wh,        text_size=_sz, bgcolor=f_bg(bd1), text_halign=text.align_center)
+    table.cell(dash, 1, 1, f_txt(bd1), text_color=f_col(bd1), text_size=_sz, bgcolor=f_bg(bd1), text_halign=text.align_center)
+    table.cell(dash, 0, 2, "4H",       text_color=_wh,        text_size=_sz, bgcolor=f_bg(bh4), text_halign=text.align_center)
+    table.cell(dash, 1, 2, f_txt(bh4), text_color=f_col(bh4), text_size=_sz, bgcolor=f_bg(bh4), text_halign=text.align_center)
+    table.cell(dash, 0, 3, "1H",       text_color=_wh,        text_size=_sz, bgcolor=f_bg(bh1), text_halign=text.align_center)
+    table.cell(dash, 1, 3, f_txt(bh1), text_color=f_col(bh1), text_size=_sz, bgcolor=f_bg(bh1), text_halign=text.align_center)
+    table.cell(dash, 0, 4, "5M",       text_color=_wh,        text_size=_sz, bgcolor=f_bg(bm5), text_halign=text.align_center)
+    table.cell(dash, 1, 4, f_txt(bm5), text_color=f_col(bm5), text_size=_sz, bgcolor=f_bg(bm5), text_halign=text.align_center)
+    table.cell(dash, 0, 5, "1M",       text_color=_wh,        text_size=_sz, bgcolor=f_bg(bm1), text_halign=text.align_center)
+    table.cell(dash, 1, 5, f_txt(bm1), text_color=f_col(bm1), text_size=_sz, bgcolor=f_bg(bm1), text_halign=text.align_center)`;
 `;
 const UNICORN_V4 = `//@version=5
 indicator("Unicorn Model HQOB (V4)", overlay=true, max_boxes_count=500, max_labels_count=500)
@@ -11093,6 +11194,7 @@ if showDash and barstate.islast
 document.getElementById('unicorn-v8-code').textContent = UNICORN_V8;
 document.getElementById('unicorn-v9s-code').textContent = UNICORN_V9_STRAT;
 document.getElementById('unicorn-v10-code').textContent = UNICORN_V10_STRAT;
+document.getElementById('unicorn-smcmtf-code').textContent = SMC_MTF;
 document.getElementById('unicorn-v7-code').textContent = UNICORN_V7;
 document.getElementById('unicorn-v7s-code').textContent = UNICORN_V7_STRAT;
 document.getElementById('unicorn-v2-code').textContent = UNICORN_V2;
@@ -11104,7 +11206,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_smcmtf' ? SMC_MTF : ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -11878,6 +11980,7 @@ const VERSION_DEFS = {
     { key: 'u_v8', date: '2026-07-15', sub: 'SMC狀態機結構偵測 與LuxAlgo一致', contentId: 'unicorn-v8-wrap', logId: 'unicorn-log-v8' },
     { key: 'u_v9s', date: '2026-07-17', sub: 'V9s Strategy：儀表板列出HQ OB 4個條件、整列亮色網底、字體選擇、全部/HQ勝率拆分', contentId: 'unicorn-v9s-wrap', logId: 'unicorn-log-v9s' },
     { key: 'u_v10', date: '2026-07-19', sub: 'V10 Strategy：UM 訊號強制 FVG+HTF PDA，統一標籤 UM⭡/UM⭣，儀表板單一 UM 勝率', contentId: 'unicorn-v10-wrap', logId: 'unicorn-log-v10' },
+    { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
