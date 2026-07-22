@@ -1,1042 +1,3 @@
-
-
-const UNICORN_V11_STRAT = `//@version=5
-strategy("交易訊號V11(Unicorn/SMC/5-618)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
-
-grpS   = "Strategy回測設定"
-tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
-slATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)
-atrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)
-
-grp1 = "訂單塊設定"
-tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
-pivL_m       = input.int(10,"樞紐左側（Manual用）",minval=1,group=grp1)
-pivR_m       = input.int(5, "樞紐右側（Manual用）",minval=1,group=grp1)
-bbSearchBars = input.int(100,"OB搜尋K數（Manual用）",minval=20,maxval=500,group=grp1)
-obExtR_m     = input.int(5,"OB右延伸K數",minval=1,maxval=30,group=grp1)
-minScore     = input.int(0, "最低品質分(0-4)",minval=0,maxval=4,group=grp1)
-hqMin        = input.int(3, "HQ門檻(分)",minval=2,maxval=4,group=grp1)
-maxOBs       = input.int(1, "每方向最多OB數",minval=1,maxval=5,group=grp1)
-obTxtSize    = input.string("Small","OB文字大小",options=["Tiny","Small","Normal","Large"],group=grp1)
-obTxtHAlign  = input.string("置中", "OB文字對齊",options=["置中","置左","置右"],          group=grp1)
-
-grp2 = "獨角獸模型"
-unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需HTF為多方結構，空方訊號需HTF為空方結構，有效過濾逆勢假訊號")
-needD1Confirm  = input.bool(false, "需要日線MSS趨勢確認",group=grp2,tooltip="開啟後多方訊號需日線MSS看多，空方訊號需日線MSS看空；有效過濾逆日線大趨勢的假訊號（上升趨勢中只做多，下降趨勢中只做空）")
-htfOBPrecision = input.float(0.5,"HTF OB 觸及精確度（0=全區間，0.5=靠支撐半段）",minval=0.0,maxval=1.0,step=0.1,group=grp2)
-unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
-allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
-sigCooldown    = input.int(10,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
-strictMSSGate  = input.bool(true,"啟用嚴格反趨勢結構閘門(HH+HL/LH+LL)",group=grp2,tooltip="V6曾用HH+HL(多頭)/LH+LL(空頭)雙pivot結構確認：只有當下結構真的與新方向相反（或尚無結構）才放行MSS。V8曾為了讓CHoCH時序與LuxAlgo SMC指標對齊而拿掉這道濾網，改成只做同方向去重(_smcTrend)。經比對669行原始版後確認此濾網對過濾逆勢假訊號有實質幫助，V8起預設改為開啟；如需回到單純_smcTrend去重（訊號較密集）可手動關閉。")
-
-grp3 = "HTF區間顯示"
-show5MOB  = input.bool(false,"顯示 5M OB",  group=grp3)
-m5Days    = input.int(1,  "5M 顯示天數", minval=1,maxval=5,   group=grp3)
-show1HOB  = input.bool(true, "顯示 1H OB",  group=grp3)
-showHTFFVG = input.bool(true,  "顯示 HTF FVG（自動配對）", group=grp3)
-h1Days    = input.int(1,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
-show4HOB  = input.bool(false,"顯示 4H OB",  group=grp3)
-show4HFVG = input.bool(false,"顯示 4H FVG", group=grp3)
-h4Days    = input.int(10, "4H 顯示天數", minval=1,maxval=90,  group=grp3)
-show1DOB  = input.bool(false,"顯示 1D OB",  group=grp3)
-show1DFVG = input.bool(false,"顯示 1D FVG", group=grp3)
-d1Days    = input.int(20, "1D 顯示天數", minval=1,maxval=180, group=grp3)
-htfExtR   = input.int(30, "HTF右延伸K數",minval=5,             group=grp3)
-
-grp4 = "訊號顯示"
-showDash    = input.bool(true,"顯示儀表板",group=grp4)
-dashPos     = input.string("右下","儀表板位置",options=["左下","右下","左上","右上"],group=grp4)
-dashFont    = input.string("Small","儀表板字體",options=["Tiny","Small","Normal","Large"],group=grp4)
-showBull    = input.bool(true,"顯示多方OB方框",group=grp4)
-showBear    = input.bool(true,"顯示空方OB方框",group=grp4)
-sigDays     = input.int(30,"訊號顯示天數",minval=1,maxval=90,group=grp4)
-showTPSL    = input.bool(true,"顯示TP/SL線",group=grp4)
-showBgColor = input.bool(false,"顯示條件背景色",group=grp4)
-
-grp5 = "透明度設定"
-obFillTransp  = input.int(60, "OB方框填色透明度",  minval=0, maxval=95, step=5, group=grp5)
-htfFillTransp = input.int(88, "HTF OB填色透明度",  minval=0, maxval=98, step=2, group=grp5)
-fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, step=2, group=grp5)
-showDeadOB    = input.bool(true, "顯示失效OB（灰色）", group=grp5)
-deadOBTransp  = input.int(80,   "失效OB透明度",        group=grp5, minval=0, maxval=95, step=5)
-
-grpFib     = "Fibonacci OTE Zone"
-showFibOTE = input.bool(true,  "顯示 Fibonacci OTE 框",          group=grpFib)
-fibPivLen  = input.int(20,     "OTE 樞紐K棒數",  minval=5, maxval=100, group=grpFib)
-fibExtR_in = input.int(50,     "OTE框向右延伸",  minval=5, maxval=300, group=grpFib)
-needFibOTE = input.bool(false, "訊號限OTE區間進場", group=grpFib, tooltip="開啟後 UM⭡/UM⭣ 只在Fib 0.5-0.618 區間觸發")
-fibBullCol = input.color(color.new(#26A69A, 75), "多方OTE顏色", group=grpFib)
-fibBearCol = input.color(color.new(#EF5350, 75), "空方OTE顏色", group=grpFib)
-_hqBg()  => math.min(95, obFillTransp + 15)
-_hqOvl() => math.min(98, obFillTransp + 33)
-
-_obTxtSz = obTxtSize=="Tiny"?size.tiny:obTxtSize=="Normal"?size.normal:obTxtSize=="Large"?size.large:size.small
-_obHAl   = obTxtHAlign=="置左"?text.align_left:obTxtHAlign=="置右"?text.align_right:text.align_center
-
-_autoTfKey = switch timeframe.period
-    "1"   => "1M"
-    "3"   => "5M"
-    "5"   => "5M"
-    "15"  => "15M"
-    "30"  => "15M"
-    "45"  => "15M"
-    "60"  => "1H"
-    "120" => "1H"
-    "240" => "4H"
-    "D"   => "1D"
-    "W"   => "1D"
-    => "1D"
-_tfKey = tfPreset == "Auto" ? _autoTfKey : tfPreset
-
-_pivL   = _tfKey=="1M"?8:_tfKey=="5M"?7:_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8:_tfKey=="1D"?5:pivL_m
-_pivR   = _tfKey=="1M"?5:_tfKey=="5M"?3:_tfKey=="15M"?5:_tfKey=="1H"?5:_tfKey=="4H"?4:_tfKey=="1D"?3:pivR_m
-_bbSrch = _tfKey=="1M"?200:_tfKey=="5M"?150:_tfKey=="15M"?120:_tfKey=="1H"?100:_tfKey=="4H"?60:_tfKey=="1D"?30:bbSearchBars
-_obExtR = obExtR_m
-
-barsPerDay = math.max(1, math.round(86400 / timeframe.in_seconds()))
-sigBarsMax = sigDays * barsPerDay
-
-tfStr = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":timeframe.period=="D"?"日":timeframe.period=="W"?"週":timeframe.period+"T"
-
-autoHTF = switch timeframe.period
-    "1"   => "60"
-    "3"   => "60"
-    "5"   => "60"
-    "15"  => "240"
-    "30"  => "240"
-    "45"  => "240"
-    "60"  => "D"
-    "120" => "D"
-    "240" => "W"
-    "D"   => "W"
-    => "W"
-htfStr = autoHTF=="60"?"1H":autoHTF=="240"?"4H":autoHTF=="D"?"日":"週"
-
-f_htf_ob_setup() =>
-    var float _lpH=na, var float _lpL=na
-    var float _bTop=na, var float _bBot=na
-    var float _rTop=na, var float _rBot=na
-    var int   _dir=0
-    _ph = ta.pivothigh(high,5,5)
-    _pl = ta.pivotlow(low,5,5)
-    if not na(_ph)
-        _lpH := _ph
-    if not na(_pl)
-        _lpL := _pl
-    if not na(_lpH) and close > _lpH and not (close[1] > _lpH)
-        _rTop := na
-        _rBot := na
-        _dir  := 1
-        for i = 1 to 20
-            if close[i] < open[i]
-                _bTop := high[i]
-                _bBot := low[i]
-                break
-    if not na(_lpL) and close < _lpL and not (close[1] < _lpL)
-        _bTop := na
-        _bBot := na
-        _dir  := -1
-        for i = 1 to 20
-            if close[i] > open[i]
-                _rTop := high[i]
-                _rBot := low[i]
-                break
-    [_bTop, _bBot, _rTop, _rBot, _dir]
-
-f_htf_fvg_setup() =>
-    var float _bFvgT = na
-    var float _bFvgB = na
-    var float _rFvgT = na
-    var float _rFvgB = na
-    if not na(_bFvgB) and low < _bFvgB
-        _bFvgT := na
-        _bFvgB := na
-    if not na(_rFvgT) and high > _rFvgT
-        _rFvgT := na
-        _rFvgB := na
-    if low[0] > high[2]
-        _bFvgT := low[0]
-        _bFvgB := high[2]
-    if high[0] < low[2]
-        _rFvgT := low[2]
-        _rFvgB := high[0]
-    [_bFvgT, _bFvgB, _rFvgT, _rFvgB]
-
-[h1BT,h1BB,h1RT,h1RB,h1MSSDir] = request.security(syminfo.tickerid,"60",  f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
-[m5BT,m5BB,m5RT,m5RB,m5MSSDir] = request.security(syminfo.tickerid,"5",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
-[h4BT,h4BB,h4RT,h4RB,h4MSSDir] = request.security(syminfo.tickerid,"240", f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
-[d1BT,d1BB,d1RT,d1RB,d1MSSDir] = request.security(syminfo.tickerid,"D",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
-
-[h1BFvgT,h1BFvgB,h1RFvgT,h1RFvgB] = request.security(syminfo.tickerid,"60",  f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
-[h4BFvgT,h4BFvgB,h4RFvgT,h4RFvgB] = request.security(syminfo.tickerid,"240", f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
-[d1BFvgT,d1BFvgB,d1RFvgT,d1RFvgB] = request.security(syminfo.tickerid,"D",   f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
-[wBFvgT,wBFvgB,wRFvgT,wRFvgB]   = request.security(syminfo.tickerid,"W",   f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
-
-htfBullTop = autoHTF=="60"?h1BT:autoHTF=="240"?h4BT:d1BT
-htfBullBot = autoHTF=="60"?h1BB:autoHTF=="240"?h4BB:d1BB
-htfBearTop = autoHTF=="60"?h1RT:autoHTF=="240"?h4RT:d1RT
-htfBearBot = autoHTF=="60"?h1RB:autoHTF=="240"?h4RB:d1RB
-htfMSSDir  = autoHTF=="60"?h1MSSDir:autoHTF=="240"?h4MSSDir:d1MSSDir
-
-htfFvgBT    = autoHTF=="60"?h1BFvgT:autoHTF=="240"?h4BFvgT:autoHTF=="D"?d1BFvgT:wBFvgT
-htfFvgBB    = autoHTF=="60"?h1BFvgB:autoHTF=="240"?h4BFvgB:autoHTF=="D"?d1BFvgB:wBFvgB
-htfFvgRT    = autoHTF=="60"?h1RFvgT:autoHTF=="240"?h4RFvgT:autoHTF=="D"?d1RFvgT:wRFvgT
-htfFvgRB    = autoHTF=="60"?h1RFvgB:autoHTF=="240"?h4RFvgB:autoHTF=="D"?d1RFvgB:wRFvgB
-h1W = math.max(bar_index - h1Days*barsPerDay, 1)
-h4W = math.max(bar_index - h4Days*barsPerDay, 1)
-d1W = math.max(bar_index - d1Days*barsPerDay, 1)
-htfFvgW     = autoHTF=="60"?h1W:autoHTF=="240"?h4W:autoHTF=="D"?d1W:math.max(bar_index-d1Days*barsPerDay,1)
-phH = ta.pivothigh(high,_pivL,_pivR)
-plL = ta.pivotlow(low, _pivL,_pivR)
-var float ph1=na, var float ph2=na
-var float pl1=na, var float pl2=na
-if not na(phH)
-    ph2 := ph1
-    ph1 := phH
-if not na(plL)
-    pl2 := pl1
-    pl1 := plL
-lastPH = ph1
-lastPL = pl1
-
-var bool hasMSSBull = false
-var bool hasMSSBear = false
-
-var int _smcTrend = 0
-_hasData        = not na(ph1) and not na(ph2) and not na(pl1) and not na(pl2)
-_isBullStruct   = _hasData and ph1 > ph2 and pl1 > pl2
-_isBearStruct   = _hasData and ph1 < ph2 and pl1 < pl2
-_rawBullMSS     = not na(lastPH) and close > lastPH and close[1] <= lastPH
-_rawBearMSS     = not na(lastPL) and close < lastPL and close[1] >= lastPL
-_structGateBull = strictMSSGate ? (_isBearStruct or not _hasData) : true
-_structGateBear = strictMSSGate ? (_isBullStruct or not _hasData) : true
-bullMSS = _rawBullMSS and _smcTrend != 1 and _structGateBull
-bearMSS = _rawBearMSS and _smcTrend != -1 and _structGateBear
-if _rawBullMSS
-    _smcTrend := 1
-if _rawBearMSS
-    _smcTrend := -1
-if bullMSS
-    hasMSSBull := true
-    hasMSSBear := false
-if bearMSS
-    hasMSSBear := true
-    hasMSSBull := false
-
-var float[] bb          = array.new_float()
-var float[] bl          = array.new_float()
-var bool[]  bb_hasFVG   = array.new_bool()
-var float[] bb_fvgT     = array.new_float()
-var float[] bb_fvgB     = array.new_float()
-var box[]   bb_box      = array.new_box()
-var box[]   bb_fbox     = array.new_box()
-var box[]   bb_hqbox    = array.new_box()
-var bool[]  bb_signaled = array.new_bool()
-var bool[]  bb_isHQ     = array.new_bool()
-var bool[]  bb_hqBig   = array.new_bool()
-var bool[]  bb_hqLiq   = array.new_bool()
-var bool[]  bb_hqPDA   = array.new_bool()
-var bool[]  bb_pbDep    = array.new_bool()
-var bool[]  bb_pbSig    = array.new_bool()
-var box[]   bb_pbbox    = array.new_box()
-
-var float[] rb          = array.new_float()
-var float[] rl          = array.new_float()
-var bool[]  rb_hasFVG   = array.new_bool()
-var float[] rb_fvgT     = array.new_float()
-var float[] rb_fvgB     = array.new_float()
-var box[]   rb_box      = array.new_box()
-var box[]   rb_fbox     = array.new_box()
-var box[]   rb_hqbox    = array.new_box()
-var bool[]  rb_signaled = array.new_bool()
-var bool[]  rb_isHQ     = array.new_bool()
-var bool[]  rb_hqBig   = array.new_bool()
-var bool[]  rb_hqLiq   = array.new_bool()
-var bool[]  rb_hqPDA   = array.new_bool()
-var bool[]  rb_pbDep    = array.new_bool()
-var bool[]  rb_pbSig    = array.new_bool()
-var box[]   rb_pbbox    = array.new_box()
-var box[]   bb_dead     = array.new_box()
-var box[]   rb_dead     = array.new_box()
-
-var label[] sigLabels   = array.new_label()
-var int[]   sigBars     = array.new_int()
-var int     lastAnySigBar = -999
-
-avgBody = ta.sma(math.abs(close-open),20)
-rng50   = ta.highest(high,50) - ta.lowest(low,50)
-mid50   = ta.lowest(low,50) + rng50*0.5
-var int   lastMSSDir    = 0
-var float _lastBullOBPh = na
-var float _lastBearOBPl = na
-
-// --- Fibonacci OTE ---
-fibPH = ta.pivothigh(high, fibPivLen, fibPivLen)
-fibPL = ta.pivotlow(low,  fibPivLen, fibPivLen)
-var float fibpH1 = na, var float fibpH2 = na
-var float fibpL1 = na, var float fibpL2 = na
-var int   fibpH1Bar = na, var int fibpL1Bar = na
-if not na(fibPH)
-    fibpH2 := fibpH1
-    fibpH1 := fibPH
-    fibpH1Bar := bar_index - fibPivLen
-if not na(fibPL)
-    fibpL2 := fibpL1
-    fibpL1 := fibPL
-    fibpL1Bar := bar_index - fibPivLen
-fibIsBull = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 > fibpH2 and fibpL1 > fibpL2
-fibIsBear = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 < fibpH2 and fibpL1 < fibpL2
-fibRng    = not na(fibpH1) and not na(fibpL1) ? fibpH1 - fibpL1 : na
-fibOTE05  = fibIsBull ? fibpL1 + 0.500 * fibRng : fibIsBear ? fibpH1 - 0.500 * fibRng : na
-fibOTE618 = fibIsBull ? fibpL1 + 0.618 * fibRng : fibIsBear ? fibpH1 - 0.618 * fibRng : na
-fibZoneHi = fibIsBull ? fibOTE618 : fibIsBear ? fibOTE05  : na
-fibZoneLo = fibIsBull ? fibOTE05  : fibIsBear ? fibOTE618 : na
-inFibOTE  = not na(fibZoneHi) and not na(fibZoneLo) and close >= fibZoneLo and close <= fibZoneHi
-
-f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
-
-while array.size(sigBars) > 0
-    if bar_index - array.get(sigBars, 0) > sigBarsMax or array.size(sigBars) > 200
-        label.delete(array.shift(sigLabels))
-        array.shift(sigBars)
-    else
-        break
-
-f_bull_shift(toGrey = false) =>
-    _bx = array.shift(bb_box)
-    if not na(_bx)
-        if toGrey and showDeadOB
-            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
-            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
-            box.set_text_color(_bx,    color.new(color.gray, 30))
-            array.push(bb_dead, _bx)
-            if array.size(bb_dead) > 10
-                box.delete(array.shift(bb_dead))
-        else
-            box.delete(_bx)
-    _f = array.shift(bb_fbox)
-    if not na(_f)
-        box.delete(_f)
-    _h = array.shift(bb_hqbox)
-    if not na(_h)
-        box.delete(_h)
-    array.shift(bb), array.shift(bl), array.shift(bb_hasFVG)
-    array.shift(bb_fvgT), array.shift(bb_fvgB)
-    array.shift(bb_signaled), array.shift(bb_isHQ)
-    array.shift(bb_hqBig),  array.shift(bb_hqLiq),  array.shift(bb_hqPDA)
-    _pbBx2 = array.shift(bb_pbbox)
-    if not na(_pbBx2)
-        box.delete(_pbBx2)
-    array.shift(bb_pbDep), array.shift(bb_pbSig)
-
-f_bear_shift(toGrey = false) =>
-    _bx = array.shift(rb_box)
-    if not na(_bx)
-        if toGrey and showDeadOB
-            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
-            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
-            box.set_text_color(_bx,    color.new(color.gray, 30))
-            array.push(rb_dead, _bx)
-            if array.size(rb_dead) > 10
-                box.delete(array.shift(rb_dead))
-        else
-            box.delete(_bx)
-    _f = array.shift(rb_fbox)
-    if not na(_f)
-        box.delete(_f)
-    _h = array.shift(rb_hqbox)
-    if not na(_h)
-        box.delete(_h)
-    array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
-    array.shift(rb_fvgT), array.shift(rb_fvgB)
-    array.shift(rb_signaled), array.shift(rb_isHQ)
-    array.shift(rb_hqBig),  array.shift(rb_hqLiq),  array.shift(rb_hqPDA)
-    _pbBx3 = array.shift(rb_pbbox)
-    if not na(_pbBx3)
-        box.delete(_pbBx3)
-    array.shift(rb_pbDep), array.shift(rb_pbSig)
-_prevMSSDir = lastMSSDir
-if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
-    _lastBullOBPh := ph1
-    _lastBearOBPl := na
-    lastMSSDir := 1
-    if _prevMSSDir != 1
-        while array.size(rb) > 0
-            f_bear_shift(true)
-    if array.size(bb) >= maxOBs
-        f_bull_shift()
-    for i = 1 to _bbSrch
-        if close[i] < open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
-            obT   = high[i]
-            obB   = low[i]
-            obBar = bar_index - i
-            fvgOk = i > 1 ? low[i-1] > high[i+1] : false
-            fvgT  = fvgOk ? low[i-1]  : na
-            fvgB  = fvgOk ? high[i+1] : na
-            inPDA = not na(mid50) ? (obT+obB)/2 < mid50 : false
-            big   = math.abs(close[i]-open[i]) > avgBody*1.5
-            liqGrab = false
-            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
-                if low[_j] < obB
-                    liqGrab := true
-                    break
-            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
-            isHQ  = sc >= hqMin
-            if sc >= minScore
-                array.push(bb, obT), array.push(bl, obB)
-                array.push(bb_hasFVG, fvgOk)
-                array.push(bb_fvgT, fvgT), array.push(bb_fvgB, fvgB)
-                array.push(bb_signaled, false), array.push(bb_isHQ, isHQ)
-                array.push(bb_hqBig, big), array.push(bb_hqLiq, liqGrab), array.push(bb_hqPDA, inPDA)
-                array.push(bb_pbDep, false), array.push(bb_pbSig, false), array.push(bb_pbbox, na)
-                if showBull
-                    _bc = isHQ?color.new(#9C27B0,0):color.new(#1E88E5,0)
-                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#1E88E5,obFillTransp)
-                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#BBDEFB,0)
-                    array.push(bb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="+OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
-                    if fvgOk
-                        array.push(bb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#64B5F6,30),bgcolor=color.new(#64B5F6,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#90CAF9,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
-                    else
-                        array.push(bb_fbox, na)
-                    if isHQ
-                        array.push(bb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
-                    else
-                        array.push(bb_hqbox, na)
-                else
-                    array.push(bb_box, na)
-                    array.push(bb_fbox, na)
-                    array.push(bb_hqbox, na)
-                if isHQ
-                    _hl = label.new(obBar,obT,"★ HQ",style=label.style_label_down,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
-                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
-            break
-
-if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
-    _lastBearOBPl := pl1
-    _lastBullOBPh := na
-    lastMSSDir := -1
-    if _prevMSSDir != -1
-        while array.size(bb) > 0
-            f_bull_shift(true)
-    if array.size(rb) >= maxOBs
-        f_bear_shift()
-    for i = 1 to _bbSrch
-        if close[i] > open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
-            obT   = high[i]
-            obB   = low[i]
-            obBar = bar_index - i
-            fvgOk = i > 1 ? high[i-1] < low[i+1] : false
-            fvgT  = fvgOk ? low[i+1]  : na
-            fvgB  = fvgOk ? high[i-1] : na
-            inPDA = not na(mid50) ? (obT+obB)/2 > mid50 : false
-            big   = math.abs(close[i]-open[i]) > avgBody*1.5
-            liqGrab = false
-            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
-                if high[_j] > obT
-                    liqGrab := true
-                    break
-            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
-            isHQ  = sc >= hqMin
-            if sc >= minScore
-                array.push(rb, obT), array.push(rl, obB)
-                array.push(rb_hasFVG, fvgOk)
-                array.push(rb_fvgT, fvgT), array.push(rb_fvgB, fvgB)
-                array.push(rb_signaled, false), array.push(rb_isHQ, isHQ)
-                array.push(rb_hqBig, big), array.push(rb_hqLiq, liqGrab), array.push(rb_hqPDA, inPDA)
-                array.push(rb_pbDep, false), array.push(rb_pbSig, false), array.push(rb_pbbox, na)
-                if showBear
-                    _bc = isHQ?color.new(#9C27B0,0):color.new(#FF8C00,0)
-                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#FF8C00,obFillTransp)
-                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#FFE0B2,0)
-                    array.push(rb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="-OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
-                    if fvgOk
-                        array.push(rb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#FFB74D,30),bgcolor=color.new(#FFB74D,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#FFCC80,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
-                    else
-                        array.push(rb_fbox, na)
-                    if isHQ
-                        array.push(rb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
-                    else
-                        array.push(rb_hqbox, na)
-                else
-                    array.push(rb_box, na)
-                    array.push(rb_fbox, na)
-                    array.push(rb_hqbox, na)
-                if isHQ
-                    _hl = label.new(obBar,obB,"★ HQ",style=label.style_label_up,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
-                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
-            break
-
-_htfBullAllow = not na(htfBullTop) and not na(htfBullBot) ? htfBullBot + (htfBullTop - htfBullBot) * (1.0 - htfOBPrecision) : htfBullTop
-_htfBearAllow = not na(htfBearTop) and not na(htfBearBot) ? htfBearTop - (htfBearTop - htfBearBot) * (1.0 - htfOBPrecision) : htfBearBot
-inHTFBull = not na(htfBullTop) and not na(htfBullBot) and low >= htfBullBot and low <= _htfBullAllow and htfMSSDir == 1
-inHTFBear = not na(htfBearTop) and not na(htfBearBot) and high <= htfBearTop and high >= _htfBearAllow and htfMSSDir == -1
-htfOkBull = unicornNeedHTF ? inHTFBull : true
-htfOkBear = unicornNeedHTF ? inHTFBear : true
-d1OkBull  = needD1Confirm ? d1MSSDir == 1  : true
-d1OkBear  = needD1Confirm ? d1MSSDir == -1 : true
-
-var bool unicornBull = false
-var bool unicornBear = false
-unicornBull := false
-unicornBear := false
-var int trigBullIdx = -1
-var int trigBearIdx = -1
-trigBullIdx := -1
-trigBearIdx := -1
-
-if array.size(bb) > 0 and lastMSSDir == 1
-    for i = 0 to array.size(bb)-1
-        obT      = array.get(bb, i)
-        obB      = array.get(bl, i)
-        fvgOn    = array.get(bb_hasFVG, i)
-        fT       = array.get(bb_fvgT, i)
-        fB       = array.get(bb_fvgB, i)
-        signaled = array.get(bb_signaled, i)
-        bx       = array.get(bb_box, i)
-        fbx      = array.get(bb_fbox, i)
-        hqbx     = array.get(bb_hqbox, i)
-        if not na(bx)
-            box.set_right(bx, bar_index + _obExtR)
-            if fvgOn and not na(fbx)
-                box.set_right(fbx, bar_index + _obExtR)
-            if not na(hqbx)
-                box.set_right(hqbx, bar_index + _obExtR)
-        if close < obB
-            if not na(bx)
-                box.set_border_color(bx, color.new(color.gray,40))
-                box.set_bgcolor(bx, color.new(color.gray,90))
-                box.set_text_color(bx, color.new(color.gray,30))
-            if not na(hqbx)
-                box.set_border_color(hqbx, color.new(color.gray,60))
-                box.set_bgcolor(hqbx, color.new(color.gray,97))
-        else if not signaled or allowRepeat
-            inFVG = fvgOn and not na(fT) and not na(fB) ? low <= fT and high >= fB : false
-            zone  = unicornNeedFVG ? inFVG : (low <= obT and high >= obB)
-            if zone and htfOkBull
-                unicornBull := true
-                trigBullIdx := i
-        pbDep = array.get(bb_pbDep, i)
-        pbSig = array.get(bb_pbSig, i)
-        pbBx  = array.get(bb_pbbox, i)
-        if not na(pbBx)
-            box.set_right(pbBx, bar_index + _obExtR)
-        if signaled and close > obT and not pbDep
-            array.set(bb_pbDep, i, true)
-        if pbDep and not pbSig and close >= obB
-            inOBpb = low <= obT and high >= obB
-            if inOBpb and htfOkBull
-                _pbT = math.max(open, close)
-                _pbB = math.min(open, close)
-                _pbBx4 = box.new(bar_index, _pbT, bar_index + _obExtR, _pbB, border_color=color.new(#00BCD4,0), bgcolor=color.new(#00BCD4,75), border_width=1, border_style=line.style_dashed, text="+PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
-                array.set(bb_pbbox, i, _pbBx4)
-                array.set(bb_pbSig, i, true)
-
-if array.size(rb) > 0 and lastMSSDir == -1
-    for i = 0 to array.size(rb)-1
-        obT      = array.get(rb, i)
-        obB      = array.get(rl, i)
-        fvgOn    = array.get(rb_hasFVG, i)
-        fT       = array.get(rb_fvgT, i)
-        fB       = array.get(rb_fvgB, i)
-        signaled = array.get(rb_signaled, i)
-        bx       = array.get(rb_box, i)
-        fbx      = array.get(rb_fbox, i)
-        hqbx     = array.get(rb_hqbox, i)
-        if not na(bx)
-            box.set_right(bx, bar_index + _obExtR)
-            if fvgOn and not na(fbx)
-                box.set_right(fbx, bar_index + _obExtR)
-            if not na(hqbx)
-                box.set_right(hqbx, bar_index + _obExtR)
-        if close > obT
-            if not na(bx)
-                box.set_border_color(bx, color.new(color.gray,40))
-                box.set_bgcolor(bx, color.new(color.gray,90))
-                box.set_text_color(bx, color.new(color.gray,30))
-            if not na(hqbx)
-                box.set_border_color(hqbx, color.new(color.gray,60))
-                box.set_bgcolor(hqbx, color.new(color.gray,97))
-        else if not signaled or allowRepeat
-            inFVG = fvgOn and not na(fT) and not na(fB) ? high >= fB and low <= fT : false
-            zone  = unicornNeedFVG ? inFVG : (high >= obB and low <= obT)
-            if zone and htfOkBear
-                unicornBear := true
-                trigBearIdx := i
-        pbDepR = array.get(rb_pbDep, i)
-        pbSigR = array.get(rb_pbSig, i)
-        pbBxR  = array.get(rb_pbbox, i)
-        if not na(pbBxR)
-            box.set_right(pbBxR, bar_index + _obExtR)
-        if signaled and close < obB and not pbDepR
-            array.set(rb_pbDep, i, true)
-        if pbDepR and not pbSigR and close <= obT
-            inOBpbR = high >= obB and low <= obT
-            if inOBpbR and htfOkBear
-                _pbTR = math.max(open, close)
-                _pbBR = math.min(open, close)
-                _pbBx5 = box.new(bar_index, _pbTR, bar_index + _obExtR, _pbBR, border_color=color.new(#FF5252,0), bgcolor=color.new(#FF5252,75), border_width=1, border_style=line.style_dashed, text="-PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
-                array.set(rb_pbbox, i, _pbBx5)
-                array.set(rb_pbSig, i, true)
-
-uBullEdge = unicornBull and not unicornBull[1]
-uBearEdge = unicornBear and not unicornBear[1]
-
-bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBull and (not needFibOTE or inFibOTE)
-bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear and (not needFibOTE or inFibOTE)
-
-if fireBull and fireBear
-    fireBull := lastMSSDir > 0
-    fireBear := lastMSSDir < 0
-
-var int _lTot   = 0
-var int _lWin   = 0
-var int _sTot   = 0
-var int _sWin   = 0
-if barstate.islast
-    _lTot := 0, _lWin := 0, _sTot := 0, _sWin := 0
-    if strategy.closedtrades > 0
-        for _ci = 0 to strategy.closedtrades - 1
-            _cpnl = strategy.closedtrades.profit(_ci)
-            _ceid = strategy.closedtrades.entry_id(_ci)
-            if _ceid == "L"
-                _lTot += 1
-                if _cpnl > 0
-                    _lWin += 1
-            else
-                _sTot += 1
-                if _cpnl > 0
-                    _sWin += 1
-var string _lWrStr   = "暫無"
-var string _sWrStr   = "暫無"
-if barstate.islast
-    _lWrStr   := _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
-    _sWrStr   := _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
-
-alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
-alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
-alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
-alertcondition(inFibOTE and barstate.isconfirmed,                       title="進入OTE區間",   message="{{ticker}} 收盤進入 Fib OTE 0.5-0.618 @ {{close}}")
-alertcondition(ta.crossover(close,fibZoneLo)  and barstate.isconfirmed, title="由下穿入OTE",   message="{{ticker}} 向上穿越 OTE 下緣 @ {{close}}")
-alertcondition(ta.crossunder(close,fibZoneHi) and barstate.isconfirmed, title="由上穿入OTE",   message="{{ticker}} 向下穿越 OTE 上緣 @ {{close}}")
-
-_atr = ta.atr(atrLen)
-var line[] _tpLines = array.new_line()
-var line[] _slLines = array.new_line()
-var label[] _tpLbls = array.new_label()
-var label[] _slLbls = array.new_label()
-
-var box   _fibOteBox = na
-var label _fibLblHi  = na
-var label _fibLblLo  = na
-var label _fibLblSH  = na
-var label _fibLblSL  = na
-_MAX_TPSL = 1
-
-if fireBull and barstate.isconfirmed
-    array.set(bb_signaled, trigBullIdx, true)
-    lastAnySigBar := bar_index
-    _isHQ  = array.get(bb_isHQ, trigBullIdx)
-    _lc    = color.new(#1E88E5,0)
-    _lt    = "UM⭡"
-    _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
-    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
-    _tpLev = close + _atr * tpATR
-    _slLev = close - _atr * slATR
-    _eid   = "L"
-    strategy.entry(_eid, strategy.long)
-    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
-    if showTPSL
-        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
-        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
-        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
-        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
-        array.push(_tpLines,_tl), array.push(_slLines,_sl)
-        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
-        if array.size(_tpLines) > _MAX_TPSL
-            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
-            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
-
-if fireBear and barstate.isconfirmed
-    array.set(rb_signaled, trigBearIdx, true)
-    lastAnySigBar := bar_index
-    _isHQ  = array.get(rb_isHQ, trigBearIdx)
-    _lc    = color.new(#FF8C00,0)
-    _lt    = "UM⭣"
-    _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
-    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
-    _tpLev = close - _atr * tpATR
-    _slLev = close + _atr * slATR
-    _eid   = "S"
-    strategy.entry(_eid, strategy.short)
-    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
-    if showTPSL
-        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
-        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
-        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
-        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
-        array.push(_tpLines,_tl), array.push(_slLines,_sl)
-        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
-        if array.size(_tpLines) > _MAX_TPSL
-            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
-            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
-
-bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
-
-ZR  = bar_index + htfExtR
-m5W = math.max(bar_index - m5Days*barsPerDay, 1)
-
-var box h1BullBox=na, var box h1BearBox=na
-var box h4BullBox=na, var box h4BearBox=na
-var box d1BullBox=na, var box d1BearBox=na
-var box m5BullBox=na, var box m5BearBox=na
-var box htfBullFvgBox=na, var box htfBearFvgBox=na
-
-
-
-if show5MOB and not na(m5BT) and not na(m5BB)
-    if na(m5BullBox)
-        m5BullBox := box.new(m5W,m5BT,ZR,m5BB,border_color=color.new(#AB47BC,20),bgcolor=color.new(#AB47BC,htfFillTransp),border_width=1,text="5M+OB",text_color=color.new(#CE93D8,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if m5W > 1
-            box.set_left(m5BullBox, m5W)
-        box.set_right(m5BullBox, ZR)
-        box.set_top(m5BullBox, m5BT)
-        box.set_bottom(m5BullBox, m5BB)
-        box.set_bgcolor(m5BullBox, color.new(#AB47BC,htfFillTransp))
-
-if show5MOB and not na(m5RT) and not na(m5RB)
-    if na(m5BearBox)
-        m5BearBox := box.new(m5W,m5RT,ZR,m5RB,border_color=color.new(#F06292,20),bgcolor=color.new(#F06292,htfFillTransp),border_width=1,text="5M-OB",text_color=color.new(#F48FB1,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if m5W > 1
-            box.set_left(m5BearBox, m5W)
-        box.set_right(m5BearBox, ZR)
-        box.set_top(m5BearBox, m5RT)
-        box.set_bottom(m5BearBox, m5RB)
-        box.set_bgcolor(m5BearBox, color.new(#F06292,htfFillTransp))
-
-if show1HOB and not na(h1BT) and not na(h1BB)
-    if na(h1BullBox)
-        h1BullBox := box.new(h1W,h1BT,ZR,h1BB,border_color=color.new(#26A69A,20),bgcolor=color.new(#26A69A,htfFillTransp),border_width=1,text="1H+OB",text_color=color.new(#80CBC4,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if h1W > 1
-            box.set_left(h1BullBox, h1W)
-        box.set_right(h1BullBox, ZR)
-        box.set_top(h1BullBox, h1BT)
-        box.set_bottom(h1BullBox, h1BB)
-        box.set_bgcolor(h1BullBox, color.new(#26A69A,htfFillTransp))
-
-if show1HOB and not na(h1RT) and not na(h1RB)
-    if na(h1BearBox)
-        h1BearBox := box.new(h1W,h1RT,ZR,h1RB,border_color=color.new(#EF5350,20),bgcolor=color.new(#EF5350,htfFillTransp),border_width=1,text="1H-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if h1W > 1
-            box.set_left(h1BearBox, h1W)
-        box.set_right(h1BearBox, ZR)
-        box.set_top(h1BearBox, h1RT)
-        box.set_bottom(h1BearBox, h1RB)
-        box.set_bgcolor(h1BearBox, color.new(#EF5350,htfFillTransp))
-
-if show4HOB and not na(h4BT) and not na(h4BB)
-    if na(h4BullBox)
-        h4BullBox := box.new(h4W,h4BT,ZR,h4BB,border_color=color.new(#00BCD4,20),bgcolor=color.new(#00BCD4,htfFillTransp),border_width=2,text="4H+OB",text_color=color.new(#80DEEA,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if h4W > 1
-            box.set_left(h4BullBox, h4W)
-        box.set_right(h4BullBox, ZR)
-        box.set_top(h4BullBox, h4BT)
-        box.set_bottom(h4BullBox, h4BB)
-        box.set_bgcolor(h4BullBox, color.new(#00BCD4,htfFillTransp))
-
-if show4HOB and not na(h4RT) and not na(h4RB)
-    if na(h4BearBox)
-        h4BearBox := box.new(h4W,h4RT,ZR,h4RB,border_color=color.new(#FF5722,20),bgcolor=color.new(#FF5722,htfFillTransp),border_width=2,text="4H-OB",text_color=color.new(#FF8A65,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if h4W > 1
-            box.set_left(h4BearBox, h4W)
-        box.set_right(h4BearBox, ZR)
-        box.set_top(h4BearBox, h4RT)
-        box.set_bottom(h4BearBox, h4RB)
-        box.set_bgcolor(h4BearBox, color.new(#FF5722,htfFillTransp))
-
-if show1DOB and not na(d1BT) and not na(d1BB)
-    if na(d1BullBox)
-        d1BullBox := box.new(d1W,d1BT,ZR,d1BB,border_color=color.new(#4CAF50,20),bgcolor=color.new(#4CAF50,htfFillTransp),border_width=2,text="1D+OB",text_color=color.new(#A5D6A7,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if d1W > 1
-            box.set_left(d1BullBox, d1W)
-        box.set_right(d1BullBox, ZR)
-        box.set_top(d1BullBox, d1BT)
-        box.set_bottom(d1BullBox, d1BB)
-        box.set_bgcolor(d1BullBox, color.new(#4CAF50,htfFillTransp))
-
-if show1DOB and not na(d1RT) and not na(d1RB)
-    if na(d1BearBox)
-        d1BearBox := box.new(d1W,d1RT,ZR,d1RB,border_color=color.new(#F44336,20),bgcolor=color.new(#F44336,htfFillTransp),border_width=2,text="1D-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
-    else
-        if d1W > 1
-            box.set_left(d1BearBox, d1W)
-        box.set_right(d1BearBox, ZR)
-        box.set_top(d1BearBox, d1RT)
-        box.set_bottom(d1BearBox, d1RB)
-        box.set_bgcolor(d1BearBox, color.new(#F44336,htfFillTransp))
-
-_fvgT = math.min(98, htfFillTransp + 5)
-
-if showHTFFVG
-    if not na(htfFvgBT) and not na(htfFvgBB)
-        if na(htfBullFvgBox)
-            htfBullFvgBox := box.new(htfFvgW,htfFvgBT,ZR,htfFvgBB,border_color=color.new(#26A69A,0),bgcolor=color.new(#26A69A,_fvgT),border_style=line.style_dashed,border_width=2,text=htfStr+" FVG+",text_color=color.new(#80CBC4,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
-        else
-            box.set_left(htfBullFvgBox, htfFvgW)
-            box.set_right(htfBullFvgBox, ZR)
-            box.set_top(htfBullFvgBox, htfFvgBT)
-            box.set_bottom(htfBullFvgBox, htfFvgBB)
-            box.set_bgcolor(htfBullFvgBox, color.new(#26A69A,_fvgT))
-            box.set_border_color(htfBullFvgBox, color.new(#26A69A,0))
-            box.set_text_color(htfBullFvgBox, color.new(#80CBC4,0))
-    else if not na(htfBullFvgBox)
-        box.set_bgcolor(htfBullFvgBox, color.new(color.gray, math.min(98,_fvgT+3)))
-        box.set_border_color(htfBullFvgBox, color.new(color.gray,60))
-        box.set_text_color(htfBullFvgBox, color.new(color.gray,30))
-    if not na(htfFvgRT) and not na(htfFvgRB)
-        if na(htfBearFvgBox)
-            htfBearFvgBox := box.new(htfFvgW,htfFvgRT,ZR,htfFvgRB,border_color=color.new(#EF5350,0),bgcolor=color.new(#EF5350,_fvgT),border_style=line.style_dashed,border_width=2,text=htfStr+" FVG-",text_color=color.new(#EF9A9A,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
-        else
-            box.set_left(htfBearFvgBox, htfFvgW)
-            box.set_right(htfBearFvgBox, ZR)
-            box.set_top(htfBearFvgBox, htfFvgRT)
-            box.set_bottom(htfBearFvgBox, htfFvgRB)
-            box.set_bgcolor(htfBearFvgBox, color.new(#EF5350,_fvgT))
-            box.set_border_color(htfBearFvgBox, color.new(#EF5350,0))
-            box.set_text_color(htfBearFvgBox, color.new(#EF9A9A,0))
-    else if not na(htfBearFvgBox)
-        box.set_bgcolor(htfBearFvgBox, color.new(color.gray, math.min(98,_fvgT+3)))
-        box.set_border_color(htfBearFvgBox, color.new(color.gray,60))
-        box.set_text_color(htfBearFvgBox, color.new(color.gray,30))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-step1 = inHTFBull or inHTFBear
-step3 = hasMSSBull or hasMSSBear
-step4 = array.size(bb) > 0 or array.size(rb) > 0
-var bool step5 = false
-step5 := false
-if array.size(bb) > 0
-    for i = 0 to array.size(bb)-1
-        if array.get(bb_hasFVG,i)
-            step5 := true
-if array.size(rb) > 0
-    for i = 0 to array.size(rb)-1
-        if array.get(rb_hasFVG,i)
-            step5 := true
-step7 = unicornBull or unicornBear
-var bool stepHQ    = false
-var bool stepHQfvg = false
-var bool stepHQbig = false
-var bool stepHQLiq = false
-var bool stepHQpda = false
-stepHQ := false, stepHQfvg := false, stepHQbig := false, stepHQLiq := false, stepHQpda := false
-if array.size(bb) > 0
-    for i = 0 to array.size(bb)-1
-        if array.get(bb_isHQ,i)
-            stepHQ := true
-        if array.get(bb_hasFVG,i)
-            stepHQfvg := true
-        if array.get(bb_hqBig,i)
-            stepHQbig := true
-        if array.get(bb_hqLiq,i)
-            stepHQLiq := true
-        if array.get(bb_hqPDA,i)
-            stepHQpda := true
-if array.size(rb) > 0
-    for i = 0 to array.size(rb)-1
-        if array.get(rb_isHQ,i)
-            stepHQ := true
-        if array.get(rb_hasFVG,i)
-            stepHQfvg := true
-        if array.get(rb_hqBig,i)
-            stepHQbig := true
-        if array.get(rb_hqLiq,i)
-            stepHQLiq := true
-        if array.get(rb_hqPDA,i)
-            stepHQpda := true
-
-bullDir = hasMSSBull and (inHTFBull or not unicornNeedHTF)
-bearDir = hasMSSBear and (inHTFBear or not unicornNeedHTF)
-dirStr  = unicornBull?"▲ 做多進場":unicornBear?"▼ 做空進場":bullDir?"多方準備":bearDir?"空方準備":"觀望"
-dirCol  = unicornBull or bullDir ? color.new(#1E88E5,0) : unicornBear or bearDir ? color.new(#FF8C00,0) : color.new(#888888,0)
-htfInfo = inHTFBull?"多方PDA":inHTFBear?"空方PDA":"未進入"
-mssInfo = hasMSSBull?"看漲":hasMSSBear?"看跌":"待確認"
-bbCnt   = array.size(bb)+array.size(rb)
-bbInfo  = step4?str.tostring(bbCnt)+" BB":"等待"
-nextStr = not step3?"等待MSS":not step4?"等待BB":(not step5 and unicornNeedFVG)?"等待FVG":not step7?"等待進場":"已觸發!"
-
-_pos   = dashPos=="左下"?position.bottom_left:dashPos=="右下"?position.bottom_right:dashPos=="左上"?position.top_left:position.top_right
-_cbg   = color.new(#0D1117, 0)
-_cHd   = color.new(#0f172a, 0)
-_cSep  = color.new(#1e293b, 0)
-_cGn   = color.new(#22c55e, 0)
-_cGr   = color.new(#475569, 0)
-_cGold = color.new(#fbbf24, 0)
-_cOr   = color.new(#FF8C00, 0)
-_cBl   = color.new(#1E88E5, 0)
-_cGnBg = color.new(#14532d, 0)
-_cAmBg = color.new(#451a03, 0)
-_fsz   = dashFont=="Tiny"?size.tiny:dashFont=="Normal"?size.normal:dashFont=="Large"?size.large:size.small
-
-var table dash = na
-if showDash
-    if na(dash)
-        dash := table.new(_pos, 2, 16, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
-    table.cell(dash, 0, 0, "Unicorn V9s · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
-    table.cell(dash, 1, 0, "參考 " + htfStr, text_color=_cGr, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_right)
-    _dirBg = unicornBull?color.new(#0c2a47,0):unicornBear?color.new(#3b0f05,0):_cHd
-    table.cell(dash, 0, 1, "方向", text_color=_cGr, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_left)
-    table.cell(dash, 1, 1, dirStr, text_color=dirCol, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_right)
-    table.cell(dash, 0, 2, "Unicorn 核心", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 1, 2, "MSS → BB → FVG → 進場", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    _bg3 = step3?_cGnBg:_cbg
-    table.cell(dash, 0, 3, (step3?"✔":"·") + " MSS 結構", text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_left)
-    table.cell(dash, 1, 3, mssInfo, text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_right)
-    _bg4 = step4?_cGnBg:_cbg
-    table.cell(dash, 0, 4, (step4?"✔":"·") + " Breaker (BB)", text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_left)
-    table.cell(dash, 1, 4, bbInfo, text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_right)
-    _bg5 = step5?_cGnBg:_cbg
-    table.cell(dash, 0, 5, (step5?"✔":"·") + " FVG 缺口", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_left)
-    table.cell(dash, 1, 5, step5?"有FVG":"無FVG", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_right)
-    _bg6 = step7?color.new(#0a3d1f,0):_cbg
-    table.cell(dash, 0, 6, (step7?"✔":"·") + " 好的進場位", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_left)
-    table.cell(dash, 1, 6, step7?"進入區間!":"等待回測", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_right)
-    table.cell(dash, 0, 7, "下一步", text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_left)
-    table.cell(dash, 1, 7, nextStr,  text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_right)
-    table.cell(dash, 0, 8, "HQ OB 品質 (4個條件)", text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 1, 8, "3個以上 = HQ★",         text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    _bg9 = stepHQfvg?_cAmBg:_cbg
-    table.cell(dash, 0, 9,  (stepHQfvg?"★":"·") + " FVG 缺口",    text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_left)
-    table.cell(dash, 1, 9,  stepHQfvg?"✔ 有缺口":"·",              text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_right)
-    _bg10 = stepHQbig?_cAmBg:_cbg
-    table.cell(dash, 0, 10, (stepHQbig?"★":"·") + " 大實體K棒",    text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_left)
-    table.cell(dash, 1, 10, stepHQbig?"✔ 大實體":"·",               text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_right)
-    _bg11 = stepHQLiq?_cAmBg:_cbg
-    table.cell(dash, 0, 11, (stepHQLiq?"★":"·") + " SSL/BSL掃除",  text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_left)
-    table.cell(dash, 1, 11, stepHQLiq?"✔ 有掃除":"·",               text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_right)
-    _bg12 = stepHQpda?_cAmBg:_cbg
-    table.cell(dash, 0, 12, (stepHQpda?"★":"·") + " HTF PDA",      text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_left)
-    table.cell(dash, 1, 12, stepHQpda?"✔ 在PDA":"·",                text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_right)
-    table.cell(dash, 0, 13, "UM 勝率",     text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    table.cell(dash, 1, 13, "",             text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
-    _lWrPct   = _lTot   > 0 ? _lWin   * 100.0 / _lTot   : -1.0
-    _sWrPct   = _sTot   > 0 ? _sWin   * 100.0 / _sTot   : -1.0
-    _lWrC2    = _lWrPct   >= 0 ? (_lWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
-    _sWrC2    = _sWrPct   >= 0 ? (_sWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
-    table.cell(dash, 0, 14, "多▲ UM",    text_color=_cBl,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
-    table.cell(dash, 1, 14, _lWrStr,    text_color=_lWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
-    table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
-
-if showFibOTE and barstate.islast and (fibIsBull or fibIsBear)
-    if not na(_fibOteBox) : box.delete(_fibOteBox)
-    if not na(_fibLblHi)  : label.delete(_fibLblHi)
-    if not na(_fibLblLo)  : label.delete(_fibLblLo)
-    if not na(_fibLblSH)  : label.delete(_fibLblSH)
-    if not na(_fibLblSL)  : label.delete(_fibLblSL)
-    _fbor = fibIsBull ? color.new(#26A69A, 0) : color.new(#EF5350, 0)
-    _fcol = fibIsBull ? fibBullCol : fibBearCol
-    _fdir = fibIsBull ? "多" : "空"
-    _fboxL = math.max(fibIsBull ? fibpH1Bar : fibpL1Bar, 0)
-    _fibOteBox := box.new(_fboxL, fibZoneHi, bar_index + fibExtR_in, fibZoneLo, bgcolor=_fcol, border_color=_fbor, border_width=1)
-    _fibLblHi  := label.new(bar_index + fibExtR_in, fibZoneHi, _fdir + " 0.618  " + str.tostring(fibZoneHi, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
-    _fibLblLo  := label.new(bar_index + fibExtR_in, fibZoneLo, _fdir + " 0.500  " + str.tostring(fibZoneLo, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
-    if fibIsBull
-        _fibLblSH := label.new(fibpH1Bar, fibpH1, "Weak High",  style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
-        _fibLblSL := label.new(fibpL1Bar, fibpL1, "Strong Low", style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
-    else
-        _fibLblSH := label.new(fibpH1Bar, fibpH1, "Strong High", style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
-        _fibLblSL := label.new(fibpL1Bar, fibpL1, "Weak Low",    style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
-    table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)`;
-</html>
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -1287,10 +248,10 @@ a:hover{text-decoration:underline}
       <div class="ver-sidebar">
         <div class="ver-tabs" id="unicorn-vtabs"></div>
         <div id="unicorn-log-v11" class="ver-log">
-          <span class="vl-dot">›</span> <b>V11 整合版（Unicorn/SMC/5-618）</b>：以 V10 為基礎，加入 Fibonacci OTE Zone，將 Strong/Weak High/Low 自動判定與 0.5–0.618 區間直接整合進同一個腳本<br>
-          <span class="vl-dot">›</span> <b>Fibonacci OTE 框</b>：多方時從 Strong Low→Weak High 量 0.5/0.618（綠框）；空方時從 Strong High→Weak Low 量（紅框），與 UM 訊號顯示在同一圖表<br>
-          <span class="vl-dot">›</span> <b>OTE 進場過濾（可選）</b>：開啟「訊號限OTE區間進場」後，UM⭡/UM⭣ 只在收盤位於 Fib 0.5–0.618 框內才觸發，減少非OTE位置的假訊號<br>
-          <span class="vl-dot">›</span> <b>提示音</b>：設定「進入OTE區間」警報條件，在 TradingView 警報視窗開啟聲音通知
+          <span class="vl-dot">›</span> <b>V11 整合版（Unicorn/SMC/5-618）</b>：以 V10 為基礎，加入 Fibonacci OTE Zone，Strong/Weak 標籤與 0.5–0.618 區間直接整合在同一腳本<br>
+          <span class="vl-dot">›</span> <b>OTE 框</b>：多方從 Strong Low→Weak High 量 0.5/0.618（綠框）；空方從 Strong High→Weak Low 量（紅框）<br>
+          <span class="vl-dot">›</span> <b>OTE 過濾（可選）</b>：開啟「訊號限OTE區間進場」，UM 訊號只在框內才觸發<br>
+          <span class="vl-dot">›</span> <b>提示音</b>：設「進入OTE區間」警報並開啟 TradingView 聲音通知
         </div>
         <div id="unicorn-log-fibote" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC Fibonacci OTE Zone</b>：自動偵測多空結構（HH+HL=多方 / LH+LL=空方），從 Strong Low→Weak High（多）或 Strong High→Weak Low（空）量出 0.5/0.618 區間<br>
@@ -10530,6 +9491,1044 @@ if showDash
     table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)`;
 
 
+
+
+const UNICORN_V11_STRAT = `//@version=5
+strategy("交易訊號V11(Unicorn/SMC/5-618)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
+
+grpS   = "Strategy回測設定"
+tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
+slATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)
+atrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)
+
+grp1 = "訂單塊設定"
+tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
+pivL_m       = input.int(10,"樞紐左側（Manual用）",minval=1,group=grp1)
+pivR_m       = input.int(5, "樞紐右側（Manual用）",minval=1,group=grp1)
+bbSearchBars = input.int(100,"OB搜尋K數（Manual用）",minval=20,maxval=500,group=grp1)
+obExtR_m     = input.int(5,"OB右延伸K數",minval=1,maxval=30,group=grp1)
+minScore     = input.int(0, "最低品質分(0-4)",minval=0,maxval=4,group=grp1)
+hqMin        = input.int(3, "HQ門檻(分)",minval=2,maxval=4,group=grp1)
+maxOBs       = input.int(1, "每方向最多OB數",minval=1,maxval=5,group=grp1)
+obTxtSize    = input.string("Small","OB文字大小",options=["Tiny","Small","Normal","Large"],group=grp1)
+obTxtHAlign  = input.string("置中", "OB文字對齊",options=["置中","置左","置右"],          group=grp1)
+
+grp2 = "獨角獸模型"
+unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需HTF為多方結構，空方訊號需HTF為空方結構，有效過濾逆勢假訊號")
+needD1Confirm  = input.bool(false, "需要日線MSS趨勢確認",group=grp2,tooltip="開啟後多方訊號需日線MSS看多，空方訊號需日線MSS看空；有效過濾逆日線大趨勢的假訊號（上升趨勢中只做多，下降趨勢中只做空）")
+htfOBPrecision = input.float(0.5,"HTF OB 觸及精確度（0=全區間，0.5=靠支撐半段）",minval=0.0,maxval=1.0,step=0.1,group=grp2)
+unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
+allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
+sigCooldown    = input.int(10,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
+strictMSSGate  = input.bool(true,"啟用嚴格反趨勢結構閘門(HH+HL/LH+LL)",group=grp2,tooltip="V6曾用HH+HL(多頭)/LH+LL(空頭)雙pivot結構確認：只有當下結構真的與新方向相反（或尚無結構）才放行MSS。V8曾為了讓CHoCH時序與LuxAlgo SMC指標對齊而拿掉這道濾網，改成只做同方向去重(_smcTrend)。經比對669行原始版後確認此濾網對過濾逆勢假訊號有實質幫助，V8起預設改為開啟；如需回到單純_smcTrend去重（訊號較密集）可手動關閉。")
+
+grp3 = "HTF區間顯示"
+show5MOB  = input.bool(false,"顯示 5M OB",  group=grp3)
+m5Days    = input.int(1,  "5M 顯示天數", minval=1,maxval=5,   group=grp3)
+show1HOB  = input.bool(true, "顯示 1H OB",  group=grp3)
+showHTFFVG = input.bool(true,  "顯示 HTF FVG（自動配對）", group=grp3)
+h1Days    = input.int(1,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
+show4HOB  = input.bool(false,"顯示 4H OB",  group=grp3)
+show4HFVG = input.bool(false,"顯示 4H FVG", group=grp3)
+h4Days    = input.int(10, "4H 顯示天數", minval=1,maxval=90,  group=grp3)
+show1DOB  = input.bool(false,"顯示 1D OB",  group=grp3)
+show1DFVG = input.bool(false,"顯示 1D FVG", group=grp3)
+d1Days    = input.int(20, "1D 顯示天數", minval=1,maxval=180, group=grp3)
+htfExtR   = input.int(30, "HTF右延伸K數",minval=5,             group=grp3)
+
+grp4 = "訊號顯示"
+showDash    = input.bool(true,"顯示儀表板",group=grp4)
+dashPos     = input.string("右下","儀表板位置",options=["左下","右下","左上","右上"],group=grp4)
+dashFont    = input.string("Small","儀表板字體",options=["Tiny","Small","Normal","Large"],group=grp4)
+showBull    = input.bool(true,"顯示多方OB方框",group=grp4)
+showBear    = input.bool(true,"顯示空方OB方框",group=grp4)
+sigDays     = input.int(30,"訊號顯示天數",minval=1,maxval=90,group=grp4)
+showTPSL    = input.bool(true,"顯示TP/SL線",group=grp4)
+showBgColor = input.bool(false,"顯示條件背景色",group=grp4)
+
+grp5 = "透明度設定"
+obFillTransp  = input.int(60, "OB方框填色透明度",  minval=0, maxval=95, step=5, group=grp5)
+htfFillTransp = input.int(88, "HTF OB填色透明度",  minval=0, maxval=98, step=2, group=grp5)
+fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, step=2, group=grp5)
+showDeadOB    = input.bool(true, "顯示失效OB（灰色）", group=grp5)
+deadOBTransp  = input.int(80,   "失效OB透明度",        group=grp5, minval=0, maxval=95, step=5)
+
+grpFib     = "Fibonacci OTE Zone"
+showFibOTE = input.bool(true,  "顯示 Fibonacci OTE 框",             group=grpFib)
+fibPivLen  = input.int(20,     "OTE 樞紐K棒數", minval=5, maxval=100, group=grpFib)
+fibExtR_in = input.int(50,     "OTE框向右延伸", minval=5, maxval=300, group=grpFib)
+needFibOTE = input.bool(false, "訊號限OTE區間進場", group=grpFib, tooltip="UM 訊號只在Fib 0.5-0.618 區間觸發")
+fibBullCol = input.color(color.new(#26A69A, 75), "多方OTE顏色", group=grpFib)
+fibBearCol = input.color(color.new(#EF5350, 75), "空方OTE顏色", group=grpFib)
+_hqBg()  => math.min(95, obFillTransp + 15)
+_hqOvl() => math.min(98, obFillTransp + 33)
+
+_obTxtSz = obTxtSize=="Tiny"?size.tiny:obTxtSize=="Normal"?size.normal:obTxtSize=="Large"?size.large:size.small
+_obHAl   = obTxtHAlign=="置左"?text.align_left:obTxtHAlign=="置右"?text.align_right:text.align_center
+
+_autoTfKey = switch timeframe.period
+    "1"   => "1M"
+    "3"   => "5M"
+    "5"   => "5M"
+    "15"  => "15M"
+    "30"  => "15M"
+    "45"  => "15M"
+    "60"  => "1H"
+    "120" => "1H"
+    "240" => "4H"
+    "D"   => "1D"
+    "W"   => "1D"
+    => "1D"
+_tfKey = tfPreset == "Auto" ? _autoTfKey : tfPreset
+
+_pivL   = _tfKey=="1M"?8:_tfKey=="5M"?7:_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8:_tfKey=="1D"?5:pivL_m
+_pivR   = _tfKey=="1M"?5:_tfKey=="5M"?3:_tfKey=="15M"?5:_tfKey=="1H"?5:_tfKey=="4H"?4:_tfKey=="1D"?3:pivR_m
+_bbSrch = _tfKey=="1M"?200:_tfKey=="5M"?150:_tfKey=="15M"?120:_tfKey=="1H"?100:_tfKey=="4H"?60:_tfKey=="1D"?30:bbSearchBars
+_obExtR = obExtR_m
+
+barsPerDay = math.max(1, math.round(86400 / timeframe.in_seconds()))
+sigBarsMax = sigDays * barsPerDay
+
+tfStr = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":timeframe.period=="D"?"日":timeframe.period=="W"?"週":timeframe.period+"T"
+
+autoHTF = switch timeframe.period
+    "1"   => "60"
+    "3"   => "60"
+    "5"   => "60"
+    "15"  => "240"
+    "30"  => "240"
+    "45"  => "240"
+    "60"  => "D"
+    "120" => "D"
+    "240" => "W"
+    "D"   => "W"
+    => "W"
+htfStr = autoHTF=="60"?"1H":autoHTF=="240"?"4H":autoHTF=="D"?"日":"週"
+
+f_htf_ob_setup() =>
+    var float _lpH=na, var float _lpL=na
+    var float _bTop=na, var float _bBot=na
+    var float _rTop=na, var float _rBot=na
+    var int   _dir=0
+    _ph = ta.pivothigh(high,5,5)
+    _pl = ta.pivotlow(low,5,5)
+    if not na(_ph)
+        _lpH := _ph
+    if not na(_pl)
+        _lpL := _pl
+    if not na(_lpH) and close > _lpH and not (close[1] > _lpH)
+        _rTop := na
+        _rBot := na
+        _dir  := 1
+        for i = 1 to 20
+            if close[i] < open[i]
+                _bTop := high[i]
+                _bBot := low[i]
+                break
+    if not na(_lpL) and close < _lpL and not (close[1] < _lpL)
+        _bTop := na
+        _bBot := na
+        _dir  := -1
+        for i = 1 to 20
+            if close[i] > open[i]
+                _rTop := high[i]
+                _rBot := low[i]
+                break
+    [_bTop, _bBot, _rTop, _rBot, _dir]
+
+f_htf_fvg_setup() =>
+    var float _bFvgT = na
+    var float _bFvgB = na
+    var float _rFvgT = na
+    var float _rFvgB = na
+    if not na(_bFvgB) and low < _bFvgB
+        _bFvgT := na
+        _bFvgB := na
+    if not na(_rFvgT) and high > _rFvgT
+        _rFvgT := na
+        _rFvgB := na
+    if low[0] > high[2]
+        _bFvgT := low[0]
+        _bFvgB := high[2]
+    if high[0] < low[2]
+        _rFvgT := low[2]
+        _rFvgB := high[0]
+    [_bFvgT, _bFvgB, _rFvgT, _rFvgB]
+
+[h1BT,h1BB,h1RT,h1RB,h1MSSDir] = request.security(syminfo.tickerid,"60",  f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[m5BT,m5BB,m5RT,m5RB,m5MSSDir] = request.security(syminfo.tickerid,"5",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[h4BT,h4BB,h4RT,h4RB,h4MSSDir] = request.security(syminfo.tickerid,"240", f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[d1BT,d1BB,d1RT,d1RB,d1MSSDir] = request.security(syminfo.tickerid,"D",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+
+[h1BFvgT,h1BFvgB,h1RFvgT,h1RFvgB] = request.security(syminfo.tickerid,"60",  f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[h4BFvgT,h4BFvgB,h4RFvgT,h4RFvgB] = request.security(syminfo.tickerid,"240", f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[d1BFvgT,d1BFvgB,d1RFvgT,d1RFvgB] = request.security(syminfo.tickerid,"D",   f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[wBFvgT,wBFvgB,wRFvgT,wRFvgB]   = request.security(syminfo.tickerid,"W",   f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+
+htfBullTop = autoHTF=="60"?h1BT:autoHTF=="240"?h4BT:d1BT
+htfBullBot = autoHTF=="60"?h1BB:autoHTF=="240"?h4BB:d1BB
+htfBearTop = autoHTF=="60"?h1RT:autoHTF=="240"?h4RT:d1RT
+htfBearBot = autoHTF=="60"?h1RB:autoHTF=="240"?h4RB:d1RB
+htfMSSDir  = autoHTF=="60"?h1MSSDir:autoHTF=="240"?h4MSSDir:d1MSSDir
+
+htfFvgBT    = autoHTF=="60"?h1BFvgT:autoHTF=="240"?h4BFvgT:autoHTF=="D"?d1BFvgT:wBFvgT
+htfFvgBB    = autoHTF=="60"?h1BFvgB:autoHTF=="240"?h4BFvgB:autoHTF=="D"?d1BFvgB:wBFvgB
+htfFvgRT    = autoHTF=="60"?h1RFvgT:autoHTF=="240"?h4RFvgT:autoHTF=="D"?d1RFvgT:wRFvgT
+htfFvgRB    = autoHTF=="60"?h1RFvgB:autoHTF=="240"?h4RFvgB:autoHTF=="D"?d1RFvgB:wRFvgB
+h1W = math.max(bar_index - h1Days*barsPerDay, 1)
+h4W = math.max(bar_index - h4Days*barsPerDay, 1)
+d1W = math.max(bar_index - d1Days*barsPerDay, 1)
+htfFvgW     = autoHTF=="60"?h1W:autoHTF=="240"?h4W:autoHTF=="D"?d1W:math.max(bar_index-d1Days*barsPerDay,1)
+phH = ta.pivothigh(high,_pivL,_pivR)
+plL = ta.pivotlow(low, _pivL,_pivR)
+var float ph1=na, var float ph2=na
+var float pl1=na, var float pl2=na
+if not na(phH)
+    ph2 := ph1
+    ph1 := phH
+if not na(plL)
+    pl2 := pl1
+    pl1 := plL
+lastPH = ph1
+lastPL = pl1
+
+var bool hasMSSBull = false
+var bool hasMSSBear = false
+
+var int _smcTrend = 0
+_hasData        = not na(ph1) and not na(ph2) and not na(pl1) and not na(pl2)
+_isBullStruct   = _hasData and ph1 > ph2 and pl1 > pl2
+_isBearStruct   = _hasData and ph1 < ph2 and pl1 < pl2
+_rawBullMSS     = not na(lastPH) and close > lastPH and close[1] <= lastPH
+_rawBearMSS     = not na(lastPL) and close < lastPL and close[1] >= lastPL
+_structGateBull = strictMSSGate ? (_isBearStruct or not _hasData) : true
+_structGateBear = strictMSSGate ? (_isBullStruct or not _hasData) : true
+bullMSS = _rawBullMSS and _smcTrend != 1 and _structGateBull
+bearMSS = _rawBearMSS and _smcTrend != -1 and _structGateBear
+if _rawBullMSS
+    _smcTrend := 1
+if _rawBearMSS
+    _smcTrend := -1
+if bullMSS
+    hasMSSBull := true
+    hasMSSBear := false
+if bearMSS
+    hasMSSBear := true
+    hasMSSBull := false
+
+var float[] bb          = array.new_float()
+var float[] bl          = array.new_float()
+var bool[]  bb_hasFVG   = array.new_bool()
+var float[] bb_fvgT     = array.new_float()
+var float[] bb_fvgB     = array.new_float()
+var box[]   bb_box      = array.new_box()
+var box[]   bb_fbox     = array.new_box()
+var box[]   bb_hqbox    = array.new_box()
+var bool[]  bb_signaled = array.new_bool()
+var bool[]  bb_isHQ     = array.new_bool()
+var bool[]  bb_hqBig   = array.new_bool()
+var bool[]  bb_hqLiq   = array.new_bool()
+var bool[]  bb_hqPDA   = array.new_bool()
+var bool[]  bb_pbDep    = array.new_bool()
+var bool[]  bb_pbSig    = array.new_bool()
+var box[]   bb_pbbox    = array.new_box()
+
+var float[] rb          = array.new_float()
+var float[] rl          = array.new_float()
+var bool[]  rb_hasFVG   = array.new_bool()
+var float[] rb_fvgT     = array.new_float()
+var float[] rb_fvgB     = array.new_float()
+var box[]   rb_box      = array.new_box()
+var box[]   rb_fbox     = array.new_box()
+var box[]   rb_hqbox    = array.new_box()
+var bool[]  rb_signaled = array.new_bool()
+var bool[]  rb_isHQ     = array.new_bool()
+var bool[]  rb_hqBig   = array.new_bool()
+var bool[]  rb_hqLiq   = array.new_bool()
+var bool[]  rb_hqPDA   = array.new_bool()
+var bool[]  rb_pbDep    = array.new_bool()
+var bool[]  rb_pbSig    = array.new_bool()
+var box[]   rb_pbbox    = array.new_box()
+var box[]   bb_dead     = array.new_box()
+var box[]   rb_dead     = array.new_box()
+
+var label[] sigLabels   = array.new_label()
+var int[]   sigBars     = array.new_int()
+var int     lastAnySigBar = -999
+
+avgBody = ta.sma(math.abs(close-open),20)
+rng50   = ta.highest(high,50) - ta.lowest(low,50)
+mid50   = ta.lowest(low,50) + rng50*0.5
+var int   lastMSSDir    = 0
+var float _lastBullOBPh = na
+var float _lastBearOBPl = na
+
+// --- Fibonacci OTE ---
+fibPH = ta.pivothigh(high, fibPivLen, fibPivLen)
+fibPL = ta.pivotlow(low,  fibPivLen, fibPivLen)
+var float fibpH1 = na, var float fibpH2 = na
+var float fibpL1 = na, var float fibpL2 = na
+var int   fibpH1Bar = na, var int fibpL1Bar = na
+if not na(fibPH)
+    fibpH2 := fibpH1
+    fibpH1 := fibPH
+    fibpH1Bar := bar_index - fibPivLen
+if not na(fibPL)
+    fibpL2 := fibpL1
+    fibpL1 := fibPL
+    fibpL1Bar := bar_index - fibPivLen
+fibIsBull = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 > fibpH2 and fibpL1 > fibpL2
+fibIsBear = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 < fibpH2 and fibpL1 < fibpL2
+fibRng    = not na(fibpH1) and not na(fibpL1) ? fibpH1 - fibpL1 : na
+fibOTE05  = fibIsBull ? fibpL1 + 0.500 * fibRng : fibIsBear ? fibpH1 - 0.500 * fibRng : na
+fibOTE618 = fibIsBull ? fibpL1 + 0.618 * fibRng : fibIsBear ? fibpH1 - 0.618 * fibRng : na
+fibZoneHi = fibIsBull ? fibOTE618 : fibIsBear ? fibOTE05  : na
+fibZoneLo = fibIsBull ? fibOTE05  : fibIsBear ? fibOTE618 : na
+inFibOTE  = not na(fibZoneHi) and not na(fibZoneLo) and close >= fibZoneLo and close <= fibZoneHi
+
+f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
+
+while array.size(sigBars) > 0
+    if bar_index - array.get(sigBars, 0) > sigBarsMax or array.size(sigBars) > 200
+        label.delete(array.shift(sigLabels))
+        array.shift(sigBars)
+    else
+        break
+
+f_bull_shift(toGrey = false) =>
+    _bx = array.shift(bb_box)
+    if not na(_bx)
+        if toGrey and showDeadOB
+            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
+            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
+            box.set_text_color(_bx,    color.new(color.gray, 30))
+            array.push(bb_dead, _bx)
+            if array.size(bb_dead) > 10
+                box.delete(array.shift(bb_dead))
+        else
+            box.delete(_bx)
+    _f = array.shift(bb_fbox)
+    if not na(_f)
+        box.delete(_f)
+    _h = array.shift(bb_hqbox)
+    if not na(_h)
+        box.delete(_h)
+    array.shift(bb), array.shift(bl), array.shift(bb_hasFVG)
+    array.shift(bb_fvgT), array.shift(bb_fvgB)
+    array.shift(bb_signaled), array.shift(bb_isHQ)
+    array.shift(bb_hqBig),  array.shift(bb_hqLiq),  array.shift(bb_hqPDA)
+    _pbBx2 = array.shift(bb_pbbox)
+    if not na(_pbBx2)
+        box.delete(_pbBx2)
+    array.shift(bb_pbDep), array.shift(bb_pbSig)
+
+f_bear_shift(toGrey = false) =>
+    _bx = array.shift(rb_box)
+    if not na(_bx)
+        if toGrey and showDeadOB
+            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
+            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
+            box.set_text_color(_bx,    color.new(color.gray, 30))
+            array.push(rb_dead, _bx)
+            if array.size(rb_dead) > 10
+                box.delete(array.shift(rb_dead))
+        else
+            box.delete(_bx)
+    _f = array.shift(rb_fbox)
+    if not na(_f)
+        box.delete(_f)
+    _h = array.shift(rb_hqbox)
+    if not na(_h)
+        box.delete(_h)
+    array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
+    array.shift(rb_fvgT), array.shift(rb_fvgB)
+    array.shift(rb_signaled), array.shift(rb_isHQ)
+    array.shift(rb_hqBig),  array.shift(rb_hqLiq),  array.shift(rb_hqPDA)
+    _pbBx3 = array.shift(rb_pbbox)
+    if not na(_pbBx3)
+        box.delete(_pbBx3)
+    array.shift(rb_pbDep), array.shift(rb_pbSig)
+_prevMSSDir = lastMSSDir
+if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
+    _lastBullOBPh := ph1
+    _lastBearOBPl := na
+    lastMSSDir := 1
+    if _prevMSSDir != 1
+        while array.size(rb) > 0
+            f_bear_shift(true)
+    if array.size(bb) >= maxOBs
+        f_bull_shift()
+    for i = 1 to _bbSrch
+        if close[i] < open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
+            obT   = high[i]
+            obB   = low[i]
+            obBar = bar_index - i
+            fvgOk = i > 1 ? low[i-1] > high[i+1] : false
+            fvgT  = fvgOk ? low[i-1]  : na
+            fvgB  = fvgOk ? high[i+1] : na
+            inPDA = not na(mid50) ? (obT+obB)/2 < mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            liqGrab = false
+            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
+                if low[_j] < obB
+                    liqGrab := true
+                    break
+            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
+            isHQ  = sc >= hqMin
+            if sc >= minScore
+                array.push(bb, obT), array.push(bl, obB)
+                array.push(bb_hasFVG, fvgOk)
+                array.push(bb_fvgT, fvgT), array.push(bb_fvgB, fvgB)
+                array.push(bb_signaled, false), array.push(bb_isHQ, isHQ)
+                array.push(bb_hqBig, big), array.push(bb_hqLiq, liqGrab), array.push(bb_hqPDA, inPDA)
+                array.push(bb_pbDep, false), array.push(bb_pbSig, false), array.push(bb_pbbox, na)
+                if showBull
+                    _bc = isHQ?color.new(#9C27B0,0):color.new(#1E88E5,0)
+                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#1E88E5,obFillTransp)
+                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#BBDEFB,0)
+                    array.push(bb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="+OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
+                    if fvgOk
+                        array.push(bb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#64B5F6,30),bgcolor=color.new(#64B5F6,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#90CAF9,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
+                    else
+                        array.push(bb_fbox, na)
+                    if isHQ
+                        array.push(bb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
+                    else
+                        array.push(bb_hqbox, na)
+                else
+                    array.push(bb_box, na)
+                    array.push(bb_fbox, na)
+                    array.push(bb_hqbox, na)
+                if isHQ
+                    _hl = label.new(obBar,obT,"★ HQ",style=label.style_label_down,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
+                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
+            break
+
+if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
+    _lastBearOBPl := pl1
+    _lastBullOBPh := na
+    lastMSSDir := -1
+    if _prevMSSDir != -1
+        while array.size(bb) > 0
+            f_bull_shift(true)
+    if array.size(rb) >= maxOBs
+        f_bear_shift()
+    for i = 1 to _bbSrch
+        if close[i] > open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
+            obT   = high[i]
+            obB   = low[i]
+            obBar = bar_index - i
+            fvgOk = i > 1 ? high[i-1] < low[i+1] : false
+            fvgT  = fvgOk ? low[i+1]  : na
+            fvgB  = fvgOk ? high[i-1] : na
+            inPDA = not na(mid50) ? (obT+obB)/2 > mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            liqGrab = false
+            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
+                if high[_j] > obT
+                    liqGrab := true
+                    break
+            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
+            isHQ  = sc >= hqMin
+            if sc >= minScore
+                array.push(rb, obT), array.push(rl, obB)
+                array.push(rb_hasFVG, fvgOk)
+                array.push(rb_fvgT, fvgT), array.push(rb_fvgB, fvgB)
+                array.push(rb_signaled, false), array.push(rb_isHQ, isHQ)
+                array.push(rb_hqBig, big), array.push(rb_hqLiq, liqGrab), array.push(rb_hqPDA, inPDA)
+                array.push(rb_pbDep, false), array.push(rb_pbSig, false), array.push(rb_pbbox, na)
+                if showBear
+                    _bc = isHQ?color.new(#9C27B0,0):color.new(#FF8C00,0)
+                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#FF8C00,obFillTransp)
+                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#FFE0B2,0)
+                    array.push(rb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="-OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
+                    if fvgOk
+                        array.push(rb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#FFB74D,30),bgcolor=color.new(#FFB74D,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#FFCC80,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
+                    else
+                        array.push(rb_fbox, na)
+                    if isHQ
+                        array.push(rb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
+                    else
+                        array.push(rb_hqbox, na)
+                else
+                    array.push(rb_box, na)
+                    array.push(rb_fbox, na)
+                    array.push(rb_hqbox, na)
+                if isHQ
+                    _hl = label.new(obBar,obB,"★ HQ",style=label.style_label_up,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
+                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
+            break
+
+_htfBullAllow = not na(htfBullTop) and not na(htfBullBot) ? htfBullBot + (htfBullTop - htfBullBot) * (1.0 - htfOBPrecision) : htfBullTop
+_htfBearAllow = not na(htfBearTop) and not na(htfBearBot) ? htfBearTop - (htfBearTop - htfBearBot) * (1.0 - htfOBPrecision) : htfBearBot
+inHTFBull = not na(htfBullTop) and not na(htfBullBot) and low >= htfBullBot and low <= _htfBullAllow and htfMSSDir == 1
+inHTFBear = not na(htfBearTop) and not na(htfBearBot) and high <= htfBearTop and high >= _htfBearAllow and htfMSSDir == -1
+htfOkBull = unicornNeedHTF ? inHTFBull : true
+htfOkBear = unicornNeedHTF ? inHTFBear : true
+d1OkBull  = needD1Confirm ? d1MSSDir == 1  : true
+d1OkBear  = needD1Confirm ? d1MSSDir == -1 : true
+
+var bool unicornBull = false
+var bool unicornBear = false
+unicornBull := false
+unicornBear := false
+var int trigBullIdx = -1
+var int trigBearIdx = -1
+trigBullIdx := -1
+trigBearIdx := -1
+
+if array.size(bb) > 0 and lastMSSDir == 1
+    for i = 0 to array.size(bb)-1
+        obT      = array.get(bb, i)
+        obB      = array.get(bl, i)
+        fvgOn    = array.get(bb_hasFVG, i)
+        fT       = array.get(bb_fvgT, i)
+        fB       = array.get(bb_fvgB, i)
+        signaled = array.get(bb_signaled, i)
+        bx       = array.get(bb_box, i)
+        fbx      = array.get(bb_fbox, i)
+        hqbx     = array.get(bb_hqbox, i)
+        if not na(bx)
+            box.set_right(bx, bar_index + _obExtR)
+            if fvgOn and not na(fbx)
+                box.set_right(fbx, bar_index + _obExtR)
+            if not na(hqbx)
+                box.set_right(hqbx, bar_index + _obExtR)
+        if close < obB
+            if not na(bx)
+                box.set_border_color(bx, color.new(color.gray,40))
+                box.set_bgcolor(bx, color.new(color.gray,90))
+                box.set_text_color(bx, color.new(color.gray,30))
+            if not na(hqbx)
+                box.set_border_color(hqbx, color.new(color.gray,60))
+                box.set_bgcolor(hqbx, color.new(color.gray,97))
+        else if not signaled or allowRepeat
+            inFVG = fvgOn and not na(fT) and not na(fB) ? low <= fT and high >= fB : false
+            zone  = unicornNeedFVG ? inFVG : (low <= obT and high >= obB)
+            if zone and htfOkBull
+                unicornBull := true
+                trigBullIdx := i
+        pbDep = array.get(bb_pbDep, i)
+        pbSig = array.get(bb_pbSig, i)
+        pbBx  = array.get(bb_pbbox, i)
+        if not na(pbBx)
+            box.set_right(pbBx, bar_index + _obExtR)
+        if signaled and close > obT and not pbDep
+            array.set(bb_pbDep, i, true)
+        if pbDep and not pbSig and close >= obB
+            inOBpb = low <= obT and high >= obB
+            if inOBpb and htfOkBull
+                _pbT = math.max(open, close)
+                _pbB = math.min(open, close)
+                _pbBx4 = box.new(bar_index, _pbT, bar_index + _obExtR, _pbB, border_color=color.new(#00BCD4,0), bgcolor=color.new(#00BCD4,75), border_width=1, border_style=line.style_dashed, text="+PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
+                array.set(bb_pbbox, i, _pbBx4)
+                array.set(bb_pbSig, i, true)
+
+if array.size(rb) > 0 and lastMSSDir == -1
+    for i = 0 to array.size(rb)-1
+        obT      = array.get(rb, i)
+        obB      = array.get(rl, i)
+        fvgOn    = array.get(rb_hasFVG, i)
+        fT       = array.get(rb_fvgT, i)
+        fB       = array.get(rb_fvgB, i)
+        signaled = array.get(rb_signaled, i)
+        bx       = array.get(rb_box, i)
+        fbx      = array.get(rb_fbox, i)
+        hqbx     = array.get(rb_hqbox, i)
+        if not na(bx)
+            box.set_right(bx, bar_index + _obExtR)
+            if fvgOn and not na(fbx)
+                box.set_right(fbx, bar_index + _obExtR)
+            if not na(hqbx)
+                box.set_right(hqbx, bar_index + _obExtR)
+        if close > obT
+            if not na(bx)
+                box.set_border_color(bx, color.new(color.gray,40))
+                box.set_bgcolor(bx, color.new(color.gray,90))
+                box.set_text_color(bx, color.new(color.gray,30))
+            if not na(hqbx)
+                box.set_border_color(hqbx, color.new(color.gray,60))
+                box.set_bgcolor(hqbx, color.new(color.gray,97))
+        else if not signaled or allowRepeat
+            inFVG = fvgOn and not na(fT) and not na(fB) ? high >= fB and low <= fT : false
+            zone  = unicornNeedFVG ? inFVG : (high >= obB and low <= obT)
+            if zone and htfOkBear
+                unicornBear := true
+                trigBearIdx := i
+        pbDepR = array.get(rb_pbDep, i)
+        pbSigR = array.get(rb_pbSig, i)
+        pbBxR  = array.get(rb_pbbox, i)
+        if not na(pbBxR)
+            box.set_right(pbBxR, bar_index + _obExtR)
+        if signaled and close < obB and not pbDepR
+            array.set(rb_pbDep, i, true)
+        if pbDepR and not pbSigR and close <= obT
+            inOBpbR = high >= obB and low <= obT
+            if inOBpbR and htfOkBear
+                _pbTR = math.max(open, close)
+                _pbBR = math.min(open, close)
+                _pbBx5 = box.new(bar_index, _pbTR, bar_index + _obExtR, _pbBR, border_color=color.new(#FF5252,0), bgcolor=color.new(#FF5252,75), border_width=1, border_style=line.style_dashed, text="-PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
+                array.set(rb_pbbox, i, _pbBx5)
+                array.set(rb_pbSig, i, true)
+
+uBullEdge = unicornBull and not unicornBull[1]
+uBearEdge = unicornBear and not unicornBear[1]
+
+bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBull and (not needFibOTE or inFibOTE)
+bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear and (not needFibOTE or inFibOTE)
+
+if fireBull and fireBear
+    fireBull := lastMSSDir > 0
+    fireBear := lastMSSDir < 0
+
+var int _lTot   = 0
+var int _lWin   = 0
+var int _sTot   = 0
+var int _sWin   = 0
+if barstate.islast
+    _lTot := 0, _lWin := 0, _sTot := 0, _sWin := 0
+    if strategy.closedtrades > 0
+        for _ci = 0 to strategy.closedtrades - 1
+            _cpnl = strategy.closedtrades.profit(_ci)
+            _ceid = strategy.closedtrades.entry_id(_ci)
+            if _ceid == "L"
+                _lTot += 1
+                if _cpnl > 0
+                    _lWin += 1
+            else
+                _sTot += 1
+                if _cpnl > 0
+                    _sWin += 1
+var string _lWrStr   = "暫無"
+var string _sWrStr   = "暫無"
+if barstate.islast
+    _lWrStr   := _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
+    _sWrStr   := _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
+
+alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
+alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
+alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
+alertcondition(inFibOTE and barstate.isconfirmed,                        title="進入OTE區間",   message="{{ticker}} 進入 Fib OTE 0.5-0.618 @ {{close}}")
+alertcondition(ta.crossover(close,fibZoneLo)  and barstate.isconfirmed,  title="由下穿入OTE",   message="{{ticker}} 向上穿越 OTE 下緣 @ {{close}}")
+alertcondition(ta.crossunder(close,fibZoneHi) and barstate.isconfirmed,  title="由上穿入OTE",   message="{{ticker}} 向下穿越 OTE 上緣 @ {{close}}")
+
+_atr = ta.atr(atrLen)
+var line[] _tpLines = array.new_line()
+var line[] _slLines = array.new_line()
+var label[] _tpLbls = array.new_label()
+var label[] _slLbls = array.new_label()
+
+var box   _fibOteBox = na
+var label _fibLblHi  = na
+var label _fibLblLo  = na
+var label _fibLblSH  = na
+var label _fibLblSL  = na
+_MAX_TPSL = 1
+
+if fireBull and barstate.isconfirmed
+    array.set(bb_signaled, trigBullIdx, true)
+    lastAnySigBar := bar_index
+    _isHQ  = array.get(bb_isHQ, trigBullIdx)
+    _lc    = color.new(#1E88E5,0)
+    _lt    = "UM⭡"
+    _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
+    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
+    _tpLev = close + _atr * tpATR
+    _slLev = close - _atr * slATR
+    _eid   = "L"
+    strategy.entry(_eid, strategy.long)
+    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    if showTPSL
+        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
+        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
+        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
+        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
+        array.push(_tpLines,_tl), array.push(_slLines,_sl)
+        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
+        if array.size(_tpLines) > _MAX_TPSL
+            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
+            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
+
+if fireBear and barstate.isconfirmed
+    array.set(rb_signaled, trigBearIdx, true)
+    lastAnySigBar := bar_index
+    _isHQ  = array.get(rb_isHQ, trigBearIdx)
+    _lc    = color.new(#FF8C00,0)
+    _lt    = "UM⭣"
+    _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
+    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
+    _tpLev = close - _atr * tpATR
+    _slLev = close + _atr * slATR
+    _eid   = "S"
+    strategy.entry(_eid, strategy.short)
+    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    if showTPSL
+        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
+        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
+        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
+        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
+        array.push(_tpLines,_tl), array.push(_slLines,_sl)
+        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
+        if array.size(_tpLines) > _MAX_TPSL
+            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
+            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
+
+bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
+
+ZR  = bar_index + htfExtR
+m5W = math.max(bar_index - m5Days*barsPerDay, 1)
+
+var box h1BullBox=na, var box h1BearBox=na
+var box h4BullBox=na, var box h4BearBox=na
+var box d1BullBox=na, var box d1BearBox=na
+var box m5BullBox=na, var box m5BearBox=na
+var box htfBullFvgBox=na, var box htfBearFvgBox=na
+
+
+
+if show5MOB and not na(m5BT) and not na(m5BB)
+    if na(m5BullBox)
+        m5BullBox := box.new(m5W,m5BT,ZR,m5BB,border_color=color.new(#AB47BC,20),bgcolor=color.new(#AB47BC,htfFillTransp),border_width=1,text="5M+OB",text_color=color.new(#CE93D8,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if m5W > 1
+            box.set_left(m5BullBox, m5W)
+        box.set_right(m5BullBox, ZR)
+        box.set_top(m5BullBox, m5BT)
+        box.set_bottom(m5BullBox, m5BB)
+        box.set_bgcolor(m5BullBox, color.new(#AB47BC,htfFillTransp))
+
+if show5MOB and not na(m5RT) and not na(m5RB)
+    if na(m5BearBox)
+        m5BearBox := box.new(m5W,m5RT,ZR,m5RB,border_color=color.new(#F06292,20),bgcolor=color.new(#F06292,htfFillTransp),border_width=1,text="5M-OB",text_color=color.new(#F48FB1,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if m5W > 1
+            box.set_left(m5BearBox, m5W)
+        box.set_right(m5BearBox, ZR)
+        box.set_top(m5BearBox, m5RT)
+        box.set_bottom(m5BearBox, m5RB)
+        box.set_bgcolor(m5BearBox, color.new(#F06292,htfFillTransp))
+
+if show1HOB and not na(h1BT) and not na(h1BB)
+    if na(h1BullBox)
+        h1BullBox := box.new(h1W,h1BT,ZR,h1BB,border_color=color.new(#26A69A,20),bgcolor=color.new(#26A69A,htfFillTransp),border_width=1,text="1H+OB",text_color=color.new(#80CBC4,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h1W > 1
+            box.set_left(h1BullBox, h1W)
+        box.set_right(h1BullBox, ZR)
+        box.set_top(h1BullBox, h1BT)
+        box.set_bottom(h1BullBox, h1BB)
+        box.set_bgcolor(h1BullBox, color.new(#26A69A,htfFillTransp))
+
+if show1HOB and not na(h1RT) and not na(h1RB)
+    if na(h1BearBox)
+        h1BearBox := box.new(h1W,h1RT,ZR,h1RB,border_color=color.new(#EF5350,20),bgcolor=color.new(#EF5350,htfFillTransp),border_width=1,text="1H-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h1W > 1
+            box.set_left(h1BearBox, h1W)
+        box.set_right(h1BearBox, ZR)
+        box.set_top(h1BearBox, h1RT)
+        box.set_bottom(h1BearBox, h1RB)
+        box.set_bgcolor(h1BearBox, color.new(#EF5350,htfFillTransp))
+
+if show4HOB and not na(h4BT) and not na(h4BB)
+    if na(h4BullBox)
+        h4BullBox := box.new(h4W,h4BT,ZR,h4BB,border_color=color.new(#00BCD4,20),bgcolor=color.new(#00BCD4,htfFillTransp),border_width=2,text="4H+OB",text_color=color.new(#80DEEA,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h4W > 1
+            box.set_left(h4BullBox, h4W)
+        box.set_right(h4BullBox, ZR)
+        box.set_top(h4BullBox, h4BT)
+        box.set_bottom(h4BullBox, h4BB)
+        box.set_bgcolor(h4BullBox, color.new(#00BCD4,htfFillTransp))
+
+if show4HOB and not na(h4RT) and not na(h4RB)
+    if na(h4BearBox)
+        h4BearBox := box.new(h4W,h4RT,ZR,h4RB,border_color=color.new(#FF5722,20),bgcolor=color.new(#FF5722,htfFillTransp),border_width=2,text="4H-OB",text_color=color.new(#FF8A65,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h4W > 1
+            box.set_left(h4BearBox, h4W)
+        box.set_right(h4BearBox, ZR)
+        box.set_top(h4BearBox, h4RT)
+        box.set_bottom(h4BearBox, h4RB)
+        box.set_bgcolor(h4BearBox, color.new(#FF5722,htfFillTransp))
+
+if show1DOB and not na(d1BT) and not na(d1BB)
+    if na(d1BullBox)
+        d1BullBox := box.new(d1W,d1BT,ZR,d1BB,border_color=color.new(#4CAF50,20),bgcolor=color.new(#4CAF50,htfFillTransp),border_width=2,text="1D+OB",text_color=color.new(#A5D6A7,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if d1W > 1
+            box.set_left(d1BullBox, d1W)
+        box.set_right(d1BullBox, ZR)
+        box.set_top(d1BullBox, d1BT)
+        box.set_bottom(d1BullBox, d1BB)
+        box.set_bgcolor(d1BullBox, color.new(#4CAF50,htfFillTransp))
+
+if show1DOB and not na(d1RT) and not na(d1RB)
+    if na(d1BearBox)
+        d1BearBox := box.new(d1W,d1RT,ZR,d1RB,border_color=color.new(#F44336,20),bgcolor=color.new(#F44336,htfFillTransp),border_width=2,text="1D-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if d1W > 1
+            box.set_left(d1BearBox, d1W)
+        box.set_right(d1BearBox, ZR)
+        box.set_top(d1BearBox, d1RT)
+        box.set_bottom(d1BearBox, d1RB)
+        box.set_bgcolor(d1BearBox, color.new(#F44336,htfFillTransp))
+
+_fvgT = math.min(98, htfFillTransp + 5)
+
+if showHTFFVG
+    if not na(htfFvgBT) and not na(htfFvgBB)
+        if na(htfBullFvgBox)
+            htfBullFvgBox := box.new(htfFvgW,htfFvgBT,ZR,htfFvgBB,border_color=color.new(#26A69A,0),bgcolor=color.new(#26A69A,_fvgT),border_style=line.style_dashed,border_width=2,text=htfStr+" FVG+",text_color=color.new(#80CBC4,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            box.set_left(htfBullFvgBox, htfFvgW)
+            box.set_right(htfBullFvgBox, ZR)
+            box.set_top(htfBullFvgBox, htfFvgBT)
+            box.set_bottom(htfBullFvgBox, htfFvgBB)
+            box.set_bgcolor(htfBullFvgBox, color.new(#26A69A,_fvgT))
+            box.set_border_color(htfBullFvgBox, color.new(#26A69A,0))
+            box.set_text_color(htfBullFvgBox, color.new(#80CBC4,0))
+    else if not na(htfBullFvgBox)
+        box.set_bgcolor(htfBullFvgBox, color.new(color.gray, math.min(98,_fvgT+3)))
+        box.set_border_color(htfBullFvgBox, color.new(color.gray,60))
+        box.set_text_color(htfBullFvgBox, color.new(color.gray,30))
+    if not na(htfFvgRT) and not na(htfFvgRB)
+        if na(htfBearFvgBox)
+            htfBearFvgBox := box.new(htfFvgW,htfFvgRT,ZR,htfFvgRB,border_color=color.new(#EF5350,0),bgcolor=color.new(#EF5350,_fvgT),border_style=line.style_dashed,border_width=2,text=htfStr+" FVG-",text_color=color.new(#EF9A9A,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            box.set_left(htfBearFvgBox, htfFvgW)
+            box.set_right(htfBearFvgBox, ZR)
+            box.set_top(htfBearFvgBox, htfFvgRT)
+            box.set_bottom(htfBearFvgBox, htfFvgRB)
+            box.set_bgcolor(htfBearFvgBox, color.new(#EF5350,_fvgT))
+            box.set_border_color(htfBearFvgBox, color.new(#EF5350,0))
+            box.set_text_color(htfBearFvgBox, color.new(#EF9A9A,0))
+    else if not na(htfBearFvgBox)
+        box.set_bgcolor(htfBearFvgBox, color.new(color.gray, math.min(98,_fvgT+3)))
+        box.set_border_color(htfBearFvgBox, color.new(color.gray,60))
+        box.set_text_color(htfBearFvgBox, color.new(color.gray,30))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+step1 = inHTFBull or inHTFBear
+step3 = hasMSSBull or hasMSSBear
+step4 = array.size(bb) > 0 or array.size(rb) > 0
+var bool step5 = false
+step5 := false
+if array.size(bb) > 0
+    for i = 0 to array.size(bb)-1
+        if array.get(bb_hasFVG,i)
+            step5 := true
+if array.size(rb) > 0
+    for i = 0 to array.size(rb)-1
+        if array.get(rb_hasFVG,i)
+            step5 := true
+step7 = unicornBull or unicornBear
+var bool stepHQ    = false
+var bool stepHQfvg = false
+var bool stepHQbig = false
+var bool stepHQLiq = false
+var bool stepHQpda = false
+stepHQ := false, stepHQfvg := false, stepHQbig := false, stepHQLiq := false, stepHQpda := false
+if array.size(bb) > 0
+    for i = 0 to array.size(bb)-1
+        if array.get(bb_isHQ,i)
+            stepHQ := true
+        if array.get(bb_hasFVG,i)
+            stepHQfvg := true
+        if array.get(bb_hqBig,i)
+            stepHQbig := true
+        if array.get(bb_hqLiq,i)
+            stepHQLiq := true
+        if array.get(bb_hqPDA,i)
+            stepHQpda := true
+if array.size(rb) > 0
+    for i = 0 to array.size(rb)-1
+        if array.get(rb_isHQ,i)
+            stepHQ := true
+        if array.get(rb_hasFVG,i)
+            stepHQfvg := true
+        if array.get(rb_hqBig,i)
+            stepHQbig := true
+        if array.get(rb_hqLiq,i)
+            stepHQLiq := true
+        if array.get(rb_hqPDA,i)
+            stepHQpda := true
+
+bullDir = hasMSSBull and (inHTFBull or not unicornNeedHTF)
+bearDir = hasMSSBear and (inHTFBear or not unicornNeedHTF)
+dirStr  = unicornBull?"▲ 做多進場":unicornBear?"▼ 做空進場":bullDir?"多方準備":bearDir?"空方準備":"觀望"
+dirCol  = unicornBull or bullDir ? color.new(#1E88E5,0) : unicornBear or bearDir ? color.new(#FF8C00,0) : color.new(#888888,0)
+htfInfo = inHTFBull?"多方PDA":inHTFBear?"空方PDA":"未進入"
+mssInfo = hasMSSBull?"看漲":hasMSSBear?"看跌":"待確認"
+bbCnt   = array.size(bb)+array.size(rb)
+bbInfo  = step4?str.tostring(bbCnt)+" BB":"等待"
+nextStr = not step3?"等待MSS":not step4?"等待BB":(not step5 and unicornNeedFVG)?"等待FVG":not step7?"等待進場":"已觸發!"
+
+_pos   = dashPos=="左下"?position.bottom_left:dashPos=="右下"?position.bottom_right:dashPos=="左上"?position.top_left:position.top_right
+_cbg   = color.new(#0D1117, 0)
+_cHd   = color.new(#0f172a, 0)
+_cSep  = color.new(#1e293b, 0)
+_cGn   = color.new(#22c55e, 0)
+_cGr   = color.new(#475569, 0)
+_cGold = color.new(#fbbf24, 0)
+_cOr   = color.new(#FF8C00, 0)
+_cBl   = color.new(#1E88E5, 0)
+_cGnBg = color.new(#14532d, 0)
+_cAmBg = color.new(#451a03, 0)
+_fsz   = dashFont=="Tiny"?size.tiny:dashFont=="Normal"?size.normal:dashFont=="Large"?size.large:size.small
+
+var table dash = na
+if showDash
+    if na(dash)
+        dash := table.new(_pos, 2, 16, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
+    table.cell(dash, 0, 0, "Unicorn V9s · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
+    table.cell(dash, 1, 0, "參考 " + htfStr, text_color=_cGr, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_right)
+    _dirBg = unicornBull?color.new(#0c2a47,0):unicornBear?color.new(#3b0f05,0):_cHd
+    table.cell(dash, 0, 1, "方向", text_color=_cGr, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_left)
+    table.cell(dash, 1, 1, dirStr, text_color=dirCol, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_right)
+    table.cell(dash, 0, 2, "Unicorn 核心", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 2, "MSS → BB → FVG → 進場", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _bg3 = step3?_cGnBg:_cbg
+    table.cell(dash, 0, 3, (step3?"✔":"·") + " MSS 結構", text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_left)
+    table.cell(dash, 1, 3, mssInfo, text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_right)
+    _bg4 = step4?_cGnBg:_cbg
+    table.cell(dash, 0, 4, (step4?"✔":"·") + " Breaker (BB)", text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_left)
+    table.cell(dash, 1, 4, bbInfo, text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_right)
+    _bg5 = step5?_cGnBg:_cbg
+    table.cell(dash, 0, 5, (step5?"✔":"·") + " FVG 缺口", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_left)
+    table.cell(dash, 1, 5, step5?"有FVG":"無FVG", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_right)
+    _bg6 = step7?color.new(#0a3d1f,0):_cbg
+    table.cell(dash, 0, 6, (step7?"✔":"·") + " 好的進場位", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_left)
+    table.cell(dash, 1, 6, step7?"進入區間!":"等待回測", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_right)
+    table.cell(dash, 0, 7, "下一步", text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_left)
+    table.cell(dash, 1, 7, nextStr,  text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_right)
+    table.cell(dash, 0, 8, "HQ OB 品質 (4個條件)", text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 8, "3個以上 = HQ★",         text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _bg9 = stepHQfvg?_cAmBg:_cbg
+    table.cell(dash, 0, 9,  (stepHQfvg?"★":"·") + " FVG 缺口",    text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_left)
+    table.cell(dash, 1, 9,  stepHQfvg?"✔ 有缺口":"·",              text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_right)
+    _bg10 = stepHQbig?_cAmBg:_cbg
+    table.cell(dash, 0, 10, (stepHQbig?"★":"·") + " 大實體K棒",    text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_left)
+    table.cell(dash, 1, 10, stepHQbig?"✔ 大實體":"·",               text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_right)
+    _bg11 = stepHQLiq?_cAmBg:_cbg
+    table.cell(dash, 0, 11, (stepHQLiq?"★":"·") + " SSL/BSL掃除",  text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_left)
+    table.cell(dash, 1, 11, stepHQLiq?"✔ 有掃除":"·",               text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_right)
+    _bg12 = stepHQpda?_cAmBg:_cbg
+    table.cell(dash, 0, 12, (stepHQpda?"★":"·") + " HTF PDA",      text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_left)
+    table.cell(dash, 1, 12, stepHQpda?"✔ 在PDA":"·",                text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_right)
+    table.cell(dash, 0, 13, "UM 勝率",     text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 13, "",             text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _lWrPct   = _lTot   > 0 ? _lWin   * 100.0 / _lTot   : -1.0
+    _sWrPct   = _sTot   > 0 ? _sWin   * 100.0 / _sTot   : -1.0
+    _lWrC2    = _lWrPct   >= 0 ? (_lWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    _sWrC2    = _sWrPct   >= 0 ? (_sWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    table.cell(dash, 0, 14, "多▲ UM",    text_color=_cBl,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 14, _lWrStr,    text_color=_lWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+
+if showFibOTE and barstate.islast and (fibIsBull or fibIsBear)
+    if not na(_fibOteBox) : box.delete(_fibOteBox)
+    if not na(_fibLblHi)  : label.delete(_fibLblHi)
+    if not na(_fibLblLo)  : label.delete(_fibLblLo)
+    if not na(_fibLblSH)  : label.delete(_fibLblSH)
+    if not na(_fibLblSL)  : label.delete(_fibLblSL)
+    _fbor = fibIsBull ? color.new(#26A69A, 0) : color.new(#EF5350, 0)
+    _fcol = fibIsBull ? fibBullCol : fibBearCol
+    _fdir = fibIsBull ? "多" : "空"
+    _fboxL = math.max(fibIsBull ? fibpH1Bar : fibpL1Bar, 0)
+    _fibOteBox := box.new(_fboxL, fibZoneHi, bar_index + fibExtR_in, fibZoneLo, bgcolor=_fcol, border_color=_fbor, border_width=1)
+    _fibLblHi  := label.new(bar_index + fibExtR_in, fibZoneHi, _fdir + " 0.618  " + str.tostring(fibZoneHi, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
+    _fibLblLo  := label.new(bar_index + fibExtR_in, fibZoneLo, _fdir + " 0.500  " + str.tostring(fibZoneLo, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
+    if fibIsBull
+        _fibLblSH := label.new(fibpH1Bar, fibpH1, "Weak High",  style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
+        _fibLblSL := label.new(fibpL1Bar, fibpL1, "Strong Low", style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
+    else
+        _fibLblSH := label.new(fibpH1Bar, fibpH1, "Strong High", style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
+        _fibLblSL := label.new(fibpL1Bar, fibpL1, "Weak Low",    style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
+    table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)`;
 const SMC_MTF = `//@version=5
 indicator("SMC 多時框結構", overlay=true)
 
@@ -12364,8 +12363,8 @@ if showDash and barstate.islast
 
 document.getElementById('unicorn-v8-code').textContent = UNICORN_V8;
 document.getElementById('unicorn-v9s-code').textContent = UNICORN_V9_STRAT;
-document.getElementById('unicorn-v11-code').textContent = UNICORN_V11_STRAT;
 document.getElementById('unicorn-v10-code').textContent = UNICORN_V10_STRAT;
+document.getElementById('unicorn-v11-code').textContent = UNICORN_V11_STRAT;
 document.getElementById('unicorn-smcmtf-code').textContent = SMC_MTF;
 document.getElementById('unicorn-fibote-code').textContent = FIB_OTE;
 document.getElementById('unicorn-v7-code').textContent = UNICORN_V7;
