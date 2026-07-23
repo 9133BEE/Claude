@@ -1951,7 +1951,7 @@ var table T = table.new(position.top_right, 3, 21,
 if barstate.islast
     ticker = syminfo.ticker
 
-    table.cell(T,0,0, ticker+" "+_activePreset,
+    table.cell(T,0,0, ticker+" "+tfLabel,
          text_color=white, text_size=size.normal, bgcolor=#161b22)
     table.cell(T,1,0, inSess?"開市 ✓":"休市",
          text_color=inSess?green:gray, text_size=size.normal, bgcolor=#161b22)
