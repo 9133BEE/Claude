@@ -9555,7 +9555,7 @@ deadOBTransp  = input.int(80,   "失效OB透明度",        group=grp5, minval=0
 
 grpFib     = "Fibonacci OTE Zone"
 showFibOTE = input.bool(true,  "顯示 Fibonacci OTE 框",             group=grpFib)
-fibPivLen  = input.int(20,     "OTE 樞紐K棒數", minval=5, maxval=100, group=grpFib)
+fibPivLen  = input.int(10,     "OTE 樞紐K棒數", minval=3, maxval=100, group=grpFib)
 fibExtR_in = input.int(50,     "OTE框向右延伸", minval=5, maxval=300, group=grpFib)
 needFibOTE = input.bool(false, "訊號限OTE區間進場", group=grpFib, tooltip="UM 訊號只在Fib 0.5-0.618 區間觸發")
 fibBullCol = input.color(color.new(#26A69A, 75), "多方OTE顏色", group=grpFib)
@@ -9768,20 +9768,23 @@ fibPH = ta.pivothigh(high, fibPivLen, fibPivLen)
 fibPL = ta.pivotlow(low,  fibPivLen, fibPivLen)
 var float fibpH1 = na, var float fibpH2 = na
 var float fibpL1 = na, var float fibpL2 = na
-var int   fibpH1Bar = na, var int fibpL1Bar = na
+var int   fibpH1Bar = na, var int fibpH2Bar = na
+var int   fibpL1Bar = na, var int fibpL2Bar = na
 if not na(fibPH)
-    fibpH2 := fibpH1
-    fibpH1 := fibPH
+    fibpH2    := fibpH1
+    fibpH2Bar := fibpH1Bar
+    fibpH1    := fibPH
     fibpH1Bar := bar_index - fibPivLen
 if not na(fibPL)
-    fibpL2 := fibpL1
-    fibpL1 := fibPL
+    fibpL2    := fibpL1
+    fibpL2Bar := fibpL1Bar
+    fibpL1    := fibPL
     fibpL1Bar := bar_index - fibPivLen
 fibIsBull = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 > fibpH2 and fibpL1 > fibpL2
 fibIsBear = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 < fibpH2 and fibpL1 < fibpL2
-fibRng    = not na(fibpH1) and not na(fibpL1) ? fibpH1 - fibpL1 : na
-fibOTE05  = fibIsBull ? fibpL1 + 0.500 * fibRng : fibIsBear ? fibpH1 - 0.500 * fibRng : na
-fibOTE618 = fibIsBull ? fibpL1 + 0.618 * fibRng : fibIsBear ? fibpH1 - 0.618 * fibRng : na
+fibRng    = fibIsBull ? fibpH1 - fibpL2 : fibIsBear ? fibpH2 - fibpL1 : na
+fibOTE05  = fibIsBull ? fibpL2 + 0.500 * fibRng : fibIsBear ? fibpH2 - 0.500 * fibRng : na
+fibOTE618 = fibIsBull ? fibpL2 + 0.618 * fibRng : fibIsBear ? fibpH2 - 0.618 * fibRng : na
 fibZoneHi = fibIsBull ? fibOTE618 : fibIsBear ? fibOTE05  : na
 fibZoneLo = fibIsBull ? fibOTE05  : fibIsBear ? fibOTE618 : na
 inFibOTE  = not na(fibZoneHi) and not na(fibZoneLo) and close >= fibZoneLo and close <= fibZoneHi
@@ -10526,13 +10529,15 @@ if showFibOTE and barstate.islast and (fibIsBull or fibIsBear)
     _fdir = fibIsBull ? "多" : "空"
     _fboxL = math.max(fibIsBull ? fibpH1Bar : fibpL1Bar, 0)
     _fibOteBox := box.new(_fboxL, fibZoneHi, bar_index + fibExtR_in, fibZoneLo, bgcolor=_fcol, border_color=_fbor, border_width=1)
-    _fibLblHi  := label.new(bar_index + fibExtR_in, fibZoneHi, _fdir + " 0.618  " + str.tostring(fibZoneHi, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
-    _fibLblLo  := label.new(bar_index + fibExtR_in, fibZoneLo, _fdir + " 0.500  " + str.tostring(fibZoneLo, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
+    _hiLvl = fibIsBull ? "0.618" : "0.500"
+    _loLvl = fibIsBull ? "0.500" : "0.618"
+    _fibLblHi  := label.new(bar_index + fibExtR_in, fibZoneHi, _fdir + " " + _hiLvl + "  " + str.tostring(fibZoneHi, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
+    _fibLblLo  := label.new(bar_index + fibExtR_in, fibZoneLo, _fdir + " " + _loLvl + "  " + str.tostring(fibZoneLo, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
     if fibIsBull
         _fibLblSH := label.new(fibpH1Bar, fibpH1, "Weak High",  style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
-        _fibLblSL := label.new(fibpL1Bar, fibpL1, "Strong Low", style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
+        _fibLblSL := label.new(fibpL2Bar, fibpL2, "Strong Low", style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
     else
-        _fibLblSH := label.new(fibpH1Bar, fibpH1, "Strong High", style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
+        _fibLblSH := label.new(fibpH2Bar, fibpH2, "Strong High", style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
         _fibLblSL := label.new(fibpL1Bar, fibpL1, "Weak Low",    style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
 `;
 const SMC_MTF = `//@version=5
@@ -10646,16 +10651,18 @@ var float pH1 = na
 var float pH2 = na
 var float pL1 = na
 var float pL2 = na
-var int   pH1Bar = na
-var int   pL1Bar = na
+var int   pH1Bar = na, var int pH2Bar = na
+var int   pL1Bar = na, var int pL2Bar = na
 
 if not na(ph)
-    pH2 := pH1
-    pH1 := ph
+    pH2    := pH1
+    pH2Bar := pH1Bar
+    pH1    := ph
     pH1Bar := bar_index - pivLen
 if not na(pl)
-    pL2 := pL1
-    pL1 := pl
+    pL2    := pL1
+    pL2Bar := pL1Bar
+    pL1    := pl
     pL1Bar := bar_index - pivLen
 
 // ─── 結構判斷（HH+HL=多方 / LH+LL=空方） ───
@@ -10663,14 +10670,14 @@ isBull = not na(pH1) and not na(pH2) and not na(pL1) and not na(pL2) and pH1 > p
 isBear = not na(pH1) and not na(pH2) and not na(pL1) and not na(pL2) and pH1 < pH2 and pL1 < pL2
 
 // ─── Fibonacci 計算 ───
-// 多方: Strong Low(pL1) → Weak High(pH1)，量 0.5/0.618（從下往上）
-// 空方: Strong High(pH1) → Weak Low(pL1)，量 0.5/0.618（從上往下）
-rng = not na(pH1) and not na(pL1) ? pH1 - pL1 : na
+// 多方: Strong Low(pL2) → Weak High(pH1)，量 0.5/0.618（從下往上）
+// 空方: Strong High(pH2) → Weak Low(pL1)，量 0.5/0.618（從上往下）
+rng = isBull ? pH1 - pL2 : isBear ? pH2 - pL1 : na
 
-fib05  = isBull ? pL1 + 0.500 * rng :
-         isBear ? pH1 - 0.500 * rng : na
-fib618 = isBull ? pL1 + 0.618 * rng :
-         isBear ? pH1 - 0.618 * rng : na
+fib05  = isBull ? pL2 + 0.500 * rng :
+         isBear ? pH2 - 0.500 * rng : na
+fib618 = isBull ? pL2 + 0.618 * rng :
+         isBear ? pH2 - 0.618 * rng : na
 
 // 多方: 0.618 在上 / 0.5 在下；空方: 0.5 在上 / 0.618 在下
 zoneHi = isBull ? fib618 : isBear ? fib05  : na
@@ -10711,15 +10718,17 @@ if barstate.islast and (isBull or isBear)
         border_color = bor,
         border_width = 1)
 
+    hiLvl = isBull ? "0.618" : "0.500"
+    loLvl = isBull ? "0.500" : "0.618"
     lblHi := label.new(bar_index + extR, zoneHi,
-        text      = dir + " 0.618  " + str.tostring(zoneHi, "#.####"),
+        text      = dir + " " + hiLvl + "  " + str.tostring(zoneHi, "#.####"),
         style     = label.style_label_left,
         color     = bor,
         textcolor = color.white,
         size      = size.small)
 
     lblLo := label.new(bar_index + extR, zoneLo,
-        text      = dir + " 0.500  " + str.tostring(zoneLo, "#.####"),
+        text      = dir + " " + loLvl + "  " + str.tostring(zoneLo, "#.####"),
         style     = label.style_label_left,
         color     = bor,
         textcolor = color.white,
@@ -10730,11 +10739,11 @@ if barstate.islast and (isBull or isBear)
             lblSH := label.new(pH1Bar, pH1,
                 text="Weak High", style=label.style_label_down,
                 color=color.new(#EF5350, 0), textcolor=color.white, size=size.tiny)
-            lblSL := label.new(pL1Bar, pL1,
+            lblSL := label.new(pL2Bar, pL2,
                 text="Strong Low", style=label.style_label_up,
                 color=color.new(#26A69A, 0), textcolor=color.white, size=size.tiny)
         else
-            lblSH := label.new(pH1Bar, pH1,
+            lblSH := label.new(pH2Bar, pH2,
                 text="Strong High", style=label.style_label_down,
                 color=color.new(#EF5350, 0), textcolor=color.white, size=size.tiny)
             lblSL := label.new(pL1Bar, pL1,
