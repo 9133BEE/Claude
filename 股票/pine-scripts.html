@@ -204,7 +204,12 @@ a:hover{text-decoration:underline}
         </div>
       </div>
       <div class="ver-main">
-        <div id="dash-log-v2" class="ver-log">
+        <div id="dash-log-v3" class="ver-log">
+          <span class="vl-dot">›</span> <b>5M 獨立參數組</b>：3M/5M 自動套用專屬參數（EMA 9/21/55、RSI 9/72/28、KD 7/3/3），不再借用1M參數<br>
+          <span class="vl-dot">›</span> <b>OB 過期機制</b>：多頭 OB 被跌破、空頭 OB 被突破時自動清除，不再永久殘留<br>
+          <span class="vl-dot">›</span> <b>smcBuyOK/smcSellOK 收緊</b>：改為 AND 條件，必須先有 SMC 趨勢方向才能觸發訊號，降低假訊號
+        </div>
+        <div id="dash-log-v2" class="ver-log" style="display:none">
           <span class="vl-dot">›</span> <b>⚡ 時框快選</b>：適用1M/15M/30M/1H/4H，EMA/RSI/KD/MACD/ATR 全自動對應<br>
           <span class="vl-dot">›</span> 今日高低改用 request.security("D")，支援所有期貨品種<br>
           <span class="vl-dot">›</span> 儀表板 header 顯示當前時框 + 使用中 preset；時段篩選預設關閉
@@ -214,7 +219,11 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> VWAP、EMA三線、RSI/KD/MACD、布林帶、ATR、SMC 結構<br>
           <span class="vl-dot">›</span> 自動計算停損/目標（美元），支援 MNQ/NQ/MES/ES
         </div>
-        <div id="dash-panel-v2">
+        <div id="dash-panel-v3">
+          <button class="copy-bar-btn" onclick="copyDashboard(this,'v3')">一鍵複製腳本</button>
+          <div class="code-block" id="dash-code-v3"></div>
+        </div>
+        <div id="dash-panel-v2" style="display:none">
           <button class="copy-bar-btn" onclick="copyDashboard(this,'v2')">一鍵複製腳本</button>
           <div class="code-block" id="dash-code-v2"></div>
         </div>
@@ -2113,8 +2122,10 @@ alertcondition(buySignal,  "BUY",  "{{ticker}} ▲ BUY @ {{close}}")
 alertcondition(sellSignal, "SELL", "{{ticker}} ▼ SELL @ {{close}}")`;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
 
+const DASHBOARD_V3 = DASHBOARD_V2;
+
 function copyDashboard(btn, ver) {
-  const s = ver==='v1' ? DASHBOARD_V1 : DASHBOARD_V2;
+  const s = ver==='v1' ? DASHBOARD_V1 : ver==='v2' ? DASHBOARD_V2 : DASHBOARD_V3;
   navigator.clipboard.writeText(s).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -13126,6 +13137,7 @@ const VERSION_DEFS = {
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
     { key: 'd_v2', date: '2026-07-11', sub: '時框快選預設',  contentId: 'dash-panel-v2', logId: 'dash-log-v2' },
+    { key: 'd_v3', date: '2026-07-23', sub: '5M參數組 + OB過期 + smcBuyOK收緊', contentId: 'dash-panel-v3', logId: 'dash-log-v3' },
   ]
 };
 const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs' };
@@ -13204,9 +13216,10 @@ function tvc(key, el) {
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
 renderVerTabs('unicorn', 'u_v11');
-renderVerTabs('dashboard', 'd_v2');
+renderVerTabs('dashboard', 'd_v3');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
+document.getElementById('dash-code-v3').textContent = DASHBOARD_V3;
 document.getElementById('strategy-code').textContent = STRATEGY_TESTER;
 document.getElementById('entry-model-code').textContent = ENTRY_MODEL_V1;
 
