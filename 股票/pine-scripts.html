@@ -1635,12 +1635,12 @@ indicator("期貨儀表板", overlay=true, max_bars_back=500, max_labels_count=5
 // ══════════════════════════════════════════
 grpPst   = "⚡ 時框快選（選「自訂」時下方參數才生效）"
 presetTF = input.string("自動","適用時框",
-     options=["自動","適用1M","適用15M","適用30M","適用1H","適用4H","自訂"],group=grpPst)
+     options=["自動","適用1M","適用5M","適用15M","適用30M","適用1H","適用4H","自訂"],group=grpPst)
 
 _autoPreset = switch timeframe.period
     "1"   => "適用1M"
-    "3"   => "適用1M"
-    "5"   => "適用1M"
+    "3"   => "適用5M"
+    "5"   => "適用5M"
     "15"  => "適用15M"
     "30"  => "適用30M"
     "60"  => "適用1H"
@@ -1680,31 +1680,32 @@ useSession = input.bool(false,"篩選主力時段（期貨建議關閉）", grou
 //  各欄位對應：[1M, 15M, 30M, 1H, 4H, 自訂]
 // ══════════════════════════════════════════
 p1 = _activePreset == "適用1M"
+p6 = _activePreset == "適用5M"
 p2 = _activePreset == "適用15M"
 p3 = _activePreset == "適用30M"
 p4 = _activePreset == "適用1H"
 p5 = _activePreset == "適用4H"
 
-emaFast  = p1?9  :p2?9  :p3?9  :p4?9  :p5?9  :emaFast_i
-emaSlow  = p1?20 :p2?21 :p3?21 :p4?21 :p5?21 :emaSlow_i
-emaTrend = p1?50 :p2?55 :p3?55 :p4?55 :p5?55 :emaTrend_i
-rsiLen   = p1?7  :p2?9  :p3?9  :p4?14 :p5?14 :rsiLen_i
-rsiOB    = p1?75 :p2?70 :p3?70 :p4?70 :p5?70 :rsiOB_i
-rsiOS    = p1?25 :p2?30 :p3?30 :p4?30 :p5?30 :rsiOS_i
-kdLen    = p1?5  :p2?9  :p3?9  :p4?14 :p5?14 :kdLen_i
-kdSmK    = p1?3  :p2?3  :p3?3  :p4?3  :p5?3  :kdSmK_i
-kdSmD    = p1?3  :p2?3  :p3?3  :p4?3  :p5?3  :kdSmD_i
-macdF    = p1?5  :p2?8  :p3?8  :p4?12 :p5?12 :macdF_i
-macdS    = p1?13 :p2?21 :p3?21 :p4?26 :p5?26 :macdS_i
-macdG    = p1?4  :p2?5  :p3?5  :p4?9  :p5?9  :macdG_i
-bbLen    = p1?15 :p2?20 :p3?20 :p4?20 :p5?20 :bbLen_i
-bbMult   = p1?2.0:p2?2.0:p3?2.0:p4?2.0:p5?2.0:bbMult_i
-atrLen   = p1?10 :p2?14 :p3?14 :p4?14 :p5?14 :atrLen_i
-slMult   = p1?1.2:p2?1.5:p3?1.5:p4?1.5:p5?2.0:slMult_i
-tpMult   = p1?2.0:p2?2.5:p3?2.5:p4?3.0:p5?4.0:tpMult_i
-volLen   = p1?10 :p2?14 :p3?14 :p4?20 :p5?20 :volLen_i
-pivLen   = p1?5  :p2?7  :p3?8  :p4?10 :p5?12 :pivLen_i
-chochCD  = p1?10 :p2?12 :p3?14 :p4?15 :p5?20 :chochCD_i
+emaFast  = p1?9  :p6?9  :p2?9  :p3?9  :p4?9  :p5?9  :emaFast_i
+emaSlow  = p1?20 :p6?21 :p2?21 :p3?21 :p4?21 :p5?21 :emaSlow_i
+emaTrend = p1?50 :p6?55 :p2?55 :p3?55 :p4?55 :p5?55 :emaTrend_i
+rsiLen   = p1?7  :p6?9  :p2?9  :p3?9  :p4?14 :p5?14 :rsiLen_i
+rsiOB    = p1?75 :p6?72 :p2?70 :p3?70 :p4?70 :p5?70 :rsiOB_i
+rsiOS    = p1?25 :p6?28 :p2?30 :p3?30 :p4?30 :p5?30 :rsiOS_i
+kdLen    = p1?5  :p6?7  :p2?9  :p3?9  :p4?14 :p5?14 :kdLen_i
+kdSmK    = p1?3  :p6?3  :p2?3  :p3?3  :p4?3  :p5?3  :kdSmK_i
+kdSmD    = p1?3  :p6?3  :p2?3  :p3?3  :p4?3  :p5?3  :kdSmD_i
+macdF    = p1?5  :p6?8  :p2?8  :p3?8  :p4?12 :p5?12 :macdF_i
+macdS    = p1?13 :p6?21 :p2?21 :p3?21 :p4?26 :p5?26 :macdS_i
+macdG    = p1?4  :p6?5  :p2?5  :p3?5  :p4?9  :p5?9  :macdG_i
+bbLen    = p1?15 :p6?20 :p2?20 :p3?20 :p4?20 :p5?20 :bbLen_i
+bbMult   = p1?2.0:p6?2.0:p2?2.0:p3?2.0:p4?2.0:p5?2.0:bbMult_i
+atrLen   = p1?10 :p6?14 :p2?14 :p3?14 :p4?14 :p5?14 :atrLen_i
+slMult   = p1?1.2:p6?1.5:p2?1.5:p3?1.5:p4?1.5:p5?2.0:slMult_i
+tpMult   = p1?2.0:p6?2.5:p2?2.5:p3?2.5:p4?3.0:p5?4.0:tpMult_i
+volLen   = p1?10 :p6?14 :p2?14 :p3?14 :p4?20 :p5?20 :volLen_i
+pivLen   = p1?5  :p6?6  :p2?7  :p3?8  :p4?10 :p5?12 :pivLen_i
+chochCD  = p1?10 :p6?12 :p2?12 :p3?14 :p4?15 :p5?20 :chochCD_i
 
 // ══════════════════════════════════════════
 //  技術指標
@@ -1779,11 +1780,18 @@ if close[1] > open[1] and close < open and (open - close) > atr * 0.8
     bearOBHigh := high[1]
     bearOBLow  := low[1]
 
+if not na(bullOBHigh) and close < bullOBLow
+    bullOBHigh := na
+    bullOBLow  := na
+if not na(bearOBHigh) and close > bearOBHigh
+    bearOBHigh := na
+    bearOBLow  := na
+
 inBullOB = not na(bullOBHigh) and close <= bullOBHigh and close >= bullOBLow
 inBearOB = not na(bearOBHigh) and close <= bearOBHigh and close >= bearOBLow
 
-smcBuyOK  = smcBull  or inDiscount or bullFVG or inBullOB
-smcSellOK = smcBear  or inPremium  or bearFVG or inBearOB
+smcBuyOK  = smcBull and (inDiscount or bullFVG or inBullOB)
+smcSellOK = smcBear and (inPremium  or bearFVG or inBearOB)
 
 // ══════════════════════════════════════════
 //  CHoCH 冷卻期
