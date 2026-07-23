@@ -9494,7 +9494,7 @@ if showDash
 
 
 const UNICORN_V11_STRAT = `//@version=5
-strategy("交易訊號V11(Unicorn/SMC/5-618)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
+strategy("交易訊號V11(Unicorn/SMC)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
 
 grpS   = "Strategy回測設定"
 tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
@@ -9553,13 +9553,6 @@ fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, ste
 showDeadOB    = input.bool(true, "顯示失效OB（灰色）", group=grp5)
 deadOBTransp  = input.int(80,   "失效OB透明度",        group=grp5, minval=0, maxval=95, step=5)
 
-grpFib     = "Fibonacci OTE Zone"
-showFibOTE = input.bool(true,  "顯示 Fibonacci OTE 框",             group=grpFib)
-fibPivLen  = input.int(10,     "OTE 樞紐K棒數", minval=3, maxval=100, group=grpFib)
-fibExtR_in = input.int(50,     "OTE框向右延伸", minval=5, maxval=300, group=grpFib)
-needFibOTE = input.bool(false, "訊號限OTE區間進場", group=grpFib, tooltip="UM 訊號只在Fib 0.5-0.618 區間觸發")
-fibBullCol = input.color(color.new(#26A69A, 75), "多方OTE顏色", group=grpFib)
-fibBearCol = input.color(color.new(#EF5350, 75), "空方OTE顏色", group=grpFib)
 _hqBg()  => math.min(95, obFillTransp + 15)
 _hqOvl() => math.min(98, obFillTransp + 33)
 
@@ -9762,32 +9755,6 @@ mid50   = ta.lowest(low,50) + rng50*0.5
 var int   lastMSSDir    = 0
 var float _lastBullOBPh = na
 var float _lastBearOBPl = na
-
-// --- Fibonacci OTE ---
-fibPH = ta.pivothigh(high, fibPivLen, fibPivLen)
-fibPL = ta.pivotlow(low,  fibPivLen, fibPivLen)
-var float fibpH1 = na, var float fibpH2 = na
-var float fibpL1 = na, var float fibpL2 = na
-var int   fibpH1Bar = na, var int fibpH2Bar = na
-var int   fibpL1Bar = na, var int fibpL2Bar = na
-if not na(fibPH)
-    fibpH2    := fibpH1
-    fibpH2Bar := fibpH1Bar
-    fibpH1    := fibPH
-    fibpH1Bar := bar_index - fibPivLen
-if not na(fibPL)
-    fibpL2    := fibpL1
-    fibpL2Bar := fibpL1Bar
-    fibpL1    := fibPL
-    fibpL1Bar := bar_index - fibPivLen
-fibIsBull = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 > fibpH2 and fibpL1 > fibpL2
-fibIsBear = not na(fibpH1) and not na(fibpH2) and not na(fibpL1) and not na(fibpL2) and fibpH1 < fibpH2 and fibpL1 < fibpL2
-fibRng    = fibIsBull ? fibpH1 - fibpL2 : fibIsBear ? fibpH2 - fibpL1 : na
-fibOTE05  = fibIsBull ? fibpL2 + 0.500 * fibRng : fibIsBear ? fibpH2 - 0.500 * fibRng : na
-fibOTE618 = fibIsBull ? fibpL2 + 0.618 * fibRng : fibIsBear ? fibpH2 - 0.618 * fibRng : na
-fibZoneHi = fibIsBull ? fibOTE618 : fibIsBear ? fibOTE05  : na
-fibZoneLo = fibIsBull ? fibOTE05  : fibIsBear ? fibOTE618 : na
-inFibOTE  = not na(fibZoneHi) and not na(fibZoneLo) and close >= fibZoneLo and close <= fibZoneHi
 
 f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
 
@@ -10077,8 +10044,8 @@ if array.size(rb) > 0 and lastMSSDir == -1
 uBullEdge = unicornBull and not unicornBull[1]
 uBearEdge = unicornBear and not unicornBear[1]
 
-bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBull and (not needFibOTE or inFibOTE)
-bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear and (not needFibOTE or inFibOTE)
+bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBull
+bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear
 
 if fireBull and fireBear
     fireBull := lastMSSDir > 0
@@ -10111,9 +10078,6 @@ if barstate.islast
 alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
 alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
 alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
-alertcondition(inFibOTE and barstate.isconfirmed,                        title="進入OTE區間",   message="{{ticker}} 進入 Fib OTE 0.5-0.618 @ {{close}}")
-alertcondition(ta.crossover(close,fibZoneLo)  and barstate.isconfirmed,  title="由下穿入OTE",   message="{{ticker}} 向上穿越 OTE 下緣 @ {{close}}")
-alertcondition(ta.crossunder(close,fibZoneHi) and barstate.isconfirmed,  title="由上穿入OTE",   message="{{ticker}} 向下穿越 OTE 上緣 @ {{close}}")
 
 _atr = ta.atr(atrLen)
 var line[] _tpLines = array.new_line()
@@ -10121,11 +10085,6 @@ var line[] _slLines = array.new_line()
 var label[] _tpLbls = array.new_label()
 var label[] _slLbls = array.new_label()
 
-var box   _fibOteBox = na
-var label _fibLblHi  = na
-var label _fibLblLo  = na
-var label _fibLblSH  = na
-var label _fibLblSL  = na
 _MAX_TPSL = 1
 
 if fireBull and barstate.isconfirmed
@@ -10513,32 +10472,6 @@ if showDash
     table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
     table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
 
-if showFibOTE and barstate.islast and (fibIsBull or fibIsBear)
-    if not na(_fibOteBox)
-        box.delete(_fibOteBox)
-    if not na(_fibLblHi)
-        label.delete(_fibLblHi)
-    if not na(_fibLblLo)
-        label.delete(_fibLblLo)
-    if not na(_fibLblSH)
-        label.delete(_fibLblSH)
-    if not na(_fibLblSL)
-        label.delete(_fibLblSL)
-    _fbor = fibIsBull ? color.new(#26A69A, 0) : color.new(#EF5350, 0)
-    _fcol = fibIsBull ? fibBullCol : fibBearCol
-    _fdir = fibIsBull ? "多" : "空"
-    _fboxL = math.max(fibIsBull ? fibpH1Bar : fibpL1Bar, 0)
-    _fibOteBox := box.new(_fboxL, fibZoneHi, bar_index + fibExtR_in, fibZoneLo, bgcolor=_fcol, border_color=_fbor, border_width=1)
-    _hiLvl = fibIsBull ? "0.618" : "0.500"
-    _loLvl = fibIsBull ? "0.500" : "0.618"
-    _fibLblHi  := label.new(bar_index + fibExtR_in, fibZoneHi, _fdir + " " + _hiLvl + "  " + str.tostring(fibZoneHi, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
-    _fibLblLo  := label.new(bar_index + fibExtR_in, fibZoneLo, _fdir + " " + _loLvl + "  " + str.tostring(fibZoneLo, "#.####"), style=label.style_label_left, color=_fbor, textcolor=color.white, size=size.small)
-    if fibIsBull
-        _fibLblSH := label.new(fibpH1Bar, fibpH1, "Weak High",  style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
-        _fibLblSL := label.new(fibpL2Bar, fibpL2, "Strong Low", style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
-    else
-        _fibLblSH := label.new(fibpH2Bar, fibpH2, "Strong High", style=label.style_label_down, color=color.new(#EF5350,0), textcolor=color.white, size=size.tiny)
-        _fibLblSL := label.new(fibpL1Bar, fibpL1, "Weak Low",    style=label.style_label_up,   color=color.new(#26A69A,0), textcolor=color.white, size=size.tiny)
 `;
 const SMC_MTF = `//@version=5
 indicator("SMC 多時框結構", overlay=true)
@@ -13174,7 +13107,7 @@ const VERSION_DEFS = {
     { key: 'u_v10', date: '2026-07-19', sub: 'V10 Strategy：UM 訊號強制 FVG+HTF PDA，統一標籤 UM⭡/UM⭣，儀表板單一 UM 勝率', contentId: 'unicorn-v10-wrap', logId: 'unicorn-log-v10' },
     { key: 'u_fibote', date: '2026-07-23', sub: 'FIB OTE Zone：偵測多空結構，自動繪製 Strong/Weak 標籤與 0.5–0.618 Fibonacci 等候區，支援提示音', contentId: 'unicorn-fibote-wrap', logId: 'unicorn-log-fibote' },
     { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
-    { key: 'u_v11', date: '2026-07-23', sub: 'V11 整合版：V10 Unicorn + Fibonacci OTE Zone（Strong/Weak 自動判定 + 0.5-0.618 框 + OTE進場過濾 + 提示音）', contentId: 'unicorn-v11-wrap', logId: 'unicorn-log-v11' },
+    { key: 'u_v11', date: '2026-07-23', sub: 'V11 整合版：V10 Unicorn/SMC 完整訊號策略', contentId: 'unicorn-v11-wrap', logId: 'unicorn-log-v11' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
