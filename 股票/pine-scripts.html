@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -9494,7 +9494,7 @@ if showDash
 
 
 const UNICORN_V11_STRAT = `//@version=5
-strategy("交易訊號V11(Unicorn/SMC)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75)
+strategy("交易訊號V11(Unicorn/SMC)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75, process_orders_on_close=true)
 
 grpS   = "Strategy回測設定"
 tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
@@ -9698,16 +9698,16 @@ _structGateBull = strictMSSGate ? (_isBearStruct or not _hasData) : true
 _structGateBear = strictMSSGate ? (_isBullStruct or not _hasData) : true
 bullMSS = _rawBullMSS and _smcTrend != 1 and _structGateBull
 bearMSS = _rawBearMSS and _smcTrend != -1 and _structGateBear
-if _rawBullMSS
-    _smcTrend := 1
-if _rawBearMSS
-    _smcTrend := -1
 if bullMSS
+    _smcTrend := 1
     hasMSSBull := true
     hasMSSBear := false
 if bearMSS
+    _smcTrend := -1
     hasMSSBear := true
     hasMSSBull := false
+
+
 
 var float[] bb          = array.new_float()
 var float[] bl          = array.new_float()
@@ -9718,6 +9718,7 @@ var box[]   bb_box      = array.new_box()
 var box[]   bb_fbox     = array.new_box()
 var box[]   bb_hqbox    = array.new_box()
 var bool[]  bb_signaled = array.new_bool()
+var bool[]  bb_isDead   = array.new_bool()
 var bool[]  bb_isHQ     = array.new_bool()
 var bool[]  bb_hqBig   = array.new_bool()
 var bool[]  bb_hqLiq   = array.new_bool()
@@ -9735,6 +9736,7 @@ var box[]   rb_box      = array.new_box()
 var box[]   rb_fbox     = array.new_box()
 var box[]   rb_hqbox    = array.new_box()
 var bool[]  rb_signaled = array.new_bool()
+var bool[]  rb_isDead   = array.new_bool()
 var bool[]  rb_isHQ     = array.new_bool()
 var bool[]  rb_hqBig   = array.new_bool()
 var bool[]  rb_hqLiq   = array.new_bool()
@@ -9785,7 +9787,7 @@ f_bull_shift(toGrey = false) =>
         box.delete(_h)
     array.shift(bb), array.shift(bl), array.shift(bb_hasFVG)
     array.shift(bb_fvgT), array.shift(bb_fvgB)
-    array.shift(bb_signaled), array.shift(bb_isHQ)
+    array.shift(bb_signaled), array.shift(bb_isHQ), array.shift(bb_isDead)
     array.shift(bb_hqBig),  array.shift(bb_hqLiq),  array.shift(bb_hqPDA)
     _pbBx2 = array.shift(bb_pbbox)
     if not na(_pbBx2)
@@ -9812,7 +9814,7 @@ f_bear_shift(toGrey = false) =>
         box.delete(_h)
     array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
     array.shift(rb_fvgT), array.shift(rb_fvgB)
-    array.shift(rb_signaled), array.shift(rb_isHQ)
+    array.shift(rb_signaled), array.shift(rb_isHQ), array.shift(rb_isDead)
     array.shift(rb_hqBig),  array.shift(rb_hqLiq),  array.shift(rb_hqPDA)
     _pbBx3 = array.shift(rb_pbbox)
     if not na(_pbBx3)
@@ -9833,7 +9835,7 @@ if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
             obT   = high[i]
             obB   = low[i]
             obBar = bar_index - i
-            fvgOk = i > 1 ? low[i-1] > high[i+1] : false
+            fvgOk = low[i-1] > high[i+1]
             fvgT  = fvgOk ? low[i-1]  : na
             fvgB  = fvgOk ? high[i+1] : na
             inPDA = not na(mid50) ? (obT+obB)/2 < mid50 : false
@@ -9849,7 +9851,7 @@ if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
                 array.push(bb, obT), array.push(bl, obB)
                 array.push(bb_hasFVG, fvgOk)
                 array.push(bb_fvgT, fvgT), array.push(bb_fvgB, fvgB)
-                array.push(bb_signaled, false), array.push(bb_isHQ, isHQ)
+                array.push(bb_signaled, false), array.push(bb_isHQ, isHQ), array.push(bb_isDead, false)
                 array.push(bb_hqBig, big), array.push(bb_hqLiq, liqGrab), array.push(bb_hqPDA, inPDA)
                 array.push(bb_pbDep, false), array.push(bb_pbSig, false), array.push(bb_pbbox, na)
                 if showBull
@@ -9872,7 +9874,7 @@ if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
                 if isHQ
                     _hl = label.new(obBar,obT,"★ HQ",style=label.style_label_down,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
                     array.push(sigLabels,_hl), array.push(sigBars,bar_index)
-            break
+                break
 
 if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
     _lastBearOBPl := pl1
@@ -9888,7 +9890,7 @@ if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
             obT   = high[i]
             obB   = low[i]
             obBar = bar_index - i
-            fvgOk = i > 1 ? high[i-1] < low[i+1] : false
+            fvgOk = high[i-1] < low[i+1]
             fvgT  = fvgOk ? low[i+1]  : na
             fvgB  = fvgOk ? high[i-1] : na
             inPDA = not na(mid50) ? (obT+obB)/2 > mid50 : false
@@ -9904,7 +9906,7 @@ if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
                 array.push(rb, obT), array.push(rl, obB)
                 array.push(rb_hasFVG, fvgOk)
                 array.push(rb_fvgT, fvgT), array.push(rb_fvgB, fvgB)
-                array.push(rb_signaled, false), array.push(rb_isHQ, isHQ)
+                array.push(rb_signaled, false), array.push(rb_isHQ, isHQ), array.push(rb_isDead, false)
                 array.push(rb_hqBig, big), array.push(rb_hqLiq, liqGrab), array.push(rb_hqPDA, inPDA)
                 array.push(rb_pbDep, false), array.push(rb_pbSig, false), array.push(rb_pbbox, na)
                 if showBear
@@ -9927,7 +9929,7 @@ if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
                 if isHQ
                     _hl = label.new(obBar,obB,"★ HQ",style=label.style_label_up,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
                     array.push(sigLabels,_hl), array.push(sigBars,bar_index)
-            break
+                break
 
 _htfBullAllow = not na(htfBullTop) and not na(htfBullBot) ? htfBullBot + (htfBullTop - htfBullBot) * (1.0 - htfOBPrecision) : htfBullTop
 _htfBearAllow = not na(htfBearTop) and not na(htfBearBot) ? htfBearTop - (htfBearTop - htfBearBot) * (1.0 - htfOBPrecision) : htfBearBot
@@ -9972,12 +9974,14 @@ if array.size(bb) > 0 and lastMSSDir == 1
             if not na(hqbx)
                 box.set_border_color(hqbx, color.new(color.gray,60))
                 box.set_bgcolor(hqbx, color.new(color.gray,97))
-        else if not signaled or allowRepeat
+            array.set(bb_isDead, i, true)
+        else if (not signaled or allowRepeat) and not array.get(bb_isDead, i)
             inFVG = fvgOn and not na(fT) and not na(fB) ? low <= fT and high >= fB : false
             zone  = unicornNeedFVG ? inFVG : (low <= obT and high >= obB)
             if zone and htfOkBull
                 unicornBull := true
                 trigBullIdx := i
+                break
         pbDep = array.get(bb_pbDep, i)
         pbSig = array.get(bb_pbSig, i)
         pbBx  = array.get(bb_pbbox, i)
@@ -10019,12 +10023,14 @@ if array.size(rb) > 0 and lastMSSDir == -1
             if not na(hqbx)
                 box.set_border_color(hqbx, color.new(color.gray,60))
                 box.set_bgcolor(hqbx, color.new(color.gray,97))
-        else if not signaled or allowRepeat
+            array.set(rb_isDead, i, true)
+        else if (not signaled or allowRepeat) and not array.get(rb_isDead, i)
             inFVG = fvgOn and not na(fT) and not na(fB) ? high >= fB and low <= fT : false
             zone  = unicornNeedFVG ? inFVG : (high >= obB and low <= obT)
             if zone and htfOkBear
                 unicornBear := true
                 trigBearIdx := i
+                break
         pbDepR = array.get(rb_pbDep, i)
         pbSigR = array.get(rb_pbSig, i)
         pbBxR  = array.get(rb_pbbox, i)
@@ -10032,7 +10038,7 @@ if array.size(rb) > 0 and lastMSSDir == -1
             box.set_right(pbBxR, bar_index + _obExtR)
         if signaled and close < obB and not pbDepR
             array.set(rb_pbDep, i, true)
-        if pbDepR and not pbSigR and close <= obT
+        if pbDepR and not pbSigR and close <= obT and close >= obB
             inOBpbR = high >= obB and low <= obT
             if inOBpbR and htfOkBear
                 _pbTR = math.max(open, close)
@@ -10047,9 +10053,9 @@ uBearEdge = unicornBear and not unicornBear[1]
 bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBull
 bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear
 
-if fireBull and fireBear
-    fireBull := lastMSSDir > 0
-    fireBear := lastMSSDir < 0
+
+
+
 
 var int _lTot   = 0
 var int _lWin   = 0
@@ -10426,7 +10432,7 @@ var table dash = na
 if showDash
     if na(dash)
         dash := table.new(_pos, 2, 16, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
-    table.cell(dash, 0, 0, "Unicorn V9s · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
+    table.cell(dash, 0, 0, "Unicorn V11 · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
     table.cell(dash, 1, 0, "參考 " + htfStr, text_color=_cGr, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_right)
     _dirBg = unicornBull?color.new(#0c2a47,0):unicornBear?color.new(#3b0f05,0):_cHd
     table.cell(dash, 0, 1, "方向", text_color=_cGr, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_left)
