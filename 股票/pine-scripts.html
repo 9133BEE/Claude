@@ -258,8 +258,8 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
         <div id="unicorn-log-v12" class="ver-log">
           <span class="vl-dot">›</span> <b>V12（基於 V11）— 8項審查修正</b>：process_orders_on_close、smcTrend 更新邏輯、bb/rb_isDead 死亡OB追蹤、fvgOk 移除 i&gt;1 限制、Bear PB 下界條件修正、重複 fireBull/fireBear 衝突程式碼清除<br>
-          <span class="vl-dot">›</span> <b>HQOB 提示音</b>：新增 3 個 alertcondition（★▲ HQOB 多方 / ★▼ HQOB 空方 / ★ HQOB 任意方向），觸發的 OB 必須是 isHQ=true 才響<br>
-          <span class="vl-dot">›</span> <b>使用方式</b>：在 TradingView 建立警報時選「★ HQOB 任意方向」條件，開啟聲音通知即可
+          <span class="vl-dot">›</span> <b>HQOB 提示音</b>：觸發的 OB 必須 isHQ=true 才發送 alert("機會點-HQOB")，訊息固定為「機會點-HQOB」<br>
+          <span class="vl-dot">›</span> <b>使用方式</b>：TradingView 建立警報 → 條件選 V12 → 選「<b>任意警報訊號</b>」→ 開啟聲音通知即可
         </div>
         <div id="unicorn-log-fibote" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC Fibonacci OTE Zone</b>：自動偵測多空結構（HH+HL=多方 / LH+LL=空方），從 Strong Low→Weak High（多）或 Strong High→Weak Low（空）量出 0.5/0.618 區間<br>
@@ -10102,12 +10102,14 @@ if barstate.islast
 fireHQBull = (fireBull and trigBullIdx >= 0 and trigBullIdx < array.size(bb_isHQ)) ? array.get(bb_isHQ, trigBullIdx) : false
 fireHQBear = (fireBear and trigBearIdx >= 0 and trigBearIdx < array.size(rb_isHQ)) ? array.get(rb_isHQ, trigBearIdx) : false
 
+if fireHQBull and barstate.isconfirmed
+    alert("機會點-HQOB", alert.freq_once_per_bar_close)
+if fireHQBear and barstate.isconfirmed
+    alert("機會點-HQOB", alert.freq_once_per_bar_close)
+
 alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
 alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
 alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
-alertcondition(fireHQBull and barstate.isconfirmed,             title="★▲ HQOB 多方訊號",  message="機會點-HQOB")
-alertcondition(fireHQBear and barstate.isconfirmed,             title="★▼ HQOB 空方訊號",  message="機會點-HQOB")
-alertcondition((fireHQBull or fireHQBear) and barstate.isconfirmed, title="★ HQOB 任意方向", message="機會點-HQOB")
 
 _atr = ta.atr(atrLen)
 var line[] _tpLines = array.new_line()
