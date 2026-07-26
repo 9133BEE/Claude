@@ -10105,9 +10105,9 @@ fireHQBear = (fireBear and trigBearIdx >= 0 and trigBearIdx < array.size(rb_isHQ
 alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
 alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
 alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
-alertcondition(fireHQBull and barstate.isconfirmed,             title="★▲ HQOB 多方訊號",  message="★ HQOB 多方進場訊號！")
-alertcondition(fireHQBear and barstate.isconfirmed,             title="★▼ HQOB 空方訊號",  message="★ HQOB 空方進場訊號！")
-alertcondition((fireHQBull or fireHQBear) and barstate.isconfirmed, title="★ HQOB 任意方向", message="★ HQOB 訊號觸發！")
+alertcondition(fireHQBull and barstate.isconfirmed,             title="★▲ HQOB 多方訊號",  message="機會點-HQOB")
+alertcondition(fireHQBear and barstate.isconfirmed,             title="★▼ HQOB 空方訊號",  message="機會點-HQOB")
+alertcondition((fireHQBull or fireHQBear) and barstate.isconfirmed, title="★ HQOB 任意方向", message="機會點-HQOB")
 
 _atr = ta.atr(atrLen)
 var line[] _tpLines = array.new_line()
