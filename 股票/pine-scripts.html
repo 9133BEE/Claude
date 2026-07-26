@@ -10100,9 +10100,15 @@ if barstate.islast
     _lWrStr   := _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
     _sWrStr   := _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
 
+fireHQBull = fireBull and trigBullIdx >= 0 and trigBullIdx < array.size(bb_isHQ) and array.get(bb_isHQ, trigBullIdx)
+fireHQBear = fireBear and trigBearIdx >= 0 and trigBearIdx < array.size(rb_isHQ) and array.get(rb_isHQ, trigBearIdx)
+
 alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
 alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
 alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
+alertcondition(fireHQBull and barstate.isconfirmed,             title="★▲ HQOB 多方訊號",  message="★ HQOB 多方進場訊號！")
+alertcondition(fireHQBear and barstate.isconfirmed,             title="★▼ HQOB 空方訊號",  message="★ HQOB 空方進場訊號！")
+alertcondition((fireHQBull or fireHQBear) and barstate.isconfirmed, title="★ HQOB 任意方向", message="★ HQOB 訊號觸發！")
 
 _atr = ta.atr(atrLen)
 var line[] _tpLines = array.new_line()
