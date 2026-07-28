@@ -258,8 +258,9 @@ a:hover{text-decoration:underline}
         <div class="ver-tabs" id="unicorn-vtabs"></div>
         <div id="unicorn-log-v12" class="ver-log">
           <span class="vl-dot">›</span> <b>V12（基於 V11）— 8項審查修正</b>：process_orders_on_close、smcTrend 更新邏輯、bb/rb_isDead 死亡OB追蹤、fvgOk 移除 i&gt;1 限制、Bear PB 下界條件修正、重複 fireBull/fireBear 衝突程式碼清除<br>
-          <span class="vl-dot">›</span> <b>HQOB 提示音</b>：觸發的 OB 必須 isHQ=true 才發送 alert("機會點-HQOB")，訊息固定為「機會點-HQOB」<br>
-          <span class="vl-dot">›</span> <b>使用方式</b>：TradingView 建立警報 → 條件選 V12 → 選「<b>任意警報訊號</b>」→ 開啟聲音通知即可
+          <span class="vl-dot">›</span> <b>HQOB 提示音</b>：觸發的 OB 必須 isHQ=true 才發送 alert()<br>
+          <span class="vl-dot">›</span> <b>使用方式</b>：TradingView 建立警報 → 條件選 V12 → 選「<b>僅alert()函數呼叫</b>」→ 開啟聲音通知即可（此模式下快訊視窗的「訊息」欄位會被忽略，不用填）<br>
+          <span class="vl-dot">›</span> <b>2026-07-28 修正</b>：HQOB alert() 訊息改為動態組字串 <code>"機會點-HQOB " + syminfo.ticker + " " + timeframe.period</code>，通知會自動帶入商品代碼與時框（如「機會點-HQOB NQ1! 5」），不再是固定死的「機會點-HQOB」
         </div>
         <div id="unicorn-log-fibote" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC Fibonacci OTE Zone</b>：自動偵測多空結構（HH+HL=多方 / LH+LL=空方），從 Strong Low→Weak High（多）或 Strong High→Weak Low（空）量出 0.5/0.618 區間<br>
@@ -13139,7 +13140,7 @@ const VERSION_DEFS = {
     { key: 'u_v10', date: '2026-07-19', sub: 'V10 Strategy：UM 訊號強制 FVG+HTF PDA，統一標籤 UM⭡/UM⭣，儀表板單一 UM 勝率', contentId: 'unicorn-v10-wrap', logId: 'unicorn-log-v10' },
     { key: 'u_fibote', date: '2026-07-23', sub: 'FIB OTE Zone：偵測多空結構，自動繪製 Strong/Weak 標籤與 0.5–0.618 Fibonacci 等候區，支援提示音', contentId: 'unicorn-fibote-wrap', logId: 'unicorn-log-fibote' },
     { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
-    { key: 'u_v12', date: '2026-07-26', sub: 'V12：8項審查修正 + HQOB 提示音 alertcondition', contentId: 'unicorn-v12-wrap', logId: 'unicorn-log-v12' },
+    { key: 'u_v12', date: '2026-07-28', sub: 'V12：8項審查修正 + HQOB alert()訊息帶入商品代碼/時框', contentId: 'unicorn-v12-wrap', logId: 'unicorn-log-v12' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
