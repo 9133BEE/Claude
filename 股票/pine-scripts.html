@@ -10103,9 +10103,9 @@ fireHQBull = (fireBull and trigBullIdx >= 0 and trigBullIdx < array.size(bb_isHQ
 fireHQBear = (fireBear and trigBearIdx >= 0 and trigBearIdx < array.size(rb_isHQ)) ? array.get(rb_isHQ, trigBearIdx) : false
 
 if fireHQBull and barstate.isconfirmed
-    alert("機會點-HQOB", alert.freq_once_per_bar_close)
+    alert("機會點-HQOB " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 if fireHQBear and barstate.isconfirmed
-    alert("機會點-HQOB", alert.freq_once_per_bar_close)
+    alert("機會點-HQOB " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
 alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
