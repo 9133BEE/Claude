@@ -256,11 +256,12 @@ a:hover{text-decoration:underline}
     <div class="ver-layout">
       <div class="ver-sidebar">
         <div class="ver-tabs" id="unicorn-vtabs"></div>
-        <div id="unicorn-log-v12" class="ver-log">
-          <span class="vl-dot">›</span> <b>V12（基於 V11）— 8項審查修正</b>：process_orders_on_close、smcTrend 更新邏輯、bb/rb_isDead 死亡OB追蹤、fvgOk 移除 i&gt;1 限制、Bear PB 下界條件修正、重複 fireBull/fireBear 衝突程式碼清除<br>
+        <div id="unicorn-log-v13" class="ver-log">
+          <span class="vl-dot">›</span> <b>V13（原V12更名）— 8項審查修正</b>：process_orders_on_close、smcTrend 更新邏輯、bb/rb_isDead 死亡OB追蹤、fvgOk 移除 i&gt;1 限制、Bear PB 下界條件修正、重複 fireBull/fireBear 衝突程式碼清除<br>
           <span class="vl-dot">›</span> <b>HQOB 提示音</b>：觸發的 OB 必須 isHQ=true 才發送 alert()<br>
-          <span class="vl-dot">›</span> <b>使用方式</b>：TradingView 建立警報 → 條件選 V12 → 選「<b>僅alert()函數呼叫</b>」→ 開啟聲音通知即可（此模式下快訊視窗的「訊息」欄位會被忽略，不用填）<br>
-          <span class="vl-dot">›</span> <b>2026-07-28 修正</b>：HQOB alert() 訊息改為動態組字串 <code>"機會點-HQOB " + syminfo.ticker + " " + timeframe.period</code>，通知會自動帶入商品代碼與時框（如「機會點-HQOB NQ1! 5」），不再是固定死的「機會點-HQOB」
+          <span class="vl-dot">›</span> <b>使用方式</b>：TradingView 建立警報 → 條件選 V13 → 選「<b>僅alert()函數呼叫</b>」→ 開啟聲音通知即可（此模式下快訊視窗的「訊息」欄位會被忽略，不用填）<br>
+          <span class="vl-dot">›</span> <b>2026-07-28 修正</b>：HQOB alert() 訊息改為動態組字串 <code>"機會點-HQOB " + syminfo.ticker + " " + timeframe.period</code>，通知會自動帶入商品代碼與時框（如「機會點-HQOB NQ1! 5」），不再是固定死的「機會點-HQOB」<br>
+          <span class="vl-dot">›</span> <b>2026-07-28 更名</b>：strategy 標題由「交易訊號V12(Unicorn/SMC)」改為「交易訊號V13(Unicorn/HQOB)」，版本編號同步由 V12 → V13
         </div>
         <div id="unicorn-log-fibote" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC Fibonacci OTE Zone</b>：自動偵測多空結構（HH+HL=多方 / LH+LL=空方），從 Strong Low→Weak High（多）或 Strong High→Weak Low（空）量出 0.5/0.618 區間<br>
@@ -348,8 +349,8 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 用途：想確認「後來的版本是不是真的比較好」，都應該回頭跟這份對照，而不是跟已經被動過的 V2 tab 對照
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
-        <div id="unicorn-v12-wrap" style="display:none">
-          <div class="code-block" id="unicorn-v12-code"></div>
+        <div id="unicorn-v13-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v13-code"></div>
         </div>
         <div id="unicorn-v10-wrap" style="display:none">
           <div class="code-block" id="unicorn-v10-code"></div>
@@ -9512,7 +9513,7 @@ if showDash
 
 
 
-const UNICORN_V12_STRAT = `//@version=5
+const UNICORN_V13_STRAT = `//@version=5
 strategy("交易訊號V13(Unicorn/HQOB)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75, process_orders_on_close=true)
 
 grpS   = "Strategy回測設定"
@@ -12350,7 +12351,7 @@ if showDash and barstate.islast
 document.getElementById('unicorn-v8-code').textContent = UNICORN_V8;
 document.getElementById('unicorn-v9s-code').textContent = UNICORN_V9_STRAT;
 document.getElementById('unicorn-v10-code').textContent = UNICORN_V10_STRAT;
-document.getElementById('unicorn-v12-code').textContent = UNICORN_V12_STRAT;
+document.getElementById('unicorn-v13-code').textContent = UNICORN_V13_STRAT;
 document.getElementById('unicorn-smcmtf-code').textContent = SMC_MTF;
 document.getElementById('unicorn-fibote-code').textContent = FIB_OTE;
 document.getElementById('unicorn-v7-code').textContent = UNICORN_V7;
@@ -12364,7 +12365,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v12' ? UNICORN_V12_STRAT : ak === 'u_fibote' ? FIB_OTE : ak === 'u_smcmtf' ? SMC_MTF : ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v13' ? UNICORN_V13_STRAT : ak === 'u_fibote' ? FIB_OTE : ak === 'u_smcmtf' ? SMC_MTF : ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -13140,7 +13141,7 @@ const VERSION_DEFS = {
     { key: 'u_v10', date: '2026-07-19', sub: 'V10 Strategy：UM 訊號強制 FVG+HTF PDA，統一標籤 UM⭡/UM⭣，儀表板單一 UM 勝率', contentId: 'unicorn-v10-wrap', logId: 'unicorn-log-v10' },
     { key: 'u_fibote', date: '2026-07-23', sub: 'FIB OTE Zone：偵測多空結構，自動繪製 Strong/Weak 標籤與 0.5–0.618 Fibonacci 等候區，支援提示音', contentId: 'unicorn-fibote-wrap', logId: 'unicorn-log-fibote' },
     { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
-    { key: 'u_v12', date: '2026-07-28', sub: 'V12：8項審查修正 + HQOB alert()訊息帶入商品代碼/時框', contentId: 'unicorn-v12-wrap', logId: 'unicorn-log-v12' },
+    { key: 'u_v13', date: '2026-07-28', sub: 'V13(原V12更名Unicorn/HQOB)：8項審查修正 + HQOB alert()訊息帶入商品代碼/時框', contentId: 'unicorn-v13-wrap', logId: 'unicorn-log-v13' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
@@ -13223,7 +13224,7 @@ function tvc(key, el) {
 
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
-renderVerTabs('unicorn', 'u_v12');
+renderVerTabs('unicorn', 'u_v13');
 renderVerTabs('dashboard', 'd_v3');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
