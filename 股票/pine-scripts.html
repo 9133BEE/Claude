@@ -261,7 +261,9 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> <b>HQOB 提示音</b>：觸發的 OB 必須 isHQ=true 才發送 alert()<br>
           <span class="vl-dot">›</span> <b>使用方式</b>：TradingView 建立警報 → 條件選 V13 → 選「<b>僅alert()函數呼叫</b>」→ 開啟聲音通知即可（此模式下快訊視窗的「訊息」欄位會被忽略，不用填）<br>
           <span class="vl-dot">›</span> <b>2026-07-28 修正</b>：HQOB alert() 訊息改為動態組字串 <code>"機會點-HQOB " + syminfo.ticker + " " + timeframe.period</code>，通知會自動帶入商品代碼與時框（如「機會點-HQOB NQ1! 5」），不再是固定死的「機會點-HQOB」<br>
-          <span class="vl-dot">›</span> <b>2026-07-28 更名</b>：strategy 標題由「交易訊號V12(Unicorn/SMC)」改為「交易訊號V13(Unicorn/HQOB)」，版本編號同步由 V12 → V13
+          <span class="vl-dot">›</span> <b>2026-07-28 更名</b>：strategy 標題由「交易訊號V12(Unicorn/SMC)」改為「交易訊號V13(Unicorn/HQOB)」，版本編號同步由 V12 → V13<br>
+          <span class="vl-dot">›</span> <b>2026-07-29 修正</b>：HQOB alert() 訊息改為全英文 <code>"ENTRY-HQOB " + syminfo.ticker + " " + timeframe.period</code>（如「ENTRY-HQOB NQ1! 5」），不再混用中文「機會點」<br>
+          <span class="vl-dot">›</span> <b>2026-07-29 新增</b>：一般UM訊號（非HQ）的alertcondition訊息也改用TradingView內建佔位符 <code>"ENTRY-Unicorn {{ticker}} {{interval}}"</code>，建警報時條件選「Unicorn 任意方向」/「▲ Unicorn 多方訊號」/「▼ Unicorn 空方訊號」（這三個會在下拉選單直接列出，跟HQOB的「僅alert()函數呼叫」是分開的機制），觸發時訊息會自動帶入商品代碼與時框，格式跟HQOB一致（如「ENTRY-Unicorn NQ1! 5」）
         </div>
         <div id="unicorn-log-fibote" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC Fibonacci OTE Zone</b>：自動偵測多空結構（HH+HL=多方 / LH+LL=空方），從 Strong Low→Weak High（多）或 Strong High→Weak Low（空）量出 0.5/0.618 區間<br>
@@ -10105,13 +10107,13 @@ fireHQBull = (fireBull and trigBullIdx >= 0 and trigBullIdx < array.size(bb_isHQ
 fireHQBear = (fireBear and trigBearIdx >= 0 and trigBearIdx < array.size(rb_isHQ)) ? array.get(rb_isHQ, trigBearIdx) : false
 
 if fireHQBull and barstate.isconfirmed
-    alert("機會點-HQOB " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    alert("ENTRY-HQOB " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 if fireHQBear and barstate.isconfirmed
-    alert("機會點-HQOB " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    alert("ENTRY-HQOB " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
-alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="Unicorn 訊號觸發！")
-alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="Unicorn 多方進場訊號！")
-alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="Unicorn 空方進場訊號！")
+alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="ENTRY-Unicorn {{ticker}} {{interval}}")
+alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="ENTRY-Unicorn {{ticker}} {{interval}}")
+alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="ENTRY-Unicorn {{ticker}} {{interval}}")
 
 _atr = ta.atr(atrLen)
 var line[] _tpLines = array.new_line()
