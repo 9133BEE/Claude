@@ -263,8 +263,12 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> <b>2026-07-28 修正</b>：HQOB alert() 訊息改為動態組字串 <code>"機會點-HQOB " + syminfo.ticker + " " + timeframe.period</code>，通知會自動帶入商品代碼與時框（如「機會點-HQOB NQ1! 5」），不再是固定死的「機會點-HQOB」<br>
           <span class="vl-dot">›</span> <b>2026-07-28 更名</b>：strategy 標題由「交易訊號V12(Unicorn/SMC)」改為「交易訊號V13(Unicorn/HQOB)」，版本編號同步由 V12 → V13<br>
           <span class="vl-dot">›</span> <b>2026-07-29 修正</b>：HQOB alert() 訊息改為全英文 <code>"ENTRY-HQOB " + syminfo.ticker + " " + timeframe.period</code>（如「ENTRY-HQOB NQ1! 5」），不再混用中文「機會點」<br>
-          <span class="vl-dot">›</span> <b>2026-07-29 修正說明</b>：下面3行 <code>alertcondition()</code> 經TradingView官方文件確認，在strategy腳本中<b>編譯不會報錯，但永遠不會出現在建立警報的下拉選單裡</b>，等同無效碼，僅保留相容性，請勿依賴它們設定警報<br>
-          <span class="vl-dot">›</span> <b>2026-07-29 新增</b>：一般UM訊號（非HQ，即fireBull/fireBear）比照HQOB做法，新增真正會作用的 <code>alert("ENTRY-Unicorn " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)</code>，建警報時條件選 V13 → 選「<b>僅alert()函數呼叫</b>」即可同時收到HQOB與一般UM訊號通知，不需要（也不能）在下拉選單找「Unicorn 多方訊號」之類的獨立選項
+          <span class="vl-dot">›</span> <b>2026-07-29 修正說明</b>：經TradingView官方文件確認，<code>alertcondition()</code> 在strategy腳本中<b>編譯不會報錯，但永遠不會出現在建立警報的下拉選單裡</b>，等同無效碼，2026-08-03已直接移除這幾行，請勿再找「Unicorn 多方訊號」之類的獨立選項<br>
+          <span class="vl-dot">›</span> <b>2026-07-29 新增</b>：一般UM訊號（非HQ，即fireBull/fireBear）比照HQOB做法，新增真正會作用的 <code>alert("ENTRY-Unicorn " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)</code>，建警報時條件選 V13 → 選「<b>僅alert()函數呼叫</b>」即可同時收到HQOB與一般UM訊號通知<br>
+          <span class="vl-dot">›</span> <b>2026-08-03 修正</b>：移除已確認無效的3行 <code>alertcondition()</code>，程式碼更乾淨<br>
+          <span class="vl-dot">›</span> <b>2026-08-03 新增</b>：UM⭡/UM⭣訊號標籤補回HQ視覺區分（比照V9s），高品質訊號顯示「HQ UM⭡/⭣」紫色，一般訊號維持藍/橘色，圖上一眼就能分辨，不用只靠alert通知文字判斷<br>
+          <span class="vl-dot">›</span> <b>2026-08-03 新增</b>：進場ID改用 <code>L_HQ/S_HQ</code> 區分HQ與一般訊號，儀表板新增「★HQ 多▲／★HQ 空▼」兩列，勝率統計不再混算，可分別檢視「全部UM勝率」與「HQ UM勝率」<br>
+          <span class="vl-dot">›</span> <b>2026-08-03 修正</b>：儀表板標題原本還顯示過時的「Unicorn V11」，已修正為「Unicorn V13」
         </div>
         <div id="unicorn-log-fibote" class="ver-log">
           <span class="vl-dot">›</span> <b>SMC Fibonacci OTE Zone</b>：自動偵測多空結構（HH+HL=多方 / LH+LL=空方），從 Strong Low→Weak High（多）或 Strong High→Weak Low（空）量出 0.5/0.618 區間<br>
@@ -10084,25 +10088,43 @@ var int _lTot   = 0
 var int _lWin   = 0
 var int _sTot   = 0
 var int _sWin   = 0
+var int _lHQTot = 0
+var int _lHQWin = 0
+var int _sHQTot = 0
+var int _sHQWin = 0
 if barstate.islast
     _lTot := 0, _lWin := 0, _sTot := 0, _sWin := 0
+    _lHQTot := 0, _lHQWin := 0, _sHQTot := 0, _sHQWin := 0
     if strategy.closedtrades > 0
         for _ci = 0 to strategy.closedtrades - 1
             _cpnl = strategy.closedtrades.profit(_ci)
             _ceid = strategy.closedtrades.entry_id(_ci)
-            if _ceid == "L"
+            _ciHQ = _ceid == "L_HQ" or _ceid == "S_HQ"
+            if str.startswith(_ceid, "L")
                 _lTot += 1
                 if _cpnl > 0
                     _lWin += 1
+                if _ciHQ
+                    _lHQTot += 1
+                    if _cpnl > 0
+                        _lHQWin += 1
             else
                 _sTot += 1
                 if _cpnl > 0
                     _sWin += 1
+                if _ciHQ
+                    _sHQTot += 1
+                    if _cpnl > 0
+                        _sHQWin += 1
 var string _lWrStr   = "暫無"
 var string _sWrStr   = "暫無"
+var string _lHQWrStr = "暫無"
+var string _sHQWrStr = "暫無"
 if barstate.islast
     _lWrStr   := _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
     _sWrStr   := _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
+    _lHQWrStr := _lHQTot > 0 ? str.tostring(math.round(_lHQWin * 100.0 / _lHQTot)) + "% (" + str.tostring(_lHQWin) + "/" + str.tostring(_lHQTot) + ")" : "暫無"
+    _sHQWrStr := _sHQTot > 0 ? str.tostring(math.round(_sHQWin * 100.0 / _sHQTot)) + "% (" + str.tostring(_sHQWin) + "/" + str.tostring(_sHQTot) + ")" : "暫無"
 
 fireHQBull = (fireBull and trigBullIdx >= 0 and trigBullIdx < array.size(bb_isHQ)) ? array.get(bb_isHQ, trigBullIdx) : false
 fireHQBear = (fireBear and trigBearIdx >= 0 and trigBearIdx < array.size(rb_isHQ)) ? array.get(rb_isHQ, trigBearIdx) : false
@@ -10117,11 +10139,6 @@ if fireBull and barstate.isconfirmed
 if fireBear and barstate.isconfirmed
     alert("ENTRY-Unicorn " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
-// alertcondition()在strategy腳本中無法產生可選警報條件(僅為相容保留,實際請用alert()函數/上方if區塊)
-alertcondition((fireBull or fireBear) and barstate.isconfirmed, title="Unicorn 任意方向",  message="ENTRY-Unicorn {{ticker}} {{interval}}")
-alertcondition(fireBull and barstate.isconfirmed,               title="▲ Unicorn 多方訊號", message="ENTRY-Unicorn {{ticker}} {{interval}}")
-alertcondition(fireBear and barstate.isconfirmed,               title="▼ Unicorn 空方訊號", message="ENTRY-Unicorn {{ticker}} {{interval}}")
-
 _atr = ta.atr(atrLen)
 var line[] _tpLines = array.new_line()
 var line[] _slLines = array.new_line()
@@ -10134,13 +10151,13 @@ if fireBull and barstate.isconfirmed
     array.set(bb_signaled, trigBullIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(bb_isHQ, trigBullIdx)
-    _lc    = color.new(#1E88E5,0)
-    _lt    = "UM⭡"
+    _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#1E88E5,0)
+    _lt    = _isHQ ? "HQ UM⭡" : "UM⭡"
     _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
     _tpLev = close + _atr * tpATR
     _slLev = close - _atr * slATR
-    _eid   = "L"
+    _eid   = _isHQ ? "L_HQ" : "L"
     strategy.entry(_eid, strategy.long)
     strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
     if showTPSL
@@ -10158,13 +10175,13 @@ if fireBear and barstate.isconfirmed
     array.set(rb_signaled, trigBearIdx, true)
     lastAnySigBar := bar_index
     _isHQ  = array.get(rb_isHQ, trigBearIdx)
-    _lc    = color.new(#FF8C00,0)
-    _lt    = "UM⭣"
+    _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#FF8C00,0)
+    _lt    = _isHQ ? "HQ UM⭣" : "UM⭣"
     _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
     array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
     _tpLev = close - _atr * tpATR
     _slLev = close + _atr * slATR
-    _eid   = "S"
+    _eid   = _isHQ ? "S_HQ" : "S"
     strategy.entry(_eid, strategy.short)
     strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
     if showTPSL
@@ -10468,8 +10485,8 @@ _fsz   = dashFont=="Tiny"?size.tiny:dashFont=="Normal"?size.normal:dashFont=="La
 var table dash = na
 if showDash
     if na(dash)
-        dash := table.new(_pos, 2, 16, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
-    table.cell(dash, 0, 0, "Unicorn V11 · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
+        dash := table.new(_pos, 2, 18, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
+    table.cell(dash, 0, 0, "Unicorn V13 · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
     table.cell(dash, 1, 0, "參考 " + htfStr, text_color=_cGr, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_right)
     _dirBg = unicornBull?color.new(#0c2a47,0):unicornBear?color.new(#3b0f05,0):_cHd
     table.cell(dash, 0, 1, "方向", text_color=_cGr, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_left)
@@ -10514,6 +10531,14 @@ if showDash
     table.cell(dash, 1, 14, _lWrStr,    text_color=_lWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
     table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
     table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    _lHQWrPct = _lHQTot > 0 ? _lHQWin * 100.0 / _lHQTot : -1.0
+    _sHQWrPct = _sHQTot > 0 ? _sHQWin * 100.0 / _sHQTot : -1.0
+    _lHQWrC2  = _lHQWrPct >= 0 ? (_lHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    _sHQWrC2  = _sHQWrPct >= 0 ? (_sHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    table.cell(dash, 0, 16, "★HQ 多▲",  text_color=_cGold,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 16, _lHQWrStr,  text_color=_lHQWrC2, text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 17, "★HQ 空▼",  text_color=_cGold,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 17, _sHQWrStr,  text_color=_sHQWrC2, text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
 
 `;
 const SMC_MTF = `//@version=5
@@ -13150,7 +13175,7 @@ const VERSION_DEFS = {
     { key: 'u_v10', date: '2026-07-19', sub: 'V10 Strategy：UM 訊號強制 FVG+HTF PDA，統一標籤 UM⭡/UM⭣，儀表板單一 UM 勝率', contentId: 'unicorn-v10-wrap', logId: 'unicorn-log-v10' },
     { key: 'u_fibote', date: '2026-07-23', sub: 'FIB OTE Zone：偵測多空結構，自動繪製 Strong/Weak 標籤與 0.5–0.618 Fibonacci 等候區，支援提示音', contentId: 'unicorn-fibote-wrap', logId: 'unicorn-log-fibote' },
     { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
-    { key: 'u_v13', date: '2026-07-29', sub: 'V13(原V12更名Unicorn/HQOB)：HQOB+一般UM訊號皆改用alert()帶入商品代碼/時框，alertcondition在strategy無效已修正', contentId: 'unicorn-v13-wrap', logId: 'unicorn-log-v13' },
+    { key: 'u_v13', date: '2026-08-03', sub: 'V13(原V12更名Unicorn/HQOB)：HQ標籤視覺區分+勝率統計拆分、移除無效alertcondition、儀表板標題修正', contentId: 'unicorn-v13-wrap', logId: 'unicorn-log-v13' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
