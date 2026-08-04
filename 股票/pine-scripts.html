@@ -861,26 +861,28 @@ if showDash and barstate.islast
   <div class="scard-header">
     <span class="scard-badge badge-entry">進場模型</span>
     <div class="scard-meta">
-      <div class="scard-title">Entry Model — MSS · SWEEP · HTF FVG · OB</div>
-      <div class="scard-desc">ICT/SMC 進場模型三要素：MSS（結構突破）+ SWEEP（流動性獵取）+ 大時框FVG + 當前時框OB，時框自動對應（5分→1H FVG、15分→4H FVG、1H→日線FVG 等）</div>
+      <div class="scard-title">Entry Model(V1) — MSS·SWEEP·HTF FVG·OB·OTE·AMD 整合版</div>
+      <div class="scard-desc">ICT/SMC 進場模型整合版：MSS（結構突破）+ SWEEP（流動性獵取）+ 大時框FVG + 當前時框OB + OTE最佳進場區（Fib 0.618–0.79）+ AMD階段（壓縮-操縱-派發），新增TP/SL自動目標、進出場預兆提示、訊號勝率自我追蹤儀表板，所有繪圖元素皆可獨立開關/調色/調透明度/調字體大小，時框自動對應核心參數</div>
     </div>
   </div>
   <div class="scard-body">
     <div class="info-grid">
       <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">所有標的</div></div>
-      <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">MSS / SWEEP / HTF FVG / OB</div></div>
+      <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">MSS / SWEEP / HTF FVG / OB / OTE / AMD</div></div>
       <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5</div></div>
-      <div class="info-item"><div class="info-label">時框支援</div><div class="info-val">1M – D（自動對應）</div></div>
+      <div class="info-item"><div class="info-label">時框支援</div><div class="info-val">1M – D（核心參數自動對應）</div></div>
     </div>
     <div class="ver-log" style="margin:10px 0">
-      <span class="vl-dot">›</span> <b>MSS / CHoCH</b>：偵測結構突破，畫水平線 + MSS 標籤，可調左右側K數、顏色、透明度、線條樣式粗細<br>
-      <span class="vl-dot">›</span> <b>SWEEP 流動性獵取</b>：偵測下破回收（Bull Sweep）或上刺回收（Bear Sweep），即時標籤顯示<br>
-      <span class="vl-dot">›</span> <b>大時框 FVG</b>（request.security）：自動對應高時框 FVG 方框，依當前時框顯示 "1H FVG" / "4H FVG" / "D FVG" 等標籤<br>
-      <span class="vl-dot">›</span> <b>當前時框 OB</b>：MSS 觸發後自動找最後一根反向K棒作為 OB，方框隨K棒右延伸，顯示 "5M OB" / "15M OB" 等
+      <span class="vl-dot">›</span> <b>2026-08-04：Entry Model(V1)</b> — 在原本 MSS/SWEEP/HTF FVG/OB 四要素基礎上，新增 <b>OTE 最佳進場區</b>（波段 Fib 0.618–0.79 折價/溢價區，觸及即標記進場）與 <b>AMD 階段</b>（壓縮 Accumulation → 操縱 Manipulation → 派發 Distribution，時段可自訂+時區可選）<br>
+      <span class="vl-dot">›</span> <b>TP/SL 自動目標</b>：依 OB 邊界 + ATR 緩衝算出進場參考價/停損，並以 R 倍數展開 TP1/TP2/TP3，線條與圖形標記皆可獨立開關<br>
+      <span class="vl-dot">›</span> <b>進出場預兆提示</b>：SWEEP 後尚未確認 MSS 時標「醞釀中」；價格接近 TP 或出現反向結構時標「留意出場」，比單純訊號觸發更早提醒<br>
+      <span class="vl-dot">›</span> <b>訊號勝率自我追蹤</b>：內建近似值統計（先中 SL 記負、先中 TP1/2/3 記勝），儀表板即時顯示勝率%與樣本數，可依日期篩選區間，方便自行驗證不同商品/週期的實際表現<br>
+      <span class="vl-dot">›</span> <b>全客製化</b>：MSS/SWEEP/FVG/OB/OTE/AMD/TP-SL/預兆/儀表板每個模組都有獨立顯示開關、顏色、透明度設定；文字大小、線條粗細/樣式為全局設定；儀表板另有位置與字體大小選項<br>
+      <span class="vl-dot">›</span> <b>時框自動對應</b>：切換圖表時框時 MSS樞紐K數、SWEEP回看K數、OB搜尋深度、HTF配對（5分→1H、15分→4H、1H→日線等）皆自動切換，關閉「自動調整」可改手動設定
     </div>
     <div class="tips-box">
-      <h4>時框對應邏輯</h4>
-      <p>1M/3M → 15M FVG｜5M/10M → 1H FVG｜15M/30M/45M → 4H FVG｜1H/2H → D FVG｜4H → W FVG｜D → M FVG</p>
+      <h4>誠實揭露（務必閱讀）</h4>
+      <p>本版本為全新整合模型，尚未經過 TradingView Strategy Tester 或大量歷史資料回測驗證勝率，「訊號勝率自我追蹤」只是腳本內建的近似即時統計（單一持倉假設、以TP1/2/3為判定目標），並非官方回測結果。請先在你實際想交易的商品與週期掛上圖表，讓儀表板累積一段時間的樣本數後再評估是否符合你的勝率門檻，勿直接實單。時框對應與AMD時段預設值為建議起始值，務必依商品特性自行調整。</p>
     </div>
     <button class="copy-bar-btn" onclick="copyEntryModel(this)" style="margin-top:10px">一鍵複製腳本</button>
     <div class="code-block" id="entry-model-code"></div>
@@ -12423,14 +12425,25 @@ function copyCode(btn) {
 }
 
 const ENTRY_MODEL_V1 = `//@version=5
-indicator("ENTRY MODEL",
-     overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+indicator("Entry Model(V1)", shorttitle="EntryModel V1", overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ══════════════════════════════════════════════════════════════════════════
+// Entry Model(V1) — ICT/SMC 進場模型整合版
+// 結構：MSS/CHoCH + SWEEP(流動性獵取) + HTF FVG + 當前TF OB
+//       + OTE最佳進場區(0.618-0.79) + AMD階段(壓縮-操縱-派發)
+// 輔助：TP/SL自動目標、進出場預兆提示、訊號勝率自我追蹤、全客製化儀表板
+// 所有繪圖元素皆可獨立開關顯示、調色、調透明度、調字體大小
+// 時框自動對應：切換圖表時框時，核心參數與大時框配對會自動切換
+// 非保證勝率，請自行對想交易的商品/週期分開驗證後再實單使用
+// ══════════════════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════════════
-// 時框自動對應
-// 當前TF → 大時框FVG  |  OB使用當前TF
-// 1M/3M → 15M | 5M/10M → 1H | 15M~45M → 4H | 1H/2H → D | 4H → W | D → M
+// 時框自動對應 + 自動參數
 // ══════════════════════════════════════════════════════════════
+grpTF = "時框自動對應"
+autoAdapt = input.bool(true, "依時框自動調整核心參數（建議開啟）", group=grpTF,
+     tooltip="開啟後 MSS樞紐K數、SWEEP回看K數、OB搜尋深度會依目前圖表時框自動切換為建議值；切換時框(例如5分→1小時)時只要保持開啟就會自動套用新參數，不必手動重調。關閉則改用各分組下方的手動設定值。")
+
 _htfTF = switch timeframe.period
     "1"   => "15"
     "2"   => "15"
@@ -12477,75 +12490,55 @@ _curLbl = switch timeframe.period
     "W"   => "W"
     => timeframe.period
 
-// ══════════════════════════════════════════════════════════════
-// 全局樣式
-// ══════════════════════════════════════════════════════════════
-grpG  = "全局樣式"
-gSzSt = input.string("small", "字體大小",
-     options=["tiny","small","normal","large","huge"], group=grpG)
-gLnW  = input.int(1, "線條粗細", minval=1, maxval=4, group=grpG)
-gLnSt = input.string("solid", "線條樣式",
-     options=["solid","dashed","dotted"], group=grpG)
+_tfKey = switch timeframe.period
+    "1"   => "1M"
+    "2"   => "1M"
+    "3"   => "5M"
+    "5"   => "5M"
+    "10"  => "15M"
+    "15"  => "15M"
+    "30"  => "15M"
+    "45"  => "15M"
+    "60"  => "1H"
+    "120" => "1H"
+    "240" => "4H"
+    "D"   => "1D"
+    "W"   => "1D"
+    => "1D"
 
-_sz = switch gSzSt
-    "tiny"   => size.tiny
-    "small"  => size.small
-    "normal" => size.normal
-    "large"  => size.large
-    "huge"   => size.huge
-    => size.small
+_autoPivL = switch _tfKey
+    "1M"  => 8
+    "5M"  => 7
+    "15M" => 6
+    "1H"  => 5
+    "4H"  => 4
+    "1D"  => 3
+    => 5
+_autoPivR = switch _tfKey
+    "1M"  => 5
+    "5M"  => 4
+    "15M" => 4
+    "1H"  => 3
+    "4H"  => 3
+    "1D"  => 2
+    => 3
+_autoSweepLB = switch _tfKey
+    "1M"  => 6
+    "5M"  => 5
+    "15M" => 5
+    "1H"  => 4
+    "4H"  => 4
+    "1D"  => 3
+    => 5
+_autoOBSearch = switch _tfKey
+    "1M"  => 400
+    "5M"  => 300
+    "15M" => 250
+    "1H"  => 200
+    "4H"  => 120
+    "1D"  => 80
+    => 200
 
-_lst = switch gLnSt
-    "solid"  => line.style_solid
-    "dashed" => line.style_dashed
-    "dotted" => line.style_dotted
-    => line.style_solid
-
-// ══════════════════════════════════════════════════════════════
-// MSS 設定
-// ══════════════════════════════════════════════════════════════
-grpM  = "MSS / CHoCH"
-showM = input.bool(true, "顯示 MSS", group=grpM)
-mPivL = input.int(5, "左側K數", minval=2, maxval=20, group=grpM)
-mPivR = input.int(3, "右側K數", minval=1, maxval=10, group=grpM)
-mColB = input.color(#22c55e, "Bull 顏色", group=grpM)
-mColR = input.color(#ef4444, "Bear 顏色", group=grpM)
-mTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpM)
-
-// ══════════════════════════════════════════════════════════════
-// SWEEP 設定
-// ══════════════════════════════════════════════════════════════
-grpS     = "SWEEP 流動性獵取"
-showS    = input.bool(true, "顯示 SWEEP", group=grpS)
-sLB      = input.int(5, "Pivot 確認K棒數（左=右）", minval=2, maxval=20, group=grpS)
-sWickMin = input.float(0.25, "最小影線/ATR 倍數", minval=0.0, step=0.05, group=grpS)
-sColB    = input.color(#26a69a, "Bull Sweep 顏色", group=grpS)
-sColR    = input.color(#ef5350, "Bear Sweep 顏色", group=grpS)
-sMax     = input.int(20, "最多顯示條數", minval=5, maxval=50, group=grpS)
-
-// ══════════════════════════════════════════════════════════════
-// 大時框 FVG 設定
-// ══════════════════════════════════════════════════════════════
-grpF  = "大時框 FVG（自動對應）"
-showF = input.bool(true, "顯示 HTF FVG", group=grpF)
-fDays = input.int(3, "顯示天數", minval=1, maxval=10, group=grpF)
-fColB = input.color(#22c55e, "Bull 顏色", group=grpF)
-fColR = input.color(#ef4444, "Bear 顏色", group=grpF)
-fTrp  = input.int(85, "填充透明度", minval=0, maxval=95, step=5, group=grpF)
-
-// ══════════════════════════════════════════════════════════════
-// 小時框 OB 設定
-// ══════════════════════════════════════════════════════════════
-grpO  = "小時框 OB（當前時框）"
-showO = input.bool(true, "顯示 OB", group=grpO)
-oDays = input.int(2, "顯示天數", minval=1, maxval=10, group=grpO)
-oColB = input.color(#3b82f6, "Bull 顏色", group=grpO)
-oColR = input.color(#a855f7, "Bear 顏色", group=grpO)
-oTrp  = input.int(85, "填充透明度", minval=0, maxval=95, step=5, group=grpO)
-
-// ══════════════════════════════════════════════════════════════
-// 共用 — 每日K棒數估算
-// ══════════════════════════════════════════════════════════════
 _bpd = switch timeframe.period
     "1"   => 1440
     "2"   => 720
@@ -12562,10 +12555,43 @@ _bpd = switch timeframe.period
     => 24
 
 // ══════════════════════════════════════════════════════════════
-// MSS 偵測 + 繪製
+// 全局樣式
 // ══════════════════════════════════════════════════════════════
-phH = ta.pivothigh(high, mPivL, mPivR)
-plL = ta.pivotlow(low,  mPivL, mPivR)
+grpG  = "全局樣式"
+gSzSt = input.string("small", "文字大小", options=["tiny", "small", "normal", "large", "huge"], group=grpG)
+gLnW  = input.int(1, "線條粗細", minval=1, maxval=4, group=grpG)
+gLnSt = input.string("solid", "線條樣式", options=["solid", "dashed", "dotted"], group=grpG)
+
+_sz = switch gSzSt
+    "tiny"   => size.tiny
+    "small"  => size.small
+    "normal" => size.normal
+    "large"  => size.large
+    "huge"   => size.huge
+    => size.small
+
+_lst = switch gLnSt
+    "solid"  => line.style_solid
+    "dashed" => line.style_dashed
+    "dotted" => line.style_dotted
+    => line.style_solid
+
+// ══════════════════════════════════════════════════════════════
+// MSS / CHoCH 設定
+// ══════════════════════════════════════════════════════════════
+grpM  = "MSS / CHoCH（結構突破）"
+showM = input.bool(true, "顯示 MSS", group=grpM)
+mPivL_m = input.int(5, "左側K數（手動用）", minval=2, maxval=30, group=grpM)
+mPivR_m = input.int(3, "右側K數（手動用）", minval=1, maxval=15, group=grpM)
+mColB = input.color(#22c55e, "Bull 顏色", group=grpM)
+mColR = input.color(#ef4444, "Bear 顏色", group=grpM)
+mTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpM)
+
+_mPivL = autoAdapt ? _autoPivL : mPivL_m
+_mPivR = autoAdapt ? _autoPivR : mPivR_m
+
+phH = ta.pivothigh(high, _mPivL, _mPivR)
+plL = ta.pivotlow(low, _mPivL, _mPivR)
 
 var float lastPH    = na
 var int   lastPHBar = na
@@ -12574,39 +12600,46 @@ var int   lastPLBar = na
 
 if not na(phH)
     lastPH    := phH
-    lastPHBar := bar_index - mPivR
+    lastPHBar := bar_index - _mPivR
 
 if not na(plL)
     lastPL    := plL
-    lastPLBar := bar_index - mPivR
+    lastPLBar := bar_index - _mPivR
 
 bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
 bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
 
 if showM and bullMSS
-    line.new(lastPHBar, lastPH, bar_index + 10, lastPH,
-         color=color.new(mColB, mTrp), width=gLnW, style=_lst)
-    label.new(math.round((lastPHBar + bar_index) / 2), lastPH, "mss",
-         style=label.style_none, yloc=yloc.price,
-         textcolor=color.new(mColB, mTrp), size=_sz,
-         textalign=text.align_center)
+    line.new(lastPHBar, lastPH, bar_index + 10, lastPH, color=color.new(mColB, mTrp), width=gLnW, style=_lst)
+    label.new(math.round((lastPHBar + bar_index) / 2), lastPH, "mss", style=label.style_none,
+         yloc=yloc.price, textcolor=color.new(mColB, mTrp), size=_sz, textalign=text.align_center)
 
 if showM and bearMSS
-    line.new(lastPLBar, lastPL, bar_index + 10, lastPL,
-         color=color.new(mColR, mTrp), width=gLnW, style=_lst)
-    label.new(math.round((lastPLBar + bar_index) / 2), lastPL, "mss",
-         style=label.style_none, yloc=yloc.price,
-         textcolor=color.new(mColR, mTrp), size=_sz,
-         textalign=text.align_center)
+    line.new(lastPLBar, lastPL, bar_index + 10, lastPL, color=color.new(mColR, mTrp), width=gLnW, style=_lst)
+    label.new(math.round((lastPLBar + bar_index) / 2), lastPL, "mss", style=label.style_none,
+         yloc=yloc.price, textcolor=color.new(mColR, mTrp), size=_sz, textalign=text.align_center)
 
 // ══════════════════════════════════════════════════════════════
-// SWEEP 偵測（ICT 流動性獵取）
-// 邏輯：Pivot Swing 確認流動性池 → 影線穿越 + 收盤反向 + ATR過濾
-// 顯示：水平虛線（從 Pivot 到觸發K棒）+ 右端小字 "s"
+// SWEEP 設定（ICT 流動性獵取：影線刺穿 + 收盤收回 + ATR過濾）
 // ══════════════════════════════════════════════════════════════
-_swPivLo = ta.pivotlow (low,  sLB, sLB)
-_swPivHi = ta.pivothigh(high, sLB, sLB)
-_swAtr   = ta.atr(14)
+grpS     = "SWEEP 流動性獵取"
+showS    = input.bool(true, "顯示 SWEEP", group=grpS)
+sLB_m    = input.int(5, "Pivot 確認K棒數（手動用，左=右）", minval=2, maxval=30, group=grpS)
+sWickMin = input.float(0.25, "最小影線 / ATR 倍數", minval=0.0, step=0.05, group=grpS)
+sColB    = input.color(#26a69a, "Bull Sweep 顏色", group=grpS)
+sColR    = input.color(#ef5350, "Bear Sweep 顏色", group=grpS)
+sMax     = input.int(20, "最多保留條數", minval=5, maxval=50, group=grpS)
+
+_sLB   = autoAdapt ? _autoSweepLB : sLB_m
+_swAtr = ta.atr(14)
+
+var bool bullSweepFired = false
+var bool bearSweepFired = false
+bullSweepFired := false
+bearSweepFired := false
+
+_swPivLo = ta.pivotlow(low, _sLB, _sLB)
+_swPivHi = ta.pivothigh(high, _sLB, _sLB)
 
 var float[] _eqlLvl = array.new_float()
 var int[]   _eqlBar = array.new_int()
@@ -12615,22 +12648,20 @@ var int[]   _eqhBar = array.new_int()
 var line[]  _swLns  = array.new_line()
 var label[] _swLbs  = array.new_label()
 
-// Pivot 確認時立即回溯掃描確認視窗內是否已有掃除
 if showS and not na(_swPivLo)
     _lvl = _swPivLo
-    _pb  = bar_index - sLB
+    _pb  = bar_index - _sLB
     _swept = false
-    for _jj = 0 to sLB
-        _j = sLB - _jj
+    for _jj = 0 to _sLB
+        _j = _sLB - _jj
         if low[_j] < _lvl and close[_j] > _lvl and (_lvl - low[_j]) >= _swAtr * sWickMin
             _sweepBar = bar_index - _j
-            array.push(_swLns, line.new(_pb, _lvl, _sweepBar, _lvl,
-                 color=sColB, width=gLnW, style=line.style_dashed))
-            array.push(_swLbs, label.new(_sweepBar, _lvl, "s",
-                 style=label.style_none, textcolor=sColB, size=_sz))
+            array.push(_swLns, line.new(_pb, _lvl, _sweepBar, _lvl, color=sColB, width=gLnW, style=line.style_dashed))
+            array.push(_swLbs, label.new(_sweepBar, _lvl, "s", style=label.style_none, textcolor=sColB, size=_sz))
             while array.size(_swLns) > sMax
                 line.delete(array.shift(_swLns))
                 label.delete(array.shift(_swLbs))
+            bullSweepFired := true
             _swept := true
             break
     if not _swept
@@ -12642,19 +12673,18 @@ if showS and not na(_swPivLo)
 
 if showS and not na(_swPivHi)
     _lvl = _swPivHi
-    _pb  = bar_index - sLB
+    _pb  = bar_index - _sLB
     _swept = false
-    for _jj = 0 to sLB
-        _j = sLB - _jj
+    for _jj = 0 to _sLB
+        _j = _sLB - _jj
         if high[_j] > _lvl and close[_j] < _lvl and (high[_j] - _lvl) >= _swAtr * sWickMin
             _sweepBar = bar_index - _j
-            array.push(_swLns, line.new(_pb, _lvl, _sweepBar, _lvl,
-                 color=sColR, width=gLnW, style=line.style_dashed))
-            array.push(_swLbs, label.new(_sweepBar, _lvl, "s",
-                 style=label.style_none, textcolor=sColR, size=_sz))
+            array.push(_swLns, line.new(_pb, _lvl, _sweepBar, _lvl, color=sColR, width=gLnW, style=line.style_dashed))
+            array.push(_swLbs, label.new(_sweepBar, _lvl, "s", style=label.style_none, textcolor=sColR, size=_sz))
             while array.size(_swLns) > sMax
                 line.delete(array.shift(_swLns))
                 label.delete(array.shift(_swLbs))
+            bearSweepFired := true
             _swept := true
             break
     if not _swept
@@ -12664,7 +12694,6 @@ if showS and not na(_swPivHi)
             array.shift(_eqhLvl)
             array.shift(_eqhBar)
 
-// 對已追蹤水位做即時掃除偵測
 if showS and barstate.isconfirmed
     _szB = array.size(_eqlLvl)
     if _szB > 0
@@ -12673,15 +12702,14 @@ if showS and barstate.isconfirmed
             _lvl = array.get(_eqlLvl, _i)
             _pb  = array.get(_eqlBar, _i)
             if low < _lvl and close > _lvl and (_lvl - low) >= _swAtr * sWickMin
-                array.push(_swLns, line.new(_pb, _lvl, bar_index, _lvl,
-                     color=sColB, width=gLnW, style=line.style_dashed))
-                array.push(_swLbs, label.new(bar_index, _lvl, "s",
-                     style=label.style_none, textcolor=sColB, size=_sz))
+                array.push(_swLns, line.new(_pb, _lvl, bar_index, _lvl, color=sColB, width=gLnW, style=line.style_dashed))
+                array.push(_swLbs, label.new(bar_index, _lvl, "s", style=label.style_none, textcolor=sColB, size=_sz))
                 while array.size(_swLns) > sMax
                     line.delete(array.shift(_swLns))
                     label.delete(array.shift(_swLbs))
                 array.remove(_eqlLvl, _i)
                 array.remove(_eqlBar, _i)
+                bullSweepFired := true
                 break
 
     _szR = array.size(_eqhLvl)
@@ -12691,37 +12719,43 @@ if showS and barstate.isconfirmed
             _lvl = array.get(_eqhLvl, _i)
             _pb  = array.get(_eqhBar, _i)
             if high > _lvl and close < _lvl and (high - _lvl) >= _swAtr * sWickMin
-                array.push(_swLns, line.new(_pb, _lvl, bar_index, _lvl,
-                     color=sColR, width=gLnW, style=line.style_dashed))
-                array.push(_swLbs, label.new(bar_index, _lvl, "s",
-                     style=label.style_none, textcolor=sColR, size=_sz))
+                array.push(_swLns, line.new(_pb, _lvl, bar_index, _lvl, color=sColR, width=gLnW, style=line.style_dashed))
+                array.push(_swLbs, label.new(bar_index, _lvl, "s", style=label.style_none, textcolor=sColR, size=_sz))
                 while array.size(_swLns) > sMax
                     line.delete(array.shift(_swLns))
                     label.delete(array.shift(_swLbs))
                 array.remove(_eqhLvl, _i)
                 array.remove(_eqhBar, _i)
+                bearSweepFired := true
                 break
 
 // ══════════════════════════════════════════════════════════════
-// 大時框 FVG — request.security
-// 偵測最近一個多方FVG（high[i+1]<low[i-1]）與空方FVG（low[i+1]>high[i-1]）
+// 大時框 FVG（request.security 自動配對）
 // ══════════════════════════════════════════════════════════════
+grpF  = "大時框 FVG（自動配對）"
+showF = input.bool(true, "顯示 HTF FVG", group=grpF)
+fDays = input.int(3, "顯示天數", minval=1, maxval=10, group=grpF)
+fColB = input.color(#22c55e, "Bull 顏色", group=grpF)
+fColR = input.color(#ef4444, "Bear 顏色", group=grpF)
+fTrp  = input.int(85, "填充透明度", minval=0, maxval=95, step=5, group=grpF)
+
 f_fvg() =>
-    bT = float(na), bB = float(na)
-    rT = float(na), rB = float(na)
+    bT = float(na)
+    bB = float(na)
+    rT = float(na)
+    rB = float(na)
     for i = 2 to 200
-        if na(bT) and high[i+1] < low[i-1]
-            bT := low[i-1]
-            bB := high[i+1]
-        if na(rT) and low[i+1] > high[i-1]
-            rT := low[i+1]
-            rB := high[i-1]
+        if na(bT) and high[i + 1] < low[i - 1]
+            bT := low[i - 1]
+            bB := high[i + 1]
+        if na(rT) and low[i + 1] > high[i - 1]
+            rT := low[i + 1]
+            rB := high[i - 1]
         if not na(bT) and not na(rT)
             break
     [bT, bB, rT, rB]
 
-[htfBT, htfBB, htfRT, htfRB] = request.security(
-     syminfo.tickerid, _htfTF, f_fvg(), lookahead=barmerge.lookahead_off)
+[htfBT, htfBB, htfRT, htfRB] = request.security(syminfo.tickerid, _htfTF, f_fvg(), lookahead=barmerge.lookahead_off)
 
 fvgL = math.max(bar_index - fDays * _bpd, 1)
 fvgR = bar_index + 10
@@ -12732,13 +12766,9 @@ var box fvgRBx = na
 if showF
     if not na(htfBT) and not na(htfBB)
         if na(fvgBBx)
-            fvgBBx := box.new(fvgL, htfBT, fvgR, htfBB,
-                 border_color=color.new(fColB, math.max(0, fTrp - 50)),
-                 bgcolor=color.new(fColB, fTrp),
-                 border_width=gLnW,
-                 text=_htfLbl + " FVG",
-                 text_color=color.white, text_size=_sz,
-                 text_halign=text.align_right, text_valign=text.align_center)
+            fvgBBx := box.new(fvgL, htfBT, fvgR, htfBB, border_color=color.new(fColB, math.max(0, fTrp - 50)),
+                 bgcolor=color.new(fColB, fTrp), border_width=gLnW, text=_htfLbl + " FVG",
+                 text_color=color.white, text_size=_sz, text_halign=text.align_right, text_valign=text.align_center)
         else
             box.set_top(fvgBBx, htfBT)
             box.set_bottom(fvgBBx, htfBB)
@@ -12747,13 +12777,9 @@ if showF
 
     if not na(htfRT) and not na(htfRB)
         if na(fvgRBx)
-            fvgRBx := box.new(fvgL, htfRT, fvgR, htfRB,
-                 border_color=color.new(fColR, math.max(0, fTrp - 50)),
-                 bgcolor=color.new(fColR, fTrp),
-                 border_width=gLnW,
-                 text=_htfLbl + " FVG",
-                 text_color=color.white, text_size=_sz,
-                 text_halign=text.align_right, text_valign=text.align_center)
+            fvgRBx := box.new(fvgL, htfRT, fvgR, htfRB, border_color=color.new(fColR, math.max(0, fTrp - 50)),
+                 bgcolor=color.new(fColR, fTrp), border_width=gLnW, text=_htfLbl + " FVG",
+                 text_color=color.white, text_size=_sz, text_halign=text.align_right, text_valign=text.align_center)
         else
             box.set_top(fvgRBx, htfRT)
             box.set_bottom(fvgRBx, htfRB)
@@ -12761,10 +12787,17 @@ if showF
             box.set_left(fvgRBx, fvgL)
 
 // ══════════════════════════════════════════════════════════════
-// 小時框 OB — MSS 觸發後找最後一根反向K棒
-// Bull OB：bullMSS 後找最近的陰線（close<open）
-// Bear OB：bearMSS 後找最近的陽線（close>open）
+// 當前時框 OB（MSS 觸發後找最後一根反向K棒）
 // ══════════════════════════════════════════════════════════════
+grpO       = "當前時框 OB"
+showO      = input.bool(true, "顯示 OB", group=grpO)
+obSearch_m = input.int(300, "OB搜尋深度（手動用）", minval=20, maxval=500, group=grpO)
+oColB      = input.color(#3b82f6, "Bull 顏色", group=grpO)
+oColR      = input.color(#a855f7, "Bear 顏色", group=grpO)
+oTrp       = input.int(85, "填充透明度", minval=0, maxval=95, step=5, group=grpO)
+
+_obSearch = autoAdapt ? _autoOBSearch : obSearch_m
+
 var float bullObT = na
 var float bullObB = na
 var int   bullObL = na
@@ -12775,7 +12808,7 @@ var box   obBBx   = na
 var box   obRBx   = na
 
 if bullMSS
-    for i = 1 to 300
+    for i = 1 to _obSearch
         if close[i] < open[i]
             bullObT := high[i]
             bullObB := low[i]
@@ -12784,16 +12817,12 @@ if bullMSS
     if showO and not na(bullObT)
         if not na(obBBx)
             box.delete(obBBx)
-        obBBx := box.new(bullObL, bullObT, bar_index + 5, bullObB,
-             border_color=color.new(oColB, math.max(0, oTrp - 50)),
-             bgcolor=color.new(oColB, oTrp),
-             border_width=gLnW,
-             text=_curLbl + " OB",
-             text_color=color.white, text_size=_sz,
-             text_halign=text.align_right, text_valign=text.align_center)
+        obBBx := box.new(bullObL, bullObT, bar_index + 5, bullObB, border_color=color.new(oColB, math.max(0, oTrp - 50)),
+             bgcolor=color.new(oColB, oTrp), border_width=gLnW, text=_curLbl + " OB",
+             text_color=color.white, text_size=_sz, text_halign=text.align_right, text_valign=text.align_center)
 
 if bearMSS
-    for i = 1 to 300
+    for i = 1 to _obSearch
         if close[i] > open[i]
             bearObT := high[i]
             bearObB := low[i]
@@ -12802,20 +12831,519 @@ if bearMSS
     if showO and not na(bearObT)
         if not na(obRBx)
             box.delete(obRBx)
-        obRBx := box.new(bearObL, bearObT, bar_index + 5, bearObB,
-             border_color=color.new(oColR, math.max(0, oTrp - 50)),
-             bgcolor=color.new(oColR, oTrp),
-             border_width=gLnW,
-             text=_curLbl + " OB",
-             text_color=color.white, text_size=_sz,
-             text_halign=text.align_right, text_valign=text.align_center)
+        obRBx := box.new(bearObL, bearObT, bar_index + 5, bearObB, border_color=color.new(oColR, math.max(0, oTrp - 50)),
+             bgcolor=color.new(oColR, oTrp), border_width=gLnW, text=_curLbl + " OB",
+             text_color=color.white, text_size=_sz, text_halign=text.align_right, text_valign=text.align_center)
 
-// 每根K棒更新右邊界
 if showO
     if not na(obBBx)
         box.set_right(obBBx, bar_index + 5)
     if not na(obRBx)
-        box.set_right(obRBx, bar_index + 5)`;
+        box.set_right(obRBx, bar_index + 5)
+
+// ══════════════════════════════════════════════════════════════
+// OTE 最佳進場區（Optimal Trade Entry，Fibonacci 0.618–0.79）
+// 波段：由 MSS 突破當下最近一個反向Pivot（起點）到之後推進的極值（終點）
+// ══════════════════════════════════════════════════════════════
+grpOTE       = "OTE 最佳進場區"
+showOTE      = input.bool(true, "顯示 OTE 區間", group=grpOTE)
+oteFibLo     = input.float(0.618, "Fib 淺緣（靠近波段極值）", minval=0.5, maxval=0.9, step=0.01, group=grpOTE)
+oteFibHi     = input.float(0.79, "Fib 深緣（遠離波段極值）", minval=0.5, maxval=0.9, step=0.01, group=grpOTE)
+oteColB      = input.color(#facc15, "多方顏色", group=grpOTE)
+oteColS      = input.color(#38bdf8, "空方顏色", group=grpOTE)
+oteTrp       = input.int(80, "填色透明度", minval=0, maxval=95, step=5, group=grpOTE)
+oteMinLegATR = input.float(1.0, "最小波段長度（ATR倍數，過濾雜訊）", minval=0.1, step=0.1, group=grpOTE)
+oteTimeout   = input.int(60, "追蹤逾時K棒數（超過未觸及即失效）", minval=5, maxval=300, group=grpOTE)
+
+_oteAtr = ta.atr(14)
+
+var float oteLegLowB    = na
+var int   oteLegLowBarB = na
+var float oteLegHighB   = na
+var bool  oteActiveB    = false
+var int   oteStartBarB  = na
+var box   oteBoxB       = na
+var bool  oteHitB       = false
+
+if bullMSS
+    oteLegLowB    := lastPL
+    oteLegLowBarB := lastPLBar
+    oteLegHighB   := high
+    oteActiveB    := not na(lastPL) and (high - lastPL) >= _oteAtr * oteMinLegATR
+    oteStartBarB  := bar_index
+    oteHitB       := false
+else if oteActiveB
+    oteLegHighB := math.max(oteLegHighB, high)
+
+_oteTopB = oteActiveB ? oteLegHighB - (oteLegHighB - oteLegLowB) * oteFibLo : na
+_oteBotB = oteActiveB ? oteLegHighB - (oteLegHighB - oteLegLowB) * oteFibHi : na
+
+if showOTE and oteActiveB and not na(_oteTopB)
+    if na(oteBoxB)
+        oteBoxB := box.new(oteStartBarB, _oteTopB, bar_index + 3, _oteBotB, border_color=color.new(oteColB, 20),
+             bgcolor=color.new(oteColB, oteTrp), border_width=1, text="OTE", text_color=color.new(oteColB, 0),
+             text_size=_sz, text_halign=text.align_right)
+    else
+        box.set_top(oteBoxB, _oteTopB)
+        box.set_bottom(oteBoxB, _oteBotB)
+        box.set_right(oteBoxB, bar_index + 3)
+
+oteEnterB = oteActiveB and not oteHitB and low <= _oteTopB and low >= _oteBotB
+if oteEnterB
+    oteHitB    := true
+    oteActiveB := false
+    if showOTE
+        label.new(bar_index, low, "OTE進場", style=label.style_label_up, color=color.new(oteColB, 10), textcolor=color.white, size=_sz)
+
+if oteActiveB and (bar_index - oteStartBarB > oteTimeout or low < oteLegLowB)
+    oteActiveB := false
+    if not na(oteBoxB)
+        box.delete(oteBoxB)
+        oteBoxB := na
+
+var float oteLegHighS    = na
+var int   oteLegHighBarS = na
+var float oteLegLowS     = na
+var bool  oteActiveS     = false
+var int   oteStartBarS   = na
+var box   oteBoxS        = na
+var bool  oteHitS        = false
+
+if bearMSS
+    oteLegHighS    := lastPH
+    oteLegHighBarS := lastPHBar
+    oteLegLowS     := low
+    oteActiveS     := not na(lastPH) and (lastPH - low) >= _oteAtr * oteMinLegATR
+    oteStartBarS   := bar_index
+    oteHitS        := false
+else if oteActiveS
+    oteLegLowS := math.min(oteLegLowS, low)
+
+_oteTopS = oteActiveS ? oteLegLowS + (oteLegHighS - oteLegLowS) * oteFibHi : na
+_oteBotS = oteActiveS ? oteLegLowS + (oteLegHighS - oteLegLowS) * oteFibLo : na
+
+if showOTE and oteActiveS and not na(_oteTopS)
+    if na(oteBoxS)
+        oteBoxS := box.new(oteStartBarS, _oteTopS, bar_index + 3, _oteBotS, border_color=color.new(oteColS, 20),
+             bgcolor=color.new(oteColS, oteTrp), border_width=1, text="OTE", text_color=color.new(oteColS, 0),
+             text_size=_sz, text_halign=text.align_right)
+    else
+        box.set_top(oteBoxS, _oteTopS)
+        box.set_bottom(oteBoxS, _oteBotS)
+        box.set_right(oteBoxS, bar_index + 3)
+
+oteEnterS = oteActiveS and not oteHitS and high >= _oteBotS and high <= _oteTopS
+if oteEnterS
+    oteHitS    := true
+    oteActiveS := false
+    if showOTE
+        label.new(bar_index, high, "OTE進場", style=label.style_label_down, color=color.new(oteColS, 10), textcolor=color.white, size=_sz)
+
+if oteActiveS and (bar_index - oteStartBarS > oteTimeout or high > oteLegHighS)
+    oteActiveS := false
+    if not na(oteBoxS)
+        box.delete(oteBoxS)
+        oteBoxS := na
+
+// ══════════════════════════════════════════════════════════════
+// AMD 模型（壓縮 Accumulation → 操縱 Manipulation → 派發 Distribution）
+// ══════════════════════════════════════════════════════════════
+grpAMD       = "AMD 模型（壓縮-操縱-派發）"
+showAMD      = input.bool(true, "顯示 AMD 階段", group=grpAMD)
+amdSession   = input.session("1800-0000", "壓縮區時段（Accumulation）", group=grpAMD,
+     tooltip="預設為外匯亞洲盤整理時段，可依商品自行調整，例如美股盤前 0400-0930、倫敦開盤前 0000-0700 等")
+amdTZ        = input.string("UTC", "時區", options=["UTC", "America/New_York", "Europe/London", "Asia/Taipei", "Asia/Shanghai", "Asia/Tokyo"], group=grpAMD)
+amdColAcc    = input.color(#f5c542, "壓縮區顏色", group=grpAMD)
+amdColManB   = input.color(#22c55e, "偏多顏色（操縱/派發）", group=grpAMD)
+amdColManR   = input.color(#ef4444, "偏空顏色（操縱/派發）", group=grpAMD)
+amdTrp       = input.int(85, "壓縮區填色透明度", minval=0, maxval=95, step=5, group=grpAMD)
+amdMinSweepATR = input.float(0.2, "操縱認定：最小突破 / ATR 倍數", minval=0.0, step=0.05, group=grpAMD)
+
+inAcc  = not na(time(timeframe.period, amdSession, amdTZ))
+newAcc = inAcc and not inAcc[1]
+
+var float amdHigh = na
+var float amdLow  = na
+
+if newAcc
+    amdHigh := high
+    amdLow  := low
+else if inAcc
+    amdHigh := math.max(amdHigh, high)
+    amdLow  := math.min(amdLow, low)
+
+var box amdBox = na
+if showAMD and inAcc
+    if newAcc
+        if not na(amdBox)
+            box.delete(amdBox)
+        amdBox := box.new(bar_index, amdHigh, bar_index, amdLow, border_color=color.new(amdColAcc, 20),
+             bgcolor=color.new(amdColAcc, amdTrp), border_width=1, text="AMD壓縮", text_color=color.new(amdColAcc, 0), text_size=_sz)
+    else
+        box.set_top(amdBox, amdHigh)
+        box.set_bottom(amdBox, amdLow)
+        box.set_right(amdBox, bar_index)
+
+sessionJustEnded = not inAcc and inAcc[1]
+var float amdRangeH = na
+var float amdRangeL = na
+var int   amdPhase  = 0
+var int   amdManBar = na
+_amdAtr = ta.atr(14)
+
+if sessionJustEnded
+    amdRangeH := amdHigh
+    amdRangeL := amdLow
+    amdPhase  := 0
+
+if not na(amdRangeH) and not inAcc
+    if amdPhase == 0 and low < amdRangeL and close > amdRangeL and (amdRangeL - low) >= _amdAtr * amdMinSweepATR
+        amdPhase  := 1
+        amdManBar := bar_index
+        if showAMD
+            label.new(bar_index, low, "操縱-掃低", style=label.style_label_up, color=color.new(amdColManB, 20), textcolor=color.white, size=_sz)
+    if amdPhase == 0 and high > amdRangeH and close < amdRangeH and (high - amdRangeH) >= _amdAtr * amdMinSweepATR
+        amdPhase  := -1
+        amdManBar := bar_index
+        if showAMD
+            label.new(bar_index, high, "操縱-掃高", style=label.style_label_down, color=color.new(amdColManR, 20), textcolor=color.white, size=_sz)
+
+if amdPhase == 1 and close > amdRangeH
+    amdPhase := 2
+    if showAMD
+        label.new(bar_index, close, "派發-偏多", style=label.style_label_up, color=color.new(amdColManB, 0), textcolor=color.white, size=_sz)
+if amdPhase == -1 and close < amdRangeL
+    amdPhase := -2
+    if showAMD
+        label.new(bar_index, close, "派發-偏空", style=label.style_label_down, color=color.new(amdColManR, 0), textcolor=color.white, size=_sz)
+
+amdPhaseStr = amdPhase == 0 ? "壓縮中/中性" : amdPhase == 1 ? "操縱(掃低待漲)" : amdPhase == -1 ? "操縱(掃高待跌)" : amdPhase == 2 ? "派發-多方" : amdPhase == -2 ? "派發-空方" : "—"
+amdPhaseCol = amdPhase == 2 ? color.new(amdColManB, 0) : amdPhase == 1 ? color.new(amdColManB, 40) : amdPhase == -2 ? color.new(amdColManR, 0) : amdPhase == -1 ? color.new(amdColManR, 40) : color.gray
+
+// ══════════════════════════════════════════════════════════════
+// TP / SL 自動目標（依 OB 邊界 + ATR 緩衝、R倍數展開）
+// ══════════════════════════════════════════════════════════════
+grpTPSL      = "停利停損目標 (TP/SL)"
+showTPSL     = input.bool(true, "顯示 TP/SL 線", group=grpTPSL)
+showSignals  = input.bool(true, "顯示進出場圖形標記", group=grpTPSL)
+slBufAtrMult = input.float(0.25, "停損緩衝（ATR倍數）", minval=0.0, step=0.05, group=grpTPSL)
+atrLenTPSL   = input.int(14, "ATR週期", minval=5, maxval=50, group=grpTPSL)
+tp1R         = input.float(1.0, "TP1（R倍數）", minval=0.1, step=0.1, group=grpTPSL)
+tp2R         = input.float(2.0, "TP2（R倍數）", minval=0.1, step=0.1, group=grpTPSL)
+tp3R         = input.float(3.0, "TP3（R倍數）", minval=0.1, step=0.1, group=grpTPSL)
+showTP1      = input.bool(true, "顯示 TP1", group=grpTPSL)
+showTP2      = input.bool(true, "顯示 TP2", group=grpTPSL)
+showTP3      = input.bool(false, "顯示 TP3", group=grpTPSL)
+showSLLine   = input.bool(true, "顯示 SL", group=grpTPSL)
+colSL        = input.color(#ef4444, "SL 顏色", group=grpTPSL)
+colTP1       = input.color(#22c55e, "TP1 顏色", group=grpTPSL)
+colTP2       = input.color(#3b82f6, "TP2 顏色", group=grpTPSL)
+colTP3       = input.color(#a855f7, "TP3 顏色", group=grpTPSL)
+tpslTrp      = input.int(0, "線條透明度", minval=0, maxval=90, step=5, group=grpTPSL)
+tpslExtend   = input.int(40, "線條延伸K數", minval=5, maxval=200, group=grpTPSL)
+
+_atrTPSL = ta.atr(atrLenTPSL)
+
+var float entryB = na
+var float slB    = na
+var float tp1B   = na
+var float tp2B   = na
+var float tp3B   = na
+var line  slLnB  = na
+var line  tp1LnB = na
+var line  tp2LnB = na
+var line  tp3LnB = na
+var bool  haveSetupB = false
+
+if bullMSS and not na(bullObT) and not na(bullObB)
+    entryB := (bullObT + bullObB) / 2
+    slB    := bullObB - _atrTPSL * slBufAtrMult
+    _riskB = entryB - slB
+    tp1B   := entryB + _riskB * tp1R
+    tp2B   := entryB + _riskB * tp2R
+    tp3B   := entryB + _riskB * tp3R
+    haveSetupB := true
+    if showTPSL
+        if not na(slLnB)
+            line.delete(slLnB)
+            line.delete(tp1LnB)
+            line.delete(tp2LnB)
+            line.delete(tp3LnB)
+        if showSLLine
+            slLnB := line.new(bar_index, slB, bar_index + tpslExtend, slB, color=color.new(colSL, tpslTrp), width=gLnW, style=line.style_dashed)
+        if showTP1
+            tp1LnB := line.new(bar_index, tp1B, bar_index + tpslExtend, tp1B, color=color.new(colTP1, tpslTrp), width=gLnW, style=line.style_dashed)
+        if showTP2
+            tp2LnB := line.new(bar_index, tp2B, bar_index + tpslExtend, tp2B, color=color.new(colTP2, tpslTrp), width=gLnW, style=line.style_dashed)
+        if showTP3
+            tp3LnB := line.new(bar_index, tp3B, bar_index + tpslExtend, tp3B, color=color.new(colTP3, tpslTrp), width=gLnW, style=line.style_dashed)
+
+var float entryS = na
+var float slS    = na
+var float tp1S   = na
+var float tp2S   = na
+var float tp3S   = na
+var line  slLnS  = na
+var line  tp1LnS = na
+var line  tp2LnS = na
+var line  tp3LnS = na
+var bool  haveSetupS = false
+
+if bearMSS and not na(bearObT) and not na(bearObB)
+    entryS := (bearObT + bearObB) / 2
+    slS    := bearObT + _atrTPSL * slBufAtrMult
+    _riskS = slS - entryS
+    tp1S   := entryS - _riskS * tp1R
+    tp2S   := entryS - _riskS * tp2R
+    tp3S   := entryS - _riskS * tp3R
+    haveSetupS := true
+    if showTPSL
+        if not na(slLnS)
+            line.delete(slLnS)
+            line.delete(tp1LnS)
+            line.delete(tp2LnS)
+            line.delete(tp3LnS)
+        if showSLLine
+            slLnS := line.new(bar_index, slS, bar_index + tpslExtend, slS, color=color.new(colSL, tpslTrp), width=gLnW, style=line.style_dashed)
+        if showTP1
+            tp1LnS := line.new(bar_index, tp1S, bar_index + tpslExtend, tp1S, color=color.new(colTP1, tpslTrp), width=gLnW, style=line.style_dashed)
+        if showTP2
+            tp2LnS := line.new(bar_index, tp2S, bar_index + tpslExtend, tp2S, color=color.new(colTP2, tpslTrp), width=gLnW, style=line.style_dashed)
+        if showTP3
+            tp3LnS := line.new(bar_index, tp3S, bar_index + tpslExtend, tp3S, color=color.new(colTP3, tpslTrp), width=gLnW, style=line.style_dashed)
+
+var bool bullTradeOpen = false
+var bool bearTradeOpen = false
+
+bullHitSL = bullTradeOpen and not na(slB) and low <= slB
+bullHitTP = bullTradeOpen and not na(tp1B) and high >= tp1B and not bullHitSL
+bearHitSL = bearTradeOpen and not na(slS) and high >= slS
+bearHitTP = bearTradeOpen and not na(tp1S) and low <= tp1S and not bearHitSL
+
+if bullHitSL or bullHitTP
+    bullTradeOpen := false
+if bearHitSL or bearHitTP
+    bearTradeOpen := false
+if bullMSS and haveSetupB
+    bullTradeOpen := true
+if bearMSS and haveSetupS
+    bearTradeOpen := true
+
+plotshape(showSignals and bullMSS, title="多方進場訊號", location=location.belowbar, style=shape.triangleup, color=color.new(mColB, 0), size=size.small, text="多")
+plotshape(showSignals and bearMSS, title="空方進場訊號", location=location.abovebar, style=shape.triangledown, color=color.new(mColR, 0), size=size.small, text="空")
+plotshape(showSignals and bullHitTP, title="多方止盈出場", location=location.abovebar, style=shape.xcross, color=color.new(colTP1, 0), size=size.tiny, text="TP")
+plotshape(showSignals and bullHitSL, title="多方止損出場", location=location.abovebar, style=shape.xcross, color=color.new(colSL, 0), size=size.tiny, text="SL")
+plotshape(showSignals and bearHitTP, title="空方止盈出場", location=location.belowbar, style=shape.xcross, color=color.new(colTP1, 0), size=size.tiny, text="TP")
+plotshape(showSignals and bearHitSL, title="空方止損出場", location=location.belowbar, style=shape.xcross, color=color.new(colSL, 0), size=size.tiny, text="SL")
+
+// ══════════════════════════════════════════════════════════════
+// 訊號勝率自我追蹤（近似值，非官方 Strategy Tester 回測）
+// 每筆訊號以 TP1/TP2/TP3（可選）為判定目標，先中 SL 記負、先中目標記勝
+// ══════════════════════════════════════════════════════════════
+grpWIN         = "訊號勝率自我追蹤"
+showWinStats   = input.bool(true, "顯示勝率統計", group=grpWIN)
+winTargetIdx   = input.string("TP1", "勝率判定目標", options=["TP1", "TP2", "TP3"], group=grpWIN)
+maxTrackTrades = input.int(200, "最多追蹤筆數", minval=20, maxval=500, group=grpWIN)
+statsFromToggle = input.bool(false, "只統計指定日期之後", group=grpWIN)
+statsFrom      = input.time(timestamp("2026-01-01 00:00"), "起始日期", group=grpWIN)
+
+var float[] tkEntry = array.new_float()
+var float[] tkSL    = array.new_float()
+var float[] tkTP    = array.new_float()
+var int[]   tkDir   = array.new_int()
+var int win  = 0
+var int loss = 0
+
+_tpTarget(t1, t2, t3) => winTargetIdx == "TP1" ? t1 : winTargetIdx == "TP2" ? t2 : t3
+_passFilter = not statsFromToggle or time >= statsFrom
+
+if bullMSS and haveSetupB and _passFilter
+    array.push(tkEntry, entryB)
+    array.push(tkSL, slB)
+    array.push(tkTP, _tpTarget(tp1B, tp2B, tp3B))
+    array.push(tkDir, 1)
+if bearMSS and haveSetupS and _passFilter
+    array.push(tkEntry, entryS)
+    array.push(tkSL, slS)
+    array.push(tkTP, _tpTarget(tp1S, tp2S, tp3S))
+    array.push(tkDir, -1)
+
+while array.size(tkDir) > maxTrackTrades
+    array.shift(tkEntry)
+    array.shift(tkSL)
+    array.shift(tkTP)
+    array.shift(tkDir)
+
+if barstate.isconfirmed
+    _n = array.size(tkDir)
+    if _n > 0
+        for _ii = 0 to _n - 1
+            _i = _n - 1 - _ii
+            _d  = array.get(tkDir, _i)
+            _sl = array.get(tkSL, _i)
+            _tp = array.get(tkTP, _i)
+            if _d == 1
+                if low <= _sl
+                    loss += 1
+                    array.remove(tkDir, _i)
+                    array.remove(tkEntry, _i)
+                    array.remove(tkSL, _i)
+                    array.remove(tkTP, _i)
+                else if high >= _tp
+                    win += 1
+                    array.remove(tkDir, _i)
+                    array.remove(tkEntry, _i)
+                    array.remove(tkSL, _i)
+                    array.remove(tkTP, _i)
+            else if _d == -1
+                if high >= _sl
+                    loss += 1
+                    array.remove(tkDir, _i)
+                    array.remove(tkEntry, _i)
+                    array.remove(tkSL, _i)
+                    array.remove(tkTP, _i)
+                else if low <= _tp
+                    win += 1
+                    array.remove(tkDir, _i)
+                    array.remove(tkEntry, _i)
+                    array.remove(tkSL, _i)
+                    array.remove(tkTP, _i)
+
+winRatePct = (win + loss) > 0 ? win / (win + loss) * 100.0 : na
+openTrades = array.size(tkDir)
+
+// ══════════════════════════════════════════════════════════════
+// 進場 / 出場預兆提示
+// ══════════════════════════════════════════════════════════════
+grpPRE        = "進出場預兆提示"
+showEntryPre  = input.bool(true, "顯示進場醞釀提示", group=grpPRE)
+showExitPre   = input.bool(true, "顯示出場醞釀提示", group=grpPRE)
+preWindowBars = input.int(15, "醞釀偵測窗口（K棒數）", minval=3, maxval=60, group=grpPRE)
+nearTPPct     = input.float(0.8, "接近TP判定比例（0~1，越大越晚提示）", minval=0.1, maxval=0.99, step=0.05, group=grpPRE)
+preColB       = input.color(#facc15, "多方預兆顏色", group=grpPRE)
+preColS       = input.color(#38bdf8, "空方預兆顏色", group=grpPRE)
+preSz         = input.string("Small", "預兆文字大小", options=["Tiny", "Small", "Normal", "Large"], group=grpPRE)
+
+_preSz = preSz == "Tiny" ? size.tiny : preSz == "Normal" ? size.normal : preSz == "Large" ? size.large : size.small
+
+_barsSinceBullSweep = ta.barssince(bullSweepFired)
+_barsSinceBearSweep = ta.barssince(bearSweepFired)
+
+bullBrewing = showEntryPre and not bullMSS and not na(_barsSinceBullSweep) and _barsSinceBullSweep <= preWindowBars and close > close[1]
+bearBrewing = showEntryPre and not bearMSS and not na(_barsSinceBearSweep) and _barsSinceBearSweep <= preWindowBars and close < close[1]
+
+if bullBrewing and not bullBrewing[1]
+    label.new(bar_index, low, "多方醞釀中", style=label.style_label_up, color=color.new(preColB, 30), textcolor=color.black, size=_preSz)
+if bearBrewing and not bearBrewing[1]
+    label.new(bar_index, high, "空方醞釀中", style=label.style_label_down, color=color.new(preColS, 30), textcolor=color.black, size=_preSz)
+
+if showExitPre and array.size(tkDir) > 0
+    _lastIdx = array.size(tkDir) - 1
+    _ld = array.get(tkDir, _lastIdx)
+    _le = array.get(tkEntry, _lastIdx)
+    _lt = array.get(tkTP, _lastIdx)
+    if _ld == 1
+        _prog = (close - _le) / (_lt - _le)
+        if _prog >= nearTPPct and _prog < 1
+            label.new(bar_index, high, "接近TP目標", style=label.style_label_down, color=color.new(colTP1, 10), textcolor=color.white, size=_preSz)
+        if bearMSS
+            label.new(bar_index, high, "反向結構出現-留意出場", style=label.style_label_down, color=color.new(color.orange, 10), textcolor=color.white, size=_preSz)
+    else if _ld == -1
+        _prog = (_le - close) / (_le - _lt)
+        if _prog >= nearTPPct and _prog < 1
+            label.new(bar_index, low, "接近TP目標", style=label.style_label_up, color=color.new(colTP1, 10), textcolor=color.white, size=_preSz)
+        if bullMSS
+            label.new(bar_index, low, "反向結構出現-留意出場", style=label.style_label_up, color=color.new(color.orange, 10), textcolor=color.white, size=_preSz)
+
+// ══════════════════════════════════════════════════════════════
+// 儀表板
+// ══════════════════════════════════════════════════════════════
+grpDASH    = "儀表板"
+showDash   = input.bool(true, "顯示儀表板", group=grpDASH)
+dashPos    = input.string("右上", "儀表板位置", options=["左上", "右上", "左下", "右下"], group=grpDASH)
+dashFontSz = input.string("Small", "儀表板字體", options=["Tiny", "Small", "Normal", "Large"], group=grpDASH)
+dashBgTrp  = input.int(15, "背景透明度", minval=0, maxval=90, step=5, group=grpDASH)
+dashHdrCol = input.color(#1f2937, "標題底色", group=grpDASH)
+dashBorderCol = input.color(#8b5cf6, "邊框顏色", group=grpDASH)
+
+_dashSz  = dashFontSz == "Tiny" ? size.tiny : dashFontSz == "Normal" ? size.normal : dashFontSz == "Large" ? size.large : size.small
+_dashPos = dashPos == "左上" ? position.top_left : dashPos == "左下" ? position.bottom_left : dashPos == "右下" ? position.bottom_right : position.top_right
+
+f_fmt(x) => na(x) ? "—" : str.tostring(x, format.mintick)
+
+var int lastSigDir = 0
+if bullMSS
+    lastSigDir := 1
+if bearMSS
+    lastSigDir := -1
+
+dirStr = lastSigDir == 1 ? "多方 ▲" : lastSigDir == -1 ? "空方 ▼" : "觀望"
+dirCol = lastSigDir == 1 ? color.new(#22c55e, 0) : lastSigDir == -1 ? color.new(#ef4444, 0) : color.gray
+
+_mssAgo   = ta.barssince(bullMSS or bearMSS)
+mssRowVal = na(_mssAgo) ? "尚未觸發" : str.tostring(_mssAgo) + "根前"
+
+_swpAgo   = math.min(nz(_barsSinceBullSweep, 999999), nz(_barsSinceBearSweep, 999999))
+swpRowVal = _swpAgo >= 999999 ? "尚未觸發" : str.tostring(_swpAgo) + "根前"
+
+fvgRowVal = (not na(htfBT) or not na(htfRT)) ? "已存在" : "無"
+obRowVal  = (not na(bullObT) or not na(bearObT)) ? "已存在" : "無"
+oteRowVal = (oteHitB or oteHitS) ? "已觸及" : (oteActiveB or oteActiveS) ? "追蹤中" : "無"
+
+_curEntry = lastSigDir == 1 ? entryB : lastSigDir == -1 ? entryS : na
+_curSL    = lastSigDir == 1 ? slB : lastSigDir == -1 ? slS : na
+_curTP1   = lastSigDir == 1 ? tp1B : lastSigDir == -1 ? tp1S : na
+_curTP2   = lastSigDir == 1 ? tp2B : lastSigDir == -1 ? tp2S : na
+_curTP3   = lastSigDir == 1 ? tp3B : lastSigDir == -1 ? tp3S : na
+
+winRowVal = na(winRatePct) ? "—（尚無樣本）" : str.tostring(winRatePct, "#.#") + "%（" + str.tostring(win) + "勝" + str.tostring(loss) + "敗）"
+
+var table dash = table.new(_dashPos, 2, 14, bgcolor=color.new(color.black, dashBgTrp), border_color=color.new(dashBorderCol, 40), border_width=1, frame_color=color.new(dashBorderCol, 20), frame_width=1)
+
+if showDash and barstate.islast
+    table.cell(dash, 0, 0, "Entry Model V1 · " + _curLbl, text_color=color.white, text_size=_dashSz, bgcolor=color.new(dashHdrCol, 0), text_halign=text.align_left)
+    table.cell(dash, 1, 0, dirStr, text_color=dirCol, text_size=_dashSz, bgcolor=color.new(dashHdrCol, 0), text_halign=text.align_center)
+    table.cell(dash, 0, 1, "MSS 結構突破", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 1, mssRowVal, text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 0, 2, "SWEEP 流動性獵取", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 2, swpRowVal, text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 0, 3, "HTF FVG（" + _htfLbl + "）", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 3, fvgRowVal, text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 0, 4, "OB（" + _curLbl + "）", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 4, obRowVal, text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 0, 5, "OTE 最佳進場區", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 5, oteRowVal, text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 0, 6, "AMD 階段", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 6, amdPhaseStr, text_color=amdPhaseCol, text_size=_dashSz)
+    table.cell(dash, 0, 7, "進場參考價", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 7, f_fmt(_curEntry), text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 0, 8, "SL 停損", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 8, f_fmt(_curSL), text_color=color.new(colSL, 0), text_size=_dashSz)
+    table.cell(dash, 0, 9, "TP1", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 9, f_fmt(_curTP1), text_color=color.new(colTP1, 0), text_size=_dashSz)
+    table.cell(dash, 0, 10, "TP2", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 10, f_fmt(_curTP2), text_color=color.new(colTP2, 0), text_size=_dashSz)
+    table.cell(dash, 0, 11, "TP3", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 11, f_fmt(_curTP3), text_color=color.new(colTP3, 0), text_size=_dashSz)
+    table.cell(dash, 0, 12, "自我追蹤勝率", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 12, showWinStats ? winRowVal : "已關閉", text_color=color.new(#FFCC00, 0), text_size=_dashSz)
+    table.cell(dash, 0, 13, "追蹤中筆數", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 1, 13, str.tostring(openTrades), text_color=color.gray, text_size=_dashSz)
+
+// ══════════════════════════════════════════════════════════════
+// 警報
+// ══════════════════════════════════════════════════════════════
+alertcondition(bullMSS, title="多方MSS", message="{{ticker}} {{interval}} 多方結構突破 MSS")
+alertcondition(bearMSS, title="空方MSS", message="{{ticker}} {{interval}} 空方結構突破 MSS")
+alertcondition(oteEnterB, title="多方OTE進場", message="{{ticker}} {{interval}} 價格進入多方OTE最佳進場區")
+alertcondition(oteEnterS, title="空方OTE進場", message="{{ticker}} {{interval}} 價格進入空方OTE最佳進場區")
+alertcondition(bullBrewing and not bullBrewing[1], title="多方醞釀", message="{{ticker}} {{interval}} 偵測到多方醞釀跡象（掃損後待結構確認）")
+alertcondition(bearBrewing and not bearBrewing[1], title="空方醞釀", message="{{ticker}} {{interval}} 偵測到空方醞釀跡象（掃損後待結構確認）")
+alertcondition(bullHitTP, title="多方止盈", message="{{ticker}} {{interval}} 多方訊號已觸及TP1")
+alertcondition(bullHitSL, title="多方止損", message="{{ticker}} {{interval}} 多方訊號已觸及SL")
+alertcondition(bearHitTP, title="空方止盈", message="{{ticker}} {{interval}} 空方訊號已觸及TP1")
+alertcondition(bearHitSL, title="空方止損", message="{{ticker}} {{interval}} 空方訊號已觸及SL")
+`;
 
 const ALGO_ALPHA_SL = `// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 // © AlgoAlpha  (SL/TP labels added)
