@@ -875,7 +875,7 @@ if showDash and barstate.islast
     <div class="ver-log" style="margin:10px 0">
       <span class="vl-dot">›</span> <b>2026-08-04：Entry Model(V1)</b> — 在原本 MSS/SWEEP/HTF FVG/OB 四要素基礎上，新增 <b>OTE 最佳進場區</b>（波段 Fib 0.618–0.79 折價/溢價區，觸及即標記進場）與 <b>AMD 階段</b>（壓縮 Accumulation → 操縱 Manipulation → 派發 Distribution，時段可自訂+時區可選）<br>
       <span class="vl-dot">›</span> <b>TP/SL 自動目標</b>：依 OB 邊界 + ATR 緩衝算出進場參考價/停損，並以 R 倍數展開 TP1/TP2/TP3，線條與圖形標記皆可獨立開關<br>
-      <span class="vl-dot">›</span> <b>進出場預兆提示</b>：SWEEP 後尚未確認 MSS 時標「醞釀中」；價格接近 TP 或出現反向結構時標「留意出場」，比單純訊號觸發更早提醒<br>
+      <span class="vl-dot">›</span> <b>進出場預兆提示</b>：改為統一顯示在儀表板的「進場預兆」「出場預兆」兩列文字狀態（SWEEP後未確認MSS→醞釀中；接近TP或出現反向結構→留意出場），不再於圖表上額外貼標籤，避免小標籤看不懂<br>
       <span class="vl-dot">›</span> <b>訊號勝率自我追蹤</b>：內建近似值統計（先中 SL 記負、先中 TP1/2/3 記勝），儀表板即時顯示勝率%與樣本數，可依日期篩選區間，方便自行驗證不同商品/週期的實際表現<br>
       <span class="vl-dot">›</span> <b>全客製化</b>：MSS/SWEEP/FVG/OB/OTE/AMD/TP-SL/預兆/儀表板每個模組都有獨立顯示開關、顏色、透明度設定；文字大小、線條粗細/樣式為全局設定；儀表板另有位置與字體大小選項<br>
       <span class="vl-dot">›</span> <b>時框自動對應</b>：切換圖表時框時 MSS樞紐K數、SWEEP回看K數、OB搜尋深度、HTF配對（5分→1H、15分→4H、1H→日線等）皆自動切換，關閉「自動調整」可改手動設定
@@ -13214,17 +13214,13 @@ openTrades = array.size(tkDir)
 
 // ══════════════════════════════════════════════════════════════
 // 進場 / 出場預兆提示
+// 進場醞釀／出場預兆改為文字狀態，統一顯示在下方儀表板（不再於圖表上另貼標籤，避免看不懂）
 // ══════════════════════════════════════════════════════════════
-grpPRE        = "進出場預兆提示"
-showEntryPre  = input.bool(true, "顯示進場醞釀提示", group=grpPRE)
-showExitPre   = input.bool(true, "顯示出場醞釀提示", group=grpPRE)
+grpPRE        = "進出場預兆提示（顯示於儀表板）"
+showEntryPre  = input.bool(true, "偵測進場醞釀（SWEEP後尚未確認MSS）", group=grpPRE)
+showExitPre   = input.bool(true, "偵測出場預兆（接近TP／出現反向結構）", group=grpPRE)
 preWindowBars = input.int(15, "醞釀偵測窗口（K棒數）", minval=3, maxval=60, group=grpPRE)
 nearTPPct     = input.float(0.8, "接近TP判定比例（0~1，越大越晚提示）", minval=0.1, maxval=0.99, step=0.05, group=grpPRE)
-preColB       = input.color(#facc15, "多方預兆顏色", group=grpPRE)
-preColS       = input.color(#38bdf8, "空方預兆顏色", group=grpPRE)
-preSz         = input.string("Small", "預兆文字大小", options=["Tiny", "Small", "Normal", "Large"], group=grpPRE)
-
-_preSz = preSz == "Tiny" ? size.tiny : preSz == "Normal" ? size.normal : preSz == "Large" ? size.large : size.small
 
 _barsSinceBullSweep = ta.barssince(bullSweepFired)
 _barsSinceBearSweep = ta.barssince(bearSweepFired)
@@ -13232,11 +13228,9 @@ _barsSinceBearSweep = ta.barssince(bearSweepFired)
 bullBrewing = showEntryPre and not bullMSS and not na(_barsSinceBullSweep) and _barsSinceBullSweep <= preWindowBars and close > close[1]
 bearBrewing = showEntryPre and not bearMSS and not na(_barsSinceBearSweep) and _barsSinceBearSweep <= preWindowBars and close < close[1]
 
-if bullBrewing and not bullBrewing[1]
-    label.new(bar_index, low, "多方醞釀中", style=label.style_label_up, color=color.new(preColB, 30), textcolor=color.black, size=_preSz)
-if bearBrewing and not bearBrewing[1]
-    label.new(bar_index, high, "空方醞釀中", style=label.style_label_down, color=color.new(preColS, 30), textcolor=color.black, size=_preSz)
+entryPreRowVal = bullBrewing ? "多方醞釀中（掃損後等結構確認）" : bearBrewing ? "空方醞釀中（掃損後等結構確認）" : "無"
 
+exitPreRowVal = "無"
 if showExitPre and array.size(tkDir) > 0
     _lastIdx = array.size(tkDir) - 1
     _ld = array.get(tkDir, _lastIdx)
@@ -13244,16 +13238,16 @@ if showExitPre and array.size(tkDir) > 0
     _lt = array.get(tkTP, _lastIdx)
     if _ld == 1
         _prog = (close - _le) / (_lt - _le)
-        if _prog >= nearTPPct and _prog < 1
-            label.new(bar_index, high, "接近TP目標", style=label.style_label_down, color=color.new(colTP1, 10), textcolor=color.white, size=_preSz)
         if bearMSS
-            label.new(bar_index, high, "反向結構出現-留意出場", style=label.style_label_down, color=color.new(color.orange, 10), textcolor=color.white, size=_preSz)
+            exitPreRowVal := "出現反向結構-留意出場"
+        else if _prog >= nearTPPct and _prog < 1
+            exitPreRowVal := "接近TP目標"
     else if _ld == -1
         _prog = (_le - close) / (_le - _lt)
-        if _prog >= nearTPPct and _prog < 1
-            label.new(bar_index, low, "接近TP目標", style=label.style_label_up, color=color.new(colTP1, 10), textcolor=color.white, size=_preSz)
         if bullMSS
-            label.new(bar_index, low, "反向結構出現-留意出場", style=label.style_label_up, color=color.new(color.orange, 10), textcolor=color.white, size=_preSz)
+            exitPreRowVal := "出現反向結構-留意出場"
+        else if _prog >= nearTPPct and _prog < 1
+            exitPreRowVal := "接近TP目標"
 
 // ══════════════════════════════════════════════════════════════
 // 儀表板
@@ -13298,37 +13292,41 @@ _curTP3   = lastSigDir == 1 ? tp3B : lastSigDir == -1 ? tp3S : na
 
 winRowVal = na(winRatePct) ? "—（尚無樣本）" : str.tostring(winRatePct, "#.#") + "%（" + str.tostring(win) + "勝" + str.tostring(loss) + "敗）"
 
-var table dash = table.new(_dashPos, 2, 14, bgcolor=color.new(color.black, dashBgTrp), border_color=color.new(dashBorderCol, 40), border_width=1, frame_color=color.new(dashBorderCol, 20), frame_width=1)
+var table dash = table.new(_dashPos, 2, 16, bgcolor=color.new(color.black, dashBgTrp), border_color=color.new(dashBorderCol, 40), border_width=1, frame_color=color.new(dashBorderCol, 20), frame_width=1)
 
 if showDash and barstate.islast
     table.cell(dash, 0, 0, "Entry Model V1 · " + _curLbl, text_color=color.white, text_size=_dashSz, bgcolor=color.new(dashHdrCol, 0), text_halign=text.align_left)
     table.cell(dash, 1, 0, dirStr, text_color=dirCol, text_size=_dashSz, bgcolor=color.new(dashHdrCol, 0), text_halign=text.align_center)
-    table.cell(dash, 0, 1, "MSS 結構突破", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 0, 1, "MSS 結構突破", text_color=color.white, text_size=_dashSz)
     table.cell(dash, 1, 1, mssRowVal, text_color=color.white, text_size=_dashSz)
-    table.cell(dash, 0, 2, "SWEEP 流動性獵取", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 0, 2, "SWEEP 流動性獵取", text_color=color.white, text_size=_dashSz)
     table.cell(dash, 1, 2, swpRowVal, text_color=color.white, text_size=_dashSz)
-    table.cell(dash, 0, 3, "HTF FVG（" + _htfLbl + "）", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 0, 3, "HTF FVG（" + _htfLbl + "）", text_color=color.white, text_size=_dashSz)
     table.cell(dash, 1, 3, fvgRowVal, text_color=color.white, text_size=_dashSz)
-    table.cell(dash, 0, 4, "OB（" + _curLbl + "）", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 0, 4, "OB（" + _curLbl + "）", text_color=color.white, text_size=_dashSz)
     table.cell(dash, 1, 4, obRowVal, text_color=color.white, text_size=_dashSz)
-    table.cell(dash, 0, 5, "OTE 最佳進場區", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 0, 5, "OTE 最佳進場區", text_color=color.white, text_size=_dashSz)
     table.cell(dash, 1, 5, oteRowVal, text_color=color.white, text_size=_dashSz)
-    table.cell(dash, 0, 6, "AMD 階段", text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 0, 6, "AMD 階段", text_color=color.white, text_size=_dashSz)
     table.cell(dash, 1, 6, amdPhaseStr, text_color=amdPhaseCol, text_size=_dashSz)
-    table.cell(dash, 0, 7, "進場參考價", text_color=color.gray, text_size=_dashSz)
-    table.cell(dash, 1, 7, f_fmt(_curEntry), text_color=color.white, text_size=_dashSz)
-    table.cell(dash, 0, 8, "SL 停損", text_color=color.gray, text_size=_dashSz)
-    table.cell(dash, 1, 8, f_fmt(_curSL), text_color=color.new(colSL, 0), text_size=_dashSz)
-    table.cell(dash, 0, 9, "TP1", text_color=color.gray, text_size=_dashSz)
-    table.cell(dash, 1, 9, f_fmt(_curTP1), text_color=color.new(colTP1, 0), text_size=_dashSz)
-    table.cell(dash, 0, 10, "TP2", text_color=color.gray, text_size=_dashSz)
-    table.cell(dash, 1, 10, f_fmt(_curTP2), text_color=color.new(colTP2, 0), text_size=_dashSz)
-    table.cell(dash, 0, 11, "TP3", text_color=color.gray, text_size=_dashSz)
-    table.cell(dash, 1, 11, f_fmt(_curTP3), text_color=color.new(colTP3, 0), text_size=_dashSz)
-    table.cell(dash, 0, 12, "自我追蹤勝率", text_color=color.gray, text_size=_dashSz)
-    table.cell(dash, 1, 12, showWinStats ? winRowVal : "已關閉", text_color=color.new(#FFCC00, 0), text_size=_dashSz)
-    table.cell(dash, 0, 13, "追蹤中筆數", text_color=color.gray, text_size=_dashSz)
-    table.cell(dash, 1, 13, str.tostring(openTrades), text_color=color.gray, text_size=_dashSz)
+    table.cell(dash, 0, 7, "進場預兆", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 7, entryPreRowVal, text_color=entryPreRowVal == "無" ? color.gray : color.new(#facc15, 0), text_size=_dashSz)
+    table.cell(dash, 0, 8, "進場參考價", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 8, f_fmt(_curEntry), text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 0, 9, "SL 停損", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 9, f_fmt(_curSL), text_color=color.new(colSL, 0), text_size=_dashSz)
+    table.cell(dash, 0, 10, "TP1", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 10, f_fmt(_curTP1), text_color=color.new(colTP1, 0), text_size=_dashSz)
+    table.cell(dash, 0, 11, "TP2", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 11, f_fmt(_curTP2), text_color=color.new(colTP2, 0), text_size=_dashSz)
+    table.cell(dash, 0, 12, "TP3", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 12, f_fmt(_curTP3), text_color=color.new(colTP3, 0), text_size=_dashSz)
+    table.cell(dash, 0, 13, "出場預兆", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 13, exitPreRowVal, text_color=exitPreRowVal == "無" ? color.gray : color.new(color.orange, 0), text_size=_dashSz)
+    table.cell(dash, 0, 14, "自我追蹤勝率", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 14, showWinStats ? winRowVal : "已關閉", text_color=color.new(#FFCC00, 0), text_size=_dashSz)
+    table.cell(dash, 0, 15, "追蹤中筆數", text_color=color.white, text_size=_dashSz)
+    table.cell(dash, 1, 15, str.tostring(openTrades), text_color=color.white, text_size=_dashSz)
 
 // ══════════════════════════════════════════════════════════════
 // 警報
