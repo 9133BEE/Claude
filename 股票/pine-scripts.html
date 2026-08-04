@@ -878,7 +878,8 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>進出場預兆提示</b>：改為統一顯示在儀表板的「進場預兆」「出場預兆」兩列文字狀態（SWEEP後未確認MSS→醞釀中；接近TP或出現反向結構→留意出場），不再於圖表上額外貼標籤，避免小標籤看不懂<br>
       <span class="vl-dot">›</span> <b>訊號勝率自我追蹤</b>：內建近似值統計（先中 SL 記負、先中 TP1/2/3 記勝），儀表板即時顯示勝率%與樣本數，可依日期篩選區間，方便自行驗證不同商品/週期的實際表現<br>
       <span class="vl-dot">›</span> <b>全客製化</b>：MSS/SWEEP/FVG/OB/OTE/AMD/TP-SL/預兆/儀表板每個模組都有獨立顯示開關、顏色、透明度設定；文字大小、線條粗細/樣式為全局設定；儀表板另有位置與字體大小選項<br>
-      <span class="vl-dot">›</span> <b>時框自動對應</b>：切換圖表時框時 MSS樞紐K數、SWEEP回看K數、OB搜尋深度、HTF配對（5分→1H、15分→4H、1H→日線等）皆自動切換，關閉「自動調整」可改手動設定
+      <span class="vl-dot">›</span> <b>時框自動對應</b>：切換圖表時框時 MSS樞紐K數、SWEEP回看K數、OB搜尋深度、HTF配對（5分→1H、15分→4H、1H→日線等）皆自動切換，關閉「自動調整」可改手動設定<br>
+      <span class="vl-dot">›</span> <b>2026-08-04 修正：訊號太密集</b> — 原本裸結構突破一有 Pivot 被突破就觸發，雜訊很多；新增「最小突破幅度(ATR倍數)」過濾雜訊假突破 + 「同方向訊號冷卻K棒數」避免連續假突破洗出一堆密集訊號，兩者皆可在 MSS 設定內自行調整或關閉（設0）
     </div>
     <div class="tips-box">
       <h4>誠實揭露（務必閱讀）</h4>
@@ -12583,12 +12584,17 @@ grpM  = "MSS / CHoCH（結構突破）"
 showM = input.bool(true, "顯示 MSS", group=grpM)
 mPivL_m = input.int(5, "左側K數（手動用）", minval=2, maxval=30, group=grpM)
 mPivR_m = input.int(3, "右側K數（手動用）", minval=1, maxval=15, group=grpM)
+mssMinBreakATR = input.float(0.15, "最小突破幅度（ATR倍數）", minval=0.0, maxval=2.0, step=0.05, group=grpM,
+     tooltip="收盤需超過前波高/低至少此ATR倍數才算有效突破，用來過濾雜訊假突破；數值越大訊號越少但越乾淨，設0關閉此過濾")
+sigCooldownBars = input.int(10, "同方向訊號冷卻K棒數", minval=0, maxval=200, group=grpM,
+     tooltip="同方向訊號觸發後，至少要再等這麼多根K棒才能觸發下一次同方向訊號，避免連續假突破洗出一堆密集訊號；設0代表不冷卻")
 mColB = input.color(#22c55e, "Bull 顏色", group=grpM)
 mColR = input.color(#ef4444, "Bear 顏色", group=grpM)
 mTrp  = input.int(0, "透明度", minval=0, maxval=95, step=5, group=grpM)
 
 _mPivL = autoAdapt ? _autoPivL : mPivL_m
 _mPivR = autoAdapt ? _autoPivR : mPivR_m
+_mssAtr = ta.atr(14)
 
 phH = ta.pivothigh(high, _mPivL, _mPivR)
 plL = ta.pivotlow(low, _mPivL, _mPivR)
@@ -12606,8 +12612,22 @@ if not na(plL)
     lastPL    := plL
     lastPLBar := bar_index - _mPivR
 
-bullMSS = not na(lastPH) and close > lastPH and not (close[1] > lastPH)
-bearMSS = not na(lastPL) and close < lastPL and not (close[1] < lastPL)
+_bullThresh = lastPH + _mssAtr * mssMinBreakATR
+_bearThresh = lastPL - _mssAtr * mssMinBreakATR
+
+_bullBreak = not na(lastPH) and close > _bullThresh and not (close[1] > _bullThresh)
+_bearBreak = not na(lastPL) and close < _bearThresh and not (close[1] < _bearThresh)
+
+var int lastBullSigBar = na
+var int lastBearSigBar = na
+
+bullMSS = _bullBreak and (sigCooldownBars <= 0 or na(lastBullSigBar) or (bar_index - lastBullSigBar) >= sigCooldownBars)
+bearMSS = _bearBreak and (sigCooldownBars <= 0 or na(lastBearSigBar) or (bar_index - lastBearSigBar) >= sigCooldownBars)
+
+if bullMSS
+    lastBullSigBar := bar_index
+if bearMSS
+    lastBearSigBar := bar_index
 
 if showM and bullMSS
     line.new(lastPHBar, lastPH, bar_index + 10, lastPH, color=color.new(mColB, mTrp), width=gLnW, style=_lst)
