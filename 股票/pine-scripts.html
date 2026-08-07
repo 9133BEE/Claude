@@ -129,7 +129,8 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">ATO訂單流</button>
   <button class="filter-btn" data-cat="algo" onclick="filt('algo',this)">AlgoAlpha</button>
   <button class="filter-btn" data-cat="scalp" onclick="filt('scalp',this)">剝頭皮</button>
-  <button class="filter-btn" data-cat="tool" onclick="filt('tool',this)">工具指標</button>
+  <button class="filter-btn" data-cat="ema" onclick="filt('ema',this)">EMA</button>
+  <button class="filter-btn" data-cat="zvqzlcci" onclick="filt('zvqzlcci',this)">ZVQZL+CCI</button>
 </div>
 
 <div class="grid" id="grid">
@@ -1020,9 +1021,9 @@ if showDash and barstate.islast
 </div>
 
 <!-- ─── EMA 雙線合併版 ─── -->
-<div class="scard" data-cat="tool">
+<div class="scard" data-cat="ema">
   <div class="scard-header">
-    <span class="scard-badge badge-trend">工具指標</span>
+    <span class="scard-badge badge-trend">EMA</span>
     <div class="scard-meta">
       <div class="scard-title">EMA(V1) — 雙線合併版</div>
       <div class="scard-desc">改寫自 TradingView 內建 EMA 指標，把原本要加兩次的兩條EMA合併成一個腳本一次設定：各自獨立長度/來源/偏移/平滑MA(含布林通道)，預設 EMA1=144(橘)、EMA2=377(藍)，比照原生EMA指標，顏色可在「樣式」分頁自行調整每條線</div>
@@ -1047,9 +1048,9 @@ if showDash and barstate.islast
 </div>
 
 <!-- ─── ZVQZL + CCI 合併版 ─── -->
-<div class="scard" data-cat="tool">
+<div class="scard" data-cat="zvqzlcci">
   <div class="scard-header">
-    <span class="scard-badge badge-trend">工具指標</span>
+    <span class="scard-badge badge-trend">ZVQZL+CCI</span>
     <div class="scard-meta">
       <div class="scard-title">ZVQZL + CCI(V1) — 合併版</div>
       <div class="scard-desc">把 ZVQZL(VQZL Z-Score，含25種MA模式可選)與 CCI(商品通道指數，含平滑MA/布林通道)兩個原本要分開加的副圖指標合併成一個腳本，兩組輸入各自獨立分區，一次加入即可同時看到兩條線</div>
