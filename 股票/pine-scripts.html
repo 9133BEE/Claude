@@ -970,6 +970,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 再修：標籤更簡短、alert加SL與點數</b> — 圖表標籤精簡成純「Open 7777.5」「Close 7780.8」（不再帶Buy/Sell to字樣）；進場alert新增「(SL-價格)」（未開緊急停損時顯示「SL-SMA轉向」）；出場alert新增「(±點數)」顯示這筆交易實際賺賠幾點，例如「Buy to Open 7777.5 (TP-7780.8)(SL-7770.8) NQ1! 5」「Sell to Close (4398.5→4401.9) (+3.4) NQ1! 5」<br>
       <span class="vl-dot">›</span> <b>2026-08-08 修正：圖表標籤與alert文字分開</b> — 標籤太密集會互相重疊蓋住不好讀，改成圖表標籤只顯示簡短的「Buy to Open 7777.5」「Sell to Close 7780.8」；詳細版（含TP預估值、建倉→平倉箭頭、商品代碼+時框）只出現在alert提示訊息裡，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：進場文字附成交價+預估平倉值</b> — 進場訊息改為「Buy to Open 4398.5 (TP~4405.2)」這種格式，成交價後面加上「TP~」預估平倉值（取當下的高/低價MA帶狀目標，會隨後續K棒持續更新，所以標記~表示估計值，實際出場價以出場訊息為準）<br>
       <span class="vl-dot">›</span> <b>2026-08-08 改回：Buy/Sell措辭 + 建倉平倉箭頭</b> — 提示字改回原本的「Buy to Open」「Sell to Close」（空方為「Sell to Open」「Buy to Close」）；進場文字不附價格，出場文字附上「(建倉價→平倉價)」箭頭方便比對，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
@@ -14762,8 +14763,9 @@ if longCond and barstate.isconfirmed
     lastEntryDir   := 1
     if useEmergencyStop
         strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
-    _labelMsg = longEntryText + " " + str.tostring(close, "#.#")
-    _alertMsg = longEntryText + " " + str.tostring(close, "#.#") + " (TP~" + str.tostring(highMA, "#.#") + ")"
+    _labelMsg = "Open " + str.tostring(close, "#.#")
+    _slPart = useEmergencyStop ? "(SL-" + str.tostring(emergencyStop, "#.#") + ")" : "(SL-SMA轉向)"
+    _alertMsg = longEntryText + " " + str.tostring(close, "#.#") + " (TP-" + str.tostring(highMA, "#.#") + ")" + _slPart
     f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
     if enableAlerts
         alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
@@ -14777,15 +14779,19 @@ if shortCond and barstate.isconfirmed
     lastEntryDir   := -1
     if useEmergencyStop
         strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
-    _labelMsg = shortEntryText + " " + str.tostring(close, "#.#")
-    _alertMsg = shortEntryText + " " + str.tostring(close, "#.#") + " (TP~" + str.tostring(lowMA, "#.#") + ")"
+    _labelMsg = "Open " + str.tostring(close, "#.#")
+    _slPart = useEmergencyStop ? "(SL-" + str.tostring(emergencyStop, "#.#") + ")" : "(SL-SMA轉向)"
+    _alertMsg = shortEntryText + " " + str.tostring(close, "#.#") + " (TP-" + str.tostring(lowMA, "#.#") + ")" + _slPart
     f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
     if enableAlerts
         alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
 
-f_exitMsg(_txt, _exitPx) => _txt + " (" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ")"
+f_exitMsg(_txt, _exitPx, _dir) =>
+    _pts = _dir == 1 ? _exitPx - entryPrice : entryPrice - _exitPx
+    _ptsStr = (_pts >= 0 ? "+" : "") + str.tostring(_pts, "#.#")
+    _txt + " (" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ") (" + _ptsStr + ")"
 
 // ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
 if strategy.position_size > 0
@@ -14796,8 +14802,8 @@ if strategy.position_size > 0
         _reason = tpHit ? "TP觸高軌" : slHit ? "SL SMA轉弱" : "逾時出場"
         strategy.close("Long", comment=_reason)
         pendingManualLongClose := true
-        _labelMsg = longExitText + " " + str.tostring(close, "#.#")
-        _alertMsg = f_exitMsg(longExitText, close)
+        _labelMsg = "Close " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(longExitText, close, 1)
         f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
@@ -14815,8 +14821,8 @@ if strategy.position_size < 0
         _reason = tpHit ? "TP觸低軌" : slHit ? "SL SMA轉強" : "逾時出場"
         strategy.close("Short", comment=_reason)
         pendingManualShortClose := true
-        _labelMsg = shortExitText + " " + str.tostring(close, "#.#")
-        _alertMsg = f_exitMsg(shortExitText, close)
+        _labelMsg = "Close " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, close, -1)
         f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
@@ -14834,8 +14840,8 @@ if longFlipToFlat
     if pendingManualLongClose
         pendingManualLongClose := false
     else
-        _labelMsg = longExitText + " " + str.tostring(emergencyStop, "#.#")
-        _alertMsg = f_exitMsg(longExitText, emergencyStop)
+        _labelMsg = "Close " + str.tostring(emergencyStop, "#.#")
+        _alertMsg = f_exitMsg(longExitText, emergencyStop, 1)
         f_mkLabel(bar_index, emergencyStop, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
@@ -14849,8 +14855,8 @@ if shortFlipToFlat
     if pendingManualShortClose
         pendingManualShortClose := false
     else
-        _labelMsg = shortExitText + " " + str.tostring(emergencyStop, "#.#")
-        _alertMsg = f_exitMsg(shortExitText, emergencyStop)
+        _labelMsg = "Close " + str.tostring(emergencyStop, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, emergencyStop, -1)
         f_mkLabel(bar_index, emergencyStop, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
@@ -15062,14 +15068,14 @@ ssfLength = input.int(20, "EDSMA - Super Smoother Filter Length", minval=1, grou
 ssfPoles  = input.int(2, "EDSMA - Super Smoother Filter Poles", options=[2, 3], group=grpZAdv)
 
 //IDWMA
-calcWeight(src, length, i) =>
+calcWeight(series float src, series int length, series int i) =>
     distanceSum = 0.0
     for j = 0 to length - 1
         distanceSum := distanceSum + math.abs(nz(src[i]) - nz(src[j]))
     distanceSum
 
 //HCF
-f(x) =>
+f(series float x) =>
     0.5*(1 - math.cos(x*3.14159))
 
 d(x,length) =>
@@ -15117,34 +15123,34 @@ get3PoleSSF(src, length) =>
     ssf := coef1 * src + coef2 * nz(ssf[1]) + coef3 * nz(ssf[2]) + coef4 * nz(ssf[3])
 
 
-vqzlMA(type, src, len) =>
+vqzlMA(series string maType, series float src, series int len) =>
     float result = 0
-    if type=="TMA"
+    if maType=="TMA"
         result := ta.sma(ta.sma(src, int(math.ceil(len / 2))), int(math.floor(len / 2)) + 1)
-    if type=="SMA"
+    if maType=="SMA"
         result := ta.sma(src, len)
-    if type=="EMA"
+    if maType=="EMA"
         result := ta.ema(src, len)
-    if type=="DEMA"
+    if maType=="DEMA"
         e = ta.ema(src, len)
         result := 2 * e - ta.ema(e, len)
-    if type=="TEMA"
+    if maType=="TEMA"
         e = ta.ema(src, len)
         result := 3 * (e - ta.ema(e, len)) + ta.ema(ta.ema(e, len), len)
-    if type=="WMA"
+    if maType=="WMA"
         result := ta.wma(src, len)
-    if type=="VWMA"
+    if maType=="VWMA"
         result := ta.vwma(src, len)
-    if type=="SMMA"
+    if maType=="SMMA"
         w = ta.wma(src, len)
         result := na(w[1]) ? ta.sma(src, len) : (w[1] * (len - 1) + src) / len
-    if type=="HMA"
+    if maType=="HMA"
         result := ta.wma(2 * ta.wma(src, int(len / 2)) - ta.wma(src, len), int(math.round(math.sqrt(len))))
-    if type=="LSMA"
+    if maType=="LSMA"
         result := ta.linreg(src, len, lsma_offset)
-    if type=="ALMA"
+    if maType=="ALMA"
         result := ta.alma(src, len, alma_offset, alma_sigma)
-    if type=="JMA"
+    if maType=="JMA"
         phaseRatio = jurik_phase < -100 ? 0.5 : jurik_phase > 100 ? 2.5 : jurik_phase / 100 + 1.5
         jbeta = 0.45 * (len - 1) / (0.45 * (len - 1) + 2)
         alpha = math.pow(jbeta, jurik_power)
@@ -15157,13 +15163,13 @@ vqzlMA(type, src, len) =>
         e2 := (e0 + phaseRatio * e1 - nz(jma[1])) * math.pow(1 - alpha, 2) + math.pow(alpha, 2) * nz(e2[1])
         jma := e2 + nz(jma[1])
         result := jma
-    if type=="VAMA"
+    if maType=="VAMA"
         mid = ta.ema(src,len)
         dev = src-mid
         vol_up = ta.highest(dev,volatility_lookback)
         vol_down = ta.lowest(dev,volatility_lookback)
         result := mid+math.avg(vol_up,vol_down)
-    if type=="FRAMA"
+    if maType=="FRAMA"
         int len1 = len/2
         e = 2.7182818284590452353602874713527
         w = math.log(2/(frama_SC+1)) / math.log(e)
@@ -15189,11 +15195,11 @@ vqzlMA(type, src, len) =>
         frama = 0.0
         frama := (1-alpha)*nz(frama[1]) + alpha*src
         result := frama
-    if type=="ZLEMA"
+    if maType=="ZLEMA"
         f_lag = (len - 1) / 2
         f_data = src + (src - src[f_lag])
         result := ta.ema(f_data, len)
-    if type=="KAMA"
+    if maType=="KAMA"
         mom = math.abs(ta.change(src, len))
         volatility = math.sum(math.abs(ta.change(src)), len)
         er = volatility != 0 ? mom / volatility : 0
@@ -15203,19 +15209,19 @@ vqzlMA(type, src, len) =>
         kama = 0.0
         kama := sc * src + (1 - sc) * nz(kama[1])
         result := kama
-    if type=="Kijun"
+    if maType=="Kijun"
         kijun = math.avg(ta.lowest(len), ta.highest(len))
         result := kijun
-    if type=="Kijun v2"
+    if maType=="Kijun v2"
         kijun = math.avg(ta.lowest(len), ta.highest(len))
         conversionLine = math.avg(ta.lowest(int(len/2)), ta.highest(int(len/2)))
         delta = (kijun + conversionLine)/2
         result := delta
-    if type=="McGinley"
+    if maType=="McGinley"
         mg = 0.0
         mg := na(mg[1]) ? ta.ema(src, len) : mg[1] + (src - mg[1]) / (len * math.pow(src/mg[1], 4))
         result := mg
-    if type=="IDWMA"
+    if maType=="IDWMA"
         idwSum = 0.0
         weightSum = 0.0
         for i = 0 to len - 1
@@ -15224,7 +15230,7 @@ vqzlMA(type, src, len) =>
             weightSum := weightSum + weight
         idwma = idwSum / weightSum
         result := idwma
-    if type=="FLMSA"
+    if maType=="FLMSA"
         n = bar_index
         b = 0.
         e = ta.sma(math.abs(src - nz(b[1])),len)
@@ -15233,7 +15239,7 @@ vqzlMA(type, src, len) =>
         a = (n - ta.sma(n,len))/ta.stdev(n,len) * r
         b := ta.sma(src,len) + a*ta.stdev(src,len)
         result := b
-    if type=="PEMA"
+    if maType=="PEMA"
         ema1 = ta.ema(src, len)
         ema2 = ta.ema(ema1, len)
         ema3 = ta.ema(ema2, len)
@@ -15244,16 +15250,16 @@ vqzlMA(type, src, len) =>
         ema8 = ta.ema(ema7, len)
         pema = 8 * ema1 - 28 * ema2 + 56 * ema3 - 70 * ema4 + 56 * ema5 - 28 * ema6 + 8 * ema7 - ema8
         result := pema
-    if type=="HCF"
+    if maType=="HCF"
         output = 0.
         output := filter(src, nz(output[1],src), len)
         result := output
-    if type=="TIF"
+    if maType=="TIF"
         b = 0.0
         a = ta.rising(src,len) or ta.falling(src,len) ? 1 : 0
         b := ta.ema(a*src+(1-a)*nz(b[1],src),center)
         result := b
-    if type=="MF"
+    if maType=="MF"
         ts=0.,b=0.,c=0.,os=0.
         alpha = 2/(len+1)
         a = feedback ? z*src + (1-z)*nz(ts[1],src) : src
@@ -15264,7 +15270,7 @@ vqzlMA(type, src, len) =>
         lower = beta*c+(1-beta)*b
         ts := os*upper+(1-os)*lower
         result := ts
-    if type=="ARMA"
+    if maType=="ARMA"
         maARMA = 0.
         mad = 0.
         src2 = zl ? src + ta.change(src,int(len/2)) : src
@@ -15272,7 +15278,7 @@ vqzlMA(type, src, len) =>
         dARMA = ta.cum(math.abs(src2[len] - maARMA))/bar_index * gamma
         mad := ta.sma(ta.sma(src2 > nz(mad[1],src2) + dARMA ? src2 + dARMA : src2 < nz(mad[1],src) - dARMA ? src2 - dARMA : nz(mad[1],src2),len),len)
         result := mad
-    if type=="DAF"
+    if maType=="DAF"
         AC = zl ? 1 : 0
         out = 0.
         K = 0.
@@ -15280,7 +15286,7 @@ vqzlMA(type, src, len) =>
         out := nz(out[1],src2) + nz(K[1])*(src2 - nz(out[1],src2)) + AC*(nz(K[1])*(src2 - ta.sma(src2,len)))
         K := math.abs(src2 - out)/(math.abs(src2 - out) + ta.stdev(src2,len)*len)
         result := out
-    if type=="WRMA"
+    if maType=="WRMA"
         alpha = 2/(len+1)
         p1 = zl ? int(len/4) : 1
         p2 = zl ? int(len/4) : int(len/2)
@@ -15294,10 +15300,10 @@ vqzlMA(type, src, len) =>
         A := src - y
         B := src - ta.ema(y,p2)
         result := y
-    if type=="RMA"
+    if maType=="RMA"
         maRMA = ta.sma(src,len*3) + ta.sma(src,len*2) - ta.sma(src,len)
         result := maRMA
-    if type=="RAF"
+    if maType=="RAF"
         altma = 0.0
         AR = 2*(ta.highest(len) - ta.lowest(len))
         BR = 2*(ta.highest(len*2) - ta.lowest(len*2))
@@ -15310,7 +15316,7 @@ vqzlMA(type, src, len) =>
         AltK = fixnan(math.pow(Factor >= 1 ? 1 : Factor,math.sqrt(len)))*(1/len)
         altma := AltK*src+(1-AltK)*nz(altma[1],src)
         result := altma
-    if type=="GF"
+    if maType=="GF"
         b = 0.0
         dGF = 0.0
         p = int(len/beta)
@@ -15319,13 +15325,13 @@ vqzlMA(type, src, len) =>
         c = b - nz(dGF[p],b)
         dGF := nz(dGF[1],src) + (zeta*a+(1-zeta)*c)/p*gamma
         result := dGF
-    if type=="A2RMA"
+    if maType=="A2RMA"
         er = math.abs(ta.change(src,len))/math.sum(math.abs(ta.change(src)),len)
         ma = 0.
         dA2 = ta.cum(math.abs(src - nz(ma[1],src)))/bar_index * gamma
         ma := ama(er,ama(er,src > nz(ma[1],src) + dA2 ? src + dA2 : src < nz(ma[1],src) - dA2 ? src - dA2 : nz(ma[1],src)))
         result := ma
-    if type=="EDSMA"
+    if maType=="EDSMA"
         zeros = src - nz(src[2])
         avgZeros = (zeros + zeros[1]) / 2
         ssf = ssfPoles == 2 ? get2PoleSSF(avgZeros, ssfLength) : get3PoleSSF(avgZeros, ssfLength)
