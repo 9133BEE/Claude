@@ -969,6 +969,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 修正：標籤價格小數點統一顯示1位</b> — OPEN/CLOSE標籤與alert訊息裡的價格原本用format.mintick(依商品跳動點顯示，可能2位以上)，改成固定顯示小數點後1位<br>
       <span class="vl-dot">›</span> <b>2026-08-08 重做：儀表板改列更直觀的資訊</b> — 拿掉「趨勢狀態」「SMA斜率」「持倉K棒數」這幾個不夠直覺的欄位，改成：目前狀態、最近建倉點(方向+價格，不管有沒有持倉都看得到)、停利(TP)、停損(SL)、距離TP/SL(還差多少點)、未實現損益、上一筆已平倉損益(紅綠配色)、策略勝率、淨損益，一眼就能看懂現在/最近一筆交易的關鍵數字<br>
       <span class="vl-dot">›</span> <b>2026-08-08 修正：帶狀線預設粗細統一</b> — 高價MA(上軌)、低價MA(下軌)原本linewidth=1(最細)，跟中期SMA的linewidth=2不一致；改成三條線統一預設為第二級粗細<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：連接線可自訂顏色/樣式</b> — 「顯示建倉→平倉連接線」新增「連接線顏色」「連接線透明度(%)」「連接線樣式」(實線/虛線/點線)設定，不再固定寫死深灰虛線<br>
@@ -14753,7 +14754,7 @@ if longCond and barstate.isconfirmed
     lastEntryDir   := 1
     if useEmergencyStop
         strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
-    _msg = longEntryText + " " + str.tostring(close, format.mintick)
+    _msg = longEntryText + " " + str.tostring(close, "#.#")
     f_mkLabel(bar_index, close, _msg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
     if enableAlerts
         alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
@@ -14767,14 +14768,14 @@ if shortCond and barstate.isconfirmed
     lastEntryDir   := -1
     if useEmergencyStop
         strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
-    _msg = shortEntryText + " " + str.tostring(close, format.mintick)
+    _msg = shortEntryText + " " + str.tostring(close, "#.#")
     f_mkLabel(bar_index, close, _msg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
     if enableAlerts
         alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
 
-f_exitMsg(_txt, _exitPx) => _txt + " " + str.tostring(_exitPx, format.mintick)
+f_exitMsg(_txt, _exitPx) => _txt + " " + str.tostring(_exitPx, "#.#")
 
 // ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
 if strategy.position_size > 0
