@@ -1069,11 +1069,13 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>ZVQZL 設定</b>：Price Smoothing=15、MA Mode=SMMA、Threshold 1/2/3=1.64/1.96/2.58、Z Length=100，其餘25種MA模式(TMA/ALMA/EMA/DEMA/TEMA/WMA/VWMA/SMA/HMA/LSMA/JMA/VAMA/FRAMA/ZLEMA/KAMA/Kijun/Kijun v2/McGinley/IDWMA/FLMSA/PEMA/HCF/TIF/MF/ARMA/DAF/WRMA/RMA/RAF/GF/A2RMA/EDSMA)專屬參數皆保留可調<br>
       <span class="vl-dot">›</span> <b>CCI 設定</b>：長度100、來源(H+L+C)/3，平滑MA類型SMA、長度5、布林標準差2(未選布林通道時為灰階)，與原生CCI指標一致<br>
       <span class="vl-dot">›</span> <b>顯示</b>：兩者皆為副圖(不是overlay)，會顯示在同一個副圖窗格，Z-Score(約±3內)與CCI(約±100~200)刻度差異大，建議加入後在圖上右鍵任一條線選「移動至新窗格/右側刻度」分開來看，這是TradingView內建的圖表操作，不影響腳本邏輯<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 更新</b>：腳本標題改為「ZVQZL + CCI(V1)」，與站上其他腳本的版本命名方式(如Entry Model(V1)、Scalping trade(V1))統一
+      <span class="vl-dot">›</span> <b>2026-08-08 更新</b>：腳本標題改為「ZVQZL + CCI(V1)」，與站上其他腳本的版本命名方式(如Entry Model(V1)、Scalping trade(V1))統一<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 修正：合併後Z-Score看起來變成一條平線</b> — 這不是計算錯誤，是Z-Score(數值通常在±3以內)和CCI(數值可到±100~200)共用同一個副圖刻度時，CCI的量級太大會把Z-Score的面積圖壓扁到幾乎看不出顏色變化。新增「顯示模式」選單(只顯示ZVQZL／只顯示CCI／兩者都顯示)，預設兩者都顯示；如果覺得疊在一起刻度被壓扁，可以先切換成只看其中一個，或參考下方「誠實揭露」的手動分開刻度做法
     </div>
     <div class="tips-box">
       <h4>誠實揭露（務必閱讀）</h4>
       <p>ZVQZL原始碼是Pine v4，我這邊沒有TradingView編譯器可以實際跑一次confirm，是逐行手動把舊版全域函式改寫成v6命名空間、並解決兩個腳本合併後的變數/函式撞名問題（例如兩邊都用過"ma"這個名字），邏輯上已盡量對照原文一一核對，但25種MA模式參數眾多，仍有可能有漏改或型別不符（例如某些除法產生的長度需要轉成整數才能丟進ta.*函式，這幾處我都已補上int()轉型）。貼上TradingView後如果編譯出現紅字錯誤，麻煩把錯誤訊息貼給我，我可以照著訊息直接修正。</p>
+      <p><b>關於刻度</b>：Z-Score和CCI量級差很多，若選「兩者都顯示」又想兩條線同時看到正常大小，需要手動分開刻度：在圖上直接點一下CCI那條線把它選取，接著把右側該線的價格標籤往下拖曳到副圖窗格外(會出現「移到新窗格」的提示)放開，CCI就會分到自己的窗格，Z-Score留在原本窗格用自己的刻度顯示；這個設定只要做一次，之後都會記住。</p>
     </div>
     <button class="copy-bar-btn" onclick="copyZvqzlCci(this)" style="margin-top:10px">一鍵複製腳本</button>
     <div class="code-block" id="zvqzl-cci-code"></div>
@@ -14759,10 +14761,11 @@ if longCond and barstate.isconfirmed
     lastEntryDir   := 1
     if useEmergencyStop
         strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
-    _msg = longEntryText + " " + str.tostring(close, "#.#") + " (TP~" + str.tostring(highMA, "#.#") + ")"
-    f_mkLabel(bar_index, close, _msg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
+    _labelMsg = longEntryText + " " + str.tostring(close, "#.#")
+    _alertMsg = longEntryText + " " + str.tostring(close, "#.#") + " (TP~" + str.tostring(highMA, "#.#") + ")"
+    f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
     if enableAlerts
-        alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 if shortCond and barstate.isconfirmed
     strategy.entry("Short", strategy.short)
@@ -14773,10 +14776,11 @@ if shortCond and barstate.isconfirmed
     lastEntryDir   := -1
     if useEmergencyStop
         strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
-    _msg = shortEntryText + " " + str.tostring(close, "#.#") + " (TP~" + str.tostring(lowMA, "#.#") + ")"
-    f_mkLabel(bar_index, close, _msg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
+    _labelMsg = shortEntryText + " " + str.tostring(close, "#.#")
+    _alertMsg = shortEntryText + " " + str.tostring(close, "#.#") + " (TP~" + str.tostring(lowMA, "#.#") + ")"
+    f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
     if enableAlerts
-        alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
 
@@ -15006,6 +15010,12 @@ indicator(title="ZVQZL + CCI(V1)", shorttitle="ZVQZL+CCI(V1)", format=format.pri
 // CCI 為 TradingView 內建 Commodity Channel Index。
 // 兩者原本各自的 MA 切換函式/變數與 CCI 的通用平滑函式重名，合併時已個別更名避免衝突。
 // ══════════════════════════════════════════════════════════════════════════
+
+// ========================= 顯示模式 =========================
+grpDisp = "顯示模式"
+dispMode = input.string("兩者都顯示", "顯示模式", options=["只顯示ZVQZL","只顯示CCI","兩者都顯示"], group=grpDisp, tooltip="Z-Score(約±3內)與CCI(約±100~200)數值差距很大，共用同一個副圖刻度時，兩者都顯示會讓Z-Score看起來被壓成一條平線。建議先選其中一個單獨看，或選兩者都顯示後在圖上把其中一條線拖曳到獨立刻度/新窗格")
+showZ   = dispMode != "只顯示CCI"
+showCCI = dispMode != "只顯示ZVQZL"
 
 // ========================= ZVQZL =========================
 grpZ = "ZVQZL"
@@ -15361,7 +15371,7 @@ chgPAS = PAS and not PAS[1]
 
 secolor = z2 > (vq0_mid + vq0_th) and z2 < (vq0_mid + vq0_th2) ? color.yellow : z2 > (vq0_mid + vq0_th2) and z2 < (vq0_mid + vq0_th3) ? color.orange : z2 > (vq0_mid + vq0_th3) ? color.green : z2 < (vq0_mid - vq0_th) and z2 > (vq0_mid - vq0_th2) ? color.yellow : z2 < (vq0_mid - vq0_th2) and z2 > (vq0_mid - vq0_th3) ? color.orange : z2 < (vq0_mid - vq0_th3) ? color.red : color.gray
 
-plot(z2, title = "Z Score ATR", color=secolor, style=plot.style_area)
+plot(showZ ? z2 : na, title = "Z Score ATR", color=secolor, style=plot.style_area)
 
 // ========================= CCI =========================
 grpC = "CCI"
@@ -15369,7 +15379,7 @@ cciLength = input.int(100, "長度", minval=1, group=grpC)
 cciSrc    = input.source(hlc3, "來源", group=grpC)
 cciBaseline = ta.sma(cciSrc, cciLength)
 cci = (cciSrc - cciBaseline) / (0.015 * ta.dev(cciSrc, cciLength))
-plot(cci, "CCI", color=#2962FF)
+plot(showCCI ? cci : na, "CCI", color=#2962FF)
 cciBand1 = hline(100, "Upper Band", color=#787B86, linestyle=hline.style_dashed)
 hline(0, "Middle Band", color=color.new(#787B86, 50))
 cciBand0 = hline(-100, "Lower Band", color=#787B86, linestyle=hline.style_dashed)
@@ -15394,10 +15404,10 @@ cciSmoothFn(source, length, MAtype) =>
 
 cciSmoothingMA = cciEnableMA ? cciSmoothFn(cci, cciMaLen, cciMaType) : na
 cciSmoothingStDev = cciIsBB ? ta.stdev(cci, cciMaLen) * cciBbMult : na
-plot(cciSmoothingMA, "CCI-based MA", color=color.yellow, display=cciEnableMA ? display.all : display.none, editable=cciEnableMA)
-cciBbUpper = plot(cciSmoothingMA + cciSmoothingStDev, "Upper Bollinger Band", color=color.green, display=cciIsBB ? display.all : display.none, editable=cciIsBB)
-cciBbLower = plot(cciSmoothingMA - cciSmoothingStDev, "Lower Bollinger Band", color=color.green, display=cciIsBB ? display.all : display.none, editable=cciIsBB)
-fill(cciBbUpper, cciBbLower, color=cciIsBB ? color.new(color.green, 90) : na, title="CCI Bollinger Bands Background Fill", display=cciIsBB ? display.all : display.none, editable=cciIsBB)
+plot(cciSmoothingMA, "CCI-based MA", color=color.yellow, display=(cciEnableMA and showCCI) ? display.all : display.none, editable=cciEnableMA)
+cciBbUpper = plot(cciSmoothingMA + cciSmoothingStDev, "Upper Bollinger Band", color=color.green, display=(cciIsBB and showCCI) ? display.all : display.none, editable=cciIsBB)
+cciBbLower = plot(cciSmoothingMA - cciSmoothingStDev, "Lower Bollinger Band", color=color.green, display=(cciIsBB and showCCI) ? display.all : display.none, editable=cciIsBB)
+fill(cciBbUpper, cciBbLower, color=cciIsBB ? color.new(color.green, 90) : na, title="CCI Bollinger Bands Background Fill", display=(cciIsBB and showCCI) ? display.all : display.none, editable=cciIsBB)
 `;
 
 document.getElementById('zvqzl-cci-code').textContent = ZVQZL_CCI_V1;
