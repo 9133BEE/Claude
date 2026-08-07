@@ -969,6 +969,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 重做：儀表板改列更直觀的資訊</b> — 拿掉「趨勢狀態」「SMA斜率」「持倉K棒數」這幾個不夠直覺的欄位，改成：目前狀態、最近建倉點(方向+價格，不管有沒有持倉都看得到)、停利(TP)、停損(SL)、距離TP/SL(還差多少點)、未實現損益、上一筆已平倉損益(紅綠配色)、策略勝率、淨損益，一眼就能看懂現在/最近一筆交易的關鍵數字<br>
       <span class="vl-dot">›</span> <b>2026-08-08 修正：帶狀線預設粗細統一</b> — 高價MA(上軌)、低價MA(下軌)原本linewidth=1(最細)，跟中期SMA的linewidth=2不一致；改成三條線統一預設為第二級粗細<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：連接線可自訂顏色/樣式</b> — 「顯示建倉→平倉連接線」新增「連接線顏色」「連接線透明度(%)」「連接線樣式」(實線/虛線/點線)設定，不再固定寫死深灰虛線<br>
       <span class="vl-dot">›</span> <b>2026-08-08 修正：標籤位置改貼在實際價格上</b> — 原本OPEN/CLOSE標籤固定畫在當根K棒的最高/最低點，跟文字顯示的實際成交價經常對不上；改成標籤直接畫在文字寫的那個價格上（進場/一般出場用close、緊急停損補標用emergencyStop），標籤位置跟數字終於一致，不會再全部擠在最上緣或最下緣<br>
@@ -14735,17 +14736,21 @@ longCond  = isUptrend   and allowLong  and low  <= lowMA  and strategy.position_
 shortCond = isDowntrend and allowShort and high >= highMA and strategy.position_size == 0
 
 // ========================= 進場 =========================
-var int   entryBar      = na
-var float entryPrice    = na
-var float emergencyStop = na
-var bool  pendingManualLongClose  = false
-var bool  pendingManualShortClose = false
+var int    entryBar       = na
+var float  entryPrice     = na
+var float  emergencyStop  = na
+var bool   pendingManualLongClose  = false
+var bool   pendingManualShortClose = false
+var float  lastEntryPrice = na
+var int    lastEntryDir   = 0
 
 if longCond and barstate.isconfirmed
     strategy.entry("Long", strategy.long)
     entryBar      := bar_index
     entryPrice    := close
     emergencyStop := close - _atrEmg * emergencyAtrMult
+    lastEntryPrice := close
+    lastEntryDir   := 1
     if useEmergencyStop
         strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
     _msg = longEntryText + " " + str.tostring(close, format.mintick)
@@ -14758,6 +14763,8 @@ if shortCond and barstate.isconfirmed
     entryBar      := bar_index
     entryPrice    := close
     emergencyStop := close + _atrEmg * emergencyAtrMult
+    lastEntryPrice := close
+    lastEntryDir   := -1
     if useEmergencyStop
         strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
     _msg = shortEntryText + " " + str.tostring(close, format.mintick)
@@ -14844,32 +14851,58 @@ plot(showBands ? highMA   : na, "高價MA(上軌)", color=color.new(#22c55e, 0),
 plot(showBands ? lowMA    : na, "低價MA(下軌)", color=color.new(#ef4444, 0), linewidth=2)
 
 // ========================= 儀表板 =========================
+_curTP = strategy.position_size > 0 ? highMA : strategy.position_size < 0 ? lowMA : na
+_curSL = strategy.position_size != 0 and useEmergencyStop ? emergencyStop : na
+_distTP = strategy.position_size > 0 ? _curTP - close : strategy.position_size < 0 ? close - _curTP : na
+_distSL = strategy.position_size > 0 ? close - _curSL : strategy.position_size < 0 ? _curSL - close : na
+_lastClosedPL = strategy.closedtrades > 0 ? strategy.closedtrades.profit(strategy.closedtrades - 1) : na
+
 var table dash = na
 if showDash and barstate.islast
     _pos = dashPos == "右上" ? position.top_right : dashPos == "右下" ? position.bottom_right : dashPos == "左上" ? position.top_left : position.bottom_left
     _fsz = dashSize == "Tiny" ? size.tiny : dashSize == "Small" ? size.small : size.normal
     if na(dash)
-        dash := table.new(_pos, 2, 7, bgcolor=color.new(#0d1117, 0), border_color=color.new(#1e293b, 0), border_width=1, frame_color=color.new(#334155, 0), frame_width=1)
+        dash := table.new(_pos, 2, 10, bgcolor=color.new(#0d1117, 0), border_color=color.new(#1e293b, 0), border_width=1, frame_color=color.new(#334155, 0), frame_width=1)
+
     table.cell(dash, 0, 0, "Scalping trade(V1)", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
     table.cell(dash, 1, 0, timeframe.period, text_color=color.new(#94a3b8, 0), text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_right)
-    _trendStr = isUptrend ? "多頭 ▲" : isDowntrend ? "空頭 ▼" : "盤整(不交易)"
-    _trendCol = isUptrend ? color.new(#22c55e, 0) : isDowntrend ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
-    table.cell(dash, 0, 1, "趨勢狀態", text_color=color.new(#94a3b8, 0), text_size=_fsz)
-    table.cell(dash, 1, 1, _trendStr, text_color=_trendCol, text_size=_fsz, text_halign=text.align_right)
-    table.cell(dash, 0, 2, "SMA斜率", text_color=color.new(#94a3b8, 0), text_size=_fsz)
-    table.cell(dash, 1, 2, str.tostring(smaSlopePct, "#.##") + "%", text_color=color.new(#94a3b8, 0), text_size=_fsz, text_halign=text.align_right)
-    _posStr = strategy.position_size > 0 ? "多單持有中" : strategy.position_size < 0 ? "空單持有中" : "空手"
-    table.cell(dash, 0, 3, "持倉狀態", text_color=color.new(#94a3b8, 0), text_size=_fsz)
-    table.cell(dash, 1, 3, _posStr, text_color=color.white, text_size=_fsz, text_halign=text.align_right)
-    table.cell(dash, 0, 4, "持倉K棒數", text_color=color.new(#94a3b8, 0), text_size=_fsz)
-    table.cell(dash, 1, 4, na(barsSinceEntry) ? "-" : str.tostring(barsSinceEntry), text_color=color.white, text_size=_fsz, text_halign=text.align_right)
+
+    _posStr = strategy.position_size > 0 ? "多頭持倉中" : strategy.position_size < 0 ? "空頭持倉中" : "空手"
+    _posCol = strategy.position_size > 0 ? color.new(#22c55e, 0) : strategy.position_size < 0 ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 1, "目前狀態", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 1, _posStr, text_color=_posCol, text_size=_fsz, text_halign=text.align_right)
+
+    _lastEntryStr = lastEntryDir == 1 ? "多 @ " + str.tostring(lastEntryPrice, format.mintick) : lastEntryDir == -1 ? "空 @ " + str.tostring(lastEntryPrice, format.mintick) : "尚無交易"
+    _lastEntryCol = lastEntryDir == 1 ? color.new(#22c55e, 0) : lastEntryDir == -1 ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 2, "最近建倉點", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 2, _lastEntryStr, text_color=_lastEntryCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 3, "停利(TP)", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 3, na(_curTP) ? "-" : str.tostring(_curTP, format.mintick), text_color=color.new(#22c55e, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 4, "停損(SL)", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 4, na(_curSL) ? (strategy.position_size != 0 ? "SMA轉向" : "-") : str.tostring(_curSL, format.mintick), text_color=color.new(#ef4444, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 5, "距離TP / SL", text_color=color.white, text_size=_fsz)
+    _distStr = na(_distTP) ? "-" : str.tostring(_distTP, format.mintick) + " / " + (na(_distSL) ? "-" : str.tostring(_distSL, format.mintick))
+    table.cell(dash, 1, 5, _distStr, text_color=color.new(#facc15, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 6, "未實現損益", text_color=color.white, text_size=_fsz)
+    _openCol = strategy.openprofit >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 6, strategy.position_size == 0 ? "-" : str.tostring(strategy.openprofit, "#,##0.##"), text_color=_openCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 7, "上一筆損益", text_color=color.white, text_size=_fsz)
+    _lastPLCol = na(_lastClosedPL) ? color.new(#94a3b8, 0) : _lastClosedPL >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 7, na(_lastClosedPL) ? "-" : str.tostring(_lastClosedPL, "#,##0.##"), text_color=_lastPLCol, text_size=_fsz, text_halign=text.align_right)
+
     _wr = strategy.closedtrades > 0 ? strategy.wintrades * 100.0 / strategy.closedtrades : -1.0
     _wrCol = _wr < 0 ? color.new(#94a3b8, 0) : _wr >= 70 ? color.new(#22c55e, 0) : _wr >= 50 ? color.new(#facc15, 0) : color.new(#ef4444, 0)
-    table.cell(dash, 0, 5, "策略勝率", text_color=color.new(#94a3b8, 0), text_size=_fsz)
-    table.cell(dash, 1, 5, _wr < 0 ? "暫無交易" : str.tostring(math.round(_wr)) + "% (" + str.tostring(strategy.wintrades) + "/" + str.tostring(strategy.closedtrades) + ")", text_color=_wrCol, text_size=_fsz, text_halign=text.align_right)
-    table.cell(dash, 0, 6, "淨損益", text_color=color.new(#94a3b8, 0), text_size=_fsz)
+    table.cell(dash, 0, 8, "策略勝率", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 8, _wr < 0 ? "暫無交易" : str.tostring(math.round(_wr)) + "% (" + str.tostring(strategy.wintrades) + "/" + str.tostring(strategy.closedtrades) + ")", text_color=_wrCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 9, "淨損益", text_color=color.white, text_size=_fsz)
     _pnlCol = strategy.netprofit >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
-    table.cell(dash, 1, 6, str.tostring(strategy.netprofit, "#,##0.##"), text_color=_pnlCol, text_size=_fsz, text_halign=text.align_right)
+    table.cell(dash, 1, 9, str.tostring(strategy.netprofit, "#,##0.##"), text_color=_pnlCol, text_size=_fsz, text_halign=text.align_right)
 `;
 
 document.getElementById('scalp-band-code').textContent = SCALP_BAND_V1;
