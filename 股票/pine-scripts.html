@@ -945,13 +945,13 @@ if showDash and barstate.islast
   </div>
 </div>
 
-<!-- ─── 剝頭皮 Scalp Band V1 ─── -->
+<!-- ─── Scalping trade(V1) ─── -->
 <div class="scard" data-cat="scalp">
   <div class="scard-header">
     <span class="scard-badge badge-scalp">剝頭皮</span>
     <div class="scard-meta">
-      <div class="scard-title">剝頭皮 Scalp Band V1 — SMA帶狀進出場</div>
-      <div class="scard-desc">改寫自 OANDA 教學文章「剝頭皮交易」：中期SMA(40)判斷趨勢方向 + 高/低價2期移動平均形成帶狀通道，觸下軌進場多單／觸上軌獲利出場（空單相反），SMA轉向或持倉逾K棒數上限強制出場，額外加上ATR緊急停損，strategy()腳本可直接用 TradingView Strategy Tester 計算真實勝率</div>
+      <div class="scard-title">Scalping trade(V1) — SMA帶狀剝頭皮</div>
+      <div class="scard-desc">改寫自 OANDA 教學文章「剝頭皮交易」：中期SMA(40)判斷趨勢方向 + 高/低價2期移動平均形成帶狀通道，觸下軌進場多單／觸上軌獲利出場（空單相反），SMA轉向或持倉逾K棒數上限強制出場，額外加上ATR緊急停損，strategy()腳本可直接用 TradingView Strategy Tester 計算真實勝率；做多/做空訊號的顏色、透明度、提示字、標籤字大小皆可獨立設定，並可選只做多/只做空/多空都做</div>
     </div>
   </div>
   <div class="scard-body">
@@ -962,10 +962,12 @@ if showDash and barstate.islast
       <div class="info-item"><div class="info-label">建議時框</div><div class="info-val">原文建議30分鐘，持倉1-2根K棒</div></div>
     </div>
     <div class="ver-log" style="margin:10px 0">
-      <span class="vl-dot">›</span> <b>2026-08-07：Scalp Band V1 首版</b> — 依 <a href="https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/" target="_blank" style="color:#58a6ff">OANDA教學文章</a> 規則改寫：40週期SMA判斷中期趨勢方向；2週期高/低價移動平均線形成帶狀通道；上升趨勢中K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場，下降趨勢相反<br>
+      <span class="vl-dot">›</span> <b>2026-08-07：Scalping trade(V1) 首版</b> — 依 <a href="https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/" target="_blank" style="color:#58a6ff">OANDA教學文章</a> 規則改寫：40週期SMA判斷中期趨勢方向；2週期高/低價移動平均線形成帶狀通道；上升趨勢中K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場，下降趨勢相反<br>
       <span class="vl-dot">›</span> <b>出場條件</b>：觸及對側帶狀線視為停利；SMA斜率轉向視為停損；持倉超過設定K棒數(預設2根)未達停利則強制逾時出場，SMA走平(斜率低於門檻)時不進場，避免盤整期洗單<br>
-      <span class="vl-dot">›</span> <b>訊號標示</b>：進場當根K棒顯示「剝頭皮▲/▼」標籤，出場依原因分別標示 TP／SL／逾時，並以 alert() 發送 ENTRY-ScalpBand-Long/Short 與 EXIT-ScalpBand-TP/SL 通知，建警報時條件選本腳本→「僅alert()函數呼叫」<br>
-      <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則<br>
+      <span class="vl-dot">›</span> <b>2026-08-07 更新：全客製化訊號 + 命名調整</b> — 腳本標題改為「Scalping trade(V1)」；新增「訊號模式」下拉選單（只出現做多訊號／只出現做空訊號／一起顯示）；做多、做空訊號各自獨立設定顏色、透明度(%)、標籤字大小、以及提示字文字內容<br>
+      <span class="vl-dot">›</span> <b>提示字格式</b>：預設做多進場「多-Scalping-Buy to Open」、做多出場「多-Scalping-Sell to Close」；做空進場「空-Scalping-Sell to Open」、做空出場「空-Scalping-Buy to Close」，實際顯示與alert內容會自動加上商品代碼與時框（如「多-Scalping-Buy to Open NQ1! 5」），文字皆可在設定內自行修改<br>
+      <span class="vl-dot">›</span> <b>提示音</b>：新增「啟用提示音(alert通知)」開關，開啟後進出場才會呼叫alert()；建警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知<br>
+      <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則；此停損由TradingView broker端執行，不會另外觸發上面的提示字/alert<br>
       <span class="vl-dot">›</span> <b>儀表板</b>：即時顯示趨勢狀態／SMA斜率／持倉狀態／持倉K棒數，並直接讀取 <code>strategy.wintrades / strategy.closedtrades</code> 顯示<b>真實策略勝率</b>（非近似估算）與淨損益
     </div>
     <div class="tips-box">
@@ -14561,16 +14563,17 @@ function copyAtoV1s(btn) {
 
 /* -- 剝頭皮 Scalp Band V1 -- */
 const SCALP_BAND_V1 = `//@version=5
-strategy("剝頭皮 SMA帶狀策略 V1 (Scalp Band)", shorttitle="ScalpBand V1", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.02, process_orders_on_close=true, calc_on_every_tick=false, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+strategy("Scalping trade(V1)", shorttitle="Scalping V1", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.02, process_orders_on_close=true, calc_on_every_tick=false, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
 
 // ══════════════════════════════════════════════════════════════════════════
-// 剝頭皮 SMA帶狀策略 V1
+// Scalping trade(V1) — 剝頭皮 SMA帶狀策略
 // 改寫自 OANDA 教學：https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/
 // 核心邏輯：中期SMA(預設40)判斷趨勢方向；高/低價2期移動平均線形成帶狀通道
 // 上升趨勢中，K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場
 // 下降趨勢中相反；SMA轉為反向、盤整無明顯斜率、或持倉逾K棒數上限則強制出場
 // 設計為極短暫持倉(1-2根K棒)，屬於高頻小賺小賠交易法，務必留意手續費/滑價侵蝕獲利
 // 新增：緊急ATR停損(原文未提及，本腳本額外加上避免單根K棒劇烈反向造成過大虧損)
+// 做多/做空訊號的顏色、透明度、提示字、標籤字大小皆可獨立設定；可選只顯示做多/只顯示做空/多空都顯示
 // 非保證勝率，請務必自行在 Strategy Tester 對想交易的商品/週期分開回測後再考慮實單
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -14584,15 +14587,39 @@ slopeMinPct = input.float(0.02, "最小斜率(%)，低於視為盤整不交易",
 grpBand = "高低帶狀(進出場軌道)"
 bandLen = input.int(2, "高/低價移動平均週期", minval=1, group=grpBand, tooltip="原文使用2週期，分別以最高價/最低價做平均形成帶狀通道")
 
+// ========================= 訊號顯示模式 =========================
+grpMode    = "訊號顯示模式"
+signalMode = input.string("一起顯示", "訊號模式", options=["只出現做多訊號", "只出現做空訊號", "一起顯示"], group=grpMode, tooltip="控制是否進場/顯示標籤/送出alert：只出現做多訊號=只做多單，只出現做空訊號=只做空單，一起顯示=多空都做")
+allowLong  = signalMode == "只出現做多訊號" or signalMode == "一起顯示"
+allowShort = signalMode == "只出現做空訊號" or signalMode == "一起顯示"
+
+// ========================= 做多訊號設定 =========================
+grpLong        = "做多訊號設定"
+longColor      = input.color(#22c55e, "做多訊號顏色", group=grpLong)
+longTransp     = input.int(0, "做多訊號透明度(%)", minval=0, maxval=100, group=grpLong)
+longEntryText  = input.string("多-Scalping-Buy to Open", "做多進場提示字", group=grpLong)
+longExitText   = input.string("多-Scalping-Sell to Close", "做多出場提示字", group=grpLong)
+longLabelSize  = input.string("Small", "做多標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpLong)
+
+// ========================= 做空訊號設定 =========================
+grpShort        = "做空訊號設定"
+shortColor      = input.color(#ef4444, "做空訊號顏色", group=grpShort)
+shortTransp     = input.int(0, "做空訊號透明度(%)", minval=0, maxval=100, group=grpShort)
+shortEntryText  = input.string("空-Scalping-Sell to Open", "做空進場提示字", group=grpShort)
+shortExitText   = input.string("空-Scalping-Buy to Close", "做空出場提示字", group=grpShort)
+shortLabelSize  = input.string("Small", "做空標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpShort)
+
+// ========================= 警報設定 =========================
+grpAlert     = "警報設定"
+enableAlerts = input.bool(true, "啟用提示音(alert通知)", group=grpAlert, tooltip="開啟後進出場會呼叫alert()函數；TradingView建立警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知即可收到提示音")
+
 // ========================= 進出場設定 =========================
-grpExit          = "進出場設定"
-maxBarsInTrade   = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=1, group=grpExit, tooltip="原文強調1-2根K棒內完成交易，逾時未達停利則直接出場")
-useSlopeExit     = input.bool(true, "SMA轉向時停損出場", group=grpExit)
-tradeLongEnable  = input.bool(true, "允許做多", group=grpExit)
-tradeShortEnable = input.bool(true, "允許做空", group=grpExit)
+grpExit        = "進出場設定"
+maxBarsInTrade = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=1, group=grpExit, tooltip="原文強調1-2根K棒內完成交易，逾時未達停利則直接出場")
+useSlopeExit   = input.bool(true, "SMA轉向時停損出場", group=grpExit)
 
 grpRisk          = "額外安全網(原文未提及)"
-useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控")
+useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，不會另外觸發上面的提示字/alert）")
 emergencyAtrLen  = input.int(14, "緊急停損ATR週期", minval=5, group=grpRisk)
 emergencyAtrMult = input.float(1.5, "緊急停損ATR倍數", minval=0.5, step=0.25, group=grpRisk)
 
@@ -14602,6 +14629,8 @@ showBands = input.bool(true, "顯示SMA/高低帶狀線", group=grpDisp)
 showDash  = input.bool(true, "顯示儀表板", group=grpDisp)
 dashPos   = input.string("右上", "儀表板位置", options=["右上","右下","左上","左下"], group=grpDisp)
 dashSize  = input.string("Small", "儀表板文字大小", options=["Tiny","Small","Normal"], group=grpDisp)
+
+_szMap(s) => s == "Tiny" ? size.tiny : s == "Small" ? size.small : s == "Normal" ? size.normal : s == "Large" ? size.large : size.huge
 
 // ========================= 核心運算 =========================
 smaTrend = ta.sma(close, smaLen)
@@ -14614,8 +14643,8 @@ smaSlopePct = (smaTrend - smaTrend[slopeLook]) / smaTrend[slopeLook] * 100
 isUptrend   = highMA > smaTrend and lowMA > smaTrend and smaSlopePct >  slopeMinPct
 isDowntrend = highMA < smaTrend and lowMA < smaTrend and smaSlopePct < -slopeMinPct
 
-longCond  = isUptrend   and tradeLongEnable  and low  <= lowMA  and strategy.position_size == 0
-shortCond = isDowntrend and tradeShortEnable and high >= highMA and strategy.position_size == 0
+longCond  = isUptrend   and allowLong  and low  <= lowMA  and strategy.position_size == 0
+shortCond = isDowntrend and allowShort and high >= highMA and strategy.position_size == 0
 
 // ========================= 進場 =========================
 var int   entryBar      = na
@@ -14627,8 +14656,9 @@ if longCond and barstate.isconfirmed
     emergencyStop := close - _atrEmg * emergencyAtrMult
     if useEmergencyStop
         strategy.exit("LongEmg", "Long", stop=emergencyStop)
-    label.new(bar_index, low, "剝頭皮▲", style=label.style_label_up, color=color.new(#22c55e, 0), textcolor=color.white, size=size.small)
-    alert("ENTRY-ScalpBand-Long " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    label.new(bar_index, low, longEntryText, style=label.style_label_up, color=color.new(longColor, longTransp), textcolor=color.white, size=_szMap(longLabelSize))
+    if enableAlerts
+        alert(longEntryText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 if shortCond and barstate.isconfirmed
     strategy.entry("Short", strategy.short)
@@ -14636,8 +14666,9 @@ if shortCond and barstate.isconfirmed
     emergencyStop := close + _atrEmg * emergencyAtrMult
     if useEmergencyStop
         strategy.exit("ShortEmg", "Short", stop=emergencyStop)
-    label.new(bar_index, high, "剝頭皮▼", style=label.style_label_down, color=color.new(#ef4444, 0), textcolor=color.white, size=size.small)
-    alert("ENTRY-ScalpBand-Short " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    label.new(bar_index, high, shortEntryText, style=label.style_label_down, color=color.new(shortColor, shortTransp), textcolor=color.white, size=_szMap(shortLabelSize))
+    if enableAlerts
+        alert(shortEntryText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
 
@@ -14646,33 +14677,23 @@ if strategy.position_size > 0
     tpHit   = high >= highMA
     slHit   = useSlopeExit and smaSlopePct < 0
     timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
-    if tpHit
-        strategy.close("Long", comment="TP 觸高軌")
-        label.new(bar_index, high, "TP", style=label.style_label_down, color=color.new(#22c55e, 70), textcolor=color.new(#22c55e, 0), size=size.tiny)
-        alert("EXIT-ScalpBand-TP " + syminfo.ticker, alert.freq_once_per_bar_close)
-    else if slHit
-        strategy.close("Long", comment="SL SMA轉弱")
-        label.new(bar_index, low, "SL", style=label.style_label_up, color=color.new(#ef4444, 70), textcolor=color.new(#ef4444, 0), size=size.tiny)
-        alert("EXIT-ScalpBand-SL " + syminfo.ticker, alert.freq_once_per_bar_close)
-    else if timeOut
-        strategy.close("Long", comment="逾時出場")
-        label.new(bar_index, low, "逾時", style=label.style_label_up, color=color.new(#94a3b8, 70), textcolor=color.new(#94a3b8, 0), size=size.tiny)
+    if tpHit or slHit or timeOut
+        _reason = tpHit ? "TP觸高軌" : slHit ? "SL SMA轉弱" : "逾時出場"
+        strategy.close("Long", comment=_reason)
+        label.new(bar_index, high, longExitText, style=label.style_label_down, color=color.new(longColor, longTransp), textcolor=color.white, size=_szMap(longLabelSize))
+        if enableAlerts
+            alert(longExitText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 if strategy.position_size < 0
     tpHit   = low <= lowMA
     slHit   = useSlopeExit and smaSlopePct > 0
     timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
-    if tpHit
-        strategy.close("Short", comment="TP 觸低軌")
-        label.new(bar_index, low, "TP", style=label.style_label_up, color=color.new(#22c55e, 70), textcolor=color.new(#22c55e, 0), size=size.tiny)
-        alert("EXIT-ScalpBand-TP " + syminfo.ticker, alert.freq_once_per_bar_close)
-    else if slHit
-        strategy.close("Short", comment="SL SMA轉強")
-        label.new(bar_index, high, "SL", style=label.style_label_down, color=color.new(#ef4444, 70), textcolor=color.new(#ef4444, 0), size=size.tiny)
-        alert("EXIT-ScalpBand-SL " + syminfo.ticker, alert.freq_once_per_bar_close)
-    else if timeOut
-        strategy.close("Short", comment="逾時出場")
-        label.new(bar_index, high, "逾時", style=label.style_label_down, color=color.new(#94a3b8, 70), textcolor=color.new(#94a3b8, 0), size=size.tiny)
+    if tpHit or slHit or timeOut
+        _reason = tpHit ? "TP觸低軌" : slHit ? "SL SMA轉強" : "逾時出場"
+        strategy.close("Short", comment=_reason)
+        label.new(bar_index, low, shortExitText, style=label.style_label_up, color=color.new(shortColor, shortTransp), textcolor=color.white, size=_szMap(shortLabelSize))
+        if enableAlerts
+            alert(shortExitText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
 if strategy.position_size == 0
     entryBar      := na
@@ -14690,7 +14711,7 @@ if showDash and barstate.islast
     _fsz = dashSize == "Tiny" ? size.tiny : dashSize == "Small" ? size.small : size.normal
     if na(dash)
         dash := table.new(_pos, 2, 7, bgcolor=color.new(#0d1117, 0), border_color=color.new(#1e293b, 0), border_width=1, frame_color=color.new(#334155, 0), frame_width=1)
-    table.cell(dash, 0, 0, "剝頭皮 Scalp Band V1", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
+    table.cell(dash, 0, 0, "Scalping trade(V1)", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
     table.cell(dash, 1, 0, timeframe.period, text_color=color.new(#94a3b8, 0), text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_right)
     _trendStr = isUptrend ? "多頭 ▲" : isDowntrend ? "空頭 ▼" : "盤整(不交易)"
     _trendCol = isUptrend ? color.new(#22c55e, 0) : isDowntrend ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
