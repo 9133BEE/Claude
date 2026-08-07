@@ -970,6 +970,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 修正：圖表標籤與alert文字分開</b> — 標籤太密集會互相重疊蓋住不好讀，改成圖表標籤只顯示簡短的「Buy to Open 7777.5」「Sell to Close 7780.8」；詳細版（含TP預估值、建倉→平倉箭頭、商品代碼+時框）只出現在alert提示訊息裡，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：進場文字附成交價+預估平倉值</b> — 進場訊息改為「Buy to Open 4398.5 (TP~4405.2)」這種格式，成交價後面加上「TP~」預估平倉值（取當下的高/低價MA帶狀目標，會隨後續K棒持續更新，所以標記~表示估計值，實際出場價以出場訊息為準）<br>
       <span class="vl-dot">›</span> <b>2026-08-08 改回：Buy/Sell措辭 + 建倉平倉箭頭</b> — 提示字改回原本的「Buy to Open」「Sell to Close」（空方為「Sell to Open」「Buy to Close」）；進場文字不附價格，出場文字附上「(建倉價→平倉價)」箭頭方便比對，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
       <span class="vl-dot">›</span> <b>2026-08-08 修正：標籤價格小數點統一顯示1位</b> — OPEN/CLOSE標籤與alert訊息裡的價格原本用format.mintick(依商品跳動點顯示，可能2位以上)，改成固定顯示小數點後1位<br>
@@ -14795,12 +14796,13 @@ if strategy.position_size > 0
         _reason = tpHit ? "TP觸高軌" : slHit ? "SL SMA轉弱" : "逾時出場"
         strategy.close("Long", comment=_reason)
         pendingManualLongClose := true
-        _msg = f_exitMsg(longExitText, close)
-        f_mkLabel(bar_index, close, _msg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
+        _labelMsg = longExitText + " " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(longExitText, close)
+        f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
@@ -14813,12 +14815,13 @@ if strategy.position_size < 0
         _reason = tpHit ? "TP觸低軌" : slHit ? "SL SMA轉強" : "逾時出場"
         strategy.close("Short", comment=_reason)
         pendingManualShortClose := true
-        _msg = f_exitMsg(shortExitText, close)
-        f_mkLabel(bar_index, close, _msg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
+        _labelMsg = shortExitText + " " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, close)
+        f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
@@ -14831,12 +14834,13 @@ if longFlipToFlat
     if pendingManualLongClose
         pendingManualLongClose := false
     else
-        _msg = f_exitMsg(longExitText, emergencyStop)
-        f_mkLabel(bar_index, emergencyStop, _msg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
+        _labelMsg = longExitText + " " + str.tostring(emergencyStop, "#.#")
+        _alertMsg = f_exitMsg(longExitText, emergencyStop)
+        f_mkLabel(bar_index, emergencyStop, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
@@ -14845,12 +14849,13 @@ if shortFlipToFlat
     if pendingManualShortClose
         pendingManualShortClose := false
     else
-        _msg = f_exitMsg(shortExitText, emergencyStop)
-        f_mkLabel(bar_index, emergencyStop, _msg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
+        _labelMsg = shortExitText + " " + str.tostring(emergencyStop, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, emergencyStop)
+        f_mkLabel(bar_index, emergencyStop, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
