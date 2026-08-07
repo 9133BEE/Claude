@@ -270,6 +270,7 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> <b>2026-07-29 修正說明</b>：經TradingView官方文件確認，<code>alertcondition()</code> 在strategy腳本中<b>編譯不會報錯，但永遠不會出現在建立警報的下拉選單裡</b>，等同無效碼，2026-08-03已直接移除這幾行，請勿再找「Unicorn 多方訊號」之類的獨立選項<br>
           <span class="vl-dot">›</span> <b>2026-07-29 新增</b>：一般UM訊號（非HQ，即fireBull/fireBear）比照HQOB做法，新增真正會作用的 <code>alert("ENTRY-Unicorn " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)</code>，建警報時條件選 V13 → 選「<b>僅alert()函數呼叫</b>」即可同時收到HQOB與一般UM訊號通知<br>
           <span class="vl-dot">›</span> <b>2026-08-03 修正</b>：移除已確認無效的3行 <code>alertcondition()</code>，程式碼更乾淨<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 調整</b>：<code>sigLabels</code> 訊號標籤清理邏輯從「超過200個逐一刪除最舊的」改成「超過250個一次批次刪除最舊的50個」，時間過期(<code>sigBarsMax</code>)的清理邏輯維持不變，跟 Scalping trade(V1) 的標籤清理設定同步；此調整跟「每張圖表可疊幾個指標」的TradingView訂閱方案上限是兩回事，不會解決 study 數量上限的錯誤<br>
           <span class="vl-dot">›</span> <b>2026-08-03 新增</b>：UM⭡/UM⭣訊號標籤補回HQ視覺區分（比照V9s），高品質訊號顯示「HQ UM⭡/⭣」紫色，一般訊號維持藍/橘色，圖上一眼就能分辨，不用只靠alert通知文字判斷<br>
           <span class="vl-dot">›</span> <b>2026-08-03 新增</b>：進場ID改用 <code>L_HQ/S_HQ</code> 區分HQ與一般訊號，儀表板新增「★HQ 多▲／★HQ 空▼」兩列，勝率統計不再混算，可分別檢視「全部UM勝率」與「HQ UM勝率」<br>
           <span class="vl-dot">›</span> <b>2026-08-03 修正</b>：儀表板標題原本還顯示過時的「Unicorn V11」，已修正為「Unicorn V13」
@@ -970,6 +971,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 調整：標籤批次清理門檻降低</b> — 「標籤數達到多少開始清理」從400調成250、「每次清理刪除幾個最舊標籤」從100調成50，跟Unicorn V13同步調整（此設定跟「每張圖表可疊幾個指標」的訂閱方案上限是兩回事，不會解決study數量上限的錯誤）<br>
       <span class="vl-dot">›</span> <b>2026-08-08 再修：標籤更簡短、alert加SL與點數</b> — 圖表標籤精簡成純「Open 7777.5」「Close 7780.8」（不再帶Buy/Sell to字樣）；進場alert新增「(SL-價格)」（未開緊急停損時顯示「SL-SMA轉向」）；出場alert新增「(±點數)」顯示這筆交易實際賺賠幾點，例如「Buy to Open 7777.5 (TP-7780.8)(SL-7770.8) NQ1! 5」「Sell to Close (4398.5→4401.9) (+3.4) NQ1! 5」<br>
       <span class="vl-dot">›</span> <b>2026-08-08 修正：圖表標籤與alert文字分開</b> — 標籤太密集會互相重疊蓋住不好讀，改成圖表標籤只顯示簡短的「Buy to Open 7777.5」「Sell to Close 7780.8」；詳細版（含TP預估值、建倉→平倉箭頭、商品代碼+時框）只出現在alert提示訊息裡，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：進場文字附成交價+預估平倉值</b> — 進場訊息改為「Buy to Open 4398.5 (TP~4405.2)」這種格式，成交價後面加上「TP~」預估平倉值（取當下的高/低價MA帶狀目標，會隨後續K棒持續更新，所以標記~表示估計值，實際出場價以出場訊息為準）<br>
@@ -9903,12 +9905,14 @@ var float _lastBearOBPl = na
 
 f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
 
-while array.size(sigBars) > 0
-    if bar_index - array.get(sigBars, 0) > sigBarsMax or array.size(sigBars) > 200
+while array.size(sigBars) > 0 and bar_index - array.get(sigBars, 0) > sigBarsMax
+    label.delete(array.shift(sigLabels))
+    array.shift(sigBars)
+
+if array.size(sigBars) > 250
+    for _i = 1 to math.min(50, array.size(sigBars))
         label.delete(array.shift(sigLabels))
         array.shift(sigBars)
-    else
-        break
 
 f_bull_shift(toGrey = false) =>
     _bx = array.shift(bb_box)
@@ -13834,7 +13838,7 @@ const VERSION_DEFS = {
     { key: 'u_v10', date: '2026-07-19', sub: 'V10 Strategy：UM 訊號強制 FVG+HTF PDA，統一標籤 UM⭡/UM⭣，儀表板單一 UM 勝率', contentId: 'unicorn-v10-wrap', logId: 'unicorn-log-v10' },
     { key: 'u_fibote', date: '2026-07-23', sub: 'FIB OTE Zone：偵測多空結構，自動繪製 Strong/Weak 標籤與 0.5–0.618 Fibonacci 等候區，支援提示音', contentId: 'unicorn-fibote-wrap', logId: 'unicorn-log-fibote' },
     { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
-    { key: 'u_v13', date: '2026-08-03', sub: 'V13(原V12更名Unicorn/HQOB)：HQ標籤視覺區分+勝率統計拆分、移除無效alertcondition、儀表板標題修正', contentId: 'unicorn-v13-wrap', logId: 'unicorn-log-v13' },
+    { key: 'u_v13', date: '2026-08-08', sub: 'V13：訊號標籤清理改成滿250批次刪最舊50個，同步Scalping V1', contentId: 'unicorn-v13-wrap', logId: 'unicorn-log-v13' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
@@ -14712,8 +14716,8 @@ showBands = input.bool(true, "顯示SMA/高低帶狀線", group=grpDisp)
 showDash  = input.bool(true, "顯示儀表板", group=grpDisp)
 dashPos   = input.string("右上", "儀表板位置", options=["右上","右下","左上","左下"], group=grpDisp)
 dashSize  = input.string("Small", "儀表板文字大小", options=["Tiny","Small","Normal"], group=grpDisp)
-labelPruneAt  = input.int(400, "標籤數達到多少開始清理", minval=50, maxval=500, group=grpDisp, tooltip="進出場標籤總數超過此門檻時，一次批次刪除最舊的N個（見下方設定），避免逐一刪除造成圖表閃爍；上限受Pine max_labels_count=500限制")
-labelPruneQty = input.int(100, "每次清理刪除幾個最舊標籤", minval=10, maxval=400, group=grpDisp)
+labelPruneAt  = input.int(250, "標籤數達到多少開始清理", minval=50, maxval=500, group=grpDisp, tooltip="進出場標籤總數超過此門檻時，一次批次刪除最舊的N個（見下方設定），避免逐一刪除造成圖表閃爍；上限受Pine max_labels_count=500限制")
+labelPruneQty = input.int(50, "每次清理刪除幾個最舊標籤", minval=10, maxval=400, group=grpDisp)
 showTradeLine  = input.bool(true, "顯示建倉→平倉連接線", group=grpDisp, tooltip="把同一筆交易的進場點跟出場點連起來，方便在訊號密集時確認哪個平倉對應哪個開倉")
 tradeLineColor = input.color(#9ca3af, "連接線顏色", group=grpDisp)
 tradeLineTransp = input.int(30, "連接線透明度(%)", minval=0, maxval=100, group=grpDisp)
@@ -14967,7 +14971,7 @@ bbMult2 = input.float(2.0, "布林帶標準差", minval=0.001, maxval=50, step=0
 var enableMA2 = maType2 != "None"
 
 // ========================= 共用平滑MA函式 =========================
-ma(source, length, MAtype) =>
+ma(series float source, series int length, series string MAtype) =>
     switch MAtype
         "SMA"                   => ta.sma(source, length)
         "SMA + Bollinger Bands" => ta.sma(source, length)
@@ -15078,10 +15082,10 @@ calcWeight(series float src, series int length, series int i) =>
 f(series float x) =>
     0.5*(1 - math.cos(x*3.14159))
 
-d(x,length) =>
+d(series float x, series int length) =>
     f(x/length) - f((x-1)/length)
 
-filter(a,b,length) =>
+filter(series float a, series float b, series int length) =>
     sum = 0.
     for i = 1 to length
         sgn = f(i/length)
@@ -15089,12 +15093,12 @@ filter(a,b,length) =>
     sum
 
 //A2RMA
-ama(er,x) =>
+ama(series float er, series float x) =>
     a = 0.
     a := er*x+(1-er)*nz(a[1],x)
 
 //EDSMA
-get2PoleSSF(src, length) =>
+get2PoleSSF(series float src, series int length) =>
     PI = 2 * math.asin(1)
     arg = math.sqrt(2) * PI / length
     a1 = math.exp(-arg)
@@ -15106,7 +15110,7 @@ get2PoleSSF(src, length) =>
     ssf = 0.0
     ssf := c1 * src + c2 * nz(ssf[1]) + c3 * nz(ssf[2])
 
-get3PoleSSF(src, length) =>
+get3PoleSSF(series float src, series int length) =>
     PI = 2 * math.asin(1)
 
     arg = PI / length
@@ -15404,7 +15408,7 @@ cciMaLen  = input.int(5, "長度", group=grpCS, display=display.none, active=cci
 cciBbMult = input.float(2.0, "布林帶標準差", minval=0.001, maxval=50, step=0.5, tooltip=cciTT_BB, group=grpCS, display=display.none, active=cciIsBB)
 var cciEnableMA = cciMaType != "None"
 
-cciSmoothFn(source, length, MAtype) =>
+cciSmoothFn(series float source, series int length, series string MAtype) =>
     switch MAtype
         "SMA"                   => ta.sma(source, length)
         "SMA + Bollinger Bands" => ta.sma(source, length)
