@@ -1023,7 +1023,7 @@ if showDash and barstate.islast
   <div class="scard-header">
     <span class="scard-badge badge-trend">工具指標</span>
     <div class="scard-meta">
-      <div class="scard-title">EMA 雙線合併版 — Moving Average Exponential(雙線)</div>
+      <div class="scard-title">EMA(V1) — 雙線合併版</div>
       <div class="scard-desc">改寫自 TradingView 內建 EMA 指標，把原本要加兩次的兩條EMA合併成一個腳本一次設定：各自獨立長度/來源/偏移/平滑MA(含布林通道)，預設 EMA1=144(橘)、EMA2=377(藍)，比照原生EMA指標，顏色可在「樣式」分頁自行調整每條線</div>
     </div>
   </div>
@@ -1037,7 +1037,8 @@ if showDash and barstate.islast
     <div class="ver-log" style="margin:10px 0">
       <span class="vl-dot">›</span> <b>2026-08-07 首版</b>：把 TradingView 內建「Moving Average Exponential」指標複製兩次的作法，合併成一個腳本、輸入分頁同時設定兩條線，各自獨立「長度／來源／偏移」與「平滑」(None/SMA/SMA+布林通道/EMA/SMMA/WMA/VWMA，各自的長度與布林標準差)<br>
       <span class="vl-dot">›</span> <b>預設值</b>：EMA1 長度144、來源收盤價、平滑SMA長度5；EMA2 長度377、來源收盤價、平滑SMA長度5，皆與原生指標的「計算」分頁(時間週期=圖表、等待時間週期結束)相同<br>
-      <span class="vl-dot">›</span> <b>顏色設定</b>：沿用原生指標作法，線條顏色不在輸入分頁調整，而是加到圖表後在指標設定的「樣式」分頁調整，EMA1主線預設橘色、EMA2主線預設藍色，兩條平滑MA預設白色，皆可個別重新上色
+      <span class="vl-dot">›</span> <b>顏色設定</b>：沿用原生指標作法，線條顏色不在輸入分頁調整，而是加到圖表後在指標設定的「樣式」分頁調整，EMA1主線預設橘色、EMA2主線預設藍色，兩條平滑MA預設白色，皆可個別重新上色<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 更新</b>：腳本標題改為「EMA(V1)」，與站上其他腳本的版本命名方式(如Entry Model(V1)、Scalping trade(V1))統一
     </div>
     <button class="copy-bar-btn" onclick="copyEmaDual(this)" style="margin-top:10px">一鍵複製腳本</button>
     <div class="code-block" id="ema-dual-code"></div>
@@ -1049,7 +1050,7 @@ if showDash and barstate.islast
   <div class="scard-header">
     <span class="scard-badge badge-trend">工具指標</span>
     <div class="scard-meta">
-      <div class="scard-title">ZVQZL + CCI 合併版</div>
+      <div class="scard-title">ZVQZL + CCI(V1) — 合併版</div>
       <div class="scard-desc">把 ZVQZL(VQZL Z-Score，含25種MA模式可選)與 CCI(商品通道指數，含平滑MA/布林通道)兩個原本要分開加的副圖指標合併成一個腳本，兩組輸入各自獨立分區，一次加入即可同時看到兩條線</div>
     </div>
   </div>
@@ -1064,7 +1065,8 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-07 首版</b>：ZVQZL原始碼為Pine v4，移植到v6時把所有舊版全域函式改成對應命名空間(sma→ta.sma、abs→math.abs、iff→三元運算子…)，並將ZVQZL內部的MA切換函式與CCI自帶的平滑MA函式分別更名避免撞名，兩者計算邏輯本身未變動<br>
       <span class="vl-dot">›</span> <b>ZVQZL 設定</b>：Price Smoothing=15、MA Mode=SMMA、Threshold 1/2/3=1.64/1.96/2.58、Z Length=100，其餘25種MA模式(TMA/ALMA/EMA/DEMA/TEMA/WMA/VWMA/SMA/HMA/LSMA/JMA/VAMA/FRAMA/ZLEMA/KAMA/Kijun/Kijun v2/McGinley/IDWMA/FLMSA/PEMA/HCF/TIF/MF/ARMA/DAF/WRMA/RMA/RAF/GF/A2RMA/EDSMA)專屬參數皆保留可調<br>
       <span class="vl-dot">›</span> <b>CCI 設定</b>：長度100、來源(H+L+C)/3，平滑MA類型SMA、長度5、布林標準差2(未選布林通道時為灰階)，與原生CCI指標一致<br>
-      <span class="vl-dot">›</span> <b>顯示</b>：兩者皆為副圖(不是overlay)，會顯示在同一個副圖窗格，Z-Score(約±3內)與CCI(約±100~200)刻度差異大，建議加入後在圖上右鍵任一條線選「移動至新窗格/右側刻度」分開來看，這是TradingView內建的圖表操作，不影響腳本邏輯
+      <span class="vl-dot">›</span> <b>顯示</b>：兩者皆為副圖(不是overlay)，會顯示在同一個副圖窗格，Z-Score(約±3內)與CCI(約±100~200)刻度差異大，建議加入後在圖上右鍵任一條線選「移動至新窗格/右側刻度」分開來看，這是TradingView內建的圖表操作，不影響腳本邏輯<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 更新</b>：腳本標題改為「ZVQZL + CCI(V1)」，與站上其他腳本的版本命名方式(如Entry Model(V1)、Scalping trade(V1))統一
     </div>
     <div class="tips-box">
       <h4>誠實揭露（務必閱讀）</h4>
@@ -14917,7 +14919,7 @@ function copyScalpBand(btn) {
 
 /* -- EMA 雙線合併版 -- */
 const EMA_DUAL_V1 = `//@version=6
-indicator(title="Moving Average Exponential (雙線)", shorttitle="EMA x2", overlay=true, timeframe="", timeframe_gaps=true)
+indicator(title="EMA(V1)", shorttitle="EMA(V1)", overlay=true, timeframe="", timeframe_gaps=true)
 
 // ========================= EMA 1 =========================
 grp1 = "EMA 1"
@@ -14990,7 +14992,7 @@ function copyEmaDual(btn) {
 
 /* -- ZVQZL + CCI 合併版 -- */
 const ZVQZL_CCI_V1 = `//@version=6
-indicator(title="ZVQZL + CCI", shorttitle="ZVQZL+CCI", format=format.price, precision=2, timeframe="", timeframe_gaps=true)
+indicator(title="ZVQZL + CCI(V1)", shorttitle="ZVQZL+CCI(V1)", format=format.price, precision=2, timeframe="", timeframe_gaps=true)
 
 // ══════════════════════════════════════════════════════════════════════════
 // ZVQZL + CCI 合併版
