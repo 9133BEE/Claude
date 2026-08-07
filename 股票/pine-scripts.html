@@ -65,6 +65,7 @@ a:hover{text-decoration:underline}
 .badge-supset{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
 .badge-entry{background:rgba(234,179,8,.15);color:#facc15;border:1px solid rgba(234,179,8,.3)}
 .badge-algo{background:rgba(0,255,187,.12);color:#00ffbb;border:1px solid rgba(0,255,187,.3)}
+.badge-scalp{background:rgba(244,63,94,.15);color:#fb7185;border:1px solid rgba(244,63,94,.3)}
 .hidden{display:none!important}
 
 .ver-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
@@ -127,6 +128,7 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="entry" onclick="filt('entry',this)">進場模型</button>
   <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">ATO訂單流</button>
   <button class="filter-btn" data-cat="algo" onclick="filt('algo',this)">AlgoAlpha</button>
+  <button class="filter-btn" data-cat="scalp" onclick="filt('scalp',this)">剝頭皮</button>
 </div>
 
 <div class="grid" id="grid">
@@ -940,6 +942,38 @@ if showDash and barstate.islast
     </div>
     <button class="copy-bar-btn" onclick="copyAtoV1s(this)">一鍵複製腳本</button>
     <div class="code-block" id="ato-v1s-code"></div>
+  </div>
+</div>
+
+<!-- ─── 剝頭皮 Scalp Band V1 ─── -->
+<div class="scard" data-cat="scalp">
+  <div class="scard-header">
+    <span class="scard-badge badge-scalp">剝頭皮</span>
+    <div class="scard-meta">
+      <div class="scard-title">剝頭皮 Scalp Band V1 — SMA帶狀進出場</div>
+      <div class="scard-desc">改寫自 OANDA 教學文章「剝頭皮交易」：中期SMA(40)判斷趨勢方向 + 高/低價2期移動平均形成帶狀通道，觸下軌進場多單／觸上軌獲利出場（空單相反），SMA轉向或持倉逾K棒數上限強制出場，額外加上ATR緊急停損，strategy()腳本可直接用 TradingView Strategy Tester 計算真實勝率</div>
+    </div>
+  </div>
+  <div class="scard-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">適用標的</div><div class="info-val">所有標的（原文以外匯為例）</div></div>
+      <div class="info-item"><div class="info-label">核心概念</div><div class="info-val">SMA趨勢濾網 + 高/低價帶狀通道</div></div>
+      <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5（strategy）</div></div>
+      <div class="info-item"><div class="info-label">建議時框</div><div class="info-val">原文建議30分鐘，持倉1-2根K棒</div></div>
+    </div>
+    <div class="ver-log" style="margin:10px 0">
+      <span class="vl-dot">›</span> <b>2026-08-07：Scalp Band V1 首版</b> — 依 <a href="https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/" target="_blank" style="color:#58a6ff">OANDA教學文章</a> 規則改寫：40週期SMA判斷中期趨勢方向；2週期高/低價移動平均線形成帶狀通道；上升趨勢中K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場，下降趨勢相反<br>
+      <span class="vl-dot">›</span> <b>出場條件</b>：觸及對側帶狀線視為停利；SMA斜率轉向視為停損；持倉超過設定K棒數(預設2根)未達停利則強制逾時出場，SMA走平(斜率低於門檻)時不進場，避免盤整期洗單<br>
+      <span class="vl-dot">›</span> <b>訊號標示</b>：進場當根K棒顯示「剝頭皮▲/▼」標籤，出場依原因分別標示 TP／SL／逾時，並以 alert() 發送 ENTRY-ScalpBand-Long/Short 與 EXIT-ScalpBand-TP/SL 通知，建警報時條件選本腳本→「僅alert()函數呼叫」<br>
+      <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則<br>
+      <span class="vl-dot">›</span> <b>儀表板</b>：即時顯示趨勢狀態／SMA斜率／持倉狀態／持倉K棒數，並直接讀取 <code>strategy.wintrades / strategy.closedtrades</code> 顯示<b>真實策略勝率</b>（非近似估算）與淨損益
+    </div>
+    <div class="tips-box">
+      <h4>誠實揭露（務必閱讀）</h4>
+      <p>本策略尚未經過任何實際歷史資料回測驗證，儀表板上的勝率是 TradingView Strategy Tester 的真實統計沒錯，但需要你自己把腳本貼到想交易的商品與週期圖表上，讓它跑過歷史K棒後才會有數字，目前我這邊無法代為執行 TradingView 回測。剝頭皮策略持倉極短（1-2根K棒），獲利目標通常很小，實際淨利表現對手續費與滑價非常敏感，即使勝率數字好看，也可能因為交易成本被侵蝕甚至轉負，務必連同 Strategy Tester 的淨利/獲利因子/最大回撤一起看，並自行針對你要交易的商品和週期調整SMA週期、帶狀週期、持倉K棒數上限，勿直接實單。原文以外匯30分鐘線為例，其他商品/週期須自行驗證是否適用。</p>
+    </div>
+    <button class="copy-bar-btn" onclick="copyScalpBand(this)" style="margin-top:10px">一鍵複製腳本</button>
+    <div class="code-block" id="scalp-band-code"></div>
   </div>
 </div>
 
@@ -14520,6 +14554,168 @@ function copyAtoV1(btn) {
 
 function copyAtoV1s(btn) {
   navigator.clipboard.writeText(ATO_V1S).then(() => {
+    btn.textContent = '✓ 已複製!';
+    setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
+  });
+}
+
+/* -- 剝頭皮 Scalp Band V1 -- */
+const SCALP_BAND_V1 = `//@version=5
+strategy("剝頭皮 SMA帶狀策略 V1 (Scalp Band)", shorttitle="ScalpBand V1", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.02, process_orders_on_close=true, calc_on_every_tick=false, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ══════════════════════════════════════════════════════════════════════════
+// 剝頭皮 SMA帶狀策略 V1
+// 改寫自 OANDA 教學：https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/
+// 核心邏輯：中期SMA(預設40)判斷趨勢方向；高/低價2期移動平均線形成帶狀通道
+// 上升趨勢中，K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場
+// 下降趨勢中相反；SMA轉為反向、盤整無明顯斜率、或持倉逾K棒數上限則強制出場
+// 設計為極短暫持倉(1-2根K棒)，屬於高頻小賺小賠交易法，務必留意手續費/滑價侵蝕獲利
+// 新增：緊急ATR停損(原文未提及，本腳本額外加上避免單根K棒劇烈反向造成過大虧損)
+// 非保證勝率，請務必自行在 Strategy Tester 對想交易的商品/週期分開回測後再考慮實單
+// ══════════════════════════════════════════════════════════════════════════
+
+// ========================= 趨勢濾網 =========================
+grpTrend    = "趨勢濾網"
+smaLen      = input.int(40, "中期趨勢SMA週期", minval=5, group=grpTrend, tooltip="原文建議以40週期SMA判斷中期方向")
+slopeLook   = input.int(5, "SMA斜率比較K棒數", minval=1, group=grpTrend)
+slopeMinPct = input.float(0.02, "最小斜率(%)，低於視為盤整不交易", minval=0, step=0.01, group=grpTrend, tooltip="SMA走平代表無明顯趨勢，原文提醒盤整時不應進場剝頭皮")
+
+// ========================= 高低帶狀 =========================
+grpBand = "高低帶狀(進出場軌道)"
+bandLen = input.int(2, "高/低價移動平均週期", minval=1, group=grpBand, tooltip="原文使用2週期，分別以最高價/最低價做平均形成帶狀通道")
+
+// ========================= 進出場設定 =========================
+grpExit          = "進出場設定"
+maxBarsInTrade   = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=1, group=grpExit, tooltip="原文強調1-2根K棒內完成交易，逾時未達停利則直接出場")
+useSlopeExit     = input.bool(true, "SMA轉向時停損出場", group=grpExit)
+tradeLongEnable  = input.bool(true, "允許做多", group=grpExit)
+tradeShortEnable = input.bool(true, "允許做空", group=grpExit)
+
+grpRisk          = "額外安全網(原文未提及)"
+useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控")
+emergencyAtrLen  = input.int(14, "緊急停損ATR週期", minval=5, group=grpRisk)
+emergencyAtrMult = input.float(1.5, "緊急停損ATR倍數", minval=0.5, step=0.25, group=grpRisk)
+
+// ========================= 顯示設定 =========================
+grpDisp   = "顯示設定"
+showBands = input.bool(true, "顯示SMA/高低帶狀線", group=grpDisp)
+showDash  = input.bool(true, "顯示儀表板", group=grpDisp)
+dashPos   = input.string("右上", "儀表板位置", options=["右上","右下","左上","左下"], group=grpDisp)
+dashSize  = input.string("Small", "儀表板文字大小", options=["Tiny","Small","Normal"], group=grpDisp)
+
+// ========================= 核心運算 =========================
+smaTrend = ta.sma(close, smaLen)
+highMA   = ta.sma(high, bandLen)
+lowMA    = ta.sma(low, bandLen)
+_atrEmg  = ta.atr(emergencyAtrLen)
+
+smaSlopePct = (smaTrend - smaTrend[slopeLook]) / smaTrend[slopeLook] * 100
+
+isUptrend   = highMA > smaTrend and lowMA > smaTrend and smaSlopePct >  slopeMinPct
+isDowntrend = highMA < smaTrend and lowMA < smaTrend and smaSlopePct < -slopeMinPct
+
+longCond  = isUptrend   and tradeLongEnable  and low  <= lowMA  and strategy.position_size == 0
+shortCond = isDowntrend and tradeShortEnable and high >= highMA and strategy.position_size == 0
+
+// ========================= 進場 =========================
+var int   entryBar      = na
+var float emergencyStop = na
+
+if longCond and barstate.isconfirmed
+    strategy.entry("Long", strategy.long)
+    entryBar      := bar_index
+    emergencyStop := close - _atrEmg * emergencyAtrMult
+    if useEmergencyStop
+        strategy.exit("LongEmg", "Long", stop=emergencyStop)
+    label.new(bar_index, low, "剝頭皮▲", style=label.style_label_up, color=color.new(#22c55e, 0), textcolor=color.white, size=size.small)
+    alert("ENTRY-ScalpBand-Long " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+if shortCond and barstate.isconfirmed
+    strategy.entry("Short", strategy.short)
+    entryBar      := bar_index
+    emergencyStop := close + _atrEmg * emergencyAtrMult
+    if useEmergencyStop
+        strategy.exit("ShortEmg", "Short", stop=emergencyStop)
+    label.new(bar_index, high, "剝頭皮▼", style=label.style_label_down, color=color.new(#ef4444, 0), textcolor=color.white, size=size.small)
+    alert("ENTRY-ScalpBand-Short " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
+
+// ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
+if strategy.position_size > 0
+    tpHit   = high >= highMA
+    slHit   = useSlopeExit and smaSlopePct < 0
+    timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
+    if tpHit
+        strategy.close("Long", comment="TP 觸高軌")
+        label.new(bar_index, high, "TP", style=label.style_label_down, color=color.new(#22c55e, 70), textcolor=color.new(#22c55e, 0), size=size.tiny)
+        alert("EXIT-ScalpBand-TP " + syminfo.ticker, alert.freq_once_per_bar_close)
+    else if slHit
+        strategy.close("Long", comment="SL SMA轉弱")
+        label.new(bar_index, low, "SL", style=label.style_label_up, color=color.new(#ef4444, 70), textcolor=color.new(#ef4444, 0), size=size.tiny)
+        alert("EXIT-ScalpBand-SL " + syminfo.ticker, alert.freq_once_per_bar_close)
+    else if timeOut
+        strategy.close("Long", comment="逾時出場")
+        label.new(bar_index, low, "逾時", style=label.style_label_up, color=color.new(#94a3b8, 70), textcolor=color.new(#94a3b8, 0), size=size.tiny)
+
+if strategy.position_size < 0
+    tpHit   = low <= lowMA
+    slHit   = useSlopeExit and smaSlopePct > 0
+    timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
+    if tpHit
+        strategy.close("Short", comment="TP 觸低軌")
+        label.new(bar_index, low, "TP", style=label.style_label_up, color=color.new(#22c55e, 70), textcolor=color.new(#22c55e, 0), size=size.tiny)
+        alert("EXIT-ScalpBand-TP " + syminfo.ticker, alert.freq_once_per_bar_close)
+    else if slHit
+        strategy.close("Short", comment="SL SMA轉強")
+        label.new(bar_index, high, "SL", style=label.style_label_down, color=color.new(#ef4444, 70), textcolor=color.new(#ef4444, 0), size=size.tiny)
+        alert("EXIT-ScalpBand-SL " + syminfo.ticker, alert.freq_once_per_bar_close)
+    else if timeOut
+        strategy.close("Short", comment="逾時出場")
+        label.new(bar_index, high, "逾時", style=label.style_label_down, color=color.new(#94a3b8, 70), textcolor=color.new(#94a3b8, 0), size=size.tiny)
+
+if strategy.position_size == 0
+    entryBar      := na
+    emergencyStop := na
+
+// ========================= 繪圖 =========================
+plot(showBands ? smaTrend : na, "中期SMA",     color=color.new(#facc15, 0), linewidth=2)
+plot(showBands ? highMA   : na, "高價MA(上軌)", color=color.new(#22c55e, 0), linewidth=1)
+plot(showBands ? lowMA    : na, "低價MA(下軌)", color=color.new(#ef4444, 0), linewidth=1)
+
+// ========================= 儀表板 =========================
+var table dash = na
+if showDash and barstate.islast
+    _pos = dashPos == "右上" ? position.top_right : dashPos == "右下" ? position.bottom_right : dashPos == "左上" ? position.top_left : position.bottom_left
+    _fsz = dashSize == "Tiny" ? size.tiny : dashSize == "Small" ? size.small : size.normal
+    if na(dash)
+        dash := table.new(_pos, 2, 7, bgcolor=color.new(#0d1117, 0), border_color=color.new(#1e293b, 0), border_width=1, frame_color=color.new(#334155, 0), frame_width=1)
+    table.cell(dash, 0, 0, "剝頭皮 Scalp Band V1", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
+    table.cell(dash, 1, 0, timeframe.period, text_color=color.new(#94a3b8, 0), text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_right)
+    _trendStr = isUptrend ? "多頭 ▲" : isDowntrend ? "空頭 ▼" : "盤整(不交易)"
+    _trendCol = isUptrend ? color.new(#22c55e, 0) : isDowntrend ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 1, "趨勢狀態", text_color=color.new(#94a3b8, 0), text_size=_fsz)
+    table.cell(dash, 1, 1, _trendStr, text_color=_trendCol, text_size=_fsz, text_halign=text.align_right)
+    table.cell(dash, 0, 2, "SMA斜率", text_color=color.new(#94a3b8, 0), text_size=_fsz)
+    table.cell(dash, 1, 2, str.tostring(smaSlopePct, "#.##") + "%", text_color=color.new(#94a3b8, 0), text_size=_fsz, text_halign=text.align_right)
+    _posStr = strategy.position_size > 0 ? "多單持有中" : strategy.position_size < 0 ? "空單持有中" : "空手"
+    table.cell(dash, 0, 3, "持倉狀態", text_color=color.new(#94a3b8, 0), text_size=_fsz)
+    table.cell(dash, 1, 3, _posStr, text_color=color.white, text_size=_fsz, text_halign=text.align_right)
+    table.cell(dash, 0, 4, "持倉K棒數", text_color=color.new(#94a3b8, 0), text_size=_fsz)
+    table.cell(dash, 1, 4, na(barsSinceEntry) ? "-" : str.tostring(barsSinceEntry), text_color=color.white, text_size=_fsz, text_halign=text.align_right)
+    _wr = strategy.closedtrades > 0 ? strategy.wintrades * 100.0 / strategy.closedtrades : -1.0
+    _wrCol = _wr < 0 ? color.new(#94a3b8, 0) : _wr >= 70 ? color.new(#22c55e, 0) : _wr >= 50 ? color.new(#facc15, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 0, 5, "策略勝率", text_color=color.new(#94a3b8, 0), text_size=_fsz)
+    table.cell(dash, 1, 5, _wr < 0 ? "暫無交易" : str.tostring(math.round(_wr)) + "% (" + str.tostring(strategy.wintrades) + "/" + str.tostring(strategy.closedtrades) + ")", text_color=_wrCol, text_size=_fsz, text_halign=text.align_right)
+    table.cell(dash, 0, 6, "淨損益", text_color=color.new(#94a3b8, 0), text_size=_fsz)
+    _pnlCol = strategy.netprofit >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 6, str.tostring(strategy.netprofit, "#,##0.##"), text_color=_pnlCol, text_size=_fsz, text_halign=text.align_right)
+`;
+
+document.getElementById('scalp-band-code').textContent = SCALP_BAND_V1;
+
+function copyScalpBand(btn) {
+  navigator.clipboard.writeText(SCALP_BAND_V1).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
   });
