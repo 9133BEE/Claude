@@ -969,6 +969,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 修正：出場顯示「建倉 NaN」+ 連接虛線沒畫出來</b> — 根因是原本用「if strategy.position_size == 0」在每根K棒末端重置entryPrice，但進場當根K棒strategy.position_size還沒更新完成、仍讀到0，導致entryPrice在剛設定完當下就被清空；出場時讀到na顯示成NaN，虛線起點座標也因此是na畫不出來。改為在4個出場路徑各自處理完後才明確清空，不再依賴position_size時序；提示字同步簡化為純「OPEN 4398.5」「CLOSE 4401.9」，不再顯示中文括號附註<br>
       <span class="vl-dot">›</span> <b>提示字格式</b>：預設做多進場「多-Scalping-Buy to Open」、做多出場「多-Scalping-Sell to Close」；做空進場「空-Scalping-Sell to Open」、做空出場「空-Scalping-Buy to Close」，實際顯示與alert內容會自動加上商品代碼與時框（如「多-Scalping-Buy to Open NQ1! 5」），文字皆可在設定內自行修改<br>
       <span class="vl-dot">›</span> <b>提示音</b>：新增「啟用提示音(alert通知)」開關，開啟後進出場才會呼叫alert()；建警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知<br>
       <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則<br>
@@ -14759,7 +14760,7 @@ if shortCond and barstate.isconfirmed
 
 barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
 
-f_exitMsg(_txt, _exitPx) => _txt + " " + str.tostring(_exitPx, format.mintick) + "（建倉 " + str.tostring(entryPrice, format.mintick) + "）"
+f_exitMsg(_txt, _exitPx) => _txt + " " + str.tostring(_exitPx, format.mintick)
 
 // ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
 if strategy.position_size > 0
@@ -14776,6 +14777,9 @@ if strategy.position_size > 0
             line.new(entryBar, entryPrice, bar_index, close, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
 
 if strategy.position_size < 0
     tpHit   = low <= lowMA
@@ -14791,6 +14795,9 @@ if strategy.position_size < 0
             line.new(entryBar, entryPrice, bar_index, close, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
 
 // ========================= 緊急停損補標(讓broker端觸發的停損也顯示訊號) =========================
 longFlipToFlat  = strategy.position_size == 0 and strategy.position_size[1] > 0
@@ -14806,6 +14813,9 @@ if longFlipToFlat
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
 
 if shortFlipToFlat
     if pendingManualShortClose
@@ -14817,11 +14827,9 @@ if shortFlipToFlat
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
-
-if strategy.position_size == 0
-    entryBar      := na
-    entryPrice    := na
-    emergencyStop := na
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
 
 // ========================= 繪圖 =========================
 plot(showBands ? smaTrend : na, "中期SMA",     color=color.new(#facc15, 0), linewidth=2)
