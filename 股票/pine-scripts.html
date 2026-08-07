@@ -966,6 +966,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-07：Scalping trade(V1) 首版</b> — 依 <a href="https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/" target="_blank" style="color:#58a6ff">OANDA教學文章</a> 規則改寫：40週期SMA判斷中期趨勢方向；2週期高/低價移動平均線形成帶狀通道；上升趨勢中K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場，下降趨勢相反<br>
       <span class="vl-dot">›</span> <b>出場條件</b>：觸及對側帶狀線視為停利；SMA斜率轉向視為停損；持倉超過設定K棒數(預設2根)未達停利則強制逾時出場，SMA走平(斜率低於門檻)時不進場，避免盤整期洗單<br>
       <span class="vl-dot">›</span> <b>2026-08-07 更新：全客製化訊號 + 命名調整</b> — 腳本標題改為「Scalping trade(V1)」；新增「訊號模式」下拉選單（只出現做多訊號／只出現做空訊號／一起顯示）；做多、做空訊號各自獨立設定顏色、透明度(%)、標籤字大小、以及提示字文字內容<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
       <span class="vl-dot">›</span> <b>提示字格式</b>：預設做多進場「多-Scalping-Buy to Open」、做多出場「多-Scalping-Sell to Close」；做空進場「空-Scalping-Sell to Open」、做空出場「空-Scalping-Buy to Close」，實際顯示與alert內容會自動加上商品代碼與時框（如「多-Scalping-Buy to Open NQ1! 5」），文字皆可在設定內自行修改<br>
       <span class="vl-dot">›</span> <b>提示音</b>：新增「啟用提示音(alert通知)」開關，開啟後進出場才會呼叫alert()；建警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知<br>
       <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則<br>
