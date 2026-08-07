@@ -129,6 +129,7 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">ATO訂單流</button>
   <button class="filter-btn" data-cat="algo" onclick="filt('algo',this)">AlgoAlpha</button>
   <button class="filter-btn" data-cat="scalp" onclick="filt('scalp',this)">剝頭皮</button>
+  <button class="filter-btn" data-cat="tool" onclick="filt('tool',this)">工具指標</button>
 </div>
 
 <div class="grid" id="grid">
@@ -967,7 +968,8 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>2026-08-07 更新：全客製化訊號 + 命名調整</b> — 腳本標題改為「Scalping trade(V1)」；新增「訊號模式」下拉選單（只出現做多訊號／只出現做空訊號／一起顯示）；做多、做空訊號各自獨立設定顏色、透明度(%)、標籤字大小、以及提示字文字內容<br>
       <span class="vl-dot">›</span> <b>提示字格式</b>：預設做多進場「多-Scalping-Buy to Open」、做多出場「多-Scalping-Sell to Close」；做空進場「空-Scalping-Sell to Open」、做空出場「空-Scalping-Buy to Close」，實際顯示與alert內容會自動加上商品代碼與時框（如「多-Scalping-Buy to Open NQ1! 5」），文字皆可在設定內自行修改<br>
       <span class="vl-dot">›</span> <b>提示音</b>：新增「啟用提示音(alert通知)」開關，開啟後進出場才會呼叫alert()；建警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知<br>
-      <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則；此停損由TradingView broker端執行，不會另外觸發上面的提示字/alert<br>
+      <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則<br>
+      <span class="vl-dot">›</span> <b>2026-08-07 修正：連續多筆進場卻看不到對應出場</b> — 原因是緊急ATR停損由broker端執行，觸發時不會畫出場標籤/送alert，盤整反覆洗單時看起來像「連續進場沒出場」，其實每次都已先平倉才能再進場（<code>strategy.position_size==0</code>強制只能有一倉），只是看不到那筆停損。新增偵測：只要偵測到部位從有轉無、且不是本腳本自己的TP/SL/逾時觸發的，就補畫對應的出場提示字與alert，並在Strategy Tester交易紀錄標註「緊急ATR停損」，確保每筆進場都能在圖上找到對應出場<br>
       <span class="vl-dot">›</span> <b>儀表板</b>：即時顯示趨勢狀態／SMA斜率／持倉狀態／持倉K棒數，並直接讀取 <code>strategy.wintrades / strategy.closedtrades</code> 顯示<b>真實策略勝率</b>（非近似估算）與淨損益
     </div>
     <div class="tips-box">
@@ -14595,16 +14597,20 @@ allowShort = signalMode == "只出現做空訊號" or signalMode == "一起顯�
 
 // ========================= 做多訊號設定 =========================
 grpLong        = "做多訊號設定"
-longColor      = input.color(#22c55e, "做多訊號顏色", group=grpLong)
-longTransp     = input.int(0, "做多訊號透明度(%)", minval=0, maxval=100, group=grpLong)
+longEntryColor  = input.color(#22c55e, "做多進場顏色", group=grpLong, tooltip="與出場顏色分開設定，避免開倉/平倉標籤同色搞混")
+longEntryTransp = input.int(0, "做多進場透明度(%)", minval=0, maxval=100, group=grpLong)
+longExitColor   = input.color(#3b82f6, "做多出場顏色", group=grpLong)
+longExitTransp  = input.int(0, "做多出場透明度(%)", minval=0, maxval=100, group=grpLong)
 longEntryText  = input.string("多-Scalping-Buy to Open", "做多進場提示字", group=grpLong)
 longExitText   = input.string("多-Scalping-Sell to Close", "做多出場提示字", group=grpLong)
 longLabelSize  = input.string("Small", "做多標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpLong)
 
 // ========================= 做空訊號設定 =========================
 grpShort        = "做空訊號設定"
-shortColor      = input.color(#ef4444, "做空訊號顏色", group=grpShort)
-shortTransp     = input.int(0, "做空訊號透明度(%)", minval=0, maxval=100, group=grpShort)
+shortEntryColor  = input.color(#ef4444, "做空進場顏色", group=grpShort, tooltip="與出場顏色分開設定，避免開倉/平倉標籤同色搞混")
+shortEntryTransp = input.int(0, "做空進場透明度(%)", minval=0, maxval=100, group=grpShort)
+shortExitColor   = input.color(#f59e0b, "做空出場顏色", group=grpShort)
+shortExitTransp  = input.int(0, "做空出場透明度(%)", minval=0, maxval=100, group=grpShort)
 shortEntryText  = input.string("空-Scalping-Sell to Open", "做空進場提示字", group=grpShort)
 shortExitText   = input.string("空-Scalping-Buy to Close", "做空出場提示字", group=grpShort)
 shortLabelSize  = input.string("Small", "做空標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpShort)
@@ -14619,7 +14625,7 @@ maxBarsInTrade = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=
 useSlopeExit   = input.bool(true, "SMA轉向時停損出場", group=grpExit)
 
 grpRisk          = "額外安全網(原文未提及)"
-useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，不會另外觸發上面的提示字/alert）")
+useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，腳本會自動偵測並補畫對應的出場提示字/alert，Strategy Tester交易紀錄會標註「緊急ATR停損」）")
 emergencyAtrLen  = input.int(14, "緊急停損ATR週期", minval=5, group=grpRisk)
 emergencyAtrMult = input.float(1.5, "緊急停損ATR倍數", minval=0.5, step=0.25, group=grpRisk)
 
@@ -14649,14 +14655,16 @@ shortCond = isDowntrend and allowShort and high >= highMA and strategy.position_
 // ========================= 進場 =========================
 var int   entryBar      = na
 var float emergencyStop = na
+var bool  pendingManualLongClose  = false
+var bool  pendingManualShortClose = false
 
 if longCond and barstate.isconfirmed
     strategy.entry("Long", strategy.long)
     entryBar      := bar_index
     emergencyStop := close - _atrEmg * emergencyAtrMult
     if useEmergencyStop
-        strategy.exit("LongEmg", "Long", stop=emergencyStop)
-    label.new(bar_index, low, longEntryText, style=label.style_label_up, color=color.new(longColor, longTransp), textcolor=color.white, size=_szMap(longLabelSize))
+        strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
+    label.new(bar_index, low, longEntryText, style=label.style_label_up, color=color.new(longEntryColor, longEntryTransp), textcolor=color.white, size=_szMap(longLabelSize))
     if enableAlerts
         alert(longEntryText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
@@ -14665,8 +14673,8 @@ if shortCond and barstate.isconfirmed
     entryBar      := bar_index
     emergencyStop := close + _atrEmg * emergencyAtrMult
     if useEmergencyStop
-        strategy.exit("ShortEmg", "Short", stop=emergencyStop)
-    label.new(bar_index, high, shortEntryText, style=label.style_label_down, color=color.new(shortColor, shortTransp), textcolor=color.white, size=_szMap(shortLabelSize))
+        strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
+    label.new(bar_index, high, shortEntryText, style=label.style_label_down, color=color.new(shortEntryColor, shortEntryTransp), textcolor=color.white, size=_szMap(shortLabelSize))
     if enableAlerts
         alert(shortEntryText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
@@ -14680,6 +14688,7 @@ if strategy.position_size > 0
     if tpHit or slHit or timeOut
         _reason = tpHit ? "TP觸高軌" : slHit ? "SL SMA轉弱" : "逾時出場"
         strategy.close("Long", comment=_reason)
+        pendingManualLongClose := true
         label.new(bar_index, high, longExitText, style=label.style_label_down, color=color.new(longColor, longTransp), textcolor=color.white, size=_szMap(longLabelSize))
         if enableAlerts
             alert(longExitText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
@@ -14691,6 +14700,27 @@ if strategy.position_size < 0
     if tpHit or slHit or timeOut
         _reason = tpHit ? "TP觸低軌" : slHit ? "SL SMA轉強" : "逾時出場"
         strategy.close("Short", comment=_reason)
+        pendingManualShortClose := true
+        label.new(bar_index, low, shortExitText, style=label.style_label_up, color=color.new(shortColor, shortTransp), textcolor=color.white, size=_szMap(shortLabelSize))
+        if enableAlerts
+            alert(shortExitText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+// ========================= 緊急停損補標(讓broker端觸發的停損也顯示訊號) =========================
+longFlipToFlat  = strategy.position_size == 0 and strategy.position_size[1] > 0
+shortFlipToFlat = strategy.position_size == 0 and strategy.position_size[1] < 0
+
+if longFlipToFlat
+    if pendingManualLongClose
+        pendingManualLongClose := false
+    else
+        label.new(bar_index, high, longExitText, style=label.style_label_down, color=color.new(longColor, longTransp), textcolor=color.white, size=_szMap(longLabelSize))
+        if enableAlerts
+            alert(longExitText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+if shortFlipToFlat
+    if pendingManualShortClose
+        pendingManualShortClose := false
+    else
         label.new(bar_index, low, shortExitText, style=label.style_label_up, color=color.new(shortColor, shortTransp), textcolor=color.white, size=_szMap(shortLabelSize))
         if enableAlerts
             alert(shortExitText + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
