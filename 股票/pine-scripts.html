@@ -967,7 +967,7 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>出場條件</b>：觸及對側帶狀線視為停利；SMA斜率轉向視為停損；持倉超過設定K棒數(預設2根)未達停利則強制逾時出場，SMA走平(斜率低於門檻)時不進場，避免盤整期洗單<br>
       <span class="vl-dot">›</span> <b>2026-08-07 更新：全客製化訊號 + 命名調整</b> — 腳本標題改為「Scalping trade(V1)」；新增「訊號模式」下拉選單（只出現做多訊號／只出現做空訊號／一起顯示）；做多、做空訊號各自獨立設定顏色、透明度(%)、標籤字大小、以及提示字文字內容<br>
       <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設改為「多-OPEN 建倉價」「多-CLOSE 平倉價」（空方同理），標籤與alert訊息都會自動加上實際成交價格，出場訊息額外附註對應的建倉價（例如「多-CLOSE 平倉價 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
       <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
       <span class="vl-dot">›</span> <b>提示字格式</b>：預設做多進場「多-Scalping-Buy to Open」、做多出場「多-Scalping-Sell to Close」；做空進場「空-Scalping-Sell to Open」、做空出場「空-Scalping-Buy to Close」，實際顯示與alert內容會自動加上商品代碼與時框（如「多-Scalping-Buy to Open NQ1! 5」），文字皆可在設定內自行修改<br>
       <span class="vl-dot">›</span> <b>提示音</b>：新增「啟用提示音(alert通知)」開關，開啟後進出場才會呼叫alert()；建警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知<br>
@@ -14657,23 +14657,25 @@ allowShort = signalMode == "只出現做空訊號" or signalMode == "一起顯�
 
 // ========================= 做多訊號設定 =========================
 grpLong        = "做多訊號設定"
-longEntryColor  = input.color(#22c55e, "做多進場顏色", group=grpLong, tooltip="與出場顏色分開設定，避免開倉/平倉標籤同色搞混")
+longEntryColor  = input.color(#22c55e, "做多進場顏色", group=grpLong, tooltip="出場顏色統一在下方「出場標籤樣式」設定，不分方向")
 longEntryTransp = input.int(0, "做多進場透明度(%)", minval=0, maxval=100, group=grpLong)
-longExitColor   = input.color(#3b82f6, "做多出場顏色", group=grpLong)
-longExitTransp  = input.int(0, "做多出場透明度(%)", minval=0, maxval=100, group=grpLong)
-longEntryText  = input.string("多-OPEN 建倉價", "做多進場提示字", group=grpLong)
-longExitText   = input.string("多-CLOSE 平倉價", "做多出場提示字", group=grpLong)
+longEntryText  = input.string("OPEN", "做多進場提示字", group=grpLong)
+longExitText   = input.string("CLOSE", "做多出場提示字", group=grpLong)
 longLabelSize  = input.string("Small", "做多標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpLong)
 
 // ========================= 做空訊號設定 =========================
 grpShort        = "做空訊號設定"
-shortEntryColor  = input.color(#ef4444, "做空進場顏色", group=grpShort, tooltip="與出場顏色分開設定，避免開倉/平倉標籤同色搞混")
+shortEntryColor  = input.color(#ef4444, "做空進場顏色", group=grpShort, tooltip="出場顏色統一在下方「出場標籤樣式」設定，不分方向")
 shortEntryTransp = input.int(0, "做空進場透明度(%)", minval=0, maxval=100, group=grpShort)
-shortExitColor   = input.color(#f59e0b, "做空出場顏色", group=grpShort)
-shortExitTransp  = input.int(0, "做空出場透明度(%)", minval=0, maxval=100, group=grpShort)
-shortEntryText  = input.string("空-OPEN 建倉價", "做空進場提示字", group=grpShort)
-shortExitText   = input.string("空-CLOSE 平倉價", "做空出場提示字", group=grpShort)
+shortEntryText  = input.string("OPEN", "做空進場提示字", group=grpShort)
+shortExitText   = input.string("CLOSE", "做空出場提示字", group=grpShort)
 shortLabelSize  = input.string("Small", "做空標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpShort)
+
+// ========================= 出場標籤樣式（多空統一） =========================
+grpExitStyle  = "出場標籤樣式（多空統一）"
+exitBgColor   = input.color(color.white, "出場標籤背景色", group=grpExitStyle, tooltip="做多/做空平倉統一用同一組顏色，看到這個顏色就知道「這是平倉」不必再分方向")
+exitTextColor = input.color(#374151, "出場標籤文字顏色", group=grpExitStyle)
+exitTransp    = input.int(0, "出場標籤透明度(%)", minval=0, maxval=100, group=grpExitStyle)
 
 // ========================= 警報設定 =========================
 grpAlert     = "警報設定"
@@ -14700,8 +14702,8 @@ labelPruneQty = input.int(100, "每次清理刪除幾個最舊標籤", minval=10
 showTradeLine = input.bool(true, "顯示建倉→平倉連接虛線", group=grpDisp, tooltip="用虛線把同一筆交易的進場點跟出場點連起來，方便在訊號密集時確認哪個平倉對應哪個開倉")
 
 var label[] allLabels = array.new_label()
-f_mkLabel(_bar, _price, _txt, _style, _col, _sz) =>
-    _lb = label.new(_bar, _price, _txt, style=_style, color=_col, textcolor=color.white, size=_sz)
+f_mkLabel(_bar, _price, _txt, _style, _col, _txtCol, _sz) =>
+    _lb = label.new(_bar, _price, _txt, style=_style, color=_col, textcolor=_txtCol, size=_sz)
     array.push(allLabels, _lb)
     if array.size(allLabels) > labelPruneAt
         for _i = 1 to math.min(labelPruneQty, array.size(allLabels))
@@ -14739,7 +14741,7 @@ if longCond and barstate.isconfirmed
     if useEmergencyStop
         strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
     _msg = longEntryText + " " + str.tostring(close, format.mintick)
-    f_mkLabel(bar_index, low, _msg, label.style_label_up, color.new(longEntryColor, longEntryTransp), _szMap(longLabelSize))
+    f_mkLabel(bar_index, low, _msg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
     if enableAlerts
         alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
@@ -14751,7 +14753,7 @@ if shortCond and barstate.isconfirmed
     if useEmergencyStop
         strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
     _msg = shortEntryText + " " + str.tostring(close, format.mintick)
-    f_mkLabel(bar_index, high, _msg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), _szMap(shortLabelSize))
+    f_mkLabel(bar_index, high, _msg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
     if enableAlerts
         alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
@@ -14769,9 +14771,9 @@ if strategy.position_size > 0
         strategy.close("Long", comment=_reason)
         pendingManualLongClose := true
         _msg = f_exitMsg(longExitText, close)
-        f_mkLabel(bar_index, high, _msg, label.style_label_down, color.new(longExitColor, longExitTransp), _szMap(longLabelSize))
+        f_mkLabel(bar_index, high, _msg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
         if showTradeLine and not na(entryBar)
-            line.new(entryBar, entryPrice, bar_index, close, style=line.style_dashed, color=color.new(longExitColor, 40), width=1)
+            line.new(entryBar, entryPrice, bar_index, close, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
@@ -14784,9 +14786,9 @@ if strategy.position_size < 0
         strategy.close("Short", comment=_reason)
         pendingManualShortClose := true
         _msg = f_exitMsg(shortExitText, close)
-        f_mkLabel(bar_index, low, _msg, label.style_label_up, color.new(shortExitColor, shortExitTransp), _szMap(shortLabelSize))
+        f_mkLabel(bar_index, low, _msg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
         if showTradeLine and not na(entryBar)
-            line.new(entryBar, entryPrice, bar_index, close, style=line.style_dashed, color=color.new(shortExitColor, 40), width=1)
+            line.new(entryBar, entryPrice, bar_index, close, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
@@ -14799,9 +14801,9 @@ if longFlipToFlat
         pendingManualLongClose := false
     else
         _msg = f_exitMsg(longExitText, emergencyStop)
-        f_mkLabel(bar_index, emergencyStop, _msg, label.style_label_down, color.new(longExitColor, longExitTransp), _szMap(longLabelSize))
+        f_mkLabel(bar_index, emergencyStop, _msg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
         if showTradeLine and not na(entryBar)
-            line.new(entryBar, entryPrice, bar_index, emergencyStop, style=line.style_dashed, color=color.new(longExitColor, 40), width=1)
+            line.new(entryBar, entryPrice, bar_index, emergencyStop, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
@@ -14810,9 +14812,9 @@ if shortFlipToFlat
         pendingManualShortClose := false
     else
         _msg = f_exitMsg(shortExitText, emergencyStop)
-        f_mkLabel(bar_index, emergencyStop, _msg, label.style_label_up, color.new(shortExitColor, shortExitTransp), _szMap(shortLabelSize))
+        f_mkLabel(bar_index, emergencyStop, _msg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
         if showTradeLine and not na(entryBar)
-            line.new(entryBar, entryPrice, bar_index, emergencyStop, style=line.style_dashed, color=color.new(shortExitColor, 40), width=1)
+            line.new(entryBar, entryPrice, bar_index, emergencyStop, style=line.style_dashed, color=color.new(exitTextColor, 50), width=1)
         if enableAlerts
             alert(_msg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
 
