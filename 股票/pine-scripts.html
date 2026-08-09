@@ -1074,7 +1074,8 @@ if showDash and barstate.islast
       <span class="vl-dot">›</span> <b>CCI 設定</b>：長度100、來源(H+L+C)/3，平滑MA類型SMA、長度5、布林標準差2(未選布林通道時為灰階)，與原生CCI指標一致<br>
       <span class="vl-dot">›</span> <b>顯示</b>：兩者皆為副圖(不是overlay)，會顯示在同一個副圖窗格，Z-Score(約±3內)與CCI(約±100~200)刻度差異大，建議加入後在圖上右鍵任一條線選「移動至新窗格/右側刻度」分開來看，這是TradingView內建的圖表操作，不影響腳本邏輯<br>
       <span class="vl-dot">›</span> <b>2026-08-08 更新</b>：腳本標題改為「ZVQZL + CCI(V1)」，與站上其他腳本的版本命名方式(如Entry Model(V1)、Scalping trade(V1))統一<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 修正：合併後Z-Score看起來變成一條平線</b> — 這不是計算錯誤，是Z-Score(數值通常在±3以內)和CCI(數值可到±100~200)共用同一個副圖刻度時，CCI的量級太大會把Z-Score的面積圖壓扁到幾乎看不出顏色變化。新增「顯示模式」選單(只顯示ZVQZL／只顯示CCI／兩者都顯示)，預設兩者都顯示；如果覺得疊在一起刻度被壓扁，可以先切換成只看其中一個，或參考下方「誠實揭露」的手動分開刻度做法
+      <span class="vl-dot">›</span> <b>2026-08-08 修正：合併後Z-Score看起來變成一條平線</b> — 這不是計算錯誤，是Z-Score(數值通常在±3以內)和CCI(數值可到±100~200)共用同一個副圖刻度時，CCI的量級太大會把Z-Score的面積圖壓扁到幾乎看不出顏色變化。新增「顯示模式」選單(只顯示ZVQZL／只顯示CCI／兩者都顯示)，預設兩者都顯示；如果覺得疊在一起刻度被壓扁，可以先切換成只看其中一個，或參考下方「誠實揭露」的手動分開刻度做法<br>
+      <span class="vl-dot">›</span> <b>2026-08-08 修正：編譯錯誤(型別)</b> — 先前把所有自訂函式的長度類參數(len/length)明確標成「series int」，結果跟腳本內大量使用的 ta.sma/ta.ema/ta.wma/ta.highest 等函式衝突(這些函式的長度參數要求「simple int」，series int等級太寬鬆反而不相容)，導致編譯出現165個型別錯誤。已全部改回「simple int」／字串類參數改「simple string」，只有實際逐根K棒變動的價格序列(src/source等)才保留「series float」，這樣才符合每個函式實際被呼叫的方式
     </div>
     <div class="tips-box">
       <h4>誠實揭露（務必閱讀）</h4>
@@ -14974,7 +14975,7 @@ bbMult2 = input.float(2.0, "布林帶標準差", minval=0.001, maxval=50, step=0
 var enableMA2 = maType2 != "None"
 
 // ========================= 共用平滑MA函式 =========================
-ma(series float source, series int length, series string MAtype) =>
+ma(series float source, simple int length, simple string MAtype) =>
     switch MAtype
         "SMA"                   => ta.sma(source, length)
         "SMA + Bollinger Bands" => ta.sma(source, length)
@@ -15075,7 +15076,7 @@ ssfLength = input.int(20, "EDSMA - Super Smoother Filter Length", minval=1, grou
 ssfPoles  = input.int(2, "EDSMA - Super Smoother Filter Poles", options=[2, 3], group=grpZAdv)
 
 //IDWMA
-calcWeight(series float src, series int length, series int i) =>
+calcWeight(series float src, simple int length, simple int i) =>
     distanceSum = 0.0
     for j = 0 to length - 1
         distanceSum := distanceSum + math.abs(nz(src[i]) - nz(src[j]))
@@ -15085,10 +15086,10 @@ calcWeight(series float src, series int length, series int i) =>
 f(series float x) =>
     0.5*(1 - math.cos(x*3.14159))
 
-d(series float x, series int length) =>
+d(series float x, simple int length) =>
     f(x/length) - f((x-1)/length)
 
-filter(series float a, series float b, series int length) =>
+filter(series float a, series float b, simple int length) =>
     sum = 0.
     for i = 1 to length
         sgn = f(i/length)
@@ -15101,7 +15102,7 @@ ama(series float er, series float x) =>
     a := er*x+(1-er)*nz(a[1],x)
 
 //EDSMA
-get2PoleSSF(series float src, series int length) =>
+get2PoleSSF(series float src, simple int length) =>
     PI = 2 * math.asin(1)
     arg = math.sqrt(2) * PI / length
     a1 = math.exp(-arg)
@@ -15113,7 +15114,7 @@ get2PoleSSF(series float src, series int length) =>
     ssf = 0.0
     ssf := c1 * src + c2 * nz(ssf[1]) + c3 * nz(ssf[2])
 
-get3PoleSSF(series float src, series int length) =>
+get3PoleSSF(series float src, simple int length) =>
     PI = 2 * math.asin(1)
 
     arg = PI / length
@@ -15130,7 +15131,7 @@ get3PoleSSF(series float src, series int length) =>
     ssf := coef1 * src + coef2 * nz(ssf[1]) + coef3 * nz(ssf[2]) + coef4 * nz(ssf[3])
 
 
-vqzlMA(series string maType, series float src, series int len) =>
+vqzlMA(simple string maType, series float src, simple int len) =>
     float result = 0
     if maType=="TMA"
         result := ta.sma(ta.sma(src, int(math.ceil(len / 2))), int(math.floor(len / 2)) + 1)
@@ -15411,7 +15412,7 @@ cciMaLen  = input.int(5, "長度", group=grpCS, display=display.none, active=cci
 cciBbMult = input.float(2.0, "布林帶標準差", minval=0.001, maxval=50, step=0.5, tooltip=cciTT_BB, group=grpCS, display=display.none, active=cciIsBB)
 var cciEnableMA = cciMaType != "None"
 
-cciSmoothFn(series float source, series int length, series string MAtype) =>
+cciSmoothFn(series float source, simple int length, simple string MAtype) =>
     switch MAtype
         "SMA"                   => ta.sma(source, length)
         "SMA + Bollinger Bands" => ta.sma(source, length)
