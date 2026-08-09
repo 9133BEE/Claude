@@ -124,10 +124,10 @@ a:hover{text-decoration:underline}
   <button class="filter-btn" data-cat="unicorn" onclick="filt('unicorn',this)">Unicorn</button>
   <button class="filter-btn" data-cat="dashboard" onclick="filt('dashboard',this)">期貨儀表板</button>
   <button class="filter-btn" data-cat="supset" onclick="filt('supset',this)">SUP SET</button>
-  <button class="filter-btn" data-cat="strategy" onclick="filt('strategy',this)">回測工具</button>
-  <button class="filter-btn" data-cat="entry" onclick="filt('entry',this)">進場模型</button>
-  <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">ATO訂單流</button>
-  <button class="filter-btn" data-cat="algo" onclick="filt('algo',this)">AlgoAlpha</button>
+  <button class="filter-btn" data-cat="strategy" onclick="filt('strategy',this)">回測工具(X)</button>
+  <button class="filter-btn" data-cat="entry" onclick="filt('entry',this)">進場模型(X)</button>
+  <button class="filter-btn" data-cat="amdx" onclick="filt('amdx',this)">ATO訂單流(X)</button>
+  <button class="filter-btn" data-cat="algo" onclick="filt('algo',this)">AlgoAlpha(X)</button>
   <button class="filter-btn" data-cat="scalp" onclick="filt('scalp',this)">剝頭皮</button>
   <button class="filter-btn" data-cat="ema" onclick="filt('ema',this)">EMA</button>
   <button class="filter-btn" data-cat="zvqzlcci" onclick="filt('zvqzlcci',this)">ZVQZL+CCI</button>
@@ -260,6 +260,11 @@ a:hover{text-decoration:underline}
     <div class="ver-layout">
       <div class="ver-sidebar">
         <div class="ver-tabs" id="unicorn-vtabs"></div>
+        <div id="unicorn-log-v14" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-09：V14 快訊文字改版</b>：HQOB訊號快訊從固定的「ENTRY-HQOB」改成附上品質分數與價格，例如看漲符合3/4項HQ條件時會是「HQOB +3/4 (7780.5) NQ1! 5」，分數直接取自該筆OB的FVG缺口/大實體K棒/SSL-BSL掃除/HTF PDA四項條件實際達成數<br>
+          <span class="vl-dot">›</span> <b>一般UM訊號</b>：從「ENTRY-Unicorn」改成方向箭頭+價格，例如「Unicorn ↑ (7780.5) NQ1! 5」（多方）／「Unicorn ↓ (7780.5) NQ1! 5」（空方）<br>
+          <span class="vl-dot">›</span> 其餘核心邏輯與V13完全相同，只改了這兩組alert()文字內容
+        </div>
         <div id="unicorn-log-v13" class="ver-log">
           <span class="vl-dot">›</span> <b>V13（原V12更名）— 8項審查修正</b>：process_orders_on_close、smcTrend 更新邏輯、bb/rb_isDead 死亡OB追蹤、fvgOk 移除 i&gt;1 限制、Bear PB 下界條件修正、重複 fireBull/fireBear 衝突程式碼清除<br>
           <span class="vl-dot">›</span> <b>HQOB 提示音</b>：觸發的 OB 必須 isHQ=true 才發送 alert()<br>
@@ -361,6 +366,9 @@ a:hover{text-decoration:underline}
           <span class="vl-dot">›</span> 用途：想確認「後來的版本是不是真的比較好」，都應該回頭跟這份對照，而不是跟已經被動過的 V2 tab 對照
         </div>
         <button class="copy-bar-btn" onclick="copyUnicornCode(this)">一鍵複製腳本</button>
+        <div id="unicorn-v14-wrap" style="display:none">
+          <div class="code-block" id="unicorn-v14-code"></div>
+        </div>
         <div id="unicorn-v13-wrap" style="display:none">
           <div class="code-block" id="unicorn-v13-code"></div>
         </div>
@@ -953,7 +961,7 @@ if showDash and barstate.islast
   <div class="scard-header">
     <span class="scard-badge badge-scalp">剝頭皮</span>
     <div class="scard-meta">
-      <div class="scard-title">Scalping trade(V1) — SMA帶狀剝頭皮</div>
+      <div class="scard-title">Scalping trade(V2) — SMA帶狀剝頭皮</div>
       <div class="scard-desc">改寫自 OANDA 教學文章「剝頭皮交易」：中期SMA(40)判斷趨勢方向 + 高/低價2期移動平均形成帶狀通道，觸下軌進場多單／觸上軌獲利出場（空單相反），SMA轉向或持倉逾K棒數上限強制出場，額外加上ATR緊急停損，strategy()腳本可直接用 TradingView Strategy Tester 計算真實勝率；做多/做空訊號的顏色、透明度、提示字、標籤字大小皆可獨立設定，並可選只做多/只做空/多空都做</div>
     </div>
   </div>
@@ -964,36 +972,54 @@ if showDash and barstate.islast
       <div class="info-item"><div class="info-label">版本</div><div class="info-val">Pine Script v5（strategy）</div></div>
       <div class="info-item"><div class="info-label">建議時框</div><div class="info-val">原文建議30分鐘，持倉1-2根K棒</div></div>
     </div>
-    <div class="ver-log" style="margin:10px 0">
-      <span class="vl-dot">›</span> <b>2026-08-07：Scalping trade(V1) 首版</b> — 依 <a href="https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/" target="_blank" style="color:#58a6ff">OANDA教學文章</a> 規則改寫：40週期SMA判斷中期趨勢方向；2週期高/低價移動平均線形成帶狀通道；上升趨勢中K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場，下降趨勢相反<br>
-      <span class="vl-dot">›</span> <b>出場條件</b>：觸及對側帶狀線視為停利；SMA斜率轉向視為停損；持倉超過設定K棒數(預設2根)未達停利則強制逾時出場，SMA走平(斜率低於門檻)時不進場，避免盤整期洗單<br>
-      <span class="vl-dot">›</span> <b>2026-08-07 更新：全客製化訊號 + 命名調整</b> — 腳本標題改為「Scalping trade(V1)」；新增「訊號模式」下拉選單（只出現做多訊號／只出現做空訊號／一起顯示）；做多、做空訊號各自獨立設定顏色、透明度(%)、標籤字大小、以及提示字文字內容<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 調整：標籤批次清理門檻降低</b> — 「標籤數達到多少開始清理」從400調成250、「每次清理刪除幾個最舊標籤」從100調成50，跟Unicorn V13同步調整（此設定跟「每張圖表可疊幾個指標」的訂閱方案上限是兩回事，不會解決study數量上限的錯誤）<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 再修：標籤更簡短、alert加SL與點數</b> — 圖表標籤精簡成純「Open 7777.5」「Close 7780.8」（不再帶Buy/Sell to字樣）；進場alert新增「(SL-價格)」（未開緊急停損時顯示「SL-SMA轉向」）；出場alert新增「(±點數)」顯示這筆交易實際賺賠幾點，例如「Buy to Open 7777.5 (TP-7780.8)(SL-7770.8) NQ1! 5」「Sell to Close (4398.5→4401.9) (+3.4) NQ1! 5」<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 修正：圖表標籤與alert文字分開</b> — 標籤太密集會互相重疊蓋住不好讀，改成圖表標籤只顯示簡短的「Buy to Open 7777.5」「Sell to Close 7780.8」；詳細版（含TP預估值、建倉→平倉箭頭、商品代碼+時框）只出現在alert提示訊息裡，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 新增：進場文字附成交價+預估平倉值</b> — 進場訊息改為「Buy to Open 4398.5 (TP~4405.2)」這種格式，成交價後面加上「TP~」預估平倉值（取當下的高/低價MA帶狀目標，會隨後續K棒持續更新，所以標記~表示估計值，實際出場價以出場訊息為準）<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 改回：Buy/Sell措辭 + 建倉平倉箭頭</b> — 提示字改回原本的「Buy to Open」「Sell to Close」（空方為「Sell to Open」「Buy to Close」）；進場文字不附價格，出場文字附上「(建倉價→平倉價)」箭頭方便比對，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 修正：標籤價格小數點統一顯示1位</b> — OPEN/CLOSE標籤與alert訊息裡的價格原本用format.mintick(依商品跳動點顯示，可能2位以上)，改成固定顯示小數點後1位<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 重做：儀表板改列更直觀的資訊</b> — 拿掉「趨勢狀態」「SMA斜率」「持倉K棒數」這幾個不夠直覺的欄位，改成：目前狀態、最近建倉點(方向+價格，不管有沒有持倉都看得到)、停利(TP)、停損(SL)、距離TP/SL(還差多少點)、未實現損益、上一筆已平倉損益(紅綠配色)、策略勝率、淨損益，一眼就能看懂現在/最近一筆交易的關鍵數字<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 修正：帶狀線預設粗細統一</b> — 高價MA(上軌)、低價MA(下軌)原本linewidth=1(最細)，跟中期SMA的linewidth=2不一致；改成三條線統一預設為第二級粗細<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 新增：連接線可自訂顏色/樣式</b> — 「顯示建倉→平倉連接線」新增「連接線顏色」「連接線透明度(%)」「連接線樣式」(實線/虛線/點線)設定，不再固定寫死深灰虛線<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 修正：標籤位置改貼在實際價格上</b> — 原本OPEN/CLOSE標籤固定畫在當根K棒的最高/最低點，跟文字顯示的實際成交價經常對不上；改成標籤直接畫在文字寫的那個價格上（進場/一般出場用close、緊急停損補標用emergencyStop），標籤位置跟數字終於一致，不會再全部擠在最上緣或最下緣<br>
-      <span class="vl-dot">›</span> <b>2026-08-08 修正：出場顯示「建倉 NaN」+ 連接虛線沒畫出來</b> — 根因是原本用「if strategy.position_size == 0」在每根K棒末端重置entryPrice，但進場當根K棒strategy.position_size還沒更新完成、仍讀到0，導致entryPrice在剛設定完當下就被清空；出場時讀到na顯示成NaN，虛線起點座標也因此是na畫不出來。改為在4個出場路徑各自處理完後才明確清空，不再依賴position_size時序；提示字同步簡化為純「OPEN 4398.5」「CLOSE 4401.9」，不再顯示中文括號附註<br>
-      <span class="vl-dot">›</span> <b>提示字格式</b>：預設做多進場「多-Scalping-Buy to Open」、做多出場「多-Scalping-Sell to Close」；做空進場「空-Scalping-Sell to Open」、做空出場「空-Scalping-Buy to Close」，實際顯示與alert內容會自動加上商品代碼與時框（如「多-Scalping-Buy to Open NQ1! 5」），文字皆可在設定內自行修改<br>
-      <span class="vl-dot">›</span> <b>提示音</b>：新增「啟用提示音(alert通知)」開關，開啟後進出場才會呼叫alert()；建警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知<br>
-      <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則<br>
-      <span class="vl-dot">›</span> <b>2026-08-07 修正：連續多筆進場卻看不到對應出場</b> — 原因是緊急ATR停損由broker端執行，觸發時不會畫出場標籤/送alert，盤整反覆洗單時看起來像「連續進場沒出場」，其實每次都已先平倉才能再進場（<code>strategy.position_size==0</code>強制只能有一倉），只是看不到那筆停損。新增偵測：只要偵測到部位從有轉無、且不是本腳本自己的TP/SL/逾時觸發的，就補畫對應的出場提示字與alert，並在Strategy Tester交易紀錄標註「緊急ATR停損」，確保每筆進場都能在圖上找到對應出場<br>
-      <span class="vl-dot">›</span> <b>儀表板</b>：即時顯示趨勢狀態／SMA斜率／持倉狀態／持倉K棒數，並直接讀取 <code>strategy.wintrades / strategy.closedtrades</code> 顯示<b>真實策略勝率</b>（非近似估算）與淨損益
-    </div>
     <div class="tips-box">
       <h4>誠實揭露（務必閱讀）</h4>
       <p>本策略尚未經過任何實際歷史資料回測驗證，儀表板上的勝率是 TradingView Strategy Tester 的真實統計沒錯，但需要你自己把腳本貼到想交易的商品與週期圖表上，讓它跑過歷史K棒後才會有數字，目前我這邊無法代為執行 TradingView 回測。剝頭皮策略持倉極短（1-2根K棒），獲利目標通常很小，實際淨利表現對手續費與滑價非常敏感，即使勝率數字好看，也可能因為交易成本被侵蝕甚至轉負，務必連同 Strategy Tester 的淨利/獲利因子/最大回撤一起看，並自行針對你要交易的商品和週期調整SMA週期、帶狀週期、持倉K棒數上限，勿直接實單。原文以外匯30分鐘線為例，其他商品/週期須自行驗證是否適用。</p>
     </div>
-    <button class="copy-bar-btn" onclick="copyScalpBand(this)" style="margin-top:10px">一鍵複製腳本</button>
-    <div class="code-block" id="scalp-band-code"></div>
+    <div class="ver-layout">
+      <div class="ver-sidebar">
+        <div class="ver-tabs" id="scalp-vtabs">
+        </div>
+      </div>
+      <div class="ver-main">
+        <div id="scalp-log-v2" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-09：V2 進場alert文字合併TP/SL</b> — 進場alert原本TP、SL分開兩組括號「(TP-7780.8)(SL-7770.8)」，改成合併成一組「(7780.8-7770.8)」，例如「Buy to Open 7777.5 (7780.8-7770.8) NQ1! 5」；其餘核心邏輯、圖表標籤、出場alert格式與V1完全相同<br>
+          <span class="vl-dot">›</span> 其餘功能（進出場邏輯、儀表板、連接線、標籤批次清理等）與V1一致，詳見V1版本頁籤的完整更新紀錄
+        </div>
+        <div id="scalp-log-v1" class="ver-log" style="display:none">
+          <span class="vl-dot">›</span> <b>2026-08-07：Scalping trade(V1) 首版</b> — 依 <a href="https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/" target="_blank" style="color:#58a6ff">OANDA教學文章</a> 規則改寫：40週期SMA判斷中期趨勢方向；2週期高/低價移動平均線形成帶狀通道；上升趨勢中K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場，下降趨勢相反<br>
+          <span class="vl-dot">›</span> <b>出場條件</b>：觸及對側帶狀線視為停利；SMA斜率轉向視為停損；持倉超過設定K棒數(預設2根)未達停利則強制逾時出場，SMA走平(斜率低於門檻)時不進場，避免盤整期洗單<br>
+          <span class="vl-dot">›</span> <b>2026-08-07 更新：全客製化訊號 + 命名調整</b> — 腳本標題改為「Scalping trade(V1)」；新增「訊號模式」下拉選單（只出現做多訊號／只出現做空訊號／一起顯示）；做多、做空訊號各自獨立設定顏色、透明度(%)、標籤字大小、以及提示字文字內容<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 修正：進場/出場顏色分開</b> — 原本做多進場「Buy to Open」與做多出場「Sell to Close」共用同一個顏色，圖表上看起來全部同色分不出開倉/平倉；改為做多、做空各自的「進場顏色」「出場顏色」獨立設定（預設做多進場綠／做多出場藍、做空進場紅／做空出場橙），一眼就能分清楚<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤/提示同步顯示價格 + 建倉平倉連接線</b> — 提示字預設精簡為「OPEN」「CLOSE」，標籤與alert訊息都會自動加上實際成交價格（例如「OPEN 29750.00」），出場訊息額外附註對應的建倉價（例如「CLOSE 29762.50（建倉 29750.00）」），不用再靠肉眼對K棒位置去猜哪個平倉對應哪個開倉；新增「顯示建倉→平倉連接虛線」開關，用虛線把同一筆交易的進出場點連起來；出場標籤顏色改為「出場標籤樣式」統一設定（預設白底深灰字），不分做多做空都同一組配色，一眼看到就知道是平倉<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 新增：標籤數量批次清理</b> — 新增「標籤數達到多少開始清理」(預設400)與「每次清理刪除幾個最舊標籤」(預設100)，超過門檻時批次刪除最舊標籤，避免逐一刪除造成圖表閃爍；緊急ATR停損補標籤同步改用實際停損價格定位(原本用K棒高/低點，位置不夠精確)<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 調整：標籤批次清理門檻降低</b> — 「標籤數達到多少開始清理」從400調成250、「每次清理刪除幾個最舊標籤」從100調成50，跟Unicorn V13同步調整（此設定跟「每張圖表可疊幾個指標」的訂閱方案上限是兩回事，不會解決study數量上限的錯誤）<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 再修：標籤更簡短、alert加SL與點數</b> — 圖表標籤精簡成純「Open 7777.5」「Close 7780.8」（不再帶Buy/Sell to字樣）；進場alert新增「(SL-價格)」（未開緊急停損時顯示「SL-SMA轉向」）；出場alert新增「(±點數)」顯示這筆交易實際賺賠幾點，例如「Buy to Open 7777.5 (TP-7780.8)(SL-7770.8) NQ1! 5」「Sell to Close (4398.5→4401.9) (+3.4) NQ1! 5」<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 修正：圖表標籤與alert文字分開</b> — 標籤太密集會互相重疊蓋住不好讀，改成圖表標籤只顯示簡短的「Buy to Open 7777.5」「Sell to Close 7780.8」；詳細版（含TP預估值、建倉→平倉箭頭、商品代碼+時框）只出現在alert提示訊息裡，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 新增：進場文字附成交價+預估平倉值</b> — 進場訊息改為「Buy to Open 4398.5 (TP~4405.2)」這種格式，成交價後面加上「TP~」預估平倉值（取當下的高/低價MA帶狀目標，會隨後續K棒持續更新，所以標記~表示估計值，實際出場價以出場訊息為準）<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 改回：Buy/Sell措辭 + 建倉平倉箭頭</b> — 提示字改回原本的「Buy to Open」「Sell to Close」（空方為「Sell to Open」「Buy to Close」）；進場文字不附價格，出場文字附上「(建倉價→平倉價)」箭頭方便比對，例如「Sell to Close (4398.5→4401.9) NQ1! 5」<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 修正：標籤價格小數點統一顯示1位</b> — OPEN/CLOSE標籤與alert訊息裡的價格原本用format.mintick(依商品跳動點顯示，可能2位以上)，改成固定顯示小數點後1位<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 重做：儀表板改列更直觀的資訊</b> — 拿掉「趨勢狀態」「SMA斜率」「持倉K棒數」這幾個不夠直覺的欄位，改成：目前狀態、最近建倉點(方向+價格，不管有沒有持倉都看得到)、停利(TP)、停損(SL)、距離TP/SL(還差多少點)、未實現損益、上一筆已平倉損益(紅綠配色)、策略勝率、淨損益，一眼就能看懂現在/最近一筆交易的關鍵數字<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 修正：帶狀線預設粗細統一</b> — 高價MA(上軌)、低價MA(下軌)原本linewidth=1(最細)，跟中期SMA的linewidth=2不一致；改成三條線統一預設為第二級粗細<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 新增：連接線可自訂顏色/樣式</b> — 「顯示建倉→平倉連接線」新增「連接線顏色」「連接線透明度(%)」「連接線樣式」(實線/虛線/點線)設定，不再固定寫死深灰虛線<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 修正：標籤位置改貼在實際價格上</b> — 原本OPEN/CLOSE標籤固定畫在當根K棒的最高/最低點，跟文字顯示的實際成交價經常對不上；改成標籤直接畫在文字寫的那個價格上（進場/一般出場用close、緊急停損補標用emergencyStop），標籤位置跟數字終於一致，不會再全部擠在最上緣或最下緣<br>
+          <span class="vl-dot">›</span> <b>2026-08-08 修正：出場顯示「建倉 NaN」+ 連接虛線沒畫出來</b> — 根因是原本用「if strategy.position_size == 0」在每根K棒末端重置entryPrice，但進場當根K棒strategy.position_size還沒更新完成、仍讀到0，導致entryPrice在剛設定完當下就被清空；出場時讀到na顯示成NaN，虛線起點座標也因此是na畫不出來。改為在4個出場路徑各自處理完後才明確清空，不再依賴position_size時序；提示字同步簡化為純「OPEN 4398.5」「CLOSE 4401.9」，不再顯示中文括號附註<br>
+          <span class="vl-dot">›</span> <b>提示字格式</b>：預設做多進場「多-Scalping-Buy to Open」、做多出場「多-Scalping-Sell to Close」；做空進場「空-Scalping-Sell to Open」、做空出場「空-Scalping-Buy to Close」，實際顯示與alert內容會自動加上商品代碼與時框（如「多-Scalping-Buy to Open NQ1! 5」），文字皆可在設定內自行修改<br>
+          <span class="vl-dot">›</span> <b>提示音</b>：新增「啟用提示音(alert通知)」開關，開啟後進出場才會呼叫alert()；建警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知<br>
+          <span class="vl-dot">›</span> <b>額外安全網（原文未提及，本腳本新增）</b>：進場價 ± ATR×倍數 設定硬性緊急停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控，可關閉還原成原文純規則<br>
+          <span class="vl-dot">›</span> <b>2026-08-07 修正：連續多筆進場卻看不到對應出場</b> — 原因是緊急ATR停損由broker端執行，觸發時不會畫出場標籤/送alert，盤整反覆洗單時看起來像「連續進場沒出場」，其實每次都已先平倉才能再進場（<code>strategy.position_size==0</code>強制只能有一倉），只是看不到那筆停損。新增偵測：只要偵測到部位從有轉無、且不是本腳本自己的TP/SL/逾時觸發的，就補畫對應的出場提示字與alert，並在Strategy Tester交易紀錄標註「緊急ATR停損」，確保每筆進場都能在圖上找到對應出場<br>
+          <span class="vl-dot">›</span> <b>儀表板</b>：即時顯示趨勢狀態／SMA斜率／持倉狀態／持倉K棒數，並直接讀取 <code>strategy.wintrades / strategy.closedtrades</code> 顯示<b>真實策略勝率</b>（非近似估算）與淨損益
+        </div>
+        <div id="scalp-panel-v2">
+          <button class="copy-bar-btn" onclick="copyScalpBand(this,'v2')">一鍵複製腳本</button>
+          <div class="code-block" id="scalp-code-v2"></div>
+        </div>
+        <div id="scalp-panel-v1" style="display:none">
+          <button class="copy-bar-btn" onclick="copyScalpBand(this,'v1')">一鍵複製腳本</button>
+          <div class="code-block" id="scalp-code-v1"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -10665,6 +10691,1036 @@ if showDash
     table.cell(dash, 1, 17, _sHQWrStr,  text_color=_sHQWrC2, text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
 
 `;
+
+const UNICORN_V14_STRAT = `//@version=5
+strategy("交易訊號V14(Unicorn/HQOB)", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75, process_orders_on_close=true)
+
+grpS   = "Strategy回測設定"
+tpATR  = input.float(2.0, "停利(ATR倍數)", minval=0.5, maxval=10.0, step=0.5, group=grpS)
+slATR  = input.float(1.0, "停損(ATR倍數)", minval=0.1, maxval=5.0,  step=0.5, group=grpS)
+atrLen = input.int(14,    "ATR週期",       minval=5,   maxval=50,              group=grpS)
+
+grp1 = "訂單塊設定"
+tfPreset     = input.string("Auto","時框預設",options=["Auto","Manual","1M","5M","15M","1H","4H","1D"],group=grp1)
+pivL_m       = input.int(10,"樞紐左側（Manual用）",minval=1,group=grp1)
+pivR_m       = input.int(5, "樞紐右側（Manual用）",minval=1,group=grp1)
+bbSearchBars = input.int(100,"OB搜尋K數（Manual用）",minval=20,maxval=500,group=grp1)
+obExtR_m     = input.int(5,"OB右延伸K數",minval=1,maxval=30,group=grp1)
+minScore     = input.int(0, "最低品質分(0-4)",minval=0,maxval=4,group=grp1)
+hqMin        = input.int(3, "HQ門檻(分)",minval=2,maxval=4,group=grp1)
+maxOBs       = input.int(1, "每方向最多OB數",minval=1,maxval=5,group=grp1)
+obTxtSize    = input.string("Small","OB文字大小",options=["Tiny","Small","Normal","Large"],group=grp1)
+obTxtHAlign  = input.string("置中", "OB文字對齊",options=["置中","置左","置右"],          group=grp1)
+
+grp2 = "獨角獸模型"
+unicornNeedHTF = input.bool(false, "需要HTF PDA+MSS確認（建議開啟）",group=grp2,tooltip="開啟後多方訊號需HTF為多方結構，空方訊號需HTF為空方結構，有效過濾逆勢假訊號")
+needD1Confirm  = input.bool(false, "需要日線MSS趨勢確認",group=grp2,tooltip="開啟後多方訊號需日線MSS看多，空方訊號需日線MSS看空；有效過濾逆日線大趨勢的假訊號（上升趨勢中只做多，下降趨勢中只做空）")
+htfOBPrecision = input.float(0.5,"HTF OB 觸及精確度（0=全區間，0.5=靠支撐半段）",minval=0.0,maxval=1.0,step=0.1,group=grp2)
+unicornNeedFVG = input.bool(false,"進場點限FVG",group=grp2)
+allowRepeat    = input.bool(true,"允許同OB重複訊號",group=grp2,tooltip="開啟後每次重新進入OB區間都會觸發訊號")
+sigCooldown    = input.int(10,"訊號冷卻根數",minval=1,maxval=50,group=grp2,tooltip="任何訊號觸發後，至少等幾根K棒才能再觸發（多空通用）")
+strictMSSGate  = input.bool(true,"啟用嚴格反趨勢結構閘門(HH+HL/LH+LL)",group=grp2,tooltip="V6曾用HH+HL(多頭)/LH+LL(空頭)雙pivot結構確認：只有當下結構真的與新方向相反（或尚無結構）才放行MSS。V8曾為了讓CHoCH時序與LuxAlgo SMC指標對齊而拿掉這道濾網，改成只做同方向去重(_smcTrend)。經比對669行原始版後確認此濾網對過濾逆勢假訊號有實質幫助，V8起預設改為開啟；如需回到單純_smcTrend去重（訊號較密集）可手動關閉。")
+
+grp3 = "HTF區間顯示"
+show5MOB  = input.bool(false,"顯示 5M OB",  group=grp3)
+m5Days    = input.int(1,  "5M 顯示天數", minval=1,maxval=5,   group=grp3)
+show1HOB  = input.bool(true, "顯示 1H OB",  group=grp3)
+showHTFFVG = input.bool(true,  "顯示 HTF FVG（自動配對）", group=grp3)
+h1Days    = input.int(1,  "1H 顯示天數", minval=1,maxval=60,  group=grp3)
+show4HOB  = input.bool(false,"顯示 4H OB",  group=grp3)
+show4HFVG = input.bool(false,"顯示 4H FVG", group=grp3)
+h4Days    = input.int(10, "4H 顯示天數", minval=1,maxval=90,  group=grp3)
+show1DOB  = input.bool(false,"顯示 1D OB",  group=grp3)
+show1DFVG = input.bool(false,"顯示 1D FVG", group=grp3)
+d1Days    = input.int(20, "1D 顯示天數", minval=1,maxval=180, group=grp3)
+htfExtR   = input.int(30, "HTF右延伸K數",minval=5,             group=grp3)
+
+grp4 = "訊號顯示"
+showDash    = input.bool(true,"顯示儀表板",group=grp4)
+dashPos     = input.string("右下","儀表板位置",options=["左下","右下","左上","右上"],group=grp4)
+dashFont    = input.string("Small","儀表板字體",options=["Tiny","Small","Normal","Large"],group=grp4)
+showBull    = input.bool(true,"顯示多方OB方框",group=grp4)
+showBear    = input.bool(true,"顯示空方OB方框",group=grp4)
+sigDays     = input.int(30,"訊號顯示天數",minval=1,maxval=90,group=grp4)
+showTPSL    = input.bool(true,"顯示TP/SL線",group=grp4)
+showBgColor = input.bool(false,"顯示條件背景色",group=grp4)
+
+grp5 = "透明度設定"
+obFillTransp  = input.int(60, "OB方框填色透明度",  minval=0, maxval=95, step=5, group=grp5)
+htfFillTransp = input.int(88, "HTF OB填色透明度",  minval=0, maxval=98, step=2, group=grp5)
+fvgFillTransp = input.int(78, "FVG填色透明度",     minval=0, maxval=98, step=2, group=grp5)
+showDeadOB    = input.bool(true, "顯示失效OB（灰色）", group=grp5)
+deadOBTransp  = input.int(80,   "失效OB透明度",        group=grp5, minval=0, maxval=95, step=5)
+
+_hqBg()  => math.min(95, obFillTransp + 15)
+_hqOvl() => math.min(98, obFillTransp + 33)
+
+_obTxtSz = obTxtSize=="Tiny"?size.tiny:obTxtSize=="Normal"?size.normal:obTxtSize=="Large"?size.large:size.small
+_obHAl   = obTxtHAlign=="置左"?text.align_left:obTxtHAlign=="置右"?text.align_right:text.align_center
+
+_autoTfKey = switch timeframe.period
+    "1"   => "1M"
+    "3"   => "5M"
+    "5"   => "5M"
+    "15"  => "15M"
+    "30"  => "15M"
+    "45"  => "15M"
+    "60"  => "1H"
+    "120" => "1H"
+    "240" => "4H"
+    "D"   => "1D"
+    "W"   => "1D"
+    => "1D"
+_tfKey = tfPreset == "Auto" ? _autoTfKey : tfPreset
+
+_pivL   = _tfKey=="1M"?8:_tfKey=="5M"?7:_tfKey=="15M"?10:_tfKey=="1H"?10:_tfKey=="4H"?8:_tfKey=="1D"?5:pivL_m
+_pivR   = _tfKey=="1M"?5:_tfKey=="5M"?3:_tfKey=="15M"?5:_tfKey=="1H"?5:_tfKey=="4H"?4:_tfKey=="1D"?3:pivR_m
+_bbSrch = _tfKey=="1M"?200:_tfKey=="5M"?150:_tfKey=="15M"?120:_tfKey=="1H"?100:_tfKey=="4H"?60:_tfKey=="1D"?30:bbSearchBars
+_obExtR = obExtR_m
+
+barsPerDay = math.max(1, math.round(86400 / timeframe.in_seconds()))
+sigBarsMax = sigDays * barsPerDay
+
+tfStr = timeframe.period=="1"?"1分":timeframe.period=="5"?"5分":timeframe.period=="15"?"15分":timeframe.period=="30"?"30分":timeframe.period=="60"?"1H":timeframe.period=="240"?"4H":timeframe.period=="D"?"日":timeframe.period=="W"?"週":timeframe.period+"T"
+
+autoHTF = switch timeframe.period
+    "1"   => "60"
+    "3"   => "60"
+    "5"   => "60"
+    "15"  => "240"
+    "30"  => "240"
+    "45"  => "240"
+    "60"  => "D"
+    "120" => "D"
+    "240" => "W"
+    "D"   => "W"
+    => "W"
+htfStr = autoHTF=="60"?"1H":autoHTF=="240"?"4H":autoHTF=="D"?"日":"週"
+
+f_htf_ob_setup() =>
+    var float _lpH=na, var float _lpL=na
+    var float _bTop=na, var float _bBot=na
+    var float _rTop=na, var float _rBot=na
+    var int   _dir=0
+    _ph = ta.pivothigh(high,5,5)
+    _pl = ta.pivotlow(low,5,5)
+    if not na(_ph)
+        _lpH := _ph
+    if not na(_pl)
+        _lpL := _pl
+    if not na(_lpH) and close > _lpH and not (close[1] > _lpH)
+        _rTop := na
+        _rBot := na
+        _dir  := 1
+        for i = 1 to 20
+            if close[i] < open[i]
+                _bTop := high[i]
+                _bBot := low[i]
+                break
+    if not na(_lpL) and close < _lpL and not (close[1] < _lpL)
+        _bTop := na
+        _bBot := na
+        _dir  := -1
+        for i = 1 to 20
+            if close[i] > open[i]
+                _rTop := high[i]
+                _rBot := low[i]
+                break
+    [_bTop, _bBot, _rTop, _rBot, _dir]
+
+f_htf_fvg_setup() =>
+    var float _bFvgT = na
+    var float _bFvgB = na
+    var float _rFvgT = na
+    var float _rFvgB = na
+    if not na(_bFvgB) and low < _bFvgB
+        _bFvgT := na
+        _bFvgB := na
+    if not na(_rFvgT) and high > _rFvgT
+        _rFvgT := na
+        _rFvgB := na
+    if low[0] > high[2]
+        _bFvgT := low[0]
+        _bFvgB := high[2]
+    if high[0] < low[2]
+        _rFvgT := low[2]
+        _rFvgB := high[0]
+    [_bFvgT, _bFvgB, _rFvgT, _rFvgB]
+
+[h1BT,h1BB,h1RT,h1RB,h1MSSDir] = request.security(syminfo.tickerid,"60",  f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[m5BT,m5BB,m5RT,m5RB,m5MSSDir] = request.security(syminfo.tickerid,"5",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[h4BT,h4BB,h4RT,h4RB,h4MSSDir] = request.security(syminfo.tickerid,"240", f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+[d1BT,d1BB,d1RT,d1RB,d1MSSDir] = request.security(syminfo.tickerid,"D",   f_htf_ob_setup(),lookahead=barmerge.lookahead_off)
+
+[h1BFvgT,h1BFvgB,h1RFvgT,h1RFvgB] = request.security(syminfo.tickerid,"60",  f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[h4BFvgT,h4BFvgB,h4RFvgT,h4RFvgB] = request.security(syminfo.tickerid,"240", f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[d1BFvgT,d1BFvgB,d1RFvgT,d1RFvgB] = request.security(syminfo.tickerid,"D",   f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+[wBFvgT,wBFvgB,wRFvgT,wRFvgB]   = request.security(syminfo.tickerid,"W",   f_htf_fvg_setup(),lookahead=barmerge.lookahead_off)
+
+htfBullTop = autoHTF=="60"?h1BT:autoHTF=="240"?h4BT:d1BT
+htfBullBot = autoHTF=="60"?h1BB:autoHTF=="240"?h4BB:d1BB
+htfBearTop = autoHTF=="60"?h1RT:autoHTF=="240"?h4RT:d1RT
+htfBearBot = autoHTF=="60"?h1RB:autoHTF=="240"?h4RB:d1RB
+htfMSSDir  = autoHTF=="60"?h1MSSDir:autoHTF=="240"?h4MSSDir:d1MSSDir
+
+htfFvgBT    = autoHTF=="60"?h1BFvgT:autoHTF=="240"?h4BFvgT:autoHTF=="D"?d1BFvgT:wBFvgT
+htfFvgBB    = autoHTF=="60"?h1BFvgB:autoHTF=="240"?h4BFvgB:autoHTF=="D"?d1BFvgB:wBFvgB
+htfFvgRT    = autoHTF=="60"?h1RFvgT:autoHTF=="240"?h4RFvgT:autoHTF=="D"?d1RFvgT:wRFvgT
+htfFvgRB    = autoHTF=="60"?h1RFvgB:autoHTF=="240"?h4RFvgB:autoHTF=="D"?d1RFvgB:wRFvgB
+h1W = math.max(bar_index - h1Days*barsPerDay, 1)
+h4W = math.max(bar_index - h4Days*barsPerDay, 1)
+d1W = math.max(bar_index - d1Days*barsPerDay, 1)
+htfFvgW     = autoHTF=="60"?h1W:autoHTF=="240"?h4W:autoHTF=="D"?d1W:math.max(bar_index-d1Days*barsPerDay,1)
+phH = ta.pivothigh(high,_pivL,_pivR)
+plL = ta.pivotlow(low, _pivL,_pivR)
+var float ph1=na, var float ph2=na
+var float pl1=na, var float pl2=na
+if not na(phH)
+    ph2 := ph1
+    ph1 := phH
+if not na(plL)
+    pl2 := pl1
+    pl1 := plL
+lastPH = ph1
+lastPL = pl1
+
+var bool hasMSSBull = false
+var bool hasMSSBear = false
+
+var int _smcTrend = 0
+_hasData        = not na(ph1) and not na(ph2) and not na(pl1) and not na(pl2)
+_isBullStruct   = _hasData and ph1 > ph2 and pl1 > pl2
+_isBearStruct   = _hasData and ph1 < ph2 and pl1 < pl2
+_rawBullMSS     = not na(lastPH) and close > lastPH and close[1] <= lastPH
+_rawBearMSS     = not na(lastPL) and close < lastPL and close[1] >= lastPL
+_structGateBull = strictMSSGate ? (_isBearStruct or not _hasData) : true
+_structGateBear = strictMSSGate ? (_isBullStruct or not _hasData) : true
+bullMSS = _rawBullMSS and _smcTrend != 1 and _structGateBull
+bearMSS = _rawBearMSS and _smcTrend != -1 and _structGateBear
+if bullMSS
+    _smcTrend := 1
+    hasMSSBull := true
+    hasMSSBear := false
+if bearMSS
+    _smcTrend := -1
+    hasMSSBear := true
+    hasMSSBull := false
+
+
+
+var float[] bb          = array.new_float()
+var float[] bl          = array.new_float()
+var bool[]  bb_hasFVG   = array.new_bool()
+var float[] bb_fvgT     = array.new_float()
+var float[] bb_fvgB     = array.new_float()
+var box[]   bb_box      = array.new_box()
+var box[]   bb_fbox     = array.new_box()
+var box[]   bb_hqbox    = array.new_box()
+var bool[]  bb_signaled = array.new_bool()
+var bool[]  bb_isDead   = array.new_bool()
+var bool[]  bb_isHQ     = array.new_bool()
+var bool[]  bb_hqBig   = array.new_bool()
+var bool[]  bb_hqLiq   = array.new_bool()
+var bool[]  bb_hqPDA   = array.new_bool()
+var bool[]  bb_pbDep    = array.new_bool()
+var bool[]  bb_pbSig    = array.new_bool()
+var box[]   bb_pbbox    = array.new_box()
+
+var float[] rb          = array.new_float()
+var float[] rl          = array.new_float()
+var bool[]  rb_hasFVG   = array.new_bool()
+var float[] rb_fvgT     = array.new_float()
+var float[] rb_fvgB     = array.new_float()
+var box[]   rb_box      = array.new_box()
+var box[]   rb_fbox     = array.new_box()
+var box[]   rb_hqbox    = array.new_box()
+var bool[]  rb_signaled = array.new_bool()
+var bool[]  rb_isDead   = array.new_bool()
+var bool[]  rb_isHQ     = array.new_bool()
+var bool[]  rb_hqBig   = array.new_bool()
+var bool[]  rb_hqLiq   = array.new_bool()
+var bool[]  rb_hqPDA   = array.new_bool()
+var bool[]  rb_pbDep    = array.new_bool()
+var bool[]  rb_pbSig    = array.new_bool()
+var box[]   rb_pbbox    = array.new_box()
+var box[]   bb_dead     = array.new_box()
+var box[]   rb_dead     = array.new_box()
+
+var label[] sigLabels   = array.new_label()
+var int[]   sigBars     = array.new_int()
+var int     lastAnySigBar = -999
+
+avgBody = ta.sma(math.abs(close-open),20)
+rng50   = ta.highest(high,50) - ta.lowest(low,50)
+mid50   = ta.lowest(low,50) + rng50*0.5
+var int   lastMSSDir    = 0
+var float _lastBullOBPh = na
+var float _lastBearOBPl = na
+
+f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
+
+while array.size(sigBars) > 0
+    if bar_index - array.get(sigBars, 0) > sigBarsMax
+        label.delete(array.shift(sigLabels))
+        array.shift(sigBars)
+    else
+        break
+
+if array.size(sigBars) > 250
+    for _i = 1 to math.min(50, array.size(sigBars))
+        label.delete(array.shift(sigLabels))
+        array.shift(sigBars)
+
+f_bull_shift(toGrey = false) =>
+    _bx = array.shift(bb_box)
+    if not na(_bx)
+        if toGrey and showDeadOB
+            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
+            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
+            box.set_text_color(_bx,    color.new(color.gray, 30))
+            array.push(bb_dead, _bx)
+            if array.size(bb_dead) > 10
+                box.delete(array.shift(bb_dead))
+        else
+            box.delete(_bx)
+    _f = array.shift(bb_fbox)
+    if not na(_f)
+        box.delete(_f)
+    _h = array.shift(bb_hqbox)
+    if not na(_h)
+        box.delete(_h)
+    array.shift(bb), array.shift(bl), array.shift(bb_hasFVG)
+    array.shift(bb_fvgT), array.shift(bb_fvgB)
+    array.shift(bb_signaled), array.shift(bb_isHQ), array.shift(bb_isDead)
+    array.shift(bb_hqBig),  array.shift(bb_hqLiq),  array.shift(bb_hqPDA)
+    _pbBx2 = array.shift(bb_pbbox)
+    if not na(_pbBx2)
+        box.delete(_pbBx2)
+    array.shift(bb_pbDep), array.shift(bb_pbSig)
+
+f_bear_shift(toGrey = false) =>
+    _bx = array.shift(rb_box)
+    if not na(_bx)
+        if toGrey and showDeadOB
+            box.set_bgcolor(_bx,       color.new(color.gray, deadOBTransp))
+            box.set_border_color(_bx,  color.new(color.gray, math.max(0, deadOBTransp - 40)))
+            box.set_text_color(_bx,    color.new(color.gray, 30))
+            array.push(rb_dead, _bx)
+            if array.size(rb_dead) > 10
+                box.delete(array.shift(rb_dead))
+        else
+            box.delete(_bx)
+    _f = array.shift(rb_fbox)
+    if not na(_f)
+        box.delete(_f)
+    _h = array.shift(rb_hqbox)
+    if not na(_h)
+        box.delete(_h)
+    array.shift(rb), array.shift(rl), array.shift(rb_hasFVG)
+    array.shift(rb_fvgT), array.shift(rb_fvgB)
+    array.shift(rb_signaled), array.shift(rb_isHQ), array.shift(rb_isDead)
+    array.shift(rb_hqBig),  array.shift(rb_hqLiq),  array.shift(rb_hqPDA)
+    _pbBx3 = array.shift(rb_pbbox)
+    if not na(_pbBx3)
+        box.delete(_pbBx3)
+    array.shift(rb_pbDep), array.shift(rb_pbSig)
+_prevMSSDir = lastMSSDir
+if bullMSS and (na(_lastBullOBPh) or ph1 > _lastBullOBPh)
+    _lastBullOBPh := ph1
+    _lastBearOBPl := na
+    lastMSSDir := 1
+    if _prevMSSDir != 1
+        while array.size(rb) > 0
+            f_bear_shift(true)
+    if array.size(bb) >= maxOBs
+        f_bull_shift()
+    for i = 1 to _bbSrch
+        if close[i] < open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
+            obT   = high[i]
+            obB   = low[i]
+            obBar = bar_index - i
+            fvgOk = low[i-1] > high[i+1]
+            fvgT  = fvgOk ? low[i-1]  : na
+            fvgB  = fvgOk ? high[i+1] : na
+            inPDA = not na(mid50) ? (obT+obB)/2 < mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            liqGrab = false
+            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
+                if low[_j] < obB
+                    liqGrab := true
+                    break
+            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
+            isHQ  = sc >= hqMin
+            if sc >= minScore
+                array.push(bb, obT), array.push(bl, obB)
+                array.push(bb_hasFVG, fvgOk)
+                array.push(bb_fvgT, fvgT), array.push(bb_fvgB, fvgB)
+                array.push(bb_signaled, false), array.push(bb_isHQ, isHQ), array.push(bb_isDead, false)
+                array.push(bb_hqBig, big), array.push(bb_hqLiq, liqGrab), array.push(bb_hqPDA, inPDA)
+                array.push(bb_pbDep, false), array.push(bb_pbSig, false), array.push(bb_pbbox, na)
+                if showBull
+                    _bc = isHQ?color.new(#9C27B0,0):color.new(#1E88E5,0)
+                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#1E88E5,obFillTransp)
+                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#BBDEFB,0)
+                    array.push(bb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="+OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
+                    if fvgOk
+                        array.push(bb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#64B5F6,30),bgcolor=color.new(#64B5F6,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#90CAF9,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
+                    else
+                        array.push(bb_fbox, na)
+                    if isHQ
+                        array.push(bb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
+                    else
+                        array.push(bb_hqbox, na)
+                else
+                    array.push(bb_box, na)
+                    array.push(bb_fbox, na)
+                    array.push(bb_hqbox, na)
+                if isHQ
+                    _hl = label.new(obBar,obT,"★ HQ",style=label.style_label_down,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
+                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
+                break
+
+if bearMSS and (na(_lastBearOBPl) or pl1 < _lastBearOBPl)
+    _lastBearOBPl := pl1
+    _lastBullOBPh := na
+    lastMSSDir := -1
+    if _prevMSSDir != -1
+        while array.size(bb) > 0
+            f_bull_shift(true)
+    if array.size(rb) >= maxOBs
+        f_bear_shift()
+    for i = 1 to _bbSrch
+        if close[i] > open[i] and math.abs(close[i]-open[i]) > avgBody * 0.6
+            obT   = high[i]
+            obB   = low[i]
+            obBar = bar_index - i
+            fvgOk = high[i-1] < low[i+1]
+            fvgT  = fvgOk ? low[i+1]  : na
+            fvgB  = fvgOk ? high[i-1] : na
+            inPDA = not na(mid50) ? (obT+obB)/2 > mid50 : false
+            big   = math.abs(close[i]-open[i]) > avgBody*1.5
+            liqGrab = false
+            for _j = i + 1 to math.min(i + 25, _bbSrch - 1)
+                if high[_j] > obT
+                    liqGrab := true
+                    break
+            sc    = f_sc(fvgOk, big, liqGrab, inPDA)
+            isHQ  = sc >= hqMin
+            if sc >= minScore
+                array.push(rb, obT), array.push(rl, obB)
+                array.push(rb_hasFVG, fvgOk)
+                array.push(rb_fvgT, fvgT), array.push(rb_fvgB, fvgB)
+                array.push(rb_signaled, false), array.push(rb_isHQ, isHQ), array.push(rb_isDead, false)
+                array.push(rb_hqBig, big), array.push(rb_hqLiq, liqGrab), array.push(rb_hqPDA, inPDA)
+                array.push(rb_pbDep, false), array.push(rb_pbSig, false), array.push(rb_pbbox, na)
+                if showBear
+                    _bc = isHQ?color.new(#9C27B0,0):color.new(#FF8C00,0)
+                    _bg = isHQ?color.new(#9C27B0,_hqBg()):color.new(#FF8C00,obFillTransp)
+                    _tc = isHQ?color.new(#E1BEE7,0):color.new(#FFE0B2,0)
+                    array.push(rb_box, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=_bc,bgcolor=_bg,border_width=2,text="-OB "+str.tostring(sc)+"/4",text_color=_tc,text_size=_obTxtSz,text_halign=_obHAl,text_valign=text.align_center))
+                    if fvgOk
+                        array.push(rb_fbox, box.new(obBar,fvgT,bar_index+_obExtR,fvgB,border_color=color.new(#FFB74D,30),bgcolor=color.new(#FFB74D,fvgFillTransp),border_style=line.style_dashed,border_width=1,text="FVG",text_color=color.new(#FFCC80,0),text_size=size.tiny,text_halign=text.align_center,text_valign=text.align_center))
+                    else
+                        array.push(rb_fbox, na)
+                    if isHQ
+                        array.push(rb_hqbox, box.new(obBar,obT,bar_index+_obExtR,obB,border_color=color.new(#CE93D8,0),bgcolor=color.new(#9C27B0,_hqOvl()),border_width=2,border_style=line.style_dashed))
+                    else
+                        array.push(rb_hqbox, na)
+                else
+                    array.push(rb_box, na)
+                    array.push(rb_fbox, na)
+                    array.push(rb_hqbox, na)
+                if isHQ
+                    _hl = label.new(obBar,obB,"★ HQ",style=label.style_label_up,color=color.new(#9C27B0,0),textcolor=color.white,size=size.small)
+                    array.push(sigLabels,_hl), array.push(sigBars,bar_index)
+                break
+
+_htfBullAllow = not na(htfBullTop) and not na(htfBullBot) ? htfBullBot + (htfBullTop - htfBullBot) * (1.0 - htfOBPrecision) : htfBullTop
+_htfBearAllow = not na(htfBearTop) and not na(htfBearBot) ? htfBearTop - (htfBearTop - htfBearBot) * (1.0 - htfOBPrecision) : htfBearBot
+inHTFBull = not na(htfBullTop) and not na(htfBullBot) and low >= htfBullBot and low <= _htfBullAllow and htfMSSDir == 1
+inHTFBear = not na(htfBearTop) and not na(htfBearBot) and high <= htfBearTop and high >= _htfBearAllow and htfMSSDir == -1
+htfOkBull = unicornNeedHTF ? inHTFBull : true
+htfOkBear = unicornNeedHTF ? inHTFBear : true
+d1OkBull  = needD1Confirm ? d1MSSDir == 1  : true
+d1OkBear  = needD1Confirm ? d1MSSDir == -1 : true
+
+var bool unicornBull = false
+var bool unicornBear = false
+unicornBull := false
+unicornBear := false
+var int trigBullIdx = -1
+var int trigBearIdx = -1
+trigBullIdx := -1
+trigBearIdx := -1
+
+if array.size(bb) > 0 and lastMSSDir == 1
+    for i = 0 to array.size(bb)-1
+        obT      = array.get(bb, i)
+        obB      = array.get(bl, i)
+        fvgOn    = array.get(bb_hasFVG, i)
+        fT       = array.get(bb_fvgT, i)
+        fB       = array.get(bb_fvgB, i)
+        signaled = array.get(bb_signaled, i)
+        bx       = array.get(bb_box, i)
+        fbx      = array.get(bb_fbox, i)
+        hqbx     = array.get(bb_hqbox, i)
+        if not na(bx)
+            box.set_right(bx, bar_index + _obExtR)
+            if fvgOn and not na(fbx)
+                box.set_right(fbx, bar_index + _obExtR)
+            if not na(hqbx)
+                box.set_right(hqbx, bar_index + _obExtR)
+        if close < obB
+            if not na(bx)
+                box.set_border_color(bx, color.new(color.gray,40))
+                box.set_bgcolor(bx, color.new(color.gray,90))
+                box.set_text_color(bx, color.new(color.gray,30))
+            if not na(hqbx)
+                box.set_border_color(hqbx, color.new(color.gray,60))
+                box.set_bgcolor(hqbx, color.new(color.gray,97))
+            array.set(bb_isDead, i, true)
+        else if (not signaled or allowRepeat) and not array.get(bb_isDead, i)
+            inFVG = fvgOn and not na(fT) and not na(fB) ? low <= fT and high >= fB : false
+            zone  = unicornNeedFVG ? inFVG : (low <= obT and high >= obB)
+            if zone and htfOkBull
+                unicornBull := true
+                trigBullIdx := i
+                break
+        pbDep = array.get(bb_pbDep, i)
+        pbSig = array.get(bb_pbSig, i)
+        pbBx  = array.get(bb_pbbox, i)
+        if not na(pbBx)
+            box.set_right(pbBx, bar_index + _obExtR)
+        if signaled and close > obT and not pbDep
+            array.set(bb_pbDep, i, true)
+        if pbDep and not pbSig and close >= obB
+            inOBpb = low <= obT and high >= obB
+            if inOBpb and htfOkBull
+                _pbT = math.max(open, close)
+                _pbB = math.min(open, close)
+                _pbBx4 = box.new(bar_index, _pbT, bar_index + _obExtR, _pbB, border_color=color.new(#00BCD4,0), bgcolor=color.new(#00BCD4,75), border_width=1, border_style=line.style_dashed, text="+PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
+                array.set(bb_pbbox, i, _pbBx4)
+                array.set(bb_pbSig, i, true)
+
+if array.size(rb) > 0 and lastMSSDir == -1
+    for i = 0 to array.size(rb)-1
+        obT      = array.get(rb, i)
+        obB      = array.get(rl, i)
+        fvgOn    = array.get(rb_hasFVG, i)
+        fT       = array.get(rb_fvgT, i)
+        fB       = array.get(rb_fvgB, i)
+        signaled = array.get(rb_signaled, i)
+        bx       = array.get(rb_box, i)
+        fbx      = array.get(rb_fbox, i)
+        hqbx     = array.get(rb_hqbox, i)
+        if not na(bx)
+            box.set_right(bx, bar_index + _obExtR)
+            if fvgOn and not na(fbx)
+                box.set_right(fbx, bar_index + _obExtR)
+            if not na(hqbx)
+                box.set_right(hqbx, bar_index + _obExtR)
+        if close > obT
+            if not na(bx)
+                box.set_border_color(bx, color.new(color.gray,40))
+                box.set_bgcolor(bx, color.new(color.gray,90))
+                box.set_text_color(bx, color.new(color.gray,30))
+            if not na(hqbx)
+                box.set_border_color(hqbx, color.new(color.gray,60))
+                box.set_bgcolor(hqbx, color.new(color.gray,97))
+            array.set(rb_isDead, i, true)
+        else if (not signaled or allowRepeat) and not array.get(rb_isDead, i)
+            inFVG = fvgOn and not na(fT) and not na(fB) ? high >= fB and low <= fT : false
+            zone  = unicornNeedFVG ? inFVG : (high >= obB and low <= obT)
+            if zone and htfOkBear
+                unicornBear := true
+                trigBearIdx := i
+                break
+        pbDepR = array.get(rb_pbDep, i)
+        pbSigR = array.get(rb_pbSig, i)
+        pbBxR  = array.get(rb_pbbox, i)
+        if not na(pbBxR)
+            box.set_right(pbBxR, bar_index + _obExtR)
+        if signaled and close < obB and not pbDepR
+            array.set(rb_pbDep, i, true)
+        if pbDepR and not pbSigR and close <= obT and close >= obB
+            inOBpbR = high >= obB and low <= obT
+            if inOBpbR and htfOkBear
+                _pbTR = math.max(open, close)
+                _pbBR = math.min(open, close)
+                _pbBx5 = box.new(bar_index, _pbTR, bar_index + _obExtR, _pbBR, border_color=color.new(#FF5252,0), bgcolor=color.new(#FF5252,75), border_width=1, border_style=line.style_dashed, text="-PB", text_color=color.white, text_size=size.tiny, text_halign=text.align_right, text_valign=text.align_center)
+                array.set(rb_pbbox, i, _pbBx5)
+                array.set(rb_pbSig, i, true)
+
+uBullEdge = unicornBull and not unicornBull[1]
+uBearEdge = unicornBear and not unicornBear[1]
+
+bool fireBull = uBullEdge and trigBullIdx >= 0 and trigBullIdx < array.size(bb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBull
+bool fireBear = uBearEdge and trigBearIdx >= 0 and trigBearIdx < array.size(rb_signaled) and (bar_index - lastAnySigBar) >= sigCooldown and d1OkBear
+
+
+
+
+
+var int _lTot   = 0
+var int _lWin   = 0
+var int _sTot   = 0
+var int _sWin   = 0
+var int _lHQTot = 0
+var int _lHQWin = 0
+var int _sHQTot = 0
+var int _sHQWin = 0
+if barstate.islast
+    _lTot := 0, _lWin := 0, _sTot := 0, _sWin := 0
+    _lHQTot := 0, _lHQWin := 0, _sHQTot := 0, _sHQWin := 0
+    if strategy.closedtrades > 0
+        for _ci = 0 to strategy.closedtrades - 1
+            _cpnl = strategy.closedtrades.profit(_ci)
+            _ceid = strategy.closedtrades.entry_id(_ci)
+            _ciHQ = _ceid == "L_HQ" or _ceid == "S_HQ"
+            if str.startswith(_ceid, "L")
+                _lTot += 1
+                if _cpnl > 0
+                    _lWin += 1
+                if _ciHQ
+                    _lHQTot += 1
+                    if _cpnl > 0
+                        _lHQWin += 1
+            else
+                _sTot += 1
+                if _cpnl > 0
+                    _sWin += 1
+                if _ciHQ
+                    _sHQTot += 1
+                    if _cpnl > 0
+                        _sHQWin += 1
+var string _lWrStr   = "暫無"
+var string _sWrStr   = "暫無"
+var string _lHQWrStr = "暫無"
+var string _sHQWrStr = "暫無"
+if barstate.islast
+    _lWrStr   := _lTot   > 0 ? str.tostring(math.round(_lWin   * 100.0 / _lTot))   + "% (" + str.tostring(_lWin)   + "/" + str.tostring(_lTot)   + ")" : "暫無"
+    _sWrStr   := _sTot   > 0 ? str.tostring(math.round(_sWin   * 100.0 / _sTot))   + "% (" + str.tostring(_sWin)   + "/" + str.tostring(_sTot)   + ")" : "暫無"
+    _lHQWrStr := _lHQTot > 0 ? str.tostring(math.round(_lHQWin * 100.0 / _lHQTot)) + "% (" + str.tostring(_lHQWin) + "/" + str.tostring(_lHQTot) + ")" : "暫無"
+    _sHQWrStr := _sHQTot > 0 ? str.tostring(math.round(_sHQWin * 100.0 / _sHQTot)) + "% (" + str.tostring(_sHQWin) + "/" + str.tostring(_sHQTot) + ")" : "暫無"
+
+fireHQBull = (fireBull and trigBullIdx >= 0 and trigBullIdx < array.size(bb_isHQ)) ? array.get(bb_isHQ, trigBullIdx) : false
+fireHQBear = (fireBear and trigBearIdx >= 0 and trigBearIdx < array.size(rb_isHQ)) ? array.get(rb_isHQ, trigBearIdx) : false
+
+_hqScoreBull = (fireHQBull and trigBullIdx < array.size(bb_hasFVG)) ? f_sc(array.get(bb_hasFVG, trigBullIdx), array.get(bb_hqBig, trigBullIdx), array.get(bb_hqLiq, trigBullIdx), array.get(bb_hqPDA, trigBullIdx)) : 0
+_hqScoreBear = (fireHQBear and trigBearIdx < array.size(rb_hasFVG)) ? f_sc(array.get(rb_hasFVG, trigBearIdx), array.get(rb_hqBig, trigBearIdx), array.get(rb_hqLiq, trigBearIdx), array.get(rb_hqPDA, trigBearIdx)) : 0
+
+if fireHQBull and barstate.isconfirmed
+    alert("HQOB +" + str.tostring(_hqScoreBull) + "/4 (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+if fireHQBear and barstate.isconfirmed
+    alert("HQOB +" + str.tostring(_hqScoreBear) + "/4 (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+if fireBull and barstate.isconfirmed
+    alert("Unicorn ↑ (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+if fireBear and barstate.isconfirmed
+    alert("Unicorn ↓ (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+_atr = ta.atr(atrLen)
+var line[] _tpLines = array.new_line()
+var line[] _slLines = array.new_line()
+var label[] _tpLbls = array.new_label()
+var label[] _slLbls = array.new_label()
+
+_MAX_TPSL = 1
+
+if fireBull and barstate.isconfirmed
+    array.set(bb_signaled, trigBullIdx, true)
+    lastAnySigBar := bar_index
+    _isHQ  = array.get(bb_isHQ, trigBullIdx)
+    _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#1E88E5,0)
+    _lt    = _isHQ ? "HQ UM⭡" : "UM⭡"
+    _lbl   = label.new(bar_index, low, _lt, style=label.style_label_up, color=_lc, textcolor=color.white, size=size.normal)
+    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
+    _tpLev = close + _atr * tpATR
+    _slLev = close - _atr * slATR
+    _eid   = _isHQ ? "L_HQ" : "L"
+    strategy.entry(_eid, strategy.long)
+    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    if showTPSL
+        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
+        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
+        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
+        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
+        array.push(_tpLines,_tl), array.push(_slLines,_sl)
+        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
+        if array.size(_tpLines) > _MAX_TPSL
+            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
+            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
+
+if fireBear and barstate.isconfirmed
+    array.set(rb_signaled, trigBearIdx, true)
+    lastAnySigBar := bar_index
+    _isHQ  = array.get(rb_isHQ, trigBearIdx)
+    _lc    = _isHQ ? color.new(#9C27B0,0) : color.new(#FF8C00,0)
+    _lt    = _isHQ ? "HQ UM⭣" : "UM⭣"
+    _lbl   = label.new(bar_index, high, _lt, style=label.style_label_down, color=_lc, textcolor=color.white, size=size.normal)
+    array.push(sigLabels,_lbl), array.push(sigBars,bar_index)
+    _tpLev = close - _atr * tpATR
+    _slLev = close + _atr * slATR
+    _eid   = _isHQ ? "S_HQ" : "S"
+    strategy.entry(_eid, strategy.short)
+    strategy.exit(_eid + "_TP", _eid, limit=_tpLev, stop=_slLev)
+    if showTPSL
+        _tl = line.new(bar_index, _tpLev, bar_index+80, _tpLev, color=color.new(#22c55e,0), style=line.style_dashed, width=1)
+        _sl = line.new(bar_index, _slLev, bar_index+80, _slLev, color=color.new(#ef4444,0), style=line.style_dashed, width=1)
+        _tlbl = label.new(bar_index+80, _tpLev, "TP", style=label.style_label_left, color=color.new(#22c55e,70), textcolor=color.new(#22c55e,0), size=size.small)
+        _slbl = label.new(bar_index+80, _slLev, "SL", style=label.style_label_left, color=color.new(#ef4444,70), textcolor=color.new(#ef4444,0), size=size.small)
+        array.push(_tpLines,_tl), array.push(_slLines,_sl)
+        array.push(_tpLbls,_tlbl), array.push(_slLbls,_slbl)
+        if array.size(_tpLines) > _MAX_TPSL
+            line.delete(array.shift(_tpLines)), line.delete(array.shift(_slLines))
+            label.delete(array.shift(_tpLbls)), label.delete(array.shift(_slLbls))
+
+bgcolor(showBgColor and unicornBull ? color.new(#1E88E5,93) : showBgColor and unicornBear ? color.new(#FF8C00,93) : na)
+
+ZR  = bar_index + htfExtR
+m5W = math.max(bar_index - m5Days*barsPerDay, 1)
+
+var box h1BullBox=na, var box h1BearBox=na
+var box h4BullBox=na, var box h4BearBox=na
+var box d1BullBox=na, var box d1BearBox=na
+var box m5BullBox=na, var box m5BearBox=na
+var box htfBullFvgBox=na, var box htfBearFvgBox=na
+
+
+
+if show5MOB and not na(m5BT) and not na(m5BB)
+    if na(m5BullBox)
+        m5BullBox := box.new(m5W,m5BT,ZR,m5BB,border_color=color.new(#AB47BC,20),bgcolor=color.new(#AB47BC,htfFillTransp),border_width=1,text="5M+OB",text_color=color.new(#CE93D8,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if m5W > 1
+            box.set_left(m5BullBox, m5W)
+        box.set_right(m5BullBox, ZR)
+        box.set_top(m5BullBox, m5BT)
+        box.set_bottom(m5BullBox, m5BB)
+        box.set_bgcolor(m5BullBox, color.new(#AB47BC,htfFillTransp))
+
+if show5MOB and not na(m5RT) and not na(m5RB)
+    if na(m5BearBox)
+        m5BearBox := box.new(m5W,m5RT,ZR,m5RB,border_color=color.new(#F06292,20),bgcolor=color.new(#F06292,htfFillTransp),border_width=1,text="5M-OB",text_color=color.new(#F48FB1,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if m5W > 1
+            box.set_left(m5BearBox, m5W)
+        box.set_right(m5BearBox, ZR)
+        box.set_top(m5BearBox, m5RT)
+        box.set_bottom(m5BearBox, m5RB)
+        box.set_bgcolor(m5BearBox, color.new(#F06292,htfFillTransp))
+
+if show1HOB and not na(h1BT) and not na(h1BB)
+    if na(h1BullBox)
+        h1BullBox := box.new(h1W,h1BT,ZR,h1BB,border_color=color.new(#26A69A,20),bgcolor=color.new(#26A69A,htfFillTransp),border_width=1,text="1H+OB",text_color=color.new(#80CBC4,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h1W > 1
+            box.set_left(h1BullBox, h1W)
+        box.set_right(h1BullBox, ZR)
+        box.set_top(h1BullBox, h1BT)
+        box.set_bottom(h1BullBox, h1BB)
+        box.set_bgcolor(h1BullBox, color.new(#26A69A,htfFillTransp))
+
+if show1HOB and not na(h1RT) and not na(h1RB)
+    if na(h1BearBox)
+        h1BearBox := box.new(h1W,h1RT,ZR,h1RB,border_color=color.new(#EF5350,20),bgcolor=color.new(#EF5350,htfFillTransp),border_width=1,text="1H-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h1W > 1
+            box.set_left(h1BearBox, h1W)
+        box.set_right(h1BearBox, ZR)
+        box.set_top(h1BearBox, h1RT)
+        box.set_bottom(h1BearBox, h1RB)
+        box.set_bgcolor(h1BearBox, color.new(#EF5350,htfFillTransp))
+
+if show4HOB and not na(h4BT) and not na(h4BB)
+    if na(h4BullBox)
+        h4BullBox := box.new(h4W,h4BT,ZR,h4BB,border_color=color.new(#00BCD4,20),bgcolor=color.new(#00BCD4,htfFillTransp),border_width=2,text="4H+OB",text_color=color.new(#80DEEA,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h4W > 1
+            box.set_left(h4BullBox, h4W)
+        box.set_right(h4BullBox, ZR)
+        box.set_top(h4BullBox, h4BT)
+        box.set_bottom(h4BullBox, h4BB)
+        box.set_bgcolor(h4BullBox, color.new(#00BCD4,htfFillTransp))
+
+if show4HOB and not na(h4RT) and not na(h4RB)
+    if na(h4BearBox)
+        h4BearBox := box.new(h4W,h4RT,ZR,h4RB,border_color=color.new(#FF5722,20),bgcolor=color.new(#FF5722,htfFillTransp),border_width=2,text="4H-OB",text_color=color.new(#FF8A65,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if h4W > 1
+            box.set_left(h4BearBox, h4W)
+        box.set_right(h4BearBox, ZR)
+        box.set_top(h4BearBox, h4RT)
+        box.set_bottom(h4BearBox, h4RB)
+        box.set_bgcolor(h4BearBox, color.new(#FF5722,htfFillTransp))
+
+if show1DOB and not na(d1BT) and not na(d1BB)
+    if na(d1BullBox)
+        d1BullBox := box.new(d1W,d1BT,ZR,d1BB,border_color=color.new(#4CAF50,20),bgcolor=color.new(#4CAF50,htfFillTransp),border_width=2,text="1D+OB",text_color=color.new(#A5D6A7,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if d1W > 1
+            box.set_left(d1BullBox, d1W)
+        box.set_right(d1BullBox, ZR)
+        box.set_top(d1BullBox, d1BT)
+        box.set_bottom(d1BullBox, d1BB)
+        box.set_bgcolor(d1BullBox, color.new(#4CAF50,htfFillTransp))
+
+if show1DOB and not na(d1RT) and not na(d1RB)
+    if na(d1BearBox)
+        d1BearBox := box.new(d1W,d1RT,ZR,d1RB,border_color=color.new(#F44336,20),bgcolor=color.new(#F44336,htfFillTransp),border_width=2,text="1D-OB",text_color=color.new(#EF9A9A,0),text_size=size.normal,text_halign=text.align_right,text_valign=text.align_center)
+    else
+        if d1W > 1
+            box.set_left(d1BearBox, d1W)
+        box.set_right(d1BearBox, ZR)
+        box.set_top(d1BearBox, d1RT)
+        box.set_bottom(d1BearBox, d1RB)
+        box.set_bgcolor(d1BearBox, color.new(#F44336,htfFillTransp))
+
+_fvgT = math.min(98, htfFillTransp + 5)
+
+if showHTFFVG
+    if not na(htfFvgBT) and not na(htfFvgBB)
+        if na(htfBullFvgBox)
+            htfBullFvgBox := box.new(htfFvgW,htfFvgBT,ZR,htfFvgBB,border_color=color.new(#26A69A,0),bgcolor=color.new(#26A69A,_fvgT),border_style=line.style_dashed,border_width=2,text=htfStr+" FVG+",text_color=color.new(#80CBC4,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            box.set_left(htfBullFvgBox, htfFvgW)
+            box.set_right(htfBullFvgBox, ZR)
+            box.set_top(htfBullFvgBox, htfFvgBT)
+            box.set_bottom(htfBullFvgBox, htfFvgBB)
+            box.set_bgcolor(htfBullFvgBox, color.new(#26A69A,_fvgT))
+            box.set_border_color(htfBullFvgBox, color.new(#26A69A,0))
+            box.set_text_color(htfBullFvgBox, color.new(#80CBC4,0))
+    else if not na(htfBullFvgBox)
+        box.set_bgcolor(htfBullFvgBox, color.new(color.gray, math.min(98,_fvgT+3)))
+        box.set_border_color(htfBullFvgBox, color.new(color.gray,60))
+        box.set_text_color(htfBullFvgBox, color.new(color.gray,30))
+    if not na(htfFvgRT) and not na(htfFvgRB)
+        if na(htfBearFvgBox)
+            htfBearFvgBox := box.new(htfFvgW,htfFvgRT,ZR,htfFvgRB,border_color=color.new(#EF5350,0),bgcolor=color.new(#EF5350,_fvgT),border_style=line.style_dashed,border_width=2,text=htfStr+" FVG-",text_color=color.new(#EF9A9A,0),text_size=size.small,text_halign=text.align_right,text_valign=text.align_center)
+        else
+            box.set_left(htfBearFvgBox, htfFvgW)
+            box.set_right(htfBearFvgBox, ZR)
+            box.set_top(htfBearFvgBox, htfFvgRT)
+            box.set_bottom(htfBearFvgBox, htfFvgRB)
+            box.set_bgcolor(htfBearFvgBox, color.new(#EF5350,_fvgT))
+            box.set_border_color(htfBearFvgBox, color.new(#EF5350,0))
+            box.set_text_color(htfBearFvgBox, color.new(#EF9A9A,0))
+    else if not na(htfBearFvgBox)
+        box.set_bgcolor(htfBearFvgBox, color.new(color.gray, math.min(98,_fvgT+3)))
+        box.set_border_color(htfBearFvgBox, color.new(color.gray,60))
+        box.set_text_color(htfBearFvgBox, color.new(color.gray,30))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+step1 = inHTFBull or inHTFBear
+step3 = hasMSSBull or hasMSSBear
+step4 = array.size(bb) > 0 or array.size(rb) > 0
+var bool step5 = false
+step5 := false
+if array.size(bb) > 0
+    for i = 0 to array.size(bb)-1
+        if array.get(bb_hasFVG,i)
+            step5 := true
+if array.size(rb) > 0
+    for i = 0 to array.size(rb)-1
+        if array.get(rb_hasFVG,i)
+            step5 := true
+step7 = unicornBull or unicornBear
+var bool stepHQ    = false
+var bool stepHQfvg = false
+var bool stepHQbig = false
+var bool stepHQLiq = false
+var bool stepHQpda = false
+stepHQ := false, stepHQfvg := false, stepHQbig := false, stepHQLiq := false, stepHQpda := false
+if array.size(bb) > 0
+    for i = 0 to array.size(bb)-1
+        if array.get(bb_isHQ,i)
+            stepHQ := true
+        if array.get(bb_hasFVG,i)
+            stepHQfvg := true
+        if array.get(bb_hqBig,i)
+            stepHQbig := true
+        if array.get(bb_hqLiq,i)
+            stepHQLiq := true
+        if array.get(bb_hqPDA,i)
+            stepHQpda := true
+if array.size(rb) > 0
+    for i = 0 to array.size(rb)-1
+        if array.get(rb_isHQ,i)
+            stepHQ := true
+        if array.get(rb_hasFVG,i)
+            stepHQfvg := true
+        if array.get(rb_hqBig,i)
+            stepHQbig := true
+        if array.get(rb_hqLiq,i)
+            stepHQLiq := true
+        if array.get(rb_hqPDA,i)
+            stepHQpda := true
+
+bullDir = hasMSSBull and (inHTFBull or not unicornNeedHTF)
+bearDir = hasMSSBear and (inHTFBear or not unicornNeedHTF)
+dirStr  = unicornBull?"▲ 做多進場":unicornBear?"▼ 做空進場":bullDir?"多方準備":bearDir?"空方準備":"觀望"
+dirCol  = unicornBull or bullDir ? color.new(#1E88E5,0) : unicornBear or bearDir ? color.new(#FF8C00,0) : color.new(#888888,0)
+htfInfo = inHTFBull?"多方PDA":inHTFBear?"空方PDA":"未進入"
+mssInfo = hasMSSBull?"看漲":hasMSSBear?"看跌":"待確認"
+bbCnt   = array.size(bb)+array.size(rb)
+bbInfo  = step4?str.tostring(bbCnt)+" BB":"等待"
+nextStr = not step3?"等待MSS":not step4?"等待BB":(not step5 and unicornNeedFVG)?"等待FVG":not step7?"等待進場":"已觸發!"
+
+_pos   = dashPos=="左下"?position.bottom_left:dashPos=="右下"?position.bottom_right:dashPos=="左上"?position.top_left:position.top_right
+_cbg   = color.new(#0D1117, 0)
+_cHd   = color.new(#0f172a, 0)
+_cSep  = color.new(#1e293b, 0)
+_cGn   = color.new(#22c55e, 0)
+_cGr   = color.new(#475569, 0)
+_cGold = color.new(#fbbf24, 0)
+_cOr   = color.new(#FF8C00, 0)
+_cBl   = color.new(#1E88E5, 0)
+_cGnBg = color.new(#14532d, 0)
+_cAmBg = color.new(#451a03, 0)
+_fsz   = dashFont=="Tiny"?size.tiny:dashFont=="Normal"?size.normal:dashFont=="Large"?size.large:size.small
+
+var table dash = na
+if showDash
+    if na(dash)
+        dash := table.new(_pos, 2, 18, bgcolor=_cbg, border_color=color.new(#1e293b,0), border_width=1, frame_color=color.new(#334155,0), frame_width=1)
+    table.cell(dash, 0, 0, "Unicorn V13 · " + tfStr, text_color=color.white, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_left)
+    table.cell(dash, 1, 0, "參考 " + htfStr, text_color=_cGr, text_size=_fsz, bgcolor=_cHd, text_halign=text.align_right)
+    _dirBg = unicornBull?color.new(#0c2a47,0):unicornBear?color.new(#3b0f05,0):_cHd
+    table.cell(dash, 0, 1, "方向", text_color=_cGr, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_left)
+    table.cell(dash, 1, 1, dirStr, text_color=dirCol, text_size=_fsz, bgcolor=_dirBg, text_halign=text.align_right)
+    table.cell(dash, 0, 2, "Unicorn 核心", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 2, "MSS → BB → FVG → 進場", text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _bg3 = step3?_cGnBg:_cbg
+    table.cell(dash, 0, 3, (step3?"✔":"·") + " MSS 結構", text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_left)
+    table.cell(dash, 1, 3, mssInfo, text_color=step3?_cGn:_cGr, text_size=_fsz, bgcolor=_bg3, text_halign=text.align_right)
+    _bg4 = step4?_cGnBg:_cbg
+    table.cell(dash, 0, 4, (step4?"✔":"·") + " Breaker (BB)", text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_left)
+    table.cell(dash, 1, 4, bbInfo, text_color=step4?_cGn:_cGr, text_size=_fsz, bgcolor=_bg4, text_halign=text.align_right)
+    _bg5 = step5?_cGnBg:_cbg
+    table.cell(dash, 0, 5, (step5?"✔":"·") + " FVG 缺口", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_left)
+    table.cell(dash, 1, 5, step5?"有FVG":"無FVG", text_color=step5?_cGn:_cGr, text_size=_fsz, bgcolor=_bg5, text_halign=text.align_right)
+    _bg6 = step7?color.new(#0a3d1f,0):_cbg
+    table.cell(dash, 0, 6, (step7?"✔":"·") + " 好的進場位", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_left)
+    table.cell(dash, 1, 6, step7?"進入區間!":"等待回測", text_color=step7?_cGn:_cGr, text_size=_fsz, bgcolor=_bg6, text_halign=text.align_right)
+    table.cell(dash, 0, 7, "下一步", text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_left)
+    table.cell(dash, 1, 7, nextStr,  text_color=_cOr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_right)
+    table.cell(dash, 0, 8, "HQ OB 品質 (4個條件)", text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 8, "3個以上 = HQ★",         text_color=_cGold, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _bg9 = stepHQfvg?_cAmBg:_cbg
+    table.cell(dash, 0, 9,  (stepHQfvg?"★":"·") + " FVG 缺口",    text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_left)
+    table.cell(dash, 1, 9,  stepHQfvg?"✔ 有缺口":"·",              text_color=stepHQfvg?_cGold:_cGr, text_size=_fsz, bgcolor=_bg9,  text_halign=text.align_right)
+    _bg10 = stepHQbig?_cAmBg:_cbg
+    table.cell(dash, 0, 10, (stepHQbig?"★":"·") + " 大實體K棒",    text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_left)
+    table.cell(dash, 1, 10, stepHQbig?"✔ 大實體":"·",               text_color=stepHQbig?_cGold:_cGr, text_size=_fsz, bgcolor=_bg10, text_halign=text.align_right)
+    _bg11 = stepHQLiq?_cAmBg:_cbg
+    table.cell(dash, 0, 11, (stepHQLiq?"★":"·") + " SSL/BSL掃除",  text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_left)
+    table.cell(dash, 1, 11, stepHQLiq?"✔ 有掃除":"·",               text_color=stepHQLiq?_cGold:_cGr, text_size=_fsz, bgcolor=_bg11, text_halign=text.align_right)
+    _bg12 = stepHQpda?_cAmBg:_cbg
+    table.cell(dash, 0, 12, (stepHQpda?"★":"·") + " HTF PDA",      text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_left)
+    table.cell(dash, 1, 12, stepHQpda?"✔ 在PDA":"·",                text_color=stepHQpda?_cGold:_cGr, text_size=_fsz, bgcolor=_bg12, text_halign=text.align_right)
+    table.cell(dash, 0, 13, "UM 勝率",     text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    table.cell(dash, 1, 13, "",             text_color=_cGr, text_size=size.tiny, bgcolor=_cSep, text_halign=text.align_center)
+    _lWrPct   = _lTot   > 0 ? _lWin   * 100.0 / _lTot   : -1.0
+    _sWrPct   = _sTot   > 0 ? _sWin   * 100.0 / _sTot   : -1.0
+    _lWrC2    = _lWrPct   >= 0 ? (_lWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    _sWrC2    = _sWrPct   >= 0 ? (_sWrPct   >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    table.cell(dash, 0, 14, "多▲ UM",    text_color=_cBl,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 14, _lWrStr,    text_color=_lWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 15, "空▼ UM",    text_color=_cOr,    text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 15, _sWrStr,    text_color=_sWrC2,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    _lHQWrPct = _lHQTot > 0 ? _lHQWin * 100.0 / _lHQTot : -1.0
+    _sHQWrPct = _sHQTot > 0 ? _sHQWin * 100.0 / _sHQTot : -1.0
+    _lHQWrC2  = _lHQWrPct >= 0 ? (_lHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    _sHQWrC2  = _sHQWrPct >= 0 ? (_sHQWrPct >= 50 ? _cGn : color.new(#ef4444,0)) : _cGr
+    table.cell(dash, 0, 16, "★HQ 多▲",  text_color=_cGold,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 16, _lHQWrStr,  text_color=_lHQWrC2, text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+    table.cell(dash, 0, 17, "★HQ 空▼",  text_color=_cGold,   text_size=_fsz, bgcolor=_cbg, text_halign=text.align_left)
+    table.cell(dash, 1, 17, _sHQWrStr,  text_color=_sHQWrC2, text_size=_fsz, bgcolor=_cbg, text_halign=text.align_right)
+
+`;
 const SMC_MTF = `//@version=5
 indicator("SMC 多時框結構", overlay=true)
 
@@ -12509,6 +13565,7 @@ if showDash and barstate.islast
 document.getElementById('unicorn-v8-code').textContent = UNICORN_V8;
 document.getElementById('unicorn-v9s-code').textContent = UNICORN_V9_STRAT;
 document.getElementById('unicorn-v10-code').textContent = UNICORN_V10_STRAT;
+document.getElementById('unicorn-v14-code').textContent = UNICORN_V14_STRAT;
 document.getElementById('unicorn-v13-code').textContent = UNICORN_V13_STRAT;
 document.getElementById('unicorn-smcmtf-code').textContent = SMC_MTF;
 document.getElementById('unicorn-fibote-code').textContent = FIB_OTE;
@@ -12523,7 +13580,7 @@ document.getElementById('unicorn-v4s-code').textContent = UNICORN_V4_STRAT;
 
 function copyUnicornCode(btn) {
   const ak = VER_ACTIVE.unicorn || 'u_v4';
-  const text = ak === 'u_v13' ? UNICORN_V13_STRAT : ak === 'u_fibote' ? FIB_OTE : ak === 'u_smcmtf' ? SMC_MTF : ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
+  const text = ak === 'u_v14' ? UNICORN_V14_STRAT : ak === 'u_v13' ? UNICORN_V13_STRAT : ak === 'u_fibote' ? FIB_OTE : ak === 'u_smcmtf' ? SMC_MTF : ak === 'u_v10' ? UNICORN_V10_STRAT : ak === 'u_v9s' ? UNICORN_V9_STRAT : ak === 'u_v8' ? UNICORN_V8 : ak === 'u_v7s' ? UNICORN_V7_STRAT : ak === 'u_v7' ? UNICORN_V7 : ak === 'u_v6' ? UNICORN_V6 : ak === 'u_v4s' ? UNICORN_V4_STRAT : ak === 'u_v4' ? UNICORN_V4 : ak === 'u_v3' ? UNICORN_V3 : ak === 'u_v2' ? UNICORN_V2 : ak === 'u_legacy' ? UNICORN_LEGACY : document.getElementById('unicorn-v1-code').innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
@@ -13843,14 +14900,19 @@ const VERSION_DEFS = {
     { key: 'u_fibote', date: '2026-07-23', sub: 'FIB OTE Zone：偵測多空結構，自動繪製 Strong/Weak 標籤與 0.5–0.618 Fibonacci 等候區，支援提示音', contentId: 'unicorn-fibote-wrap', logId: 'unicorn-log-fibote' },
     { key: 'u_smcmtf', date: '2026-07-22', sub: 'SMC 多時框結構儀表板：1D/4H/1H/5M/1M 即時顯示 BOS/CHoCH 結構方向', contentId: 'unicorn-smcmtf-wrap', logId: 'unicorn-log-smcmtf' },
     { key: 'u_v13', date: '2026-08-08', sub: 'V13：訊號標籤清理改成滿250批次刪最舊50個，同步Scalping V1', contentId: 'unicorn-v13-wrap', logId: 'unicorn-log-v13' },
+    { key: 'u_v14', date: '2026-08-09', sub: 'V14：快訊文字改版，HQOB附品質分數與價格、Unicorn改方向箭頭+價格', contentId: 'unicorn-v14-wrap', logId: 'unicorn-log-v14' },
   ],
   dashboard: [
     { key: 'd_v1', date: '2026-07-10', sub: '1分K + SMC',    contentId: 'dash-panel-v1', logId: 'dash-log-v1' },
     { key: 'd_v2', date: '2026-07-11', sub: '時框快選預設',  contentId: 'dash-panel-v2', logId: 'dash-log-v2' },
     { key: 'd_v3', date: '2026-07-23', sub: '5M參數組 + OB過期 + smcBuyOK收緊', contentId: 'dash-panel-v3', logId: 'dash-log-v3' },
+  ],
+  scalping: [
+    { key: 's_v1', date: '2026-08-08', sub: 'V1：SMA帶狀剝頭皮首版，含全客製化訊號/儀表板/標籤清理等歷次修正', contentId: 'scalp-panel-v1', logId: 'scalp-log-v1' },
+    { key: 's_v2', date: '2026-08-09', sub: 'V2：進場alert文字合併TP/SL成一組括號', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
   ]
 };
-const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs' };
+const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs', scalping: 'scalp-vtabs' };
 const VER_ACTIVE = {};
 
 function _getVisible(cardKey) {
@@ -13925,7 +14987,7 @@ function tvc(key, el) {
 
 
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
-renderVerTabs('unicorn', 'u_v13');
+renderVerTabs('unicorn', 'u_v14');
 renderVerTabs('dashboard', 'd_v3');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
@@ -14936,8 +15998,9 @@ if showDash and barstate.islast
 
 document.getElementById('scalp-band-code').textContent = SCALP_BAND_V1;
 
-function copyScalpBand(btn) {
-  navigator.clipboard.writeText(SCALP_BAND_V1).then(() => {
+function copyScalpBand(btn, ver) {
+  const s = ver === 'v2' ? SCALP_BAND_V2 : SCALP_BAND_V1;
+  navigator.clipboard.writeText(s).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
   });
