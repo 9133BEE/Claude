@@ -14989,6 +14989,7 @@ function tvc(key, el) {
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
 renderVerTabs('unicorn', 'u_v14');
 renderVerTabs('dashboard', 'd_v3');
+renderVerTabs('scalping', 's_v2');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
 document.getElementById('dash-code-v3').textContent = DASHBOARD_V3;
@@ -15996,7 +15997,296 @@ if showDash and barstate.islast
     table.cell(dash, 1, 9, str.tostring(strategy.netprofit, "#,##0.##"), text_color=_pnlCol, text_size=_fsz, text_halign=text.align_right)
 `;
 
-document.getElementById('scalp-band-code').textContent = SCALP_BAND_V1;
+const SCALP_BAND_V2 = `//@version=5
+strategy("Scalping trade(V2)", shorttitle="Scalping V2", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.02, process_orders_on_close=true, calc_on_every_tick=false, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ══════════════════════════════════════════════════════════════════════════
+// Scalping trade(V2) — 剝頭皮 SMA帶狀策略
+// 改寫自 OANDA 教學：https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/
+// 核心邏輯：中期SMA(預設40)判斷趨勢方向；高/低價2期移動平均線形成帶狀通道
+// 上升趨勢中，K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場
+// 下降趨勢中相反；SMA轉為反向、盤整無明顯斜率、或持倉逾K棒數上限則強制出場
+// 設計為極短暫持倉(1-2根K棒)，屬於高頻小賺小賠交易法，務必留意手續費/滑價侵蝕獲利
+// V2：進場alert文字把TP/SL合併成一組括號「(TP-SL)」，其餘邏輯與V1相同
+// 新增：緊急ATR停損(原文未提及，本腳本額外加上避免單根K棒劇烈反向造成過大虧損)
+// 做多/做空訊號的顏色、透明度、提示字、標籤字大小皆可獨立設定；可選只顯示做多/只顯示做空/多空都顯示
+// 非保證勝率，請務必自行在 Strategy Tester 對想交易的商品/週期分開回測後再考慮實單
+// ══════════════════════════════════════════════════════════════════════════
+
+// ========================= 趨勢濾網 =========================
+grpTrend    = "趨勢濾網"
+smaLen      = input.int(40, "中期趨勢SMA週期", minval=5, group=grpTrend, tooltip="原文建議以40週期SMA判斷中期方向")
+slopeLook   = input.int(5, "SMA斜率比較K棒數", minval=1, group=grpTrend)
+slopeMinPct = input.float(0.02, "最小斜率(%)，低於視為盤整不交易", minval=0, step=0.01, group=grpTrend, tooltip="SMA走平代表無明顯趨勢，原文提醒盤整時不應進場剝頭皮")
+
+// ========================= 高低帶狀 =========================
+grpBand = "高低帶狀(進出場軌道)"
+bandLen = input.int(2, "高/低價移動平均週期", minval=1, group=grpBand, tooltip="原文使用2週期，分別以最高價/最低價做平均形成帶狀通道")
+
+// ========================= 訊號顯示模式 =========================
+grpMode    = "訊號顯示模式"
+signalMode = input.string("一起顯示", "訊號模式", options=["只出現做多訊號", "只出現做空訊號", "一起顯示"], group=grpMode, tooltip="控制是否進場/顯示標籤/送出alert：只出現做多訊號=只做多單，只出現做空訊號=只做空單，一起顯示=多空都做")
+allowLong  = signalMode == "只出現做多訊號" or signalMode == "一起顯示"
+allowShort = signalMode == "只出現做空訊號" or signalMode == "一起顯示"
+
+// ========================= 做多訊號設定 =========================
+grpLong        = "做多訊號設定"
+longEntryColor  = input.color(#22c55e, "做多進場顏色", group=grpLong, tooltip="出場顏色統一在下方「出場標籤樣式」設定，不分方向")
+longEntryTransp = input.int(0, "做多進場透明度(%)", minval=0, maxval=100, group=grpLong)
+longEntryText  = input.string("Buy to Open", "做多進場提示字", group=grpLong)
+longExitText   = input.string("Sell to Close", "做多出場提示字", group=grpLong)
+longLabelSize  = input.string("Small", "做多標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpLong)
+
+// ========================= 做空訊號設定 =========================
+grpShort        = "做空訊號設定"
+shortEntryColor  = input.color(#ef4444, "做空進場顏色", group=grpShort, tooltip="出場顏色統一在下方「出場標籤樣式」設定，不分方向")
+shortEntryTransp = input.int(0, "做空進場透明度(%)", minval=0, maxval=100, group=grpShort)
+shortEntryText  = input.string("Sell to Open", "做空進場提示字", group=grpShort)
+shortExitText   = input.string("Buy to Close", "做空出場提示字", group=grpShort)
+shortLabelSize  = input.string("Small", "做空標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpShort)
+
+// ========================= 出場標籤樣式（多空統一） =========================
+grpExitStyle  = "出場標籤樣式（多空統一）"
+exitBgColor   = input.color(color.white, "出場標籤背景色", group=grpExitStyle, tooltip="做多/做空平倉統一用同一組顏色，看到這個顏色就知道「這是平倉」不必再分方向")
+exitTextColor = input.color(#374151, "出場標籤文字顏色", group=grpExitStyle)
+exitTransp    = input.int(0, "出場標籤透明度(%)", minval=0, maxval=100, group=grpExitStyle)
+
+// ========================= 警報設定 =========================
+grpAlert     = "警報設定"
+enableAlerts = input.bool(true, "啟用提示音(alert通知)", group=grpAlert, tooltip="開啟後進出場會呼叫alert()函數；TradingView建立警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知即可收到提示音")
+
+// ========================= 進出場設定 =========================
+grpExit        = "進出場設定"
+maxBarsInTrade = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=1, group=grpExit, tooltip="原文強調1-2根K棒內完成交易，逾時未達停利則直接出場")
+useSlopeExit   = input.bool(true, "SMA轉向時停損出場", group=grpExit)
+
+grpRisk          = "額外安全網(原文未提及)"
+useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，腳本會自動偵測並補畫對應的出場提示字/alert，Strategy Tester交易紀錄會標註「緊急ATR停損」）")
+emergencyAtrLen  = input.int(14, "緊急停損ATR週期", minval=5, group=grpRisk)
+emergencyAtrMult = input.float(1.5, "緊急停損ATR倍數", minval=0.5, step=0.25, group=grpRisk)
+
+// ========================= 顯示設定 =========================
+grpDisp   = "顯示設定"
+showBands = input.bool(true, "顯示SMA/高低帶狀線", group=grpDisp)
+showDash  = input.bool(true, "顯示儀表板", group=grpDisp)
+dashPos   = input.string("右上", "儀表板位置", options=["右上","右下","左上","左下"], group=grpDisp)
+dashSize  = input.string("Small", "儀表板文字大小", options=["Tiny","Small","Normal"], group=grpDisp)
+labelPruneAt  = input.int(250, "標籤數達到多少開始清理", minval=50, maxval=500, group=grpDisp, tooltip="進出場標籤總數超過此門檻時，一次批次刪除最舊的N個（見下方設定），避免逐一刪除造成圖表閃爍；上限受Pine max_labels_count=500限制")
+labelPruneQty = input.int(50, "每次清理刪除幾個最舊標籤", minval=10, maxval=400, group=grpDisp)
+showTradeLine  = input.bool(true, "顯示建倉→平倉連接線", group=grpDisp, tooltip="把同一筆交易的進場點跟出場點連起來，方便在訊號密集時確認哪個平倉對應哪個開倉")
+tradeLineColor = input.color(#9ca3af, "連接線顏色", group=grpDisp)
+tradeLineTransp = input.int(30, "連接線透明度(%)", minval=0, maxval=100, group=grpDisp)
+tradeLineStyle = input.string("虛線", "連接線樣式", options=["實線","虛線","點線"], group=grpDisp)
+_tlStyle = tradeLineStyle == "實線" ? line.style_solid : tradeLineStyle == "點線" ? line.style_dotted : line.style_dashed
+
+var label[] allLabels = array.new_label()
+f_mkLabel(_bar, _price, _txt, _style, _col, _txtCol, _sz) =>
+    _lb = label.new(_bar, _price, _txt, style=_style, color=_col, textcolor=_txtCol, size=_sz)
+    array.push(allLabels, _lb)
+    if array.size(allLabels) > labelPruneAt
+        for _i = 1 to math.min(labelPruneQty, array.size(allLabels))
+            label.delete(array.shift(allLabels))
+    _lb
+
+_szMap(s) => s == "Tiny" ? size.tiny : s == "Small" ? size.small : s == "Normal" ? size.normal : s == "Large" ? size.large : size.huge
+
+// ========================= 核心運算 =========================
+smaTrend = ta.sma(close, smaLen)
+highMA   = ta.sma(high, bandLen)
+lowMA    = ta.sma(low, bandLen)
+_atrEmg  = ta.atr(emergencyAtrLen)
+
+smaSlopePct = (smaTrend - smaTrend[slopeLook]) / smaTrend[slopeLook] * 100
+
+isUptrend   = highMA > smaTrend and lowMA > smaTrend and smaSlopePct >  slopeMinPct
+isDowntrend = highMA < smaTrend and lowMA < smaTrend and smaSlopePct < -slopeMinPct
+
+longCond  = isUptrend   and allowLong  and low  <= lowMA  and strategy.position_size == 0
+shortCond = isDowntrend and allowShort and high >= highMA and strategy.position_size == 0
+
+// ========================= 進場 =========================
+var int    entryBar       = na
+var float  entryPrice     = na
+var float  emergencyStop  = na
+var bool   pendingManualLongClose  = false
+var bool   pendingManualShortClose = false
+var float  lastEntryPrice = na
+var int    lastEntryDir   = 0
+
+if longCond and barstate.isconfirmed
+    strategy.entry("Long", strategy.long)
+    entryBar      := bar_index
+    entryPrice    := close
+    emergencyStop := close - _atrEmg * emergencyAtrMult
+    lastEntryPrice := close
+    lastEntryDir   := 1
+    if useEmergencyStop
+        strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
+    _labelMsg = "Open " + str.tostring(close, "#.#")
+    _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
+    _alertMsg = longEntryText + " " + str.tostring(close, "#.#") + " (" + str.tostring(highMA, "#.#") + "-" + _slVal + ")"
+    f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
+    if enableAlerts
+        alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+if shortCond and barstate.isconfirmed
+    strategy.entry("Short", strategy.short)
+    entryBar      := bar_index
+    entryPrice    := close
+    emergencyStop := close + _atrEmg * emergencyAtrMult
+    lastEntryPrice := close
+    lastEntryDir   := -1
+    if useEmergencyStop
+        strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
+    _labelMsg = "Open " + str.tostring(close, "#.#")
+    _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
+    _alertMsg = shortEntryText + " " + str.tostring(close, "#.#") + " (" + str.tostring(lowMA, "#.#") + "-" + _slVal + ")"
+    f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
+    if enableAlerts
+        alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+
+barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
+
+f_exitMsg(_txt, _exitPx, _dir) =>
+    _pts = _dir == 1 ? _exitPx - entryPrice : entryPrice - _exitPx
+    _ptsStr = (_pts >= 0 ? "+" : "") + str.tostring(_pts, "#.#")
+    _txt + " (" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ") (" + _ptsStr + ")"
+
+// ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
+if strategy.position_size > 0
+    tpHit   = high >= highMA
+    slHit   = useSlopeExit and smaSlopePct < 0
+    timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
+    if tpHit or slHit or timeOut
+        _reason = tpHit ? "TP觸高軌" : slHit ? "SL SMA轉弱" : "逾時出場"
+        strategy.close("Long", comment=_reason)
+        pendingManualLongClose := true
+        _labelMsg = "Close " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(longExitText, close, 1)
+        f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
+
+if strategy.position_size < 0
+    tpHit   = low <= lowMA
+    slHit   = useSlopeExit and smaSlopePct > 0
+    timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
+    if tpHit or slHit or timeOut
+        _reason = tpHit ? "TP觸低軌" : slHit ? "SL SMA轉強" : "逾時出場"
+        strategy.close("Short", comment=_reason)
+        pendingManualShortClose := true
+        _labelMsg = "Close " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, close, -1)
+        f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
+
+// ========================= 緊急停損補標(讓broker端觸發的停損也顯示訊號) =========================
+longFlipToFlat  = strategy.position_size == 0 and strategy.position_size[1] > 0
+shortFlipToFlat = strategy.position_size == 0 and strategy.position_size[1] < 0
+
+if longFlipToFlat
+    if pendingManualLongClose
+        pendingManualLongClose := false
+    else
+        _labelMsg = "Close " + str.tostring(emergencyStop, "#.#")
+        _alertMsg = f_exitMsg(longExitText, emergencyStop, 1)
+        f_mkLabel(bar_index, emergencyStop, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
+
+if shortFlipToFlat
+    if pendingManualShortClose
+        pendingManualShortClose := false
+    else
+        _labelMsg = "Close " + str.tostring(emergencyStop, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, emergencyStop, -1)
+        f_mkLabel(bar_index, emergencyStop, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        emergencyStop := na
+
+// ========================= 繪圖 =========================
+plot(showBands ? smaTrend : na, "中期SMA",     color=color.new(#facc15, 0), linewidth=2)
+plot(showBands ? highMA   : na, "高價MA(上軌)", color=color.new(#22c55e, 0), linewidth=2)
+plot(showBands ? lowMA    : na, "低價MA(下軌)", color=color.new(#ef4444, 0), linewidth=2)
+
+// ========================= 儀表板 =========================
+_curTP = strategy.position_size > 0 ? highMA : strategy.position_size < 0 ? lowMA : na
+_curSL = strategy.position_size != 0 and useEmergencyStop ? emergencyStop : na
+_distTP = strategy.position_size > 0 ? _curTP - close : strategy.position_size < 0 ? close - _curTP : na
+_distSL = strategy.position_size > 0 ? close - _curSL : strategy.position_size < 0 ? _curSL - close : na
+_lastClosedPL = strategy.closedtrades > 0 ? strategy.closedtrades.profit(strategy.closedtrades - 1) : na
+
+var table dash = na
+if showDash and barstate.islast
+    _pos = dashPos == "右上" ? position.top_right : dashPos == "右下" ? position.bottom_right : dashPos == "左上" ? position.top_left : position.bottom_left
+    _fsz = dashSize == "Tiny" ? size.tiny : dashSize == "Small" ? size.small : size.normal
+    if na(dash)
+        dash := table.new(_pos, 2, 10, bgcolor=color.new(#0d1117, 0), border_color=color.new(#1e293b, 0), border_width=1, frame_color=color.new(#334155, 0), frame_width=1)
+
+    table.cell(dash, 0, 0, "Scalping trade(V1)", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
+    table.cell(dash, 1, 0, timeframe.period, text_color=color.new(#94a3b8, 0), text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_right)
+
+    _posStr = strategy.position_size > 0 ? "多頭持倉中" : strategy.position_size < 0 ? "空頭持倉中" : "空手"
+    _posCol = strategy.position_size > 0 ? color.new(#22c55e, 0) : strategy.position_size < 0 ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 1, "目前狀態", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 1, _posStr, text_color=_posCol, text_size=_fsz, text_halign=text.align_right)
+
+    _lastEntryStr = lastEntryDir == 1 ? "多 @ " + str.tostring(lastEntryPrice, format.mintick) : lastEntryDir == -1 ? "空 @ " + str.tostring(lastEntryPrice, format.mintick) : "尚無交易"
+    _lastEntryCol = lastEntryDir == 1 ? color.new(#22c55e, 0) : lastEntryDir == -1 ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 2, "最近建倉點", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 2, _lastEntryStr, text_color=_lastEntryCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 3, "停利(TP)", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 3, na(_curTP) ? "-" : str.tostring(_curTP, format.mintick), text_color=color.new(#22c55e, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 4, "停損(SL)", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 4, na(_curSL) ? (strategy.position_size != 0 ? "SMA轉向" : "-") : str.tostring(_curSL, format.mintick), text_color=color.new(#ef4444, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 5, "距離TP / SL", text_color=color.white, text_size=_fsz)
+    _distStr = na(_distTP) ? "-" : str.tostring(_distTP, format.mintick) + " / " + (na(_distSL) ? "-" : str.tostring(_distSL, format.mintick))
+    table.cell(dash, 1, 5, _distStr, text_color=color.new(#facc15, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 6, "未實現損益", text_color=color.white, text_size=_fsz)
+    _openCol = strategy.openprofit >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 6, strategy.position_size == 0 ? "-" : str.tostring(strategy.openprofit, "#,##0.##"), text_color=_openCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 7, "上一筆損益", text_color=color.white, text_size=_fsz)
+    _lastPLCol = na(_lastClosedPL) ? color.new(#94a3b8, 0) : _lastClosedPL >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 7, na(_lastClosedPL) ? "-" : str.tostring(_lastClosedPL, "#,##0.##"), text_color=_lastPLCol, text_size=_fsz, text_halign=text.align_right)
+
+    _wr = strategy.closedtrades > 0 ? strategy.wintrades * 100.0 / strategy.closedtrades : -1.0
+    _wrCol = _wr < 0 ? color.new(#94a3b8, 0) : _wr >= 70 ? color.new(#22c55e, 0) : _wr >= 50 ? color.new(#facc15, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 0, 8, "策略勝率", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 8, _wr < 0 ? "暫無交易" : str.tostring(math.round(_wr)) + "% (" + str.tostring(strategy.wintrades) + "/" + str.tostring(strategy.closedtrades) + ")", text_color=_wrCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 9, "淨損益", text_color=color.white, text_size=_fsz)
+    _pnlCol = strategy.netprofit >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 9, str.tostring(strategy.netprofit, "#,##0.##"), text_color=_pnlCol, text_size=_fsz, text_halign=text.align_right)
+`;
+
+document.getElementById('scalp-code-v1').textContent = SCALP_BAND_V1;
+document.getElementById('scalp-code-v2').textContent = SCALP_BAND_V2;
 
 function copyScalpBand(btn, ver) {
   const s = ver === 'v2' ? SCALP_BAND_V2 : SCALP_BAND_V1;
