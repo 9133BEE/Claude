@@ -15076,7 +15076,7 @@ ssfLength = input.int(20, "EDSMA - Super Smoother Filter Length", minval=1, grou
 ssfPoles  = input.int(2, "EDSMA - Super Smoother Filter Poles", options=[2, 3], group=grpZAdv)
 
 //IDWMA
-calcWeight(series float src, simple int length, simple int i) =>
+calcWeight(series float src, simple int length, series int i) =>
     distanceSum = 0.0
     for j = 0 to length - 1
         distanceSum := distanceSum + math.abs(nz(src[i]) - nz(src[j]))
