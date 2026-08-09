@@ -9905,9 +9905,12 @@ var float _lastBearOBPl = na
 
 f_sc(a,b,c,d) => (a?1:0)+(b?1:0)+(c?1:0)+(d?1:0)
 
-while array.size(sigBars) > 0 and bar_index - array.get(sigBars, 0) > sigBarsMax
-    label.delete(array.shift(sigLabels))
-    array.shift(sigBars)
+while array.size(sigBars) > 0
+    if bar_index - array.get(sigBars, 0) > sigBarsMax
+        label.delete(array.shift(sigLabels))
+        array.shift(sigBars)
+    else
+        break
 
 if array.size(sigBars) > 250
     for _i = 1 to math.min(50, array.size(sigBars))
