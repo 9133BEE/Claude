@@ -261,8 +261,9 @@ a:hover{text-decoration:underline}
       <div class="ver-sidebar">
         <div class="ver-tabs" id="unicorn-vtabs"></div>
         <div id="unicorn-log-v14" class="ver-log">
-          <span class="vl-dot">›</span> <b>2026-08-09：V14 快訊文字改版</b>：HQOB訊號快訊從固定的「ENTRY-HQOB」改成附上品質分數與價格，例如看漲符合3/4項HQ條件時會是「HQOB +3/4 (7780.5) NQ1! 5」，分數直接取自該筆OB的FVG缺口/大實體K棒/SSL-BSL掃除/HTF PDA四項條件實際達成數<br>
-          <span class="vl-dot">›</span> <b>一般UM訊號</b>：從「ENTRY-Unicorn」改成方向箭頭+價格，例如「Unicorn ↑ (7780.5) NQ1! 5」（多方）／「Unicorn ↓ (7780.5) NQ1! 5」（空方）<br>
+          <span class="vl-dot">›</span> <b>2026-08-09：V14 快訊文字改版</b>：HQOB訊號快訊從固定的「ENTRY-HQOB」改成附上品質分數與價格，例如看漲符合3/4項HQ條件時會是「HQOB +3/4 (7780.5)」，分數直接取自該筆OB的FVG缺口/大實體K棒/SSL-BSL掃除/HTF PDA四項條件實際達成數<br>
+          <span class="vl-dot">›</span> <b>一般UM訊號</b>：從「ENTRY-Unicorn」改成方向箭頭+價格，例如「Unicorn ↑ (7780.5)」（多方）／「Unicorn ↓ (7780.5)」（空方）<br>
+          <span class="vl-dot">›</span> <b>2026-08-09 再修</b>：拿掉商品代碼（TradingView快訊通知標題本來就會顯示商品代碼，訊息內文重複顯示是多餘的），改成時框放最前面用「→」連接，例如「5→HQOB +3/4 (7780.5)」「5→Unicorn ↑ (7780.5)」<br>
           <span class="vl-dot">›</span> 其餘核心邏輯與V13完全相同，只改了這兩組alert()文字內容
         </div>
         <div id="unicorn-log-v13" class="ver-log">
@@ -983,7 +984,8 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v2" class="ver-log">
-          <span class="vl-dot">›</span> <b>2026-08-09：V2 進場alert文字合併TP/SL</b> — 進場alert原本TP、SL分開兩組括號「(TP-7780.8)(SL-7770.8)」，改成合併成一組「(7780.8-7770.8)」，例如「Buy to Open 7777.5 (7780.8-7770.8) NQ1! 5」；其餘核心邏輯、圖表標籤、出場alert格式與V1完全相同<br>
+          <span class="vl-dot">›</span> <b>2026-08-09：V2 進場alert文字合併TP/SL</b> — 進場alert原本TP、SL分開兩組括號「(TP-7780.8)(SL-7770.8)」，改成合併成一組「(7780.8-7770.8)」<br>
+          <span class="vl-dot">›</span> <b>2026-08-09 再修：alert文字拿掉商品代碼、時框移到最前面、分兩行顯示</b> — 商品代碼在TradingView快訊通知標題本來就有顯示，內文重複顯示是多餘的，已移除；時框改放最前面用「→」連接；括號詳細資訊改成換行顯示，例如進場「5→Buy to Open 7777.5」換行「(7780.8-7770.8)」，出場「5→Sell to Close」換行「(4398.5→4401.9) (+3.4)」<br>
           <span class="vl-dot">›</span> 其餘功能（進出場邏輯、儀表板、連接線、標籤批次清理等）與V1一致，詳見V1版本頁籤的完整更新紀錄
         </div>
         <div id="scalp-log-v1" class="ver-log" style="display:none">
@@ -11310,14 +11312,14 @@ _hqScoreBull = (fireHQBull and trigBullIdx < array.size(bb_hasFVG)) ? f_sc(array
 _hqScoreBear = (fireHQBear and trigBearIdx < array.size(rb_hasFVG)) ? f_sc(array.get(rb_hasFVG, trigBearIdx), array.get(rb_hqBig, trigBearIdx), array.get(rb_hqLiq, trigBearIdx), array.get(rb_hqPDA, trigBearIdx)) : 0
 
 if fireHQBull and barstate.isconfirmed
-    alert("HQOB +" + str.tostring(_hqScoreBull) + "/4 (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    alert(timeframe.period + "→HQOB +" + str.tostring(_hqScoreBull) + "/4 (" + str.tostring(close, "#.#") + ")", alert.freq_once_per_bar_close)
 if fireHQBear and barstate.isconfirmed
-    alert("HQOB +" + str.tostring(_hqScoreBear) + "/4 (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    alert(timeframe.period + "→HQOB +" + str.tostring(_hqScoreBear) + "/4 (" + str.tostring(close, "#.#") + ")", alert.freq_once_per_bar_close)
 
 if fireBull and barstate.isconfirmed
-    alert("Unicorn ↑ (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    alert(timeframe.period + "→Unicorn ↑ (" + str.tostring(close, "#.#") + ")", alert.freq_once_per_bar_close)
 if fireBear and barstate.isconfirmed
-    alert("Unicorn ↓ (" + str.tostring(close, "#.#") + ") " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+    alert(timeframe.period + "→Unicorn ↓ (" + str.tostring(close, "#.#") + ")", alert.freq_once_per_bar_close)
 
 _atr = ta.atr(atrLen)
 var line[] _tpLines = array.new_line()
@@ -16124,10 +16126,10 @@ if longCond and barstate.isconfirmed
         strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
     _labelMsg = "Open " + str.tostring(close, "#.#")
     _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
-    _alertMsg = longEntryText + " " + str.tostring(close, "#.#") + " (" + str.tostring(highMA, "#.#") + "-" + _slVal + ")"
+    _alertMsg = timeframe.period + "→" + longEntryText + " " + str.tostring(close, "#.#") + "\n(" + str.tostring(highMA, "#.#") + "-" + _slVal + ")"
     f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
     if enableAlerts
-        alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        alert(_alertMsg, alert.freq_once_per_bar_close)
 
 if shortCond and barstate.isconfirmed
     strategy.entry("Short", strategy.short)
@@ -16140,17 +16142,17 @@ if shortCond and barstate.isconfirmed
         strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
     _labelMsg = "Open " + str.tostring(close, "#.#")
     _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
-    _alertMsg = shortEntryText + " " + str.tostring(close, "#.#") + " (" + str.tostring(lowMA, "#.#") + "-" + _slVal + ")"
+    _alertMsg = timeframe.period + "→" + shortEntryText + " " + str.tostring(close, "#.#") + "\n(" + str.tostring(lowMA, "#.#") + "-" + _slVal + ")"
     f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
     if enableAlerts
-        alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+        alert(_alertMsg, alert.freq_once_per_bar_close)
 
 barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
 
 f_exitMsg(_txt, _exitPx, _dir) =>
     _pts = _dir == 1 ? _exitPx - entryPrice : entryPrice - _exitPx
     _ptsStr = (_pts >= 0 ? "+" : "") + str.tostring(_pts, "#.#")
-    _txt + " (" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ") (" + _ptsStr + ")"
+    timeframe.period + "→" + _txt + "\n(" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ") (" + _ptsStr + ")"
 
 // ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
 if strategy.position_size > 0
@@ -16167,7 +16169,7 @@ if strategy.position_size > 0
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
@@ -16186,7 +16188,7 @@ if strategy.position_size < 0
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
@@ -16205,7 +16207,7 @@ if longFlipToFlat
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
@@ -16220,7 +16222,7 @@ if shortFlipToFlat
         if showTradeLine and not na(entryBar)
             line.new(entryBar, entryPrice, bar_index, emergencyStop, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
         if enableAlerts
-            alert(_alertMsg + " " + syminfo.ticker + " " + timeframe.period, alert.freq_once_per_bar_close)
+            alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
         emergencyStop := na
