@@ -984,6 +984,7 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v2" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-09 優化：停利改用R倍數，不再依賴帶狀寬度</b> — 原本停利(TP)是「碰到對側帶狀線」，跟停損(SL，ATR倍數)是兩套完全不相干的機制，兩者之間沒有設計過的比例關係，可能是「賺小賠大」的根本原因；改成新增「停利R倍數(相對於停損距離)」設定(預設1.5)，停利價=進場價+風險距離(緊急停損ATR距離)×此倍數，直接控制風報比，回測後依結果調整<br>
           <span class="vl-dot">›</span> <b>2026-08-09：V2 進場alert文字合併TP/SL</b> — 進場alert原本TP、SL分開兩組括號「(TP-7780.8)(SL-7770.8)」，改成合併成一組「(7780.8-7770.8)」<br>
           <span class="vl-dot">›</span> <b>2026-08-09 再修：alert文字拿掉商品代碼、時框移到最前面</b> — 商品代碼在TradingView快訊通知標題本來就有顯示，內文重複顯示是多餘的，已移除；時框改放最前面用「→」連接，例如進場「5→Buy to Open 7777.5 (7780.8-7770.8)」，出場「5→Sell to Close (4398.5→4401.9) (+3.4)」<br>
           <span class="vl-dot">›</span> <b>2026-08-09 修正：換行編譯錯誤的真正原因</b> — 網站原始碼本身是JavaScript樣板字串，先前寫的單一 <code>\n</code> 在瀏覽器產生程式碼時就被JavaScript自己吃掉轉成真正的換行字元，導致複製到Pine編輯器時字串中間出現一個裸換行，Pine字串不能跨行、因此編譯失敗；並不是Pine不支援<code>\n</code>。修正為在網站原始碼寫兩個反斜線 <code>\\n</code>，讓JavaScript輸出後仍是給Pine看的單一 <code>\n</code> 跳脫字元，這樣alert()訊息才會真正分兩行顯示<br>
@@ -16062,6 +16063,7 @@ enableAlerts = input.bool(true, "啟用提示音(alert通知)", group=grpAlert, 
 grpExit        = "進出場設定"
 maxBarsInTrade = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=1, group=grpExit, tooltip="原文強調1-2根K棒內完成交易，逾時未達停利則直接出場")
 useSlopeExit   = input.bool(true, "SMA轉向時停損出場", group=grpExit)
+tpRMultiple    = input.float(1.5, "停利R倍數(相對於停損距離)", minval=0.5, step=0.25, group=grpExit, tooltip="停利改用「進場價+風險距離(緊急停損ATR距離)×此倍數」計算，直接控制風報比，不再依賴帶狀寬度決定")
 
 grpRisk          = "額外安全網(原文未提及)"
 useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，腳本會自動偵測並補畫對應的出場提示字/alert，Strategy Tester交易紀錄會標註「緊急ATR停損」）")
@@ -16115,12 +16117,14 @@ var bool   pendingManualLongClose  = false
 var bool   pendingManualShortClose = false
 var float  lastEntryPrice = na
 var int    lastEntryDir   = 0
+var float  tpPrice        = na
 
 if longCond and barstate.isconfirmed
     strategy.entry("Long", strategy.long)
     entryBar      := bar_index
     entryPrice    := close
     emergencyStop := close - _atrEmg * emergencyAtrMult
+    tpPrice       := close + (_atrEmg * emergencyAtrMult) * tpRMultiple
     lastEntryPrice := close
     lastEntryDir   := 1
     if useEmergencyStop
@@ -16137,6 +16141,7 @@ if shortCond and barstate.isconfirmed
     entryBar      := bar_index
     entryPrice    := close
     emergencyStop := close + _atrEmg * emergencyAtrMult
+    tpPrice       := close - (_atrEmg * emergencyAtrMult) * tpRMultiple
     lastEntryPrice := close
     lastEntryDir   := -1
     if useEmergencyStop
@@ -16157,7 +16162,7 @@ f_exitMsg(_txt, _exitPx, _dir) =>
 
 // ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
 if strategy.position_size > 0
-    tpHit   = high >= highMA
+    tpHit   = high >= tpPrice
     slHit   = useSlopeExit and smaSlopePct < 0
     timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
     if tpHit or slHit or timeOut
@@ -16173,10 +16178,11 @@ if strategy.position_size > 0
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
+        tpPrice       := na
         emergencyStop := na
 
 if strategy.position_size < 0
-    tpHit   = low <= lowMA
+    tpHit   = low <= tpPrice
     slHit   = useSlopeExit and smaSlopePct > 0
     timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
     if tpHit or slHit or timeOut
@@ -16192,6 +16198,7 @@ if strategy.position_size < 0
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
+        tpPrice       := na
         emergencyStop := na
 
 // ========================= 緊急停損補標(讓broker端觸發的停損也顯示訊號) =========================
@@ -16211,6 +16218,7 @@ if longFlipToFlat
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
+        tpPrice       := na
         emergencyStop := na
 
 if shortFlipToFlat
@@ -16226,6 +16234,7 @@ if shortFlipToFlat
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
         entryPrice    := na
+        tpPrice       := na
         emergencyStop := na
 
 // ========================= 繪圖 =========================
@@ -16247,7 +16256,7 @@ if showDash and barstate.islast
     if na(dash)
         dash := table.new(_pos, 2, 10, bgcolor=color.new(#0d1117, 0), border_color=color.new(#1e293b, 0), border_width=1, frame_color=color.new(#334155, 0), frame_width=1)
 
-    table.cell(dash, 0, 0, "Scalping trade(V1)", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
+    table.cell(dash, 0, 0, "Scalping trade(V2)", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
     table.cell(dash, 1, 0, timeframe.period, text_color=color.new(#94a3b8, 0), text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_right)
 
     _posStr = strategy.position_size > 0 ? "多頭持倉中" : strategy.position_size < 0 ? "空頭持倉中" : "空手"
