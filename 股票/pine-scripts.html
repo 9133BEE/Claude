@@ -984,6 +984,7 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v2" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-09 修正：出場標籤被同一根K棒的新進場標籤蓋住</b> — 根因是策略常常「這根K棒剛出場、同一根馬上又反手進場」，出場跟新進場的標籤畫在同一根K棒、價格又非常接近（例如出場4370.2、新進場4370.1），兩個框幾乎完全疊在一起，肉眼只看得到最上層那個，看起來像「有alert沒標籤」；新增「出場後至少要等1根K棒才能再進場」的限制(`lastExitBar`)，避免同根K棒疊圖，對策略邏輯本身也更合理（不該同根K棒立刻反手）<br>
           <span class="vl-dot">›</span> <b>2026-08-09 全面檢查修正：儀表板「停利(TP)」欄位還在顯示舊帶狀邏輯</b> — 改用R倍數計算停利後，儀表板顯示那格忘記同步，還在顯示`highMA`/`lowMA`帶狀線位置，跟實際出場判斷用的`tpPrice`不一致，會誤導使用者；已改成顯示真正生效的`tpPrice`，距離TP欄位同步修正<br>
           <span class="vl-dot">›</span> <b>2026-08-09 修正：緊急停損補標籤位置跟K棒對不上</b> — 根因是broker端觸發緊急ATR停損後，補標籤邏輯要等1-2根K棒才偵測到，但畫標籤用的是「進場當下算好的理論停損價」，畫在的卻是「現在才偵測到的這根K棒」，兩者不是同一個時間點，導致標籤位置飄在K棒之外對不上。改用 <code>strategy.closedtrades.exit_price()</code> 抓這筆交易實際成交價，取代理論停損價，標籤位置跟文字才會是真正發生過的價格<br>
           <span class="vl-dot">›</span> <b>2026-08-09 優化：停利改用R倍數，不再依賴帶狀寬度</b> — 原本停利(TP)是「碰到對側帶狀線」，跟停損(SL，ATR倍數)是兩套完全不相干的機制，兩者之間沒有設計過的比例關係，可能是「賺小賠大」的根本原因；改成新增「停利R倍數(相對於停損距離)」設定(預設1.5)，停利價=進場價+風險距離(緊急停損ATR距離)×此倍數，直接控制風報比，回測後依結果調整<br>
@@ -16108,8 +16109,10 @@ smaSlopePct = (smaTrend - smaTrend[slopeLook]) / smaTrend[slopeLook] * 100
 isUptrend   = highMA > smaTrend and lowMA > smaTrend and smaSlopePct >  slopeMinPct
 isDowntrend = highMA < smaTrend and lowMA < smaTrend and smaSlopePct < -slopeMinPct
 
-longCond  = isUptrend   and allowLong  and low  <= lowMA  and strategy.position_size == 0
-shortCond = isDowntrend and allowShort and high >= highMA and strategy.position_size == 0
+var int lastExitBar = na
+_reentryOk = na(lastExitBar) or bar_index - lastExitBar >= 1
+longCond  = isUptrend   and allowLong  and low  <= lowMA  and strategy.position_size == 0 and _reentryOk
+shortCond = isDowntrend and allowShort and high >= highMA and strategy.position_size == 0 and _reentryOk
 
 // ========================= 進場 =========================
 var int    entryBar       = na
@@ -16179,6 +16182,7 @@ if strategy.position_size > 0
         if enableAlerts
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
+        lastExitBar   := bar_index
         entryPrice    := na
         tpPrice       := na
         emergencyStop := na
@@ -16199,6 +16203,7 @@ if strategy.position_size < 0
         if enableAlerts
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
+        lastExitBar   := bar_index
         entryPrice    := na
         tpPrice       := na
         emergencyStop := na
@@ -16220,6 +16225,7 @@ if longFlipToFlat
         if enableAlerts
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
+        lastExitBar   := bar_index
         entryPrice    := na
         tpPrice       := na
         emergencyStop := na
@@ -16237,6 +16243,7 @@ if shortFlipToFlat
         if enableAlerts
             alert(_alertMsg, alert.freq_once_per_bar_close)
         entryBar      := na
+        lastExitBar   := bar_index
         entryPrice    := na
         tpPrice       := na
         emergencyStop := na
