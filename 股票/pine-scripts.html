@@ -985,7 +985,8 @@ if showDash and barstate.islast
       <div class="ver-main">
         <div id="scalp-log-v2" class="ver-log">
           <span class="vl-dot">›</span> <b>2026-08-09：V2 進場alert文字合併TP/SL</b> — 進場alert原本TP、SL分開兩組括號「(TP-7780.8)(SL-7770.8)」，改成合併成一組「(7780.8-7770.8)」<br>
-          <span class="vl-dot">›</span> <b>2026-08-09 再修：alert文字拿掉商品代碼、時框移到最前面、分兩行顯示</b> — 商品代碼在TradingView快訊通知標題本來就有顯示，內文重複顯示是多餘的，已移除；時框改放最前面用「→」連接；括號詳細資訊改成換行顯示，例如進場「5→Buy to Open 7777.5」換行「(7780.8-7770.8)」，出場「5→Sell to Close」換行「(4398.5→4401.9) (+3.4)」<br>
+          <span class="vl-dot">›</span> <b>2026-08-09 再修：alert文字拿掉商品代碼、時框移到最前面</b> — 商品代碼在TradingView快訊通知標題本來就有顯示，內文重複顯示是多餘的，已移除；時框改放最前面用「→」連接，例如進場「5→Buy to Open 7777.5 (7780.8-7770.8)」，出場「5→Sell to Close (4398.5→4401.9) (+3.4)」<br>
+          <span class="vl-dot">›</span> <b>2026-08-09 修正：換行導致編譯錯誤</b> — 原本想用 <code>\n</code> 把訊息拆成兩行，但Pine Script的alert()訊息字串不支援這個跳脫字元，會直接編譯失敗（"mismatched character"錯誤），已改回單行顯示<br>
           <span class="vl-dot">›</span> 其餘功能（進出場邏輯、儀表板、連接線、標籤批次清理等）與V1一致，詳見V1版本頁籤的完整更新紀錄
         </div>
         <div id="scalp-log-v1" class="ver-log" style="display:none">
@@ -16126,7 +16127,7 @@ if longCond and barstate.isconfirmed
         strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
     _labelMsg = "Open " + str.tostring(close, "#.#")
     _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
-    _alertMsg = timeframe.period + "→" + longEntryText + " " + str.tostring(close, "#.#") + "\n(" + str.tostring(highMA, "#.#") + "-" + _slVal + ")"
+    _alertMsg = timeframe.period + "→" + longEntryText + " " + str.tostring(close, "#.#") + " (" + str.tostring(highMA, "#.#") + "-" + _slVal + ")"
     f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
     if enableAlerts
         alert(_alertMsg, alert.freq_once_per_bar_close)
@@ -16142,7 +16143,7 @@ if shortCond and barstate.isconfirmed
         strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
     _labelMsg = "Open " + str.tostring(close, "#.#")
     _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
-    _alertMsg = timeframe.period + "→" + shortEntryText + " " + str.tostring(close, "#.#") + "\n(" + str.tostring(lowMA, "#.#") + "-" + _slVal + ")"
+    _alertMsg = timeframe.period + "→" + shortEntryText + " " + str.tostring(close, "#.#") + " (" + str.tostring(lowMA, "#.#") + "-" + _slVal + ")"
     f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
     if enableAlerts
         alert(_alertMsg, alert.freq_once_per_bar_close)
@@ -16152,7 +16153,7 @@ barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - 
 f_exitMsg(_txt, _exitPx, _dir) =>
     _pts = _dir == 1 ? _exitPx - entryPrice : entryPrice - _exitPx
     _ptsStr = (_pts >= 0 ? "+" : "") + str.tostring(_pts, "#.#")
-    timeframe.period + "→" + _txt + "\n(" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ") (" + _ptsStr + ")"
+    timeframe.period + "→" + _txt + " (" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ") (" + _ptsStr + ")"
 
 // ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
 if strategy.position_size > 0
