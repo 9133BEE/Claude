@@ -108,7 +108,7 @@ $engToChn = @{
   "Restaurant management"="餐廳管理"; "Retirement Insurance Benefits"="退休保險福利";
   "RV Travel"="露營車旅遊"; "Sap basis"="SAP企業系統基礎"; "Seed accelerator"="種子加速器";
   "Skyscanner"="Skyscanner機票比價"; "socializing"="社交活動"; "SQL"="SQL資料庫語言";
-  "Sustainable architecture"="永續建築"; "Taichung"="台中"; "Taichung; Changhua; Miaoli"="台中；彰化；苗栗";
+  "Sustainable architecture"="永續建築"; "Supply chain management"="供應鏈管理"; "Taichung"="台中"; "Taichung; Changhua; Miaoli"="台中；彰化；苗栗";
   "Taichung; Changhua; Miaoli; Nantou"="台中；彰化；苗栗；南投"; "Taichung; Changhua; Nantou"="台中；彰化；南投";
   "Taoyuan City; Hsinchu; Miaoli; Hsinchu City"="桃園；新竹縣；苗栗；新竹市";
   "Taoyuan City; Taichung; Changhua; Hsinchu; Miaoli; Nantou"="桃園；台中；彰化；新竹；苗栗；南投";
