@@ -984,7 +984,7 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v3" class="ver-log">
-          <span class="vl-dot">›</span> <b>2026-08-11：V3 新增多重技術面共振濾網，目標提升勝率 + 修正「連續兩個Open」根因bug</b> — 使用者反映有時候會連續出現兩個Open標籤中間沒有Close，且希望在單純帶狀觸碰之外加入其他技術分析輔助判斷。根因調查發現：緊急ATR停損由broker端執行，腳本要等「觸發後的下一根K棒」才偵測得到並補畫出場標籤；原本V2執行順序是「先檢查新進場→才處理補標」，如果偵測補標的那根K棒同時又符合新進場條件，補標邏輯會誤用「這根K棒剛設定好的新倉位」entryPrice/entryBar去畫「上一筆」的出場標籤，導致標籤內容錯亂、且跟新Open標籤疊在同一根K棒、價位又接近，看起來像「連續兩個Open」。已改成「先處理補標(用舊倉位正確資料)→才檢查新進場」，且補標時同步更新lastExitBar，讓再進場冷卻機制對broker端停損也生效<br>
+          <span class="vl-dot">›</span> <b>2026-08-13：V3 新增多重技術面共振濾網，目標提升勝率 + 修正「連續兩個Open」根因bug</b> — 使用者反映有時候會連續出現兩個Open標籤中間沒有Close，且希望在單純帶狀觸碰之外加入其他技術分析輔助判斷。根因調查發現：緊急ATR停損由broker端執行，腳本要等「觸發後的下一根K棒」才偵測得到並補畫出場標籤；原本V2執行順序是「先檢查新進場→才處理補標」，如果偵測補標的那根K棒同時又符合新進場條件，補標邏輯會誤用「這根K棒剛設定好的新倉位」entryPrice/entryBar去畫「上一筆」的出場標籤，導致標籤內容錯亂、且跟新Open標籤疊在同一根K棒、價位又接近，看起來像「連續兩個Open」。已改成「先處理補標(用舊倉位正確資料)→才檢查新進場」，且補標時同步更新lastExitBar，讓再進場冷卻機制對broker端停損也生效<br>
           <span class="vl-dot">›</span> <b>新增①Z-Score動能濾網</b> — 改寫自 VQZL Z Score(Invsto/@sarangab)，固定用EMA平滑控制腳本複雜度，衡量價格動能的標準化強度，做多要求Z-Score>0、做空要求<0，可選加開「需同步加速」更嚴格模式<br>
           <span class="vl-dot">›</span> <b>新增②CCI動量濾網</b> — 商品通道指標，衡量價格偏離均值的程度，做多要求CCI>0、做空要求<0，同樣可選加開「需同步加速」<br>
           <span class="vl-dot">›</span> <b>新增③SMC市場結構濾網</b> — 用樞紐高/低點判斷近期市場結構，higher high+higher low=偏多結構、lower high+lower low=偏空結構，結構方向須與訊號方向一致<br>
@@ -14932,7 +14932,7 @@ const VERSION_DEFS = {
   scalping: [
     { key: 's_v1', date: '2026-08-08', sub: 'V1：SMA帶狀剝頭皮首版，含全客製化訊號/儀表板/標籤清理等歷次修正', contentId: 'scalp-panel-v1', logId: 'scalp-log-v1' },
     { key: 's_v2', date: '2026-08-11', sub: 'V2：修正標籤批次清理誤刪新標籤、同根K棒進出場標籤疊圖、緊急停損補標位置、儀表板TP顯示', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
-    { key: 's_v3', date: '2026-08-11', sub: 'V3：新增Z-Score/CCI/SMC結構/波動度共振濾網提升勝率，修正連續兩個Open根因bug', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
+    { key: 's_v3', date: '2026-08-13', sub: 'V3：新增Z-Score/CCI/SMC結構/波動度共振濾網提升勝率，修正連續兩個Open根因bug', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
   ]
 };
 const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs', scalping: 'scalp-vtabs' };
