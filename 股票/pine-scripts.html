@@ -984,6 +984,7 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v3" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-13 再修正：手續費模型設錯，導致命中TP的單還是倒虧</b> — 使用者實際回測ES1!(1分K，2026/8/3-8/13，114筆進出場)後回報「勝率太低」，交易紀錄顯示57筆交易只有11筆淨賺(~19%勝率)，且89%的單是逾時出場；追查發現關鍵證據：第52筆交易明確觸發TP停利、價格最大有利波動達$969.56，但淨利卻是-$60.84，因為單筆手續費高達$310.84。根因是V1/V2/V3從頭到尾都沿用<code>commission_type=percent, commission_value=0.02</code>（手續費算合約名目價值的0.02%）搭配<code>default_qty_type=percent_of_equity, default_qty_value=100</code>（每筆都用全部資金去換算合約口數），在期貨大合約上換算出單筆來回手續費高達$300+，跟策略設計「1-2根K棒賺幾點」的獲利目標完全不成比例，導致大量原本會小賺的單被手續費吃成小賠，拖累勝率——這跟①②③④共振濾網或訊號品質完全無關。已比照本網站Unicorn V13/V14已驗證過的正確設定，改為<code>commission_type=cash_per_contract, commission_value=0.75</code>（每口固定收$0.75，符合真實期貨手續費行情）+ <code>default_qty_value=10</code>（只用10%資金算口數，不是全押），單筆來回手續費從$300+降到幾塊錢，請重新貼上腳本、重新回測比較<br>
           <span class="vl-dot">›</span> <b>2026-08-13：V3 新增多重技術面共振濾網，目標提升勝率 + 修正「連續兩個Open」根因bug</b> — 使用者反映有時候會連續出現兩個Open標籤中間沒有Close，且希望在單純帶狀觸碰之外加入其他技術分析輔助判斷。根因調查發現：緊急ATR停損由broker端執行，腳本要等「觸發後的下一根K棒」才偵測得到並補畫出場標籤；原本V2執行順序是「先檢查新進場→才處理補標」，如果偵測補標的那根K棒同時又符合新進場條件，補標邏輯會誤用「這根K棒剛設定好的新倉位」entryPrice/entryBar去畫「上一筆」的出場標籤，導致標籤內容錯亂、且跟新Open標籤疊在同一根K棒、價位又接近，看起來像「連續兩個Open」。已改成「先處理補標(用舊倉位正確資料)→才檢查新進場」，且補標時同步更新lastExitBar，讓再進場冷卻機制對broker端停損也生效<br>
           <span class="vl-dot">›</span> <b>新增①Z-Score動能濾網</b> — 改寫自 VQZL Z Score(Invsto/@sarangab)，固定用EMA平滑控制腳本複雜度，衡量價格動能的標準化強度，做多要求Z-Score>0、做空要求<0，可選加開「需同步加速」更嚴格模式<br>
           <span class="vl-dot">›</span> <b>新增②CCI動量濾網</b> — 商品通道指標，衡量價格偏離均值的程度，做多要求CCI>0、做空要求<0，同樣可選加開「需同步加速」<br>
@@ -14932,7 +14933,7 @@ const VERSION_DEFS = {
   scalping: [
     { key: 's_v1', date: '2026-08-08', sub: 'V1：SMA帶狀剝頭皮首版，含全客製化訊號/儀表板/標籤清理等歷次修正', contentId: 'scalp-panel-v1', logId: 'scalp-log-v1' },
     { key: 's_v2', date: '2026-08-11', sub: 'V2：修正標籤批次清理誤刪新標籤、同根K棒進出場標籤疊圖、緊急停損補標位置、儀表板TP顯示', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
-    { key: 's_v3', date: '2026-08-13', sub: 'V3：新增Z-Score/CCI/SMC結構/波動度共振濾網提升勝率，修正連續兩個Open根因bug', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
+    { key: 's_v3', date: '2026-08-13', sub: 'V3：新增共振濾網、修正連續兩個Open根因bug；再修正手續費模型(percent→cash_per_contract)避免命中TP還倒虧', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
   ]
 };
 const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs', scalping: 'scalp-vtabs' };
@@ -16325,7 +16326,7 @@ if showDash and barstate.islast
 `;
 
 const SCALP_BAND_V3 = `//@version=5
-strategy("Scalping trade(V3)", shorttitle="Scalping V3", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.02, process_orders_on_close=true, calc_on_every_tick=false, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+strategy("Scalping trade(V3)", shorttitle="Scalping V3", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.cash_per_contract, commission_value=0.75, process_orders_on_close=true, calc_on_every_tick=false, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
 
 // ══════════════════════════════════════════════════════════════════════════
 // Scalping trade(V3) — 剝頭皮 SMA帶狀策略 + 多重技術面共振濾網
