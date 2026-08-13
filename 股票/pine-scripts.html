@@ -962,8 +962,8 @@ if showDash and barstate.islast
   <div class="scard-header">
     <span class="scard-badge badge-scalp">剝頭皮</span>
     <div class="scard-meta">
-      <div class="scard-title">Scalping trade(V2) — SMA帶狀剝頭皮</div>
-      <div class="scard-desc">改寫自 OANDA 教學文章「剝頭皮交易」：中期SMA(40)判斷趨勢方向 + 高/低價2期移動平均形成帶狀通道，觸下軌進場多單／觸上軌獲利出場（空單相反），SMA轉向或持倉逾K棒數上限強制出場，額外加上ATR緊急停損，strategy()腳本可直接用 TradingView Strategy Tester 計算真實勝率；做多/做空訊號的顏色、透明度、提示字、標籤字大小皆可獨立設定，並可選只做多/只做空/多空都做</div>
+      <div class="scard-title">Scalping trade(V3) — SMA帶狀剝頭皮 + 多重技術面共振濾網</div>
+      <div class="scard-desc">改寫自 OANDA 教學文章「剝頭皮交易」：中期SMA(40)判斷趨勢方向 + 高/低價2期移動平均形成帶狀通道，觸下軌進場多單／觸上軌獲利出場（空單相反），SMA轉向或持倉逾K棒數上限強制出場，額外加上ATR緊急停損；V3新增Z-Score動能、CCI動量、SMC市場結構三項可調整共振濾網，加上獨立的波動度硬性關卡與可選交易時段濾網，目的是過濾單純「價格剛好碰到帶狀線」的假訊號、提升勝率，全部可個別開關回到V2純帶狀邏輯；strategy()腳本可直接用 TradingView Strategy Tester 計算真實勝率；做多/做空訊號的顏色、透明度、提示字、標籤字大小皆可獨立設定，並可選只做多/只做空/多空都做</div>
     </div>
   </div>
   <div class="scard-body">
@@ -983,7 +983,17 @@ if showDash and barstate.islast
         </div>
       </div>
       <div class="ver-main">
-        <div id="scalp-log-v2" class="ver-log">
+        <div id="scalp-log-v3" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-11：V3 新增多重技術面共振濾網，目標提升勝率 + 修正「連續兩個Open」根因bug</b> — 使用者反映有時候會連續出現兩個Open標籤中間沒有Close，且希望在單純帶狀觸碰之外加入其他技術分析輔助判斷。根因調查發現：緊急ATR停損由broker端執行，腳本要等「觸發後的下一根K棒」才偵測得到並補畫出場標籤；原本V2執行順序是「先檢查新進場→才處理補標」，如果偵測補標的那根K棒同時又符合新進場條件，補標邏輯會誤用「這根K棒剛設定好的新倉位」entryPrice/entryBar去畫「上一筆」的出場標籤，導致標籤內容錯亂、且跟新Open標籤疊在同一根K棒、價位又接近，看起來像「連續兩個Open」。已改成「先處理補標(用舊倉位正確資料)→才檢查新進場」，且補標時同步更新lastExitBar，讓再進場冷卻機制對broker端停損也生效<br>
+          <span class="vl-dot">›</span> <b>新增①Z-Score動能濾網</b> — 改寫自 VQZL Z Score(Invsto/@sarangab)，固定用EMA平滑控制腳本複雜度，衡量價格動能的標準化強度，做多要求Z-Score>0、做空要求<0，可選加開「需同步加速」更嚴格模式<br>
+          <span class="vl-dot">›</span> <b>新增②CCI動量濾網</b> — 商品通道指標，衡量價格偏離均值的程度，做多要求CCI>0、做空要求<0，同樣可選加開「需同步加速」<br>
+          <span class="vl-dot">›</span> <b>新增③SMC市場結構濾網</b> — 用樞紐高/低點判斷近期市場結構，higher high+higher low=偏多結構、lower high+lower low=偏空結構，結構方向須與訊號方向一致<br>
+          <span class="vl-dot">›</span> <b>新增④波動度濾網(獨立硬性關卡)</b> — 改寫自期貨儀表板常見的ATR波動監控概念，用ta.percentrank比較目前ATR在近期分布中的百分位，異常放大時直接暫停進場，避免帶狀線在劇烈波動時被雜訊瞬間洗過去；此項獨立於①②③的共振評分之外，不計分、但波動過大時無論分數多高都不放行<br>
+          <span class="vl-dot">›</span> <b>新增「至少需符合幾項濾網才進場」門檻設定</b>（預設2/3）、可選交易時段濾網、共振濾網背景色與除錯標記(方便回測時肉眼核對)、「帶狀觸碰/濾網擋掉」統計列(避免濾網設太嚴導致樣本數過小)；①②③④與時段濾網皆可個別關閉，全部關閉+門檻設0即完全等同V2純帶狀邏輯，方便逐項A/B測試<br>
+          <span class="vl-dot">›</span> <b>誠實揭露</b>：以上新增濾網皆未經過任何實際歷史資料回測驗證，各濾網週期參數與共振門檻皆為合理預設值、非最佳化結果，務必自行在 Strategy Tester 對想交易的商品/週期分開回測，依規定回測勝率需達70%以上才建議推版上線，若怎麼調整都到不了，代表這個時框/商品可能不適合這套帶狀觸碰架構的天花板，考慮換週期或縮小適用商品範圍
+        </div>
+        <div id="scalp-log-v2" class="ver-log" style="display:none">
+          <span class="vl-dot">›</span> <b>2026-08-11 修正：標籤批次清理可能連坐刪除剛畫好的新標籤</b> — 清理邏輯是「陣列超過門檻(labelPruneAt)時，一次刪除最舊的N個(labelPruneQty)」，但N是使用者可調整的設定值(最大400)，門檻下限只有50；如果調成N接近或超過當下陣列大小，清理迴圈會把「剛push進陣列、也就是這根K棒才剛畫好的新標籤」一併刪掉，造成alert跳出來但畫面上完全看不到標籤（連舊標籤帶一起消失，不是只藏在別的標籤後面），且跟alert是否重建無關、只要設定值沒改就會一直發生；已改成清理數量結構上永遠保留至少1個(最新那個)，不會再誤刪剛畫的標籤<br>
           <span class="vl-dot">›</span> <b>2026-08-10 修正：出場標籤被同一根K棒的新進場標籤蓋住</b> — 根因是策略常常「這根K棒剛出場、同一根馬上又反手進場」，出場跟新進場的標籤畫在同一根K棒、價格又非常接近（例如出場4370.2、新進場4370.1），兩個框幾乎完全疊在一起，肉眼只看得到最上層那個，看起來像「有alert沒標籤」；新增「出場後至少要等1根K棒才能再進場」的限制(`lastExitBar`)，避免同根K棒疊圖，對策略邏輯本身也更合理（不該同根K棒立刻反手）<br>
           <span class="vl-dot">›</span> <b>2026-08-10 全面檢查修正：儀表板「停利(TP)」欄位還在顯示舊帶狀邏輯</b> — 改用R倍數計算停利後，儀表板顯示那格忘記同步，還在顯示`highMA`/`lowMA`帶狀線位置，跟實際出場判斷用的`tpPrice`不一致，會誤導使用者；已改成顯示真正生效的`tpPrice`，距離TP欄位同步修正<br>
           <span class="vl-dot">›</span> <b>2026-08-10 修正：緊急停損補標籤位置跟K棒對不上</b> — 根因是broker端觸發緊急ATR停損後，補標籤邏輯要等1-2根K棒才偵測到，但畫標籤用的是「進場當下算好的理論停損價」，畫在的卻是「現在才偵測到的這根K棒」，兩者不是同一個時間點，導致標籤位置飄在K棒之外對不上。改用 <code>strategy.closedtrades.exit_price()</code> 抓這筆交易實際成交價，取代理論停損價，標籤位置跟文字才會是真正發生過的價格<br>
@@ -994,6 +1004,7 @@ if showDash and barstate.islast
           <span class="vl-dot">›</span> 其餘功能（進出場邏輯、儀表板、連接線、標籤批次清理等）與V1一致，詳見V1版本頁籤的完整更新紀錄
         </div>
         <div id="scalp-log-v1" class="ver-log" style="display:none">
+          <span class="vl-dot">›</span> <b>2026-08-11 修正：標籤批次清理可能連坐刪除剛畫好的新標籤</b> — 跟V2同一個bug、同步修正，詳見V2版本頁籤說明<br>
           <span class="vl-dot">›</span> <b>2026-08-07：Scalping trade(V1) 首版</b> — 依 <a href="https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/" target="_blank" style="color:#58a6ff">OANDA教學文章</a> 規則改寫：40週期SMA判斷中期趨勢方向；2週期高/低價移動平均線形成帶狀通道；上升趨勢中K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場，下降趨勢相反<br>
           <span class="vl-dot">›</span> <b>出場條件</b>：觸及對側帶狀線視為停利；SMA斜率轉向視為停損；持倉超過設定K棒數(預設2根)未達停利則強制逾時出場，SMA走平(斜率低於門檻)時不進場，避免盤整期洗單<br>
           <span class="vl-dot">›</span> <b>2026-08-07 更新：全客製化訊號 + 命名調整</b> — 腳本標題改為「Scalping trade(V1)」；新增「訊號模式」下拉選單（只出現做多訊號／只出現做空訊號／一起顯示）；做多、做空訊號各自獨立設定顏色、透明度(%)、標籤字大小、以及提示字文字內容<br>
@@ -1017,7 +1028,11 @@ if showDash and barstate.islast
           <span class="vl-dot">›</span> <b>2026-08-07 修正：連續多筆進場卻看不到對應出場</b> — 原因是緊急ATR停損由broker端執行，觸發時不會畫出場標籤/送alert，盤整反覆洗單時看起來像「連續進場沒出場」，其實每次都已先平倉才能再進場（<code>strategy.position_size==0</code>強制只能有一倉），只是看不到那筆停損。新增偵測：只要偵測到部位從有轉無、且不是本腳本自己的TP/SL/逾時觸發的，就補畫對應的出場提示字與alert，並在Strategy Tester交易紀錄標註「緊急ATR停損」，確保每筆進場都能在圖上找到對應出場<br>
           <span class="vl-dot">›</span> <b>儀表板</b>：即時顯示趨勢狀態／SMA斜率／持倉狀態／持倉K棒數，並直接讀取 <code>strategy.wintrades / strategy.closedtrades</code> 顯示<b>真實策略勝率</b>（非近似估算）與淨損益
         </div>
-        <div id="scalp-panel-v2">
+        <div id="scalp-panel-v3">
+          <button class="copy-bar-btn" onclick="copyScalpBand(this,'v3')">一鍵複製腳本</button>
+          <div class="code-block" id="scalp-code-v3"></div>
+        </div>
+        <div id="scalp-panel-v2" style="display:none">
           <button class="copy-bar-btn" onclick="copyScalpBand(this,'v2')">一鍵複製腳本</button>
           <div class="code-block" id="scalp-code-v2"></div>
         </div>
@@ -14916,7 +14931,8 @@ const VERSION_DEFS = {
   ],
   scalping: [
     { key: 's_v1', date: '2026-08-08', sub: 'V1：SMA帶狀剝頭皮首版，含全客製化訊號/儀表板/標籤清理等歷次修正', contentId: 'scalp-panel-v1', logId: 'scalp-log-v1' },
-    { key: 's_v2', date: '2026-08-10', sub: 'V2：修正同根K棒進出場標籤疊圖、緊急停損補標位置、儀表板TP顯示', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
+    { key: 's_v2', date: '2026-08-11', sub: 'V2：修正標籤批次清理誤刪新標籤、同根K棒進出場標籤疊圖、緊急停損補標位置、儀表板TP顯示', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
+    { key: 's_v3', date: '2026-08-11', sub: 'V3：新增Z-Score/CCI/SMC結構/波動度共振濾網提升勝率，修正連續兩個Open根因bug', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
   ]
 };
 const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs', scalping: 'scalp-vtabs' };
@@ -14996,7 +15012,7 @@ function tvc(key, el) {
 // initialise dynamic version tabs (renders tabs, restores checkmarks)
 renderVerTabs('unicorn', 'u_v14');
 renderVerTabs('dashboard', 'd_v3');
-renderVerTabs('scalping', 's_v2');
+renderVerTabs('scalping', 's_v3');
 document.getElementById('dash-code-v1').textContent = DASHBOARD_V1;
 document.getElementById('dash-code-v2').textContent = DASHBOARD_V2;
 document.getElementById('dash-code-v3').textContent = DASHBOARD_V3;
@@ -15803,7 +15819,7 @@ f_mkLabel(_bar, _price, _txt, _style, _col, _txtCol, _sz) =>
     _lb = label.new(_bar, _price, _txt, style=_style, color=_col, textcolor=_txtCol, size=_sz)
     array.push(allLabels, _lb)
     if array.size(allLabels) > labelPruneAt
-        for _i = 1 to math.min(labelPruneQty, array.size(allLabels))
+        for _i = 1 to math.min(labelPruneQty, array.size(allLabels) - 1)
             label.delete(array.shift(allLabels))
     _lb
 
@@ -16092,7 +16108,7 @@ f_mkLabel(_bar, _price, _txt, _style, _col, _txtCol, _sz) =>
     _lb = label.new(_bar, _price, _txt, style=_style, color=_col, textcolor=_txtCol, size=_sz)
     array.push(allLabels, _lb)
     if array.size(allLabels) > labelPruneAt
-        for _i = 1 to math.min(labelPruneQty, array.size(allLabels))
+        for _i = 1 to math.min(labelPruneQty, array.size(allLabels) - 1)
             label.delete(array.shift(allLabels))
     _lb
 
@@ -16308,11 +16324,515 @@ if showDash and barstate.islast
     table.cell(dash, 1, 9, str.tostring(strategy.netprofit, "#,##0.##"), text_color=_pnlCol, text_size=_fsz, text_halign=text.align_right)
 `;
 
+const SCALP_BAND_V3 = `//@version=5
+strategy("Scalping trade(V3)", shorttitle="Scalping V3", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.02, process_orders_on_close=true, calc_on_every_tick=false, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ══════════════════════════════════════════════════════════════════════════
+// Scalping trade(V3) — 剝頭皮 SMA帶狀策略 + 多重技術面共振濾網
+// 改寫自 OANDA 教學：https://www.oanda.com/bvi-ft/lab-education/technical_analysis/scalping-trade/
+//
+// 【核心邏輯，與V1/V2相同】
+// 中期SMA(預設40)判斷趨勢方向；高/低價2期移動平均線形成帶狀通道
+// 上升趨勢中，K棒觸碰下軌(低價MA)進場做多，觸碰上軌(高價MA)獲利出場
+// 下降趨勢中相反；SMA轉為反向、盤整無明顯斜率、或持倉逾K棒數上限則強制出場
+//
+// 【V3新增①：多重技術面共振濾網】
+// 單純「價格剛好碰到帶狀線」常常是假訊號(尤其盤整區間反覆洗)，V3新增三項可獨立開關的
+// 共振條件，全部通過或至少通過設定門檻(minConfluence)才放行進場：
+//   ① Z-Score動能濾網：改寫自 VQZL Z Score(Invsto/@sarangab)，衡量價格動能的標準化強度
+//   ② CCI動量濾網：商品通道指標，衡量價格偏離均值的程度
+//   ③ SMC市場結構濾網：用樞紐高/低點判斷近期市場結構是否偏多/偏空(類似SMC結構判斷)
+// 以上三項預設全開、至少符合2項才進場，可在「多重技術面共振濾網」設定群組調整或關閉回到V2邏輯
+// 另外新增第④項獨立硬性關卡(不計入①②③評分)：
+//   ④ 波動度濾網：改寫自期貨儀表板常見的ATR波動監控概念，異常爆量/過度波動時直接暫停進場，
+//     避免帶狀線在劇烈波動時被雜訊瞬間洗過去、誤判成有效觸碰
+//
+// 【V3新增②：修正「連續出現兩個Open」的根因bug】
+// 根因：緊急ATR停損由broker端執行，腳本要等「觸發後的下一根K棒」才偵測得到並補畫出場標籤。
+// 原本V2的執行順序是「先檢查新進場→才處理補標」，如果偵測到補標的那根K棒同時又符合新的
+// 進場條件，補標邏輯會誤用「這根K棒剛設定好的新倉位」entryPrice/entryBar去畫「上一筆」的
+// 出場標籤，導致出場標籤內容錯亂、且新Open標籤跟錯亂的Close標籤疊在同一根K棒、價位又接近，
+// 肉眼看起來就像「連續出現兩個Open」。V3改成「先處理補標(用舊倉位正確資料)→才檢查新進場」，
+// 且補標時會同步更新lastExitBar，讓「出場後至少要等1根K棒才能再進場」的冷卻機制對broker端
+// 觸發的停損也生效，不再只保護「腳本自己主動close」的情況。
+//
+// 非保證勝率，請務必自行在 Strategy Tester 對想交易的商品/週期分開回測、依結果調整
+// minConfluence與各濾網週期參數後再考慮實單。
+//
+// 【參數量暴增後的使用提醒】
+// V3新增的濾網全部預設可個別關閉，關掉①②③④與時段濾網、minConfluence設0，
+// 邏輯會完全等同V2(純帶狀觸碰)，方便直接A/B比較「加濾網前後」的差異，
+// 而不是只能整套一起換掉、無從得知到底是哪個改動造成勝率變化。
+// ══════════════════════════════════════════════════════════════════════════
+
+// ========================= 趨勢濾網 =========================
+grpTrend    = "趨勢濾網"
+smaLen      = input.int(40, "中期趨勢SMA週期", minval=5, group=grpTrend, tooltip="原文建議以40週期SMA判斷中期方向")
+slopeLook   = input.int(5, "SMA斜率比較K棒數", minval=1, group=grpTrend)
+slopeMinPct = input.float(0.02, "最小斜率(%)，低於視為盤整不交易", minval=0, step=0.01, group=grpTrend, tooltip="SMA走平代表無明顯趨勢，原文提醒盤整時不應進場剝頭皮")
+
+// ========================= 高低帶狀 =========================
+grpBand = "高低帶狀(進出場軌道)"
+bandLen = input.int(2, "高/低價移動平均週期", minval=1, group=grpBand, tooltip="原文使用2週期，分別以最高價/最低價做平均形成帶狀通道")
+
+// ========================= 多重技術面共振濾網(V3新增) =========================
+grpConf = "多重技術面共振濾網(V3新增)"
+useZScore  = input.bool(true, "①啟用 Z-Score動能濾網", group=grpConf, tooltip="改寫自VQZL指標，衡量價格波動的標準化動能強度；做多要求Z-Score>0(動能偏多)，做空要求Z-Score<0(動能偏空)")
+zSmoothLen = input.int(15, "Z-Score價格平滑週期(EMA)", minval=1, group=grpConf, tooltip="原版VQZL可選30種MA類型，為控制腳本複雜度固定用EMA平滑")
+zLen       = input.int(100, "Z-Score標準差計算週期", minval=10, group=grpConf)
+
+useZTrend  = input.bool(false, "Z-Score需同步加速(非只看正負號)", group=grpConf, tooltip="開啟後除了Z-Score>0/<0，還要求Z-Score本身正在上升(做多)/下降(做空)，代表動能不是偏多/偏空就好、還要正在增強，更嚴格但訊號更少，預設關閉")
+
+useCCI = input.bool(true, "②啟用 CCI動量濾網", group=grpConf, tooltip="商品通道指標，衡量價格偏離均值的程度；做多要求CCI>0，做空要求CCI<0")
+cciLen = input.int(20, "CCI週期", minval=1, group=grpConf)
+useCCITrend = input.bool(false, "CCI需同步加速(非只看正負號)", group=grpConf, tooltip="開啟後除了CCI>0/<0，還要求CCI本身正在上升(做多)/下降(做空)，預設關閉")
+
+useStructure = input.bool(true, "③啟用 SMC市場結構濾網", group=grpConf, tooltip="用樞紐高/低點判斷近期市場結構(higher high+higher low=偏多結構，lower high+lower low=偏空結構)；結構方向須與訊號方向一致")
+structLen = input.int(5, "結構樞紐點左右確認K棒數", minval=2, group=grpConf, tooltip="樞紐點需左右各structLen根K棒都沒有更高/更低價才算確認，數字越大結構越穩定但確認越慢(會延遲)")
+
+minConfluence = input.int(2, "至少需符合幾項方向性濾網才放行進場(共3項：①②③)", minval=0, maxval=3, group=grpConf, tooltip="0=完全不強制(等同V2原本邏輯，只看帶狀線)；數字越高進場越嚴格、訊號會變少但品質理論上更高，請務必搭配Strategy Tester實測調整，不要憑感覺設定")
+
+useVolFilter = input.bool(true, "④啟用 波動度濾網(期貨儀表板概念，獨立於上方3項評分)", group=grpConf, tooltip="改寫自期貨儀表板常見的ATR波動監控概念：避免在異常爆量/過度波動時進場剝頭皮(容易滑價、假突破洗單後反噬)；此項為獨立硬性關卡，不計入①②③的共振分數，波動過大時無論分數多高都不進場")
+volLen    = input.int(50, "波動度濾網ATR百分位計算週期", minval=10, group=grpConf)
+volMaxPct = input.float(85, "ATR百分位超過多少視為過度波動(不利進場)", minval=50, maxval=99, group=grpConf, tooltip="例如85代表目前ATR落在近期volLen根K棒的分布中屬於最高的15%區間內，視為波動異常放大、不利短線剝頭皮，暫停進場")
+
+// ========================= 交易時段濾網(可選) =========================
+grpSession = "交易時段濾網(可選，剝頭皮策略對流動性特別敏感)"
+useSession = input.bool(false, "啟用時段濾網", group=grpSession, tooltip="剝頭皮策略持倉極短，對點差/滑價特別敏感；冷門/低流動性時段(例如期貨的隔夜盤、假期前後)容易一進場就先吃一口滑價，直接侵蝕原本就不厚的獲利空間。預設關閉(維持24小時都可交易)，建議先確認實際交易商品的主力時段後再啟用")
+sessionStr = input.session("0930-1600", "允許交易時段(依圖表所在時區)", group=grpSession, tooltip="格式範例：0930-1600；只有在此時段內才會進場，時段外即使訊號成立也不會進場")
+inSession = not useSession or not na(time(timeframe.period, sessionStr))
+
+// ========================= 訊號顯示模式 =========================
+grpMode    = "訊號顯示模式"
+signalMode = input.string("一起顯示", "訊號模式", options=["只出現做多訊號", "只出現做空訊號", "一起顯示"], group=grpMode, tooltip="控制是否進場/顯示標籤/送出alert：只出現做多訊號=只做多單，只出現做空訊號=只做空單，一起顯示=多空都做")
+allowLong  = signalMode == "只出現做多訊號" or signalMode == "一起顯示"
+allowShort = signalMode == "只出現做空訊號" or signalMode == "一起顯示"
+
+// ========================= 做多訊號設定 =========================
+grpLong        = "做多訊號設定"
+longEntryColor  = input.color(#22c55e, "做多進場顏色", group=grpLong, tooltip="出場顏色統一在下方「出場標籤樣式」設定，不分方向")
+longEntryTransp = input.int(0, "做多進場透明度(%)", minval=0, maxval=100, group=grpLong)
+longEntryText  = input.string("Buy to Open", "做多進場提示字", group=grpLong)
+longExitText   = input.string("Sell to Close", "做多出場提示字", group=grpLong)
+longLabelSize  = input.string("Small", "做多標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpLong)
+
+// ========================= 做空訊號設定 =========================
+grpShort        = "做空訊號設定"
+shortEntryColor  = input.color(#ef4444, "做空進場顏色", group=grpShort, tooltip="出場顏色統一在下方「出場標籤樣式」設定，不分方向")
+shortEntryTransp = input.int(0, "做空進場透明度(%)", minval=0, maxval=100, group=grpShort)
+shortEntryText  = input.string("Sell to Open", "做空進場提示字", group=grpShort)
+shortExitText   = input.string("Buy to Close", "做空出場提示字", group=grpShort)
+shortLabelSize  = input.string("Small", "做空標籤字大小", options=["Tiny","Small","Normal","Large","Huge"], group=grpShort)
+
+// ========================= 出場標籤樣式（多空統一） =========================
+grpExitStyle  = "出場標籤樣式（多空統一）"
+exitBgColor   = input.color(color.white, "出場標籤背景色", group=grpExitStyle, tooltip="做多/做空平倉統一用同一組顏色，看到這個顏色就知道「這是平倉」不必再分方向")
+exitTextColor = input.color(#374151, "出場標籤文字顏色", group=grpExitStyle)
+exitTransp    = input.int(0, "出場標籤透明度(%)", minval=0, maxval=100, group=grpExitStyle)
+
+// ========================= 警報設定 =========================
+grpAlert     = "警報設定"
+enableAlerts = input.bool(true, "啟用提示音(alert通知)", group=grpAlert, tooltip="開啟後進出場會呼叫alert()函數；TradingView建立警報時條件選本腳本→「僅alert()函數呼叫」→開啟聲音通知即可收到提示音")
+
+// ========================= 進出場設定 =========================
+grpExit        = "進出場設定"
+maxBarsInTrade = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=1, group=grpExit, tooltip="原文強調1-2根K棒內完成交易，逾時未達停利則直接出場")
+useSlopeExit   = input.bool(true, "SMA轉向時停損出場", group=grpExit)
+tpRMultiple    = input.float(1.5, "停利R倍數(相對於停損距離)", minval=0.5, step=0.25, group=grpExit, tooltip="停利改用「進場價+風險距離(緊急停損ATR距離)×此倍數」計算，直接控制風報比，不再依賴帶狀寬度決定")
+
+grpRisk          = "額外安全網(原文未提及)"
+useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，腳本會自動偵測並補畫對應的出場提示字/alert，Strategy Tester交易紀錄會標註「緊急ATR停損」）")
+emergencyAtrLen  = input.int(14, "緊急停損ATR週期", minval=5, group=grpRisk)
+emergencyAtrMult = input.float(1.5, "緊急停損ATR倍數", minval=0.5, step=0.25, group=grpRisk)
+
+// ========================= 顯示設定 =========================
+grpDisp   = "顯示設定"
+showBands = input.bool(true, "顯示SMA/高低帶狀線", group=grpDisp)
+showDash  = input.bool(true, "顯示儀表板", group=grpDisp)
+dashPos   = input.string("右上", "儀表板位置", options=["右上","右下","左上","左下"], group=grpDisp)
+dashSize  = input.string("Small", "儀表板文字大小", options=["Tiny","Small","Normal"], group=grpDisp)
+labelPruneAt  = input.int(250, "標籤數達到多少開始清理", minval=50, maxval=500, group=grpDisp, tooltip="進出場標籤總數超過此門檻時，一次批次刪除最舊的N個（見下方設定），避免逐一刪除造成圖表閃爍；上限受Pine max_labels_count=500限制")
+labelPruneQty = input.int(50, "每次清理刪除幾個最舊標籤", minval=10, maxval=400, group=grpDisp)
+showTradeLine  = input.bool(true, "顯示建倉→平倉連接線", group=grpDisp, tooltip="把同一筆交易的進場點跟出場點連起來，方便在訊號密集時確認哪個平倉對應哪個開倉")
+tradeLineColor = input.color(#9ca3af, "連接線顏色", group=grpDisp)
+tradeLineTransp = input.int(30, "連接線透明度(%)", minval=0, maxval=100, group=grpDisp)
+tradeLineStyle = input.string("虛線", "連接線樣式", options=["實線","虛線","點線"], group=grpDisp)
+_tlStyle = tradeLineStyle == "實線" ? line.style_solid : tradeLineStyle == "點線" ? line.style_dotted : line.style_dashed
+
+// ========================= 標籤批次清理(結構上保證不會誤刪剛畫好的新標籤) =========================
+var label[] allLabels = array.new_label()
+f_mkLabel(_bar, _price, _txt, _style, _col, _txtCol, _sz) =>
+    _lb = label.new(_bar, _price, _txt, style=_style, color=_col, textcolor=_txtCol, size=_sz)
+    array.push(allLabels, _lb)
+    if array.size(allLabels) > labelPruneAt
+        for _i = 1 to math.min(labelPruneQty, array.size(allLabels) - 1)
+            label.delete(array.shift(allLabels))
+    _lb
+
+_szMap(s) => s == "Tiny" ? size.tiny : s == "Small" ? size.small : s == "Normal" ? size.normal : s == "Large" ? size.large : size.huge
+
+// ========================= 核心運算：SMA/帶狀 =========================
+smaTrend = ta.sma(close, smaLen)
+highMA   = ta.sma(high, bandLen)
+lowMA    = ta.sma(low, bandLen)
+_atrEmg  = ta.atr(emergencyAtrLen)
+
+smaSlopePct = (smaTrend - smaTrend[slopeLook]) / smaTrend[slopeLook] * 100
+
+isUptrend   = highMA > smaTrend and lowMA > smaTrend and smaSlopePct >  slopeMinPct
+isDowntrend = highMA < smaTrend and lowMA < smaTrend and smaSlopePct < -slopeMinPct
+
+// ========================= 共振濾網①：Z-Score動能(改寫自VQZL) =========================
+// 原理：用平滑後的OHLC計算「價格動能相對真實波幅的比例」(vqi)，再取一段期間的標準化Z分數，
+// Z>0代表近期動能偏多、Z<0代表偏空，數值絕對值越大代表動能越極端(強)
+zHigh   = ta.ema(high,  zSmoothLen)
+zLow    = ta.ema(low,   zSmoothLen)
+zOpen   = ta.ema(open,  zSmoothLen)
+zClose  = ta.ema(close, zSmoothLen)
+zPClose = zClose[1]
+zTrueRange = math.max(zHigh, zClose) - math.min(zLow, zPClose)
+zRange     = zHigh - zLow
+_vqi    = zRange != 0 and zTrueRange != 0 ? ((zClose - zPClose) / zTrueRange + (zClose - zOpen) / zRange) * 0.5 : 0.0
+_vqiAbs = math.abs(_vqi) * (zClose - zPClose + zClose - zOpen) * 0.5
+sumVqi  = math.abs(_vqiAbs) > 1 ? _vqiAbs : math.abs(_vqiAbs) * 10 > 1 ? _vqiAbs * 10 : _vqiAbs
+zStdDev = ta.stdev(sumVqi, zLen)
+zMean   = ta.sma(sumVqi, zLen)
+zScore  = zStdDev != 0 ? (sumVqi - zMean) / zStdDev : 0.0
+
+// ========================= 共振濾網②：CCI動量 =========================
+// 原理：價格偏離其移動平均的程度，用平均絕對離差(mean deviation)標準化，CCI>0代表偏多、<0偏空
+cciSrc = hlc3
+cciMa  = ta.sma(cciSrc, cciLen)
+cciDev = ta.dev(cciSrc, cciLen)
+cciVal = cciDev != 0 ? (cciSrc - cciMa) / (0.015 * cciDev) : 0.0
+
+// ========================= 共振濾網③：SMC市場結構(樞紐高低點) =========================
+// 原理：抓最近兩個確認的樞紐高點、兩個確認的樞紐低點比較，
+// higher high + higher low = 偏多結構(結構性支撐/壓力都墊高)
+// lower high + lower low = 偏空結構(結構性支撐/壓力都降低)
+_ph = ta.pivothigh(high, structLen, structLen)
+_pl = ta.pivotlow(low, structLen, structLen)
+var float lastPH = na
+var float prevPH = na
+var float lastPL = na
+var float prevPL = na
+if not na(_ph)
+    prevPH := lastPH
+    lastPH := _ph
+if not na(_pl)
+    prevPL := lastPL
+    lastPL := _pl
+structBullish = not na(lastPH) and not na(prevPH) and not na(lastPL) and not na(prevPL) and lastPH > prevPH and lastPL > prevPL
+structBearish = not na(lastPH) and not na(prevPH) and not na(lastPL) and not na(prevPL) and lastPH < prevPH and lastPL < prevPL
+
+// ========================= 共振濾網加總計分 =========================
+_zLongOk    = useZScore    and zScore > 0   and (not useZTrend   or zScore > zScore[1])
+_zShortOk   = useZScore    and zScore < 0   and (not useZTrend   or zScore < zScore[1])
+_cciLongOk  = useCCI       and cciVal > 0   and (not useCCITrend or cciVal > cciVal[1])
+_cciShortOk = useCCI       and cciVal < 0   and (not useCCITrend or cciVal < cciVal[1])
+_stLongOk   = useStructure and structBullish
+_stShortOk  = useStructure and structBearish
+
+confLongScore  = (_zLongOk ? 1 : 0)  + (_cciLongOk ? 1 : 0)  + (_stLongOk ? 1 : 0)
+confShortScore = (_zShortOk ? 1 : 0) + (_cciShortOk ? 1 : 0) + (_stShortOk ? 1 : 0)
+confluenceLongOk  = confLongScore  >= minConfluence
+confluenceShortOk = confShortScore >= minConfluence
+
+// ========================= 共振濾網④：波動度硬性關卡(獨立於上方評分，期貨儀表板概念) =========================
+// 原理：用ta.percentrank比較「目前ATR」在近期volLen根K棒裡的相對位置(0~100百分位)，
+// 百分位越高代表當下波動相對近期是「異常放大」，這種時候帶狀線很容易被雜訊瞬間洗過去，
+// 觸碰下軌/上軌不代表真的到了合理的進場區間，容易變成「進場就被巴」，故獨立設為硬性關卡
+_atrPctRank = ta.percentrank(_atrEmg, volLen)
+volOk = not useVolFilter or _atrPctRank < volMaxPct
+
+// ========================= 進出場狀態變數 =========================
+var int    entryBar       = na
+var float  entryPrice     = na
+var float  emergencyStop  = na
+var bool   pendingManualLongClose  = false
+var bool   pendingManualShortClose = false
+var float  lastEntryPrice = na
+var int    lastEntryDir   = 0
+var float  tpPrice        = na
+var int    lastExitBar    = na
+
+f_exitMsg(_txt, _exitPx, _dir) =>
+    _pts = _dir == 1 ? _exitPx - entryPrice : entryPrice - _exitPx
+    _ptsStr = (_pts >= 0 ? "+" : "") + str.tostring(_pts, "#.#")
+    timeframe.period + "→" + _txt + "\\n(" + str.tostring(entryPrice, "#.#") + "→" + str.tostring(_exitPx, "#.#") + ") (" + _ptsStr + ")"
+
+// ========================= 緊急停損補標(V3改到進場條件判斷「之前」執行，見上方說明) =========================
+longFlipToFlat  = strategy.position_size == 0 and strategy.position_size[1] > 0
+shortFlipToFlat = strategy.position_size == 0 and strategy.position_size[1] < 0
+
+if longFlipToFlat
+    if pendingManualLongClose
+        pendingManualLongClose := false
+    else
+        _actualExitPx = strategy.closedtrades > 0 ? strategy.closedtrades.exit_price(strategy.closedtrades - 1) : emergencyStop
+        _labelMsg = "Close " + str.tostring(_actualExitPx, "#.#")
+        _alertMsg = f_exitMsg(longExitText, _actualExitPx, 1)
+        f_mkLabel(bar_index, _actualExitPx, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, _actualExitPx, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        tpPrice       := na
+        emergencyStop := na
+        lastExitBar   := bar_index
+
+if shortFlipToFlat
+    if pendingManualShortClose
+        pendingManualShortClose := false
+    else
+        _actualExitPx = strategy.closedtrades > 0 ? strategy.closedtrades.exit_price(strategy.closedtrades - 1) : emergencyStop
+        _labelMsg = "Close " + str.tostring(_actualExitPx, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, _actualExitPx, -1)
+        f_mkLabel(bar_index, _actualExitPx, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, _actualExitPx, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        tpPrice       := na
+        emergencyStop := na
+        lastExitBar   := bar_index
+
+// ========================= 進場條件(帶狀觸碰 + 共振濾網 + 再進場冷卻) =========================
+_reentryOk = na(lastExitBar) or bar_index - lastExitBar >= 1
+longCond  = isUptrend   and allowLong  and low  <= lowMA  and strategy.position_size == 0 and _reentryOk and confluenceLongOk  and volOk and inSession
+shortCond = isDowntrend and allowShort and high >= highMA and strategy.position_size == 0 and _reentryOk and confluenceShortOk and volOk and inSession
+
+// ========================= 濾網有效性統計(累計次數，方便回測後判斷濾網是否過嚴) =========================
+// 原理：分別統計「單純帶狀觸碰(不看任何濾網)」發生的次數，跟「觸碰了但被①②③④或時段濾網
+// 擋下來沒進場」的次數，比較兩者可以知道目前濾網設定整體擋掉了多少比例的原始訊號，
+// 如果擋掉比例過高(例如超過90%)代表濾網可能設太嚴、訊號量不足以支撐有意義的回測樣本
+_rawLongTouch  = isUptrend   and allowLong  and low  <= lowMA  and strategy.position_size == 0 and _reentryOk
+_rawShortTouch = isDowntrend and allowShort and high >= highMA and strategy.position_size == 0 and _reentryOk
+var int longBandTouches  = 0
+var int longFilteredOut  = 0
+var int shortBandTouches = 0
+var int shortFilteredOut = 0
+if _rawLongTouch and barstate.isconfirmed
+    longBandTouches += 1
+    if not longCond
+        longFilteredOut += 1
+if _rawShortTouch and barstate.isconfirmed
+    shortBandTouches += 1
+    if not shortCond
+        shortFilteredOut += 1
+_totalTouches  = longBandTouches + shortBandTouches
+_totalFiltered = longFilteredOut + shortFilteredOut
+_filteredPct   = _totalTouches > 0 ? _totalFiltered * 100.0 / _totalTouches : 0.0
+
+if longCond and barstate.isconfirmed
+    strategy.entry("Long", strategy.long)
+    entryBar      := bar_index
+    entryPrice    := close
+    emergencyStop := close - _atrEmg * emergencyAtrMult
+    tpPrice       := close + (_atrEmg * emergencyAtrMult) * tpRMultiple
+    lastEntryPrice := close
+    lastEntryDir   := 1
+    if useEmergencyStop
+        strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
+    _labelMsg = "Open " + str.tostring(close, "#.#")
+    _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
+    _alertMsg = timeframe.period + "→" + longEntryText + " " + str.tostring(close, "#.#") + "\\n(" + str.tostring(highMA, "#.#") + "-" + _slVal + ") 共振" + str.tostring(confLongScore) + "/3"
+    f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(longEntryColor, longEntryTransp), color.white, _szMap(longLabelSize))
+    if enableAlerts
+        alert(_alertMsg, alert.freq_once_per_bar_close)
+
+if shortCond and barstate.isconfirmed
+    strategy.entry("Short", strategy.short)
+    entryBar      := bar_index
+    entryPrice    := close
+    emergencyStop := close + _atrEmg * emergencyAtrMult
+    tpPrice       := close - (_atrEmg * emergencyAtrMult) * tpRMultiple
+    lastEntryPrice := close
+    lastEntryDir   := -1
+    if useEmergencyStop
+        strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
+    _labelMsg = "Open " + str.tostring(close, "#.#")
+    _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
+    _alertMsg = timeframe.period + "→" + shortEntryText + " " + str.tostring(close, "#.#") + "\\n(" + str.tostring(lowMA, "#.#") + "-" + _slVal + ") 共振" + str.tostring(confShortScore) + "/3"
+    f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(shortEntryColor, shortEntryTransp), color.white, _szMap(shortLabelSize))
+    if enableAlerts
+        alert(_alertMsg, alert.freq_once_per_bar_close)
+
+barsSinceEntry = strategy.position_size != 0 and not na(entryBar) ? bar_index - entryBar : na
+
+// ========================= 出場(觸帶獲利/SMA轉向/逾時) =========================
+if strategy.position_size > 0
+    tpHit   = high >= tpPrice
+    slHit   = useSlopeExit and smaSlopePct < 0
+    timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
+    if tpHit or slHit or timeOut
+        _reason = tpHit ? "TP觸高軌" : slHit ? "SL SMA轉弱" : "逾時出場"
+        strategy.close("Long", comment=_reason)
+        pendingManualLongClose := true
+        _labelMsg = "Close " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(longExitText, close, 1)
+        f_mkLabel(bar_index, close, _labelMsg, label.style_label_down, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(longLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        tpPrice       := na
+        emergencyStop := na
+        lastExitBar   := bar_index
+
+if strategy.position_size < 0
+    tpHit   = low <= tpPrice
+    slHit   = useSlopeExit and smaSlopePct > 0
+    timeOut = not na(barsSinceEntry) and barsSinceEntry >= maxBarsInTrade
+    if tpHit or slHit or timeOut
+        _reason = tpHit ? "TP觸低軌" : slHit ? "SL SMA轉強" : "逾時出場"
+        strategy.close("Short", comment=_reason)
+        pendingManualShortClose := true
+        _labelMsg = "Close " + str.tostring(close, "#.#")
+        _alertMsg = f_exitMsg(shortExitText, close, -1)
+        f_mkLabel(bar_index, close, _labelMsg, label.style_label_up, color.new(exitBgColor, exitTransp), exitTextColor, _szMap(shortLabelSize))
+        if showTradeLine and not na(entryBar)
+            line.new(entryBar, entryPrice, bar_index, close, style=_tlStyle, color=color.new(tradeLineColor, tradeLineTransp), width=1)
+        if enableAlerts
+            alert(_alertMsg, alert.freq_once_per_bar_close)
+        entryBar      := na
+        entryPrice    := na
+        tpPrice       := na
+        emergencyStop := na
+        lastExitBar   := bar_index
+
+// ========================= 繪圖：帶狀線 =========================
+plot(showBands ? smaTrend : na, "中期SMA",     color=color.new(#facc15, 0), linewidth=2)
+plot(showBands ? highMA   : na, "高價MA(上軌)", color=color.new(#22c55e, 0), linewidth=2)
+plot(showBands ? lowMA    : na, "低價MA(下軌)", color=color.new(#ef4444, 0), linewidth=2)
+
+// ========================= 繪圖：共振濾網背景提示(方便肉眼確認目前偏多/偏空) =========================
+grpConfPlot = "共振濾網背景色(可關閉)"
+showConfBg = input.bool(false, "顯示共振濾網背景色", group=grpConfPlot, tooltip="開啟後，畫面背景會依「目前共振分數是否達標」顯示淡綠/淡紅色，方便肉眼確認濾網狀態，不影響進出場邏輯")
+bgcolor(showConfBg and confluenceLongOk and isUptrend ? color.new(#22c55e, 92) : showConfBg and confluenceShortOk and isDowntrend ? color.new(#ef4444, 92) : na, title="共振濾網達標背景")
+
+// ========================= 共振濾網除錯標記(可選，回測時肉眼核對各濾網是否符合預期) =========================
+grpDebug = "共振濾網除錯標記(可選)"
+showFilterMarks = input.bool(false, "顯示各濾網通過/未過標記", group=grpDebug, tooltip="在K棒下方顯示小圓點/三角形，用來核對回測時各濾網的判斷是否符合預期，不影響進出場邏輯，正式使用建議關閉避免圖表雜亂")
+plotshape(showFilterMarks and useZScore and zScore != 0 ? (zScore > 0 ? 1 : -1) : na, title="Z-Score方向標記", style=shape.circle, location=location.bottom, color=zScore > 0 ? color.new(#22c55e, 40) : color.new(#ef4444, 40), size=size.tiny)
+plotshape(showFilterMarks and useCCI and cciVal != 0 ? (cciVal > 0 ? 1 : -1) : na, title="CCI方向標記", style=shape.circle, location=location.bottom, color=cciVal > 0 ? color.new(#38bdf8, 40) : color.new(#facc15, 40), size=size.tiny)
+plotshape(showFilterMarks and useStructure and structBullish ? 1 : na, title="結構偏多標記", style=shape.triangleup, location=location.belowbar, color=color.new(#22c55e, 0), size=size.tiny)
+plotshape(showFilterMarks and useStructure and structBearish ? 1 : na, title="結構偏空標記", style=shape.triangledown, location=location.abovebar, color=color.new(#ef4444, 0), size=size.tiny)
+
+// ========================= 儀表板 =========================
+_curTP = strategy.position_size != 0 ? tpPrice : na
+_curSL = strategy.position_size != 0 and useEmergencyStop ? emergencyStop : na
+_distTP = strategy.position_size > 0 ? _curTP - close : strategy.position_size < 0 ? close - _curTP : na
+_distSL = strategy.position_size > 0 ? close - _curSL : strategy.position_size < 0 ? _curSL - close : na
+_lastClosedPL = strategy.closedtrades > 0 ? strategy.closedtrades.profit(strategy.closedtrades - 1) : na
+
+var table dash = na
+if showDash and barstate.islast
+    _pos = dashPos == "右上" ? position.top_right : dashPos == "右下" ? position.bottom_right : dashPos == "左上" ? position.top_left : position.bottom_left
+    _fsz = dashSize == "Tiny" ? size.tiny : dashSize == "Small" ? size.small : size.normal
+    if na(dash)
+        dash := table.new(_pos, 2, 16, bgcolor=color.new(#0d1117, 0), border_color=color.new(#1e293b, 0), border_width=1, frame_color=color.new(#334155, 0), frame_width=1)
+
+    table.cell(dash, 0, 0, "Scalping trade(V3)", text_color=color.white, text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_left)
+    table.cell(dash, 1, 0, timeframe.period, text_color=color.new(#94a3b8, 0), text_size=_fsz, bgcolor=color.new(#1f2937, 0), text_halign=text.align_right)
+
+    _posStr = strategy.position_size > 0 ? "多頭持倉中" : strategy.position_size < 0 ? "空頭持倉中" : "空手"
+    _posCol = strategy.position_size > 0 ? color.new(#22c55e, 0) : strategy.position_size < 0 ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 1, "目前狀態", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 1, _posStr, text_color=_posCol, text_size=_fsz, text_halign=text.align_right)
+
+    _lastEntryStr = lastEntryDir == 1 ? "多 @ " + str.tostring(lastEntryPrice, format.mintick) : lastEntryDir == -1 ? "空 @ " + str.tostring(lastEntryPrice, format.mintick) : "尚無交易"
+    _lastEntryCol = lastEntryDir == 1 ? color.new(#22c55e, 0) : lastEntryDir == -1 ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 2, "最近建倉點", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 2, _lastEntryStr, text_color=_lastEntryCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 3, "停利(TP)", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 3, na(_curTP) ? "-" : str.tostring(_curTP, format.mintick), text_color=color.new(#22c55e, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 4, "停損(SL)", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 4, na(_curSL) ? (strategy.position_size != 0 ? "SMA轉向" : "-") : str.tostring(_curSL, format.mintick), text_color=color.new(#ef4444, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 5, "距離TP / SL", text_color=color.white, text_size=_fsz)
+    _distStr = na(_distTP) ? "-" : str.tostring(_distTP, format.mintick) + " / " + (na(_distSL) ? "-" : str.tostring(_distSL, format.mintick))
+    table.cell(dash, 1, 5, _distStr, text_color=color.new(#facc15, 0), text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 6, "Z-Score / CCI", text_color=color.white, text_size=_fsz)
+    _zStr = useZScore ? str.tostring(zScore, "#.##") : "停用"
+    _cciStr = useCCI ? str.tostring(cciVal, "#.#") : "停用"
+    table.cell(dash, 1, 6, _zStr + " / " + _cciStr, text_color=color.new(#38bdf8, 0), text_size=_fsz, text_halign=text.align_right)
+
+    _structStr = not useStructure ? "停用" : structBullish ? "偏多結構" : structBearish ? "偏空結構" : "無明顯結構"
+    _structCol = structBullish ? color.new(#22c55e, 0) : structBearish ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 7, "SMC市場結構", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 7, _structStr, text_color=_structCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 8, "共振分數(需≥" + str.tostring(minConfluence) + ")", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 8, "多" + str.tostring(confLongScore) + "/3、空" + str.tostring(confShortScore) + "/3", text_color=color.new(#facc15, 0), text_size=_fsz, text_halign=text.align_right)
+
+    _volStr = not useVolFilter ? "停用" : str.tostring(math.round(_atrPctRank)) + "% " + (volOk ? "(正常)" : "(過度波動✕)")
+    _volCol = not useVolFilter ? color.new(#94a3b8, 0) : volOk ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 0, 9, "④波動度(ATR百分位)", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 9, _volStr, text_color=_volCol, text_size=_fsz, text_halign=text.align_right)
+
+    _sessStr = not useSession ? "不限時段" : (inSession ? "時段內" : "時段外✕")
+    _sessCol = not useSession ? color.new(#94a3b8, 0) : inSession ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 0, 10, "交易時段", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 10, _sessStr, text_color=_sessCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 11, "未實現損益", text_color=color.white, text_size=_fsz)
+    _openCol = strategy.openprofit >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 11, strategy.position_size == 0 ? "-" : str.tostring(strategy.openprofit, "#,##0.##"), text_color=_openCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 12, "上一筆損益", text_color=color.white, text_size=_fsz)
+    _lastPLCol = na(_lastClosedPL) ? color.new(#94a3b8, 0) : _lastClosedPL >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 12, na(_lastClosedPL) ? "-" : str.tostring(_lastClosedPL, "#,##0.##"), text_color=_lastPLCol, text_size=_fsz, text_halign=text.align_right)
+
+    _wr = strategy.closedtrades > 0 ? strategy.wintrades * 100.0 / strategy.closedtrades : -1.0
+    _wrCol = _wr < 0 ? color.new(#94a3b8, 0) : _wr >= 70 ? color.new(#22c55e, 0) : _wr >= 50 ? color.new(#facc15, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 0, 13, "策略勝率", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 13, _wr < 0 ? "暫無交易" : str.tostring(math.round(_wr)) + "% (" + str.tostring(strategy.wintrades) + "/" + str.tostring(strategy.closedtrades) + ")", text_color=_wrCol, text_size=_fsz, text_halign=text.align_right)
+
+    table.cell(dash, 0, 14, "淨損益", text_color=color.white, text_size=_fsz)
+    _pnlCol = strategy.netprofit >= 0 ? color.new(#22c55e, 0) : color.new(#ef4444, 0)
+    table.cell(dash, 1, 14, str.tostring(strategy.netprofit, "#,##0.##"), text_color=_pnlCol, text_size=_fsz, text_halign=text.align_right)
+
+    _filterCol = _filteredPct >= 90 ? color.new(#ef4444, 0) : color.new(#94a3b8, 0)
+    table.cell(dash, 0, 15, "帶狀觸碰/濾網擋掉", text_color=color.white, text_size=_fsz)
+    table.cell(dash, 1, 15, str.tostring(_totalTouches) + "次 / 擋" + str.tostring(_totalFiltered) + "次(" + str.tostring(math.round(_filteredPct)) + "%)", text_color=_filterCol, text_size=_fsz, text_halign=text.align_right)
+
+// ══════════════════════════════════════════════════════════════════════════
+// 【回測建議流程，交給金融分析師/自己回測時可依此步驟調整】
+// 1. 先用預設設定(共振①②③全開、加速選項關閉、至少符合2/3)在目標商品/週期跑一次
+//    Strategy Tester，記錄「策略勝率」「淨損益」「交易次數」當基準線
+// 2. 若勝率比V2好但交易次數變太少(樣本數過小，例如少於30筆不太可信)，
+//    可把minConfluence降到1，用交易次數換取統計顯著性，同時持續追蹤勝率有沒有真的改善
+// 3. 若勝率仍不理想，逐一單獨關閉①Z-Score／②CCI／③SMC結構其中一項做A/B比較，
+//    找出哪個濾網對這個商品/週期真正有鑑別力；每個商品最佳組合不一定相同，勿憑感覺猜測
+// 4. 想更嚴格可個別開啟「Z-Score需同步加速」「CCI需同步加速」，代價是訊號會更少
+// 5. 開啟「顯示各濾網通過/未過標記」搭配「顯示共振濾網背景色」，肉眼核對濾網判斷是否
+//    符合預期，尤其結構濾網(structLen太大確認太慢會錯過時機、太小則容易被雜訊觸發)
+// 6. 依既定規則，回測勝率需達70%以上才建議推版上線；若怎麼調整都到不了，代表這個
+//    時框/商品可能不適合這套「帶狀觸碰」進場架構的天花板，考慮換週期或縮小適用商品範圍，
+//    而不是繼續加更多濾網硬凹
+// 7. 儀表板最下方新增「帶狀觸碰/濾網擋掉」統計：分子是原始帶狀觸碰次數，分母後面的
+//    「擋N次」是被①②③④或時段濾網擋掉沒進場的次數。如果擋掉比例長期超過90%，
+//    代表目前設定太嚴、真正進場的樣本數可能太小，回測結果的統計意義有限，此時應該
+//    優先考慮放寬minConfluence或關掉其中一項濾網，而不是照單全收70%這個高勝率數字
+// ══════════════════════════════════════════════════════════════════════════
+`;
+
 document.getElementById('scalp-code-v1').textContent = SCALP_BAND_V1;
 document.getElementById('scalp-code-v2').textContent = SCALP_BAND_V2;
+document.getElementById('scalp-code-v3').textContent = SCALP_BAND_V3;
 
 function copyScalpBand(btn, ver) {
-  const s = ver === 'v2' ? SCALP_BAND_V2 : SCALP_BAND_V1;
+  const s = ver === 'v3' ? SCALP_BAND_V3 : ver === 'v2' ? SCALP_BAND_V2 : SCALP_BAND_V1;
   navigator.clipboard.writeText(s).then(() => {
     btn.textContent = '✓ 已複製!';
     setTimeout(() => btn.textContent = '一鍵複製腳本', 1500);
