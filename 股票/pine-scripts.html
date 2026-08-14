@@ -16402,7 +16402,7 @@ volMaxPct = input.float(85, "ATR百分位超過多少視為過度波動(不利�
 // ========================= 交易時段濾網(可選) =========================
 grpSession = "交易時段濾網(可選，剝頭皮策略對流動性特別敏感)"
 useSession = input.bool(false, "啟用時段濾網", group=grpSession, tooltip="剝頭皮策略持倉極短，對點差/滑價特別敏感；冷門/低流動性時段(例如期貨的隔夜盤、假期前後)容易一進場就先吃一口滑價，直接侵蝕原本就不厚的獲利空間。預設關閉(維持24小時都可交易)，建議先確認實際交易商品的主力時段後再啟用")
-sessionStr = input.session("0930-1600", "允許交易時段(依圖表所在時區)", group=grpSession, tooltip="格式範例：0930-1600；只有在此時段內才會進場，時段外即使訊號成立也不會進場")
+sessionStr = input.session("0000-0000", "允許交易時段(依圖表所在時區)", group=grpSession, tooltip="預設0000-0000代表全日(24小時)不限時段；格式範例：0930-1600，只有在此時段內才會進場，時段外即使訊號成立也不會進場")
 inSession = not useSession or not na(time(timeframe.period, sessionStr))
 
 // ========================= 訊號顯示模式 =========================
