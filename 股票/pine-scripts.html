@@ -984,6 +984,7 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v3" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-13 四修：新增固定USD停損選項(預設$150)</b> — 使用者要求把停損直接設成固定150美元一筆，不想再依賴ATR動態換算。新增「停損計算方式」下拉選單（固定USD金額／ATR倍數，預設固定USD金額）與「固定USD停損金額」輸入(預設150)；固定USD模式會依「交易口數」跟商品的<code>syminfo.pointvalue</code>(每點價值)自動換算成對應的停損點數，例如ES每口每點值$50，1口時$150停損約等於3點，若把交易口數調成2口，同一個$150會自動換算成約1.5點，確保不管口數怎麼調，每筆最大虧損都固定在設定的USD金額；停利仍是「停損距離×R倍數」，所以停利點數會跟著新的停損距離一起等比例縮放，風報比不變；ATR倍數模式維持原本邏輯，可隨時切換回去<br>
           <span class="vl-dot">›</span> <b>2026-08-13 三修：改成cash_per_contract後Strategy Tester完全跑不出交易</b> — 上一版修正手續費模型時，順手把<code>default_qty_type</code>改成跟Unicorn一樣的<code>percent_of_equity=10</code>，但沒注意到Unicorn跟Scalping交易的商品/預設資金組合不同：Pine預設起始資金$1,000,000，10%只有$100,000，而ES這類期貨一口的名目價值換算下來動輒$37萬以上，10%資金換算出來的口數直接被無條件捨去成0口，導致entry()永遠以0口下單、Strategy Tester完全沒有任何交易紀錄（空白）。改成<code>default_qty_type=strategy.fixed</code>+新增可調整的「交易口數(合約數/股數)」輸入(預設1口)，不再受帳戶權益比例換算影響，商品價格再貴也一定會以固定口數成交<br>
           <span class="vl-dot">›</span> <b>2026-08-13 再修正：手續費模型設錯，導致命中TP的單還是倒虧</b> — 使用者實際回測ES1!(1分K，2026/8/3-8/13，114筆進出場)後回報「勝率太低」，交易紀錄顯示57筆交易只有11筆淨賺(~19%勝率)，且89%的單是逾時出場；追查發現關鍵證據：第52筆交易明確觸發TP停利、價格最大有利波動達$969.56，但淨利卻是-$60.84，因為單筆手續費高達$310.84。根因是V1/V2/V3從頭到尾都沿用<code>commission_type=percent, commission_value=0.02</code>（手續費算合約名目價值的0.02%）搭配<code>default_qty_type=percent_of_equity, default_qty_value=100</code>（每筆都用全部資金去換算合約口數），在期貨大合約上換算出單筆來回手續費高達$300+，跟策略設計「1-2根K棒賺幾點」的獲利目標完全不成比例，導致大量原本會小賺的單被手續費吃成小賠，拖累勝率——這跟①②③④共振濾網或訊號品質完全無關。已比照本網站Unicorn V13/V14已驗證過的正確設定，改為<code>commission_type=cash_per_contract, commission_value=0.75</code>（每口固定收$0.75，符合真實期貨手續費行情）+ <code>default_qty_value=10</code>（只用10%資金算口數，不是全押），單筆來回手續費從$300+降到幾塊錢，請重新貼上腳本、重新回測比較<br>
           <span class="vl-dot">›</span> <b>2026-08-13：V3 新增多重技術面共振濾網，目標提升勝率 + 修正「連續兩個Open」根因bug</b> — 使用者反映有時候會連續出現兩個Open標籤中間沒有Close，且希望在單純帶狀觸碰之外加入其他技術分析輔助判斷。根因調查發現：緊急ATR停損由broker端執行，腳本要等「觸發後的下一根K棒」才偵測得到並補畫出場標籤；原本V2執行順序是「先檢查新進場→才處理補標」，如果偵測補標的那根K棒同時又符合新進場條件，補標邏輯會誤用「這根K棒剛設定好的新倉位」entryPrice/entryBar去畫「上一筆」的出場標籤，導致標籤內容錯亂、且跟新Open標籤疊在同一根K棒、價位又接近，看起來像「連續兩個Open」。已改成「先處理補標(用舊倉位正確資料)→才檢查新進場」，且補標時同步更新lastExitBar，讓再進場冷卻機制對broker端停損也生效<br>
@@ -14934,7 +14935,7 @@ const VERSION_DEFS = {
   scalping: [
     { key: 's_v1', date: '2026-08-08', sub: 'V1：SMA帶狀剝頭皮首版，含全客製化訊號/儀表板/標籤清理等歷次修正', contentId: 'scalp-panel-v1', logId: 'scalp-log-v1' },
     { key: 's_v2', date: '2026-08-11', sub: 'V2：修正標籤批次清理誤刪新標籤、同根K棒進出場標籤疊圖、緊急停損補標位置、儀表板TP顯示', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
-    { key: 's_v3', date: '2026-08-13', sub: 'V3：新增共振濾網、修正連續兩個Open根因bug；再修正手續費模型(percent→cash_per_contract)避免命中TP還倒虧', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
+    { key: 's_v3', date: '2026-08-13', sub: 'V3：新增共振濾網/修正連續兩個Open根因bug/修正手續費模型/固定口數下單/新增固定USD停損(預設$150)', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
   ]
 };
 const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs', scalping: 'scalp-vtabs' };
@@ -16444,9 +16445,11 @@ useSlopeExit   = input.bool(true, "SMA轉向時停損出場", group=grpExit)
 tpRMultiple    = input.float(1.5, "停利R倍數(相對於停損距離)", minval=0.5, step=0.25, group=grpExit, tooltip="停利改用「進場價+風險距離(緊急停損ATR距離)×此倍數」計算，直接控制風報比，不再依賴帶狀寬度決定")
 
 grpRisk          = "額外安全網(原文未提及)"
-useEmergencyStop = input.bool(true, "啟用緊急ATR停損", group=grpRisk, tooltip="以進場價±ATR×倍數當作硬停損，避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，腳本會自動偵測並補畫對應的出場提示字/alert，Strategy Tester交易紀錄會標註「緊急ATR停損」）")
-emergencyAtrLen  = input.int(14, "緊急停損ATR週期", minval=5, group=grpRisk)
-emergencyAtrMult = input.float(1.5, "緊急停損ATR倍數", minval=0.5, step=0.25, group=grpRisk)
+useEmergencyStop = input.bool(true, "啟用緊急停損", group=grpRisk, tooltip="避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，腳本會自動偵測並補畫對應的出場提示字/alert，Strategy Tester交易紀錄會標註對應原因）")
+stopMode = input.string("固定USD金額", "停損計算方式", options=["固定USD金額", "ATR倍數"], group=grpRisk, tooltip="固定USD金額：不管進場價位/波動度多少，這筆單虧損達到設定金額就停損，金額是以下方「交易口數」換算，口數越多換算的停損點數會自動縮小以維持同樣USD風險；ATR倍數：依當下波動度動態調整停損距離(原V1/V2邏輯)")
+stopUSD          = input.float(150, "固定USD停損金額(每筆)", minval=1, group=grpRisk, tooltip="例如ES每口每點值$50，交易口數=1時，停損$150約等於3點；口數改成2口時，同樣$150風險會自動換算成約1.5點，維持每筆最多虧$150的目標不變")
+emergencyAtrLen  = input.int(14, "緊急停損ATR週期(僅ATR倍數模式適用)", minval=5, group=grpRisk)
+emergencyAtrMult = input.float(1.5, "緊急停損ATR倍數(僅ATR倍數模式適用)", minval=0.5, step=0.25, group=grpRisk)
 
 // ========================= 顯示設定 =========================
 grpDisp   = "顯示設定"
@@ -16479,6 +16482,9 @@ smaTrend = ta.sma(close, smaLen)
 highMA   = ta.sma(high, bandLen)
 lowMA    = ta.sma(low, bandLen)
 _atrEmg  = ta.atr(emergencyAtrLen)
+_pointVal    = syminfo.pointvalue != 0 ? syminfo.pointvalue : 1
+_usdStopDist = stopUSD / (contractQty * _pointVal)
+_stopDist    = stopMode == "固定USD金額" ? _usdStopDist : _atrEmg * emergencyAtrMult
 
 smaSlopePct = (smaTrend - smaTrend[slopeLook]) / smaTrend[slopeLook] * 100
 
@@ -16635,12 +16641,12 @@ if longCond and barstate.isconfirmed
     strategy.entry("Long", strategy.long, qty=contractQty)
     entryBar      := bar_index
     entryPrice    := close
-    emergencyStop := close - _atrEmg * emergencyAtrMult
-    tpPrice       := close + (_atrEmg * emergencyAtrMult) * tpRMultiple
+    emergencyStop := close - _stopDist
+    tpPrice       := close + _stopDist * tpRMultiple
     lastEntryPrice := close
     lastEntryDir   := 1
     if useEmergencyStop
-        strategy.exit("LongEmg", "Long", stop=emergencyStop, comment="緊急ATR停損")
+        strategy.exit("LongEmg", "Long", stop=emergencyStop, comment=stopMode == "固定USD金額" ? "固定USD停損" : "緊急ATR停損")
     _labelMsg = "Open " + str.tostring(close, "#.#")
     _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
     _alertMsg = timeframe.period + "→" + longEntryText + " " + str.tostring(close, "#.#") + "\\n(" + str.tostring(highMA, "#.#") + "-" + _slVal + ") 共振" + str.tostring(confLongScore) + "/3"
@@ -16652,12 +16658,12 @@ if shortCond and barstate.isconfirmed
     strategy.entry("Short", strategy.short, qty=contractQty)
     entryBar      := bar_index
     entryPrice    := close
-    emergencyStop := close + _atrEmg * emergencyAtrMult
-    tpPrice       := close - (_atrEmg * emergencyAtrMult) * tpRMultiple
+    emergencyStop := close + _stopDist
+    tpPrice       := close - _stopDist * tpRMultiple
     lastEntryPrice := close
     lastEntryDir   := -1
     if useEmergencyStop
-        strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment="緊急ATR停損")
+        strategy.exit("ShortEmg", "Short", stop=emergencyStop, comment=stopMode == "固定USD金額" ? "固定USD停損" : "緊急ATR停損")
     _labelMsg = "Open " + str.tostring(close, "#.#")
     _slVal = useEmergencyStop ? str.tostring(emergencyStop, "#.#") : "SMA轉向"
     _alertMsg = timeframe.period + "→" + shortEntryText + " " + str.tostring(close, "#.#") + "\\n(" + str.tostring(lowMA, "#.#") + "-" + _slVal + ") 共振" + str.tostring(confShortScore) + "/3"
