@@ -984,6 +984,7 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v3" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-15 五修：①②Z-Score/CCI濾網改用真正的強訊號門檻，不再只看正負號</b> — 使用者實測ES1!歷經7種參數組合(停利倍數1.0~2.0、K棒數2~5、minConfluence 2~3)，完整8週資料回測結果全部獲利因子低於1(0.692~0.888)，其中一次看似轉正(獲利因子1.084)的組合，事後用完整期間重測後證實只是8天30筆小樣本的運氣、且該組合(K棒數5)還會在特定週五進場單上撐過整個週末、被跳空咬穿固定停損(單筆實際虧損$976.5，遠超設定的$150)，已排除。追查後發現①②濾網原本的判斷邏輯是「Z-Score/CCI剛跨過0軸就算通過」，統計上跟丟硬幣沒兩樣，鑑別力太弱，硬要湊齊幾個弱訊號一起同意(minConfluence)也證實沒用(3項全同意比2項還差)。本次改成需要超過有意義的門檻才算數：新增「Z-Score門檻」(預設1.0，可調，原版VQZL常用1.64/1.96/2.58標準差門檻)、「CCI門檻」(預設100，傳統CCI交易法的標準動能門檻)，做多需Z-Score>門檻、CCI>門檻，做空則是負向對稱；③SMC結構濾網、④波動度濾網邏輯不變<br>
           <span class="vl-dot">›</span> <b>2026-08-13 四修：新增固定USD停損選項(預設$150)</b> — 使用者要求把停損直接設成固定150美元一筆，不想再依賴ATR動態換算。新增「停損計算方式」下拉選單（固定USD金額／ATR倍數，預設固定USD金額）與「固定USD停損金額」輸入(預設150)；固定USD模式會依「交易口數」跟商品的<code>syminfo.pointvalue</code>(每點價值)自動換算成對應的停損點數，例如ES每口每點值$50，1口時$150停損約等於3點，若把交易口數調成2口，同一個$150會自動換算成約1.5點，確保不管口數怎麼調，每筆最大虧損都固定在設定的USD金額；停利仍是「停損距離×R倍數」，所以停利點數會跟著新的停損距離一起等比例縮放，風報比不變；ATR倍數模式維持原本邏輯，可隨時切換回去<br>
           <span class="vl-dot">›</span> <b>2026-08-13 三修：改成cash_per_contract後Strategy Tester完全跑不出交易</b> — 上一版修正手續費模型時，順手把<code>default_qty_type</code>改成跟Unicorn一樣的<code>percent_of_equity=10</code>，但沒注意到Unicorn跟Scalping交易的商品/預設資金組合不同：Pine預設起始資金$1,000,000，10%只有$100,000，而ES這類期貨一口的名目價值換算下來動輒$37萬以上，10%資金換算出來的口數直接被無條件捨去成0口，導致entry()永遠以0口下單、Strategy Tester完全沒有任何交易紀錄（空白）。改成<code>default_qty_type=strategy.fixed</code>+新增可調整的「交易口數(合約數/股數)」輸入(預設1口)，不再受帳戶權益比例換算影響，商品價格再貴也一定會以固定口數成交<br>
           <span class="vl-dot">›</span> <b>2026-08-13 再修正：手續費模型設錯，導致命中TP的單還是倒虧</b> — 使用者實際回測ES1!(1分K，2026/8/3-8/13，114筆進出場)後回報「勝率太低」，交易紀錄顯示57筆交易只有11筆淨賺(~19%勝率)，且89%的單是逾時出場；追查發現關鍵證據：第52筆交易明確觸發TP停利、價格最大有利波動達$969.56，但淨利卻是-$60.84，因為單筆手續費高達$310.84。根因是V1/V2/V3從頭到尾都沿用<code>commission_type=percent, commission_value=0.02</code>（手續費算合約名目價值的0.02%）搭配<code>default_qty_type=percent_of_equity, default_qty_value=100</code>（每筆都用全部資金去換算合約口數），在期貨大合約上換算出單筆來回手續費高達$300+，跟策略設計「1-2根K棒賺幾點」的獲利目標完全不成比例，導致大量原本會小賺的單被手續費吃成小賠，拖累勝率——這跟①②③④共振濾網或訊號品質完全無關。已比照本網站Unicorn V13/V14已驗證過的正確設定，改為<code>commission_type=cash_per_contract, commission_value=0.75</code>（每口固定收$0.75，符合真實期貨手續費行情）+ <code>default_qty_value=10</code>（只用10%資金算口數，不是全押），單筆來回手續費從$300+降到幾塊錢，請重新貼上腳本、重新回測比較<br>
@@ -14935,7 +14936,7 @@ const VERSION_DEFS = {
   scalping: [
     { key: 's_v1', date: '2026-08-08', sub: 'V1：SMA帶狀剝頭皮首版，含全客製化訊號/儀表板/標籤清理等歷次修正', contentId: 'scalp-panel-v1', logId: 'scalp-log-v1' },
     { key: 's_v2', date: '2026-08-11', sub: 'V2：修正標籤批次清理誤刪新標籤、同根K棒進出場標籤疊圖、緊急停損補標位置、儀表板TP顯示', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
-    { key: 's_v3', date: '2026-08-13', sub: 'V3：新增共振濾網/修正連續兩個Open根因bug/修正手續費模型/固定口數下單/新增固定USD停損(預設$150)', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
+    { key: 's_v3', date: '2026-08-15', sub: 'V3：Z-Score/CCI改用強訊號門檻(非只看正負號)，修正連續兩個Open根因bug，新增固定USD停損', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
   ]
 };
 const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs', scalping: 'scalp-vtabs' };
@@ -16380,15 +16381,17 @@ bandLen = input.int(2, "高/低價移動平均週期", minval=1, group=grpBand, 
 
 // ========================= 多重技術面共振濾網(V3新增) =========================
 grpConf = "多重技術面共振濾網(V3新增)"
-useZScore  = input.bool(true, "①啟用 Z-Score動能濾網", group=grpConf, tooltip="改寫自VQZL指標，衡量價格波動的標準化動能強度；做多要求Z-Score>0(動能偏多)，做空要求Z-Score<0(動能偏空)")
+useZScore  = input.bool(true, "①啟用 Z-Score動能濾網", group=grpConf, tooltip="改寫自VQZL指標，衡量價格波動的標準化動能強度；做多要求Z-Score>門檻(動能偏多)，做空要求Z-Score<-門檻(動能偏空)")
 zSmoothLen = input.int(15, "Z-Score價格平滑週期(EMA)", minval=1, group=grpConf, tooltip="原版VQZL可選30種MA類型，為控制腳本複雜度固定用EMA平滑")
 zLen       = input.int(100, "Z-Score標準差計算週期", minval=10, group=grpConf)
+zThreshold = input.float(1.0, "Z-Score門檻(絕對值)", minval=0, step=0.1, group=grpConf, tooltip="原本只要Z-Score剛跨過0軸就算通過，等於雜訊也算數；改成需要超過這個門檻(做多>+門檻、做空<-門檻)才算真正動能訊號，數字越大越嚴格。原版VQZL指標常用1.64(90%信心)/1.96(95%信心)/2.58(99%信心)當標準差門檻，可參考")
 
-useZTrend  = input.bool(false, "Z-Score需同步加速(非只看正負號)", group=grpConf, tooltip="開啟後除了Z-Score>0/<0，還要求Z-Score本身正在上升(做多)/下降(做空)，代表動能不是偏多/偏空就好、還要正在增強，更嚴格但訊號更少，預設關閉")
+useZTrend  = input.bool(false, "Z-Score需同步加速(非只看正負號)", group=grpConf, tooltip="開啟後除了Z-Score超過門檻，還要求Z-Score本身正在上升(做多)/下降(做空)，代表動能不是偏多/偏空就好、還要正在增強，更嚴格但訊號更少，預設關閉")
 
-useCCI = input.bool(true, "②啟用 CCI動量濾網", group=grpConf, tooltip="商品通道指標，衡量價格偏離均值的程度；做多要求CCI>0，做空要求CCI<0")
+useCCI = input.bool(true, "②啟用 CCI動量濾網", group=grpConf, tooltip="商品通道指標，衡量價格偏離均值的程度；做多要求CCI>門檻，做空要求CCI<-門檻")
 cciLen = input.int(20, "CCI週期", minval=1, group=grpConf)
-useCCITrend = input.bool(false, "CCI需同步加速(非只看正負號)", group=grpConf, tooltip="開啟後除了CCI>0/<0，還要求CCI本身正在上升(做多)/下降(做空)，預設關閉")
+cciThreshold = input.float(100, "CCI門檻(絕對值)", minval=0, step=10, group=grpConf, tooltip="傳統CCI交易法把±100當作真正動能訊號的門檻，不是0；原本只要CCI剛跨過0軸就算通過太寬鬆，改成需要超過這個門檻(做多>+門檻、做空<-門檻)才算數")
+useCCITrend = input.bool(false, "CCI需同步加速(非只看正負號)", group=grpConf, tooltip="開啟後除了CCI超過門檻，還要求CCI本身正在上升(做多)/下降(做空)，預設關閉")
 
 useStructure = input.bool(true, "③啟用 SMC市場結構濾網", group=grpConf, tooltip="用樞紐高/低點判斷近期市場結構(higher high+higher low=偏多結構，lower high+lower low=偏空結構)；結構方向須與訊號方向一致")
 structLen = input.int(5, "結構樞紐點左右確認K棒數", minval=2, group=grpConf, tooltip="樞紐點需左右各structLen根K棒都沒有更高/更低價才算確認，數字越大結構越穩定但確認越慢(會延遲)")
@@ -16535,10 +16538,10 @@ structBullish = not na(lastPH) and not na(prevPH) and not na(lastPL) and not na(
 structBearish = not na(lastPH) and not na(prevPH) and not na(lastPL) and not na(prevPL) and lastPH < prevPH and lastPL < prevPL
 
 // ========================= 共振濾網加總計分 =========================
-_zLongOk    = useZScore    and zScore > 0   and (not useZTrend   or zScore > zScore[1])
-_zShortOk   = useZScore    and zScore < 0   and (not useZTrend   or zScore < zScore[1])
-_cciLongOk  = useCCI       and cciVal > 0   and (not useCCITrend or cciVal > cciVal[1])
-_cciShortOk = useCCI       and cciVal < 0   and (not useCCITrend or cciVal < cciVal[1])
+_zLongOk    = useZScore    and zScore > zThreshold      and (not useZTrend   or zScore > zScore[1])
+_zShortOk   = useZScore    and zScore < -zThreshold     and (not useZTrend   or zScore < zScore[1])
+_cciLongOk  = useCCI       and cciVal > cciThreshold     and (not useCCITrend or cciVal > cciVal[1])
+_cciShortOk = useCCI       and cciVal < -cciThreshold    and (not useCCITrend or cciVal < cciVal[1])
 _stLongOk   = useStructure and structBullish
 _stShortOk  = useStructure and structBearish
 
