@@ -984,6 +984,7 @@ if showDash and barstate.islast
       </div>
       <div class="ver-main">
         <div id="scalp-log-v3" class="ver-log">
+          <span class="vl-dot">›</span> <b>2026-08-15 七修：新增固定USD停利選項</b> — 停利原本只有「停損距離×R倍數」一種算法，現在跟停損一樣新增「停利計算方式」下拉選單(固定USD金額／R倍數)，預設固定USD金額，新增「固定USD停利金額」輸入(預設225=原本停損$150×1.5倍，維持跟舊版相同的起始風報比)；固定USD模式下同樣會依「交易口數」跟商品點值自動換算成對應點數，口數越多換算點數越小、每筆最大獲利目標維持設定的USD金額不變。R倍數模式維持原邏輯(停利=停損距離×倍數)，兩種模式可自由切換<br>
           <span class="vl-dot">›</span> <b>2026-08-15 六修：所有設定欄位加上實測數據當說明，Z/CCI門檻預設值改回0</b> — 實測發現「Z-Score需同步加速」「CCI需同步加速」這兩個選項預設沒關好、測試時意外被打開，可能混淆了部分測試結果的解讀；藉此機會把①②③④、停利倍數、K棒數、minConfluence等關鍵設定的tooltip全部補上目前為止的實測獲利因子數據，方便之後調整時直接在設定選單看到「這個值目前測起來好不好」，不用回頭翻對話紀錄。同時把Z-Score門檻、CCI門檻的預設值從1.0/100改回0，因為目前證據顯示0(寬鬆判斷)的表現一路都優於拉高門檻，避免使用者一開始就套用測試證實較差的預設值<br>
           <span class="vl-dot">›</span> <b>2026-08-15 五修：①②Z-Score/CCI濾網改用真正的強訊號門檻，不再只看正負號</b> — 使用者實測ES1!歷經7種參數組合(停利倍數1.0~2.0、K棒數2~5、minConfluence 2~3)，完整8週資料回測結果全部獲利因子低於1(0.692~0.888)，其中一次看似轉正(獲利因子1.084)的組合，事後用完整期間重測後證實只是8天30筆小樣本的運氣、且該組合(K棒數5)還會在特定週五進場單上撐過整個週末、被跳空咬穿固定停損(單筆實際虧損$976.5，遠超設定的$150)，已排除。追查後發現①②濾網原本的判斷邏輯是「Z-Score/CCI剛跨過0軸就算通過」，統計上跟丟硬幣沒兩樣，鑑別力太弱，硬要湊齊幾個弱訊號一起同意(minConfluence)也證實沒用(3項全同意比2項還差)。本次改成需要超過有意義的門檻才算數：新增「Z-Score門檻」(預設1.0，可調，原版VQZL常用1.64/1.96/2.58標準差門檻)、「CCI門檻」(預設100，傳統CCI交易法的標準動能門檻)，做多需Z-Score>門檻、CCI>門檻，做空則是負向對稱；③SMC結構濾網、④波動度濾網邏輯不變<br>
           <span class="vl-dot">›</span> <b>2026-08-13 四修：新增固定USD停損選項(預設$150)</b> — 使用者要求把停損直接設成固定150美元一筆，不想再依賴ATR動態換算。新增「停損計算方式」下拉選單（固定USD金額／ATR倍數，預設固定USD金額）與「固定USD停損金額」輸入(預設150)；固定USD模式會依「交易口數」跟商品的<code>syminfo.pointvalue</code>(每點價值)自動換算成對應的停損點數，例如ES每口每點值$50，1口時$150停損約等於3點，若把交易口數調成2口，同一個$150會自動換算成約1.5點，確保不管口數怎麼調，每筆最大虧損都固定在設定的USD金額；停利仍是「停損距離×R倍數」，所以停利點數會跟著新的停損距離一起等比例縮放，風報比不變；ATR倍數模式維持原本邏輯，可隨時切換回去<br>
@@ -14937,7 +14938,7 @@ const VERSION_DEFS = {
   scalping: [
     { key: 's_v1', date: '2026-08-08', sub: 'V1：SMA帶狀剝頭皮首版，含全客製化訊號/儀表板/標籤清理等歷次修正', contentId: 'scalp-panel-v1', logId: 'scalp-log-v1' },
     { key: 's_v2', date: '2026-08-11', sub: 'V2：修正標籤批次清理誤刪新標籤、同根K棒進出場標籤疊圖、緊急停損補標位置、儀表板TP顯示', contentId: 'scalp-panel-v2', logId: 'scalp-log-v2' },
-    { key: 's_v3', date: '2026-08-15', sub: 'V3：Z-Score/CCI改用強訊號門檻(非只看正負號)，修正連續兩個Open根因bug，新增固定USD停損', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
+    { key: 's_v3', date: '2026-08-15', sub: 'V3：新增固定USD停利/停損可分別設定，Z-Score/CCI改用強訊號門檻，修正連續兩個Open根因bug', contentId: 'scalp-panel-v3', logId: 'scalp-log-v3' },
   ]
 };
 const VER_VTABS_ID = { unicorn: 'unicorn-vtabs', dashboard: 'dash-vtabs', scalping: 'scalp-vtabs' };
@@ -16446,7 +16447,9 @@ grpExit        = "進出場設定"
 maxBarsInTrade = input.int(2, "最大持倉K棒數(逾時強制出場)", minval=1, group=grpExit, tooltip="原文強調1-2根K棒內完成交易，逾時未達停利則直接出場。實測：2根獲利因子0.887(最佳)，拉到3根掉到0.881，拉到4-5根掉到0.741~0.756，而且5根還會讓週五進場的單有機會撐過整個週末、被跳空咬穿固定停損(實測過單筆虧損比設定的停損金額多6倍以上)。目前證據顯示維持2根最安全也最好，不建議拉長")
 contractQty    = input.int(1, "交易口數(合約數/股數)", minval=1, group=grpExit, tooltip="固定口數下單，不受帳戶權益%換算影響；用percent_of_equity在ES/NQ這類大合約商品上，換算出的口數常常不到1口導致完全不會成交，改用固定口數避免這個問題")
 useSlopeExit   = input.bool(true, "SMA轉向時停損出場", group=grpExit)
-tpRMultiple    = input.float(1.5, "停利R倍數(相對於停損距離)", minval=0.5, step=0.25, group=grpExit, tooltip="停利改用「進場價+風險距離(緊急停損ATR距離)×此倍數」計算，直接控制風報比，不再依賴帶狀寬度決定。實測：1.0倍獲利因子0.888、1.5倍0.887(兩者統計上沒差)，拉到1.75倍掉到0.881，2.0倍掉到0.741~0.756。目前證據顯示1.0~1.5倍最好，拉遠停利目標沒有幫助")
+tpMode = input.string("固定USD金額", "停利計算方式", options=["固定USD金額", "R倍數(相對於停損距離)"], group=grpExit, tooltip="固定USD金額：不管停損距離多少，這筆單獲利達到設定金額就停利，換算邏輯跟停損的「固定USD金額」模式一樣，會依「交易口數」自動換算成對應點數；R倍數：停利=停損距離×倍數(原V3邏輯，停損距離改變時停利會跟著等比例縮放)")
+tpUSD          = input.float(225, "固定USD停利金額(每筆)", minval=1, group=grpExit, tooltip="僅「固定USD金額」模式適用。預設225 = 停損$150×1.5倍，維持跟R倍數模式相同的風報比當起點，可自行調整")
+tpRMultiple    = input.float(1.5, "停利R倍數(相對於停損距離)", minval=0.5, step=0.25, group=grpExit, tooltip="僅「R倍數」模式適用。停利=停損距離(緊急停損ATR距離或固定USD換算後的點數)×此倍數。實測：1.0倍獲利因子0.888、1.5倍0.887(兩者統計上沒差)，拉到1.75倍掉到0.881，2.0倍掉到0.741~0.756。目前證據顯示1.0~1.5倍最好，拉遠停利目標沒有幫助")
 
 grpRisk          = "額外安全網(原文未提及)"
 useEmergencyStop = input.bool(true, "啟用緊急停損", group=grpRisk, tooltip="避免單根K棒劇烈反向、SMA轉向判斷來不及反應時虧損失控（此停損由TradingView broker端執行，腳本會自動偵測並補畫對應的出場提示字/alert，Strategy Tester交易紀錄會標註對應原因）")
@@ -16489,6 +16492,8 @@ _atrEmg  = ta.atr(emergencyAtrLen)
 _pointVal    = syminfo.pointvalue != 0 ? syminfo.pointvalue : 1
 _usdStopDist = stopUSD / (contractQty * _pointVal)
 _stopDist    = stopMode == "固定USD金額" ? _usdStopDist : _atrEmg * emergencyAtrMult
+_usdTpDist   = tpUSD / (contractQty * _pointVal)
+_tpDist      = tpMode == "固定USD金額" ? _usdTpDist : _stopDist * tpRMultiple
 
 smaSlopePct = (smaTrend - smaTrend[slopeLook]) / smaTrend[slopeLook] * 100
 
@@ -16646,7 +16651,7 @@ if longCond and barstate.isconfirmed
     entryBar      := bar_index
     entryPrice    := close
     emergencyStop := close - _stopDist
-    tpPrice       := close + _stopDist * tpRMultiple
+    tpPrice       := close + _tpDist
     lastEntryPrice := close
     lastEntryDir   := 1
     if useEmergencyStop
@@ -16663,7 +16668,7 @@ if shortCond and barstate.isconfirmed
     entryBar      := bar_index
     entryPrice    := close
     emergencyStop := close + _stopDist
-    tpPrice       := close - _stopDist * tpRMultiple
+    tpPrice       := close - _tpDist
     lastEntryPrice := close
     lastEntryDir   := -1
     if useEmergencyStop
